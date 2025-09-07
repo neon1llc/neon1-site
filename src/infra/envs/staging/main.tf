@@ -20,8 +20,7 @@ provider "aws" {
 }
 
 module "site" {
-  source    = "../../modules/static-site"
-  providers = { aws = aws, aws.us_east_1 = aws.us_east_1 }
+  source = "../../modules/static-site"
 
   project = var.project
   env     = var.env
