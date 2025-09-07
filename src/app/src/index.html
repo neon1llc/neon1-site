@@ -1204,64 +1204,180 @@
                 requestAnimationFrame(draw);
             })();
         </script>
-    
+
         <!-- neon1-site :: Neo modal (self-contained) -->
-        <div id="neo-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999;">
-          <div style="max-width:720px; height:70vh; margin:5vh auto; background:#0b0b0b; color:#eaeaea; border-radius:12px; display:flex; flex-direction:column; box-shadow:0 10px 40px rgba(0,0,0,0.5);">
-            <div style="padding:12px 16px; border-bottom:1px solid #222; display:flex; justify-content:space-between; align-items:center;">
-              <strong>Neo</strong>
-              <button id="neo-close" aria-label="Close Neo chat" style="background:#222; color:#eee; border:0; padding:6px 10px; border-radius:8px; cursor:pointer;">Close</button>
+        <div
+            id="neo-modal"
+            style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); z-index: 9999"
+        >
+            <div
+                style="
+                    max-width: 720px;
+                    height: 70vh;
+                    margin: 5vh auto;
+                    background: #0b0b0b;
+                    color: #eaeaea;
+                    border-radius: 12px;
+                    display: flex;
+                    flex-direction: column;
+                    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+                "
+            >
+                <div
+                    style="
+                        padding: 12px 16px;
+                        border-bottom: 1px solid #222;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    "
+                >
+                    <strong>Neo</strong>
+                    <button
+                        id="neo-close"
+                        aria-label="Close Neo chat"
+                        style="
+                            background: #222;
+                            color: #eee;
+                            border: 0;
+                            padding: 6px 10px;
+                            border-radius: 8px;
+                            cursor: pointer;
+                        "
+                    >
+                        Close
+                    </button>
+                </div>
+                <div
+                    id="neo-feed"
+                    style="flex: 1; overflow: auto; padding: 16px; font-family: system-ui, sans-serif"
+                ></div>
+                <form id="neo-form" style="display: flex; gap: 8px; padding: 12px; border-top: 1px solid #222">
+                    <input
+                        id="neo-input"
+                        autocomplete="off"
+                        placeholder="Ask Neo anything..."
+                        style="
+                            flex: 1;
+                            padding: 10px;
+                            border-radius: 8px;
+                            border: 1px solid #333;
+                            background: #111;
+                            color: #fff;
+                        "
+                    />
+                    <button
+                        id="neo-send"
+                        type="submit"
+                        style="
+                            padding: 10px 14px;
+                            border-radius: 8px;
+                            border: 0;
+                            background: #2d6cdf;
+                            color: #fff;
+                            cursor: pointer;
+                        "
+                    >
+                        Send
+                    </button>
+                </form>
             </div>
-            <div id="neo-feed" style="flex:1; overflow:auto; padding:16px; font-family:system-ui, sans-serif;"></div>
-            <form id="neo-form" style="display:flex; gap:8px; padding:12px; border-top:1px solid #222;">
-              <input id="neo-input" autocomplete="off" placeholder="Ask Neo anything..." style="flex:1; padding:10px; border-radius:8px; border:1px solid #333; background:#111; color:#fff;">
-              <button id="neo-send" type="submit" style="padding:10px 14px; border-radius:8px; border:0; background:#2d6cdf; color:#fff; cursor:pointer;">Send</button>
-            </form>
-          </div>
         </div>
-        
 
         <!-- neon1-site :: Neo chat script -->
         <script src="/neo-config.js"></script>
         <script>
-        const $ = (sel) => document.querySelector(sel);
-        const NEO_SESSION_KEY = "neo_session_id";
-        const neoSessionId = localStorage.getItem(NEO_SESSION_KEY) || (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()));
-        localStorage.setItem(NEO_SESSION_KEY, neoSessionId);
-        const neoModal = document.getElementById("neo-modal");
-        const neoOpen = () => { neoModal.style.display = "block"; setTimeout(()=> $("#neo-input")?.focus(), 0); };
-        const neoClose = () => { neoModal.style.display = "none"; };
-        document.addEventListener("click", (e) => { if (e.target.id === "neo-close" || e.target === neoModal) neoClose(); });
-        document.addEventListener("keydown", (e) => { if (e.ctrlKey && e.key === "/") { neoOpen(); e.preventDefault(); } if (e.key === "Escape" && neoModal.style.display === "block") neoClose(); });
-        document.addEventListener("click", (e) => { const t = e.target.closest("[data-open-neo]"); if (t) { neoOpen(); e.preventDefault(); } });
-        const feed = $("#neo-feed");
-        function pushMessage(role, text) {
-          const div = document.createElement("div");
-          div.style.margin = "8px 0"; div.style.whiteSpace = "pre-wrap";
-          div.innerHTML = role === "user" ? "<strong style=\"color:#91c9ff\">You:</strong> " + escapeHtml(text)
-                                          : "<strong style=\"color:#8af\">Neo:</strong> " + escapeHtml(text);
-          feed.appendChild(div); feed.scrollTop = feed.scrollHeight;
-        }
-        function escapeHtml(s) { return s.replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[m])); }
-        const form = $("#neo-form");
-        form?.addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const input = $("#neo-input");
-          const message = (input?.value || "").trim(); if (!message) return;
-          pushMessage("user", message); input.value = "";
-          const url = (window.NEO_CHAT_API || "").toString();
-          if (!url) { pushMessage("assistant", "Backend not configured. Ask someone to set NEO_CHAT_API."); return; }
-          try {
-            const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message, sessionId: neoSessionId }) });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || "Request failed");
-            pushMessage("assistant", data.reply || "(no reply)");
-          } catch (err) {
-            pushMessage("assistant", "Error: " + (err?.message || String(err)));
-          }
-        });
+            const $ = (sel) => document.querySelector(sel);
+            const NEO_SESSION_KEY = "neo_session_id";
+            const neoSessionId =
+                localStorage.getItem(NEO_SESSION_KEY) || (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()));
+            localStorage.setItem(NEO_SESSION_KEY, neoSessionId);
+            const neoModal = document.getElementById("neo-modal");
+            const neoOpen = () => {
+                neoModal.style.display = "block";
+                setTimeout(() => $("#neo-input")?.focus(), 0);
+            };
+            const neoClose = () => {
+                neoModal.style.display = "none";
+            };
+            document.addEventListener("click", (e) => {
+                if (e.target.id === "neo-close" || e.target === neoModal) neoClose();
+            });
+            document.addEventListener("keydown", (e) => {
+                if (e.ctrlKey && e.key === "/") {
+                    neoOpen();
+                    e.preventDefault();
+                }
+                if (e.key === "Escape" && neoModal.style.display === "block") neoClose();
+            });
+            document.addEventListener("click", (e) => {
+                const t = e.target.closest("[data-open-neo]");
+                if (t) {
+                    neoOpen();
+                    e.preventDefault();
+                }
+            });
+            const feed = $("#neo-feed");
+            function pushMessage(role, text) {
+                const div = document.createElement("div");
+                div.style.margin = "8px 0";
+                div.style.whiteSpace = "pre-wrap";
+                div.innerHTML =
+                    role === "user"
+                        ? '<strong style="color:#91c9ff">You:</strong> ' + escapeHtml(text)
+                        : '<strong style="color:#8af">Neo:</strong> ' + escapeHtml(text);
+                feed.appendChild(div);
+                feed.scrollTop = feed.scrollHeight;
+            }
+            function escapeHtml(s) {
+                return s.replace(
+                    /[&<>"']/g,
+                    (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m])
+                );
+            }
+            const form = $("#neo-form");
+            form?.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const input = $("#neo-input");
+                const message = (input?.value || "").trim();
+                if (!message) return;
+                pushMessage("user", message);
+                input.value = "";
+                const url = (window.NEO_CHAT_API || "").toString();
+                if (!url) {
+                    pushMessage("assistant", "Backend not configured. Ask someone to set NEO_CHAT_API.");
+                    return;
+                }
+                try {
+                    const res = await fetch(url, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ message, sessionId: neoSessionId }),
+                    });
+                    const data = await res.json();
+                    if (!res.ok) throw new Error(data.error || "Request failed");
+                    pushMessage("assistant", data.reply || "(no reply)");
+                } catch (err) {
+                    pushMessage("assistant", "Error: " + (err?.message || String(err)));
+                }
+            });
         </script>
-        <button data-open-neo style="position:fixed; right:16px; bottom:16px; z-index:9998; padding:10px 12px; border-radius:999px; border:0; background:#111; color:#fff; box-shadow:0 6px 18px rgba(0,0,0,0.3);">Neo</button>
-        
-</body>
+        <button
+            data-open-neo
+            style="
+                position: fixed;
+                right: 16px;
+                bottom: 16px;
+                z-index: 9998;
+                padding: 10px 12px;
+                border-radius: 999px;
+                border: 0;
+                background: #111;
+                color: #fff;
+                box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+            "
+        >
+            Neo
+        </button>
+    </body>
 </html>

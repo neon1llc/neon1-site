@@ -6,23 +6,26 @@
 terraform {
   required_version = ">= 1.6.0"
   required_providers {
-    aws = { source = "hashicorp/aws", version = ">= 5.0" }
-    random = { source = "hashicorp/random", version = ">= 3.5" }
+    aws     = { source = "hashicorp/aws", version = ">= 5.0" }
+    random  = { source = "hashicorp/random", version = ">= 3.5" }
     archive = { source = "hashicorp/archive", version = ">= 2.4" }
   }
-  backend "s3" {}  # Configured via backend.hcl
+  backend "s3" {} # Configured via backend.hcl
 }
 
 provider "aws" { region = var.region }
-provider "aws" { alias = "us_east_1", region = "us-east-1" }
+provider "aws" {
+  alias  = "us_east_1"
+  region = "us-east-1"
+}
 
 module "site" {
-  source = "../../modules/static-site"
+  source    = "../../modules/static-site"
   providers = { aws = aws, aws.us_east_1 = aws.us_east_1 }
 
-  project  = var.project
-  env      = var.env
-  region   = var.region
+  project = var.project
+  env     = var.env
+  region  = var.region
 
   base_domain            = var.base_domain
   subdomain              = var.subdomain
@@ -59,8 +62,8 @@ module "neo_chat" {
 }
 
 # Outputs consumed by CI
-output "bucket_name"                { value = module.site.bucket_name }
+output "bucket_name" { value = module.site.bucket_name }
 output "cloudfront_distribution_id" { value = module.site.cloudfront_distribution_id }
-output "cloudfront_domain_name"     { value = module.site.cloudfront_domain_name }
-output "full_domain_name"           { value = module.site.full_domain_name }
-output "neo_chat_api_url"           { value = module.neo_chat.api_url }
+output "cloudfront_domain_name" { value = module.site.cloudfront_domain_name }
+output "full_domain_name" { value = module.site.full_domain_name }
+output "neo_chat_api_url" { value = module.neo_chat.api_url }
