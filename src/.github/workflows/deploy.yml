@@ -1,0 +1,70 @@
+
+# neon1-site :: CI/CD — branch→env
+name: neon1-site CI/CD
+
+on:
+  push:
+    branches: [ "dev", "staging", "main" ]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      ENV_NAME: ${{ github.ref == 'refs/heads/dev' && 'dev' || (github.ref == 'refs/heads/staging' && 'staging' || 'prod') }}
+      ROLE_ARN: ${{ github.ref == 'refs/heads/dev' && vars.AWS_ROLE_TO_ASSUME_DEV || (github.ref == 'refs/heads/staging' && vars.AWS_ROLE_TO_ASSUME_STAGING || vars.AWS_ROLE_TO_ASSUME_PROD) }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        working-directory: infra/envs/${{ env.ENV_NAME }}
+        run: terraform init -input=false -backend-config=backend.hcl
+
+      - name: Terraform Apply
+        working-directory: infra/envs/${{ env.ENV_NAME }}
+        run: terraform apply -input=false -auto-approve -var-file=${{ env.ENV_NAME }}.tfvars
+
+      - name: Capture TF Outputs
+        id: tfoutputs
+        working-directory: infra/envs/${{ env.ENV_NAME }}
+        run: |
+          terraform output -json > tf-outputs.json
+          echo "bucket=$(jq -r .bucket_name.value tf-outputs.json)" >> $GITHUB_OUTPUT
+          echo "dist_id=$(jq -r .cloudfront_distribution_id.value tf-outputs.json)" >> $GITHUB_OUTPUT
+          echo "neo_api=$(jq -r .neo_chat_api_url.value tf-outputs.json)" >> $GITHUB_OUTPUT
+
+      - name: Build static site
+        run: scripts/build.sh
+
+      - name: Write Neo chat config to dist
+        run: |
+          echo "window.NEO_CHAT_API='${{ steps.tfoutputs.outputs.neo_api }}';" > dist/neo-config.js
+          echo "Wrote dist/neo-config.js with ${{ steps.tfoutputs.outputs.neo_api }}"
+
+      - name: Upload to S3
+        run: |
+          aws s3 sync dist s3://${{ steps.tfoutputs.outputs.bucket }} --delete
+
+      - name: Invalidate CloudFront
+        if: ${{ steps.tfoutputs.outputs.dist_id != '' }}
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${{ steps.tfoutputs.outputs.dist_id }} --paths "/*"
