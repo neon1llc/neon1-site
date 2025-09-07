@@ -25,11 +25,11 @@ bootstrap:
 
 plan-dev:
 	terraform -chdir=infra/envs/dev init -backend-config=backend.hcl
-	terraform -chdir=infra/envs/dev plan -var-file=dev.tfvars
+	terraform -chdir=infra/envs/dev plan -var-file=development.tfvars
 
 deploy-dev:
 	terraform -chdir=infra/envs/dev init -backend-config=backend.hcl
-	terraform -chdir=infra/envs/dev apply -auto-approve -var-file=dev.tfvars
+	terraform -chdir=infra/envs/dev apply -auto-approve -var-file=development.tfvars
 
 plan-staging:
 	terraform -chdir=infra/envs/staging init -backend-config=backend.hcl
@@ -41,11 +41,11 @@ deploy-staging:
 
 plan-prod:
 	terraform -chdir=infra/envs/prod init -backend-config=backend.hcl
-	terraform -chdir=infra/envs/prod plan -var-file=prod.tfvars
+	terraform -chdir=infra/envs/prod plan -var-file=production.tfvars
 
 deploy-prod:
 	terraform -chdir=infra/envs/prod init -backend-config=backend.hcl
-	terraform -chdir=infra/envs/prod apply -auto-approve -var-file=prod.tfvars
+	terraform -chdir=infra/envs/prod apply -auto-approve -var-file=production.tfvars
 
 build:
 	bash scripts/build.sh
