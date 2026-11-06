@@ -31,7 +31,7 @@
   const menu = document.getElementById("menu");
 
   // ---- Layout: where each view starts and how far it scrolls inside ----
-  const vh = () => innerHeight;
+  const vh = () => (window.visualViewport ? visualViewport.height : innerHeight);
   const maxY = () => root.scrollHeight - vh();
   const docTop = (el) => el.getBoundingClientRect().top + scrollY;
   function range(i) {
