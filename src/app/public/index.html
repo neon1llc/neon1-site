@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="version" content="0.3.0" />
+  <meta name="version" content="0.3.1" />
   <title>neon1 — technology that works together</title>
   <meta name="description" content="neon1 helps people and small businesses make their technology work together: cloud, AI, automation, networks and devices, built to stay yours." />
   <meta name="theme-color" content="#0D0208" />
@@ -90,10 +90,13 @@
 
     /* ---- Hero: quiet, lets the rain carry the drama ---- */
     .hero { min-height: calc(100svh - 56px); display: grid; place-content: center; text-align: center; }
-    .brand { font-size: clamp(40px, 7vw, 84px); font-weight: 500; margin: 0; color: var(--glow); line-height: 1;
-      text-shadow: 0 0 10px rgba(0,255,65,.35); }
-    .brand .one { font-size: .8em; }
-    .tagline { font-size: clamp(16px, 1.8vw, 19px); color: var(--muted); margin: 20px auto 36px; max-width: 520px; }
+    /* Wordmark + tagline keep the v0.1 look: system monospace, wide tracking, soft double glow. */
+    .brand { font: 700 clamp(38px, 5.5vw, 68px)/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      letter-spacing: .06em; margin: 0; color: #9aff9a;
+      text-shadow: 0 0 8px rgba(154,255,154,.7), 0 0 18px rgba(0,255,106,.45); }
+    .brand .one { display: inline-block; transform: scale(.8); transform-origin: bottom left; }
+    .tagline { font: clamp(13px, 1.6vw, 16px)/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: #a8ffcf; opacity: .9; margin: 18px auto 36px; max-width: 560px; }
     .reveal { opacity: 0; animation: rise .9s ease-out forwards; }
     .reveal.d1 { animation-delay: .5s; } .reveal.d2 { animation-delay: 1.3s; }
     @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
@@ -282,7 +285,7 @@
     </div>
     <div class="legal">
       <span>© <span id="yr"></span> NEON1 LLC · New York</span>
-      <span>no tracking, no cookies · v0.3.0</span>
+      <span>no tracking, no cookies · v0.3.1</span>
     </div>
   </footer>
   </div>

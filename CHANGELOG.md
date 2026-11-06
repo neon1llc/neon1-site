@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.3.1
+
+- Wordmark and tagline return to the v0.1.0 style: system monospace, wide tracking, soft double glow.
+
 ## v0.3.0
 
 - Waking up: below the hero, the page fades from the Matrix into a light surface; rain, its controls and the header follow.
