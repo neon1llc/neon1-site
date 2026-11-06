@@ -12,6 +12,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - New default rain, "text": Latin, Greek, Cyrillic, Hebrew, Arabic, Devanagari, Thai, kana, Hangul, and CJK, weighted like the original neon1 rain. The cycle is now text, katakana, numbers, symbols, emoji, faces, mixed.
 - Rain words hold about 0.75 seconds less before fading.
 - Glass panes over the rain act as lenses: clear black, with the rain behind each pane magnified about 15% and bent at a thin rim, drawn on a canvas layer so it works the same in every browser. They cover the logo, each header link, the book-a-call button (keeping its green border), the rain controls, and the hero wordmark and tagline sit on blurred glass panes with one shared radius. The header returns to plain once it turns light.
+- About focuses on why neon1 exists and the habits behind it, with a fuller nod to Neo and Andrew.
 - The rain falls about 25% slower. For now, rain words are only neon1's own names, slogans, values, and offerings; Matrix, movie, and tech-stack words are commented out.
 - The hero pane has equal space above the wordmark and below the slogan.
 - Scrolling back up into a tall view (like services) lands with its last lines fully on screen, not hidden by the header offset.
