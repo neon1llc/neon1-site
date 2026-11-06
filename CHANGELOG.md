@@ -2,6 +2,13 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.3.0
+
+- Waking up: below the hero, the page fades from the Matrix into a light surface; rain, its controls and the header follow.
+- Rain words in five glow colors: Matrix/movie easter eggs (white), neon1 names and slogans (green), tech stack (cyan), offerings (amber), values (violet).
+- Grid / free toggle: snapped rows or columns falling at their own speeds.
+- Browser console greeting.
+
 ## v0.2.1
 
 - Self-hosted Inter (text) and JetBrains Mono (headings), both SIL OFL.
