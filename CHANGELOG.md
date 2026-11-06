@@ -2,6 +2,18 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.9.0
+
+- Every view starts right under the header. Views that fit are centered between the header and the bottom of the screen; taller ones scroll from their top. The landing view no longer scrolls a little into the next one, and the work view fits a laptop screen.
+- Section links and links opened from another page land exactly on their view.
+- Resistance between views is about 20% softer.
+- "book a call" opens the booking calendar in a new tab, and the contact button is sized to its text.
+- The logo has no glow on the light parts of the page, and its "1" now matches the height of the lowercase letters everywhere.
+- Rain: larger, brighter glyphs with longer trails. Words spell slowly and stay sharp enough to read. A new button cycles the characters: katakana, symbols, emoji, mixed.
+- Open source: each project opens with a short definition and shows "pre-release" (and its version where there is one). DeployOps is now deploy-ops. 1NEON stands for Needs, Engineering, Operations, Nurture.
+- "why neon1" is now "about": how it started, what it stands for, and the slogan.
+- Hours in questions match the booking calendar.
+
 ## v0.8.0
 
 - Scrolling moves one view at a time. At the edge of a view the page resists, giving a little per scroll, then settles into the next view, fast at first and slowing as it lands. Views taller than the screen scroll normally until their edge. Works with mouse, trackpad, touch, keyboard and the header links, all at the same speed.

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="version" content="0.8.0" />
+  <meta name="version" content="0.9.0" />
   <title>neon1</title>
   <meta name="description" content="neon1 is a one-person technology practice in New York: cloud and AI engineering, business automation, networks and cameras." />
   <meta name="theme-color" content="#0D0208" />
@@ -480,7 +480,7 @@
     </div>
     <div class="legal">
       <span>© <span id="yr"></span> NEON1 LLC, New York</span>
-      <span>No tracking or cookies. v0.8.0</span>
+      <span>No tracking or cookies. v0.9.0</span>
     </div>
   </footer>
   </div>
@@ -558,7 +558,7 @@
             ctx.font = font(700);
             for (let k = 0; k < c.wi; k++) {
               const ch = c.word[k], wy = (c.wy + k) * size;
-              ctx.fillStyle = "#0D0208"; ctx.fillRect(x, wy, size, size);
+              ctx.shadowBlur = 0; ctx.fillStyle = "#0D0208"; ctx.fillRect(x, wy, size, size);
               if (ch === " ") continue;
               ctx.shadowColor = c.color; ctx.shadowBlur = k === c.wi - 1 && c.wi < c.word.length ? 10 : 4;
               ctx.fillStyle = c.color; ctx.fillText(ch, x + size * 0.18, wy);

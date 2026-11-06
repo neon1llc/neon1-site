@@ -240,7 +240,13 @@
     target = y = Math.max(top, Math.min(bottom, target));
   });
   const start = views.indexOf(document.getElementById(location.hash.slice(1)));
-  if (start > 0) scrollTo(0, range(start)[0]);
+  // Opened with a section link: land on that view once fonts and layout settle.
+  history.scrollRestoration = "manual";
+  // Fonts can change heights after the first paint, so land again until the visitor scrolls.
+  const land = () => { if (start > 0 && !lastInput && !settling) { scrollTo(0, range(start)[0]); sync(); } };
+  land();
+  addEventListener("load", land);
+  if (document.fonts) document.fonts.ready.then(land);
   sync();
   requestAnimationFrame(render);
 })();
