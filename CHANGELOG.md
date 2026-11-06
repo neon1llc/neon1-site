@@ -2,6 +2,13 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.5.0
+
+- Hero is only the wordmark, "1 is glad to be of service." and a falling scroll cue.
+- Navigation collapses into one "menu" button with a full-screen menu (Esc closes, focus returns). The header is invisible over the hero.
+- One dark-mode neon (#7CFF9E) for the wordmark, mark, buttons and cue.
+- Prices removed from the site; services say who each tier is for. The free call and fixed quote move to the contact band.
+
 ## v0.4.0
 
 - Two-mode palette: Matrix dark for the hero, very light grey (#F2F4F2) with document green (#035704) and logo green (#327641) for the rest.
