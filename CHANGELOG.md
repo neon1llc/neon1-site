@@ -11,6 +11,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - neon1-ready joins open source.
 - New default rain, "text": Latin, Greek, Cyrillic, Hebrew, Arabic, Devanagari, Thai, kana, Hangul, and CJK, weighted like the original neon1 rain. The cycle is now text, katakana, numbers, symbols, emoji, faces, mixed.
 - Rain words hold about 0.75 seconds less before fading.
+- Scrolling back up into a tall view (like services) lands with its last lines fully on screen, not hidden by the header offset.
 
 ## v0.10.0
 
