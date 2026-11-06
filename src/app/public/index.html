@@ -3,8 +3,8 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="version" content="0.11.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="version" content="0.11.1" />
   <title>neon1</title>
   <meta name="description" content="neon1 is a one-person technology practice in New York: cloud and AI engineering, business automation, networks, and cameras." />
   <meta name="theme-color" content="#0D0208" />
@@ -338,8 +338,8 @@
        magnifies the rain behind each pane; logo, links, button, controls, and hero share one radius */
     header:not(.light) .logo, header:not(.light) .links a, header:not(.light) .menu-btn {
       border-radius: var(--glass-r); background: transparent; box-shadow: none; }
-    header:not(.light) .logo, header:not(.light) .links a:not(.btn) { padding: 7px 12px; }
-    header:not(.light) .links { gap: 10px; }
+    header .logo, header .links a:not(.btn) { padding: 7px 12px; }
+    header .links { gap: 10px; }
     .links .btn, .menu-btn { border-radius: var(--glass-r); }
     /* 1NEON button: quieter than book a call, with the portal's rings */
     .links .portal { color: var(--neon); border-color: var(--line); background: transparent; }
@@ -381,8 +381,32 @@
     .glide, .glide body { scroll-behavior: auto; }
     @media (prefers-reduced-motion: reduce) { header { transition: none; } }
 
-    /* Case studies intro line */
+    /* Case studies intro line, with the four stages on a line of their own */
     .intro { margin: -6px 0 clamp(18px, 3vh, 30px); }
+    .intro .stages { display: block; }
+
+    /* Notched phones in landscape: the page runs edge to edge, with content kept inside the safe area */
+    nav, section, .foot { padding-left: max(24px, env(safe-area-inset-left)); padding-right: max(24px, env(safe-area-inset-right)); }
+    .legal { padding-left: max(24px, env(safe-area-inset-left)); }
+    .rainctl { right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); }
+
+    /* Nav items stay on one line with centered text; below the width they fit in, they fold into the menu */
+    .links a { white-space: nowrap; justify-content: center; text-align: center; }
+    @media (max-width: 960px) { .links { display: none; } .menu-btn { display: inline-block; } }
+
+    /* Open source: a public project shows the case-study arrow on hover, a private one a lock that explains itself */
+    .row h3 { display: flex; align-items: center; gap: 8px; }
+    .go, .lock { display: inline-grid; place-items: center; width: 24px; height: 24px; color: var(--brand); opacity: 0; transition: opacity .2s, transform .2s; }
+    .go svg, .lock svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+    a.row:hover .go, a.row:focus-visible .go { opacity: 1; transform: translate(2px, -2px); }
+    .row:hover .lock, .lock:focus { opacity: 1; }
+    /* Touch screens have no hover, so the marks stay faintly visible */
+    @media (hover: none) { .go, .lock { opacity: .7; } }
+    .lock { position: relative; cursor: help; border-radius: 6px; outline-offset: 2px; }
+    .lock::after { content: "currently\Aprivate"; white-space: pre; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+      font: 500 12px/1.35 var(--mono); color: var(--brand); text-align: center; background: #fff; border: 1px solid var(--brand); border-radius: 8px;
+      padding: 6px 12px; opacity: 0; pointer-events: none; transition: opacity .2s; }
+    .lock:hover::after, .lock:focus::after { opacity: 1; }
   </style>
 </head>
 <body>
@@ -466,7 +490,7 @@
 
     <section id="projects" class="view" aria-labelledby="projects-h">
       <h2 id="projects-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>case studies</h2>
-      <p class="lead intro reveal-on">From cloud systems to a grandparent's email, every one runs the same way: <b class="nl">N</b>eed, <b class="nl">E</b>xecution, <b class="nl">O</b>bservation, <b class="nl">N</b>ext.</p>
+      <p class="lead intro reveal-on">From cloud systems to a grandparent's email, every one runs the same way: <span class="stages"><b class="nl">N</b>eed, <b class="nl">E</b>xecution, <b class="nl">O</b>bservation, <b class="nl">N</b>ext.</span></p>
       <div class="rail-wrap">
         <div class="cases" id="cases" tabindex="0" aria-label="Case studies, scroll sideways">
         <article class="case reveal-on" id="case-accounting">
@@ -537,22 +561,22 @@
       <h2 id="work-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>open source</h2>
       <div class="rows">
         <a class="row reveal-on" href="https://github.com/neon1llc/aws-clip" target="_blank" rel="noopener">
-          <h3>aws-clip</h3>
+          <h3>AWS CLIP <span class="go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></span></h3>
           <p class="state">pre-release</p>
           <p><b>AWS CLI Plus.</b> A wrapper around the AWS CLI that checks which account you're in, explains what a command will do before it runs, and hides secrets in its output.</p>
         </a>
         <div class="row reveal-on">
-          <h3>deploy-ops</h3>
+          <h3>DeployOps <span class="lock" tabindex="0" role="img" aria-label="currently private"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span></h3>
           <p class="state">pre-release · v0.42.0</p>
           <p><b>Cloud automation, bundled.</b> Pipelines for infrastructure and applications on AWS, Azure, Google Cloud, or several at once. It sets up CI/CD for one repo or many, works with the IaC you already use, and adds checks, approvals, rollback, monitoring, and alerts where your team will see them.</p>
         </div>
         <div class="row reveal-on">
-          <h3>neon1-ready</h3>
+          <h3>neon1 Ready <span class="lock" tabindex="0" role="img" aria-label="currently private"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span></h3>
           <p class="state">pre-release</p>
           <p><b>Security readiness for every space.</b> Plain-language guidance for a phone, a home network, a classroom, a small office, or a company heading into SOC 2: five things worth doing first, then what's next.</p>
         </div>
         <div class="row reveal-on">
-          <h3>1NEON</h3>
+          <h3>1NEON <span class="lock" tabindex="0" role="img" aria-label="currently private"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span></h3>
           <p class="state">pre-release</p>
           <p><b>1 portal. Needs. Execution. Observation. Next.</b> Project management in layers: what the client needs, the work to deliver it, measuring how it actually performs, and what to improve next. Proposals, decisions, files, and results stay together from the first call to ongoing care. Pronounced "onion".</p>
         </div>
@@ -611,7 +635,7 @@
     </div>
     <div class="legal">
       <span>© <span id="yr"></span> NEON1 LLC, New York</span>
-      <span>No tracking or cookies. v0.11.0</span>
+      <span>No tracking or cookies. v0.11.1</span>
     </div>
   </footer>
   </div>

@@ -2,6 +2,14 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.11.1
+
+- Open source shows formal names: AWS CLIP, DeployOps, neon1 Ready, and 1NEON. A public project shows the case-study arrow on hover and opens in a new tab; a private one shows a lock that says "currently private" on hover or tap.
+- The case studies intro puts Need, Execution, Observation, and Next on a line of their own.
+- The logo and nav links keep their place when the header turns light.
+- Nav items stay on one line with centered text, and fold into the menu below 960px wide.
+- In landscape on notched phones, the header and page run edge to edge, with content kept clear of the notch.
+
 ## v0.11.0
 
 - A 1NEON button in the top bar, and in the phone menu, opens the client portal at neon1.tech/1NEON.
