@@ -50,6 +50,7 @@
     :focus-visible { outline: 2px solid var(--glow); outline-offset: 3px; border-radius: 6px; }
 
     /* ---- Matrix rain: decorative layer behind everything ---- */
+    #lens { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 1; pointer-events: none; opacity: .8; }
     #rain { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; opacity: .8; }
     .veil { position: fixed; inset: 0; z-index: 1; pointer-events: none;
       background: radial-gradient(70% 45% at 50% 48%, rgba(13,2,8,.6), rgba(13,2,8,.15) 75%); }
@@ -352,12 +353,11 @@
     @media (max-width: 640px) { .case-layer { inset: 64px 0 0; } .case-panel { inset: 0; border-radius: 0; border: 0; } }
 
     /* Page background turns light once the rain has faded */
-    /* Clear glass over the rain: no tint, so the black stays black and only the rain blurs;
-       the logo, links, button, controls, and hero wordmark share one radius, off once the header goes light */
+    /* Clear glass over the rain: no tint, so the black stays black; the lens layer in the script
+       magnifies the rain behind each pane; logo, links, button, controls, and hero share one radius */
     :root { --glass-r: 8px; }
     .glass, .rainctl .chip, header:not(.light) .logo, header:not(.light) .links a, header:not(.light) .menu-btn {
-      border-radius: var(--glass-r); background: transparent; box-shadow: none;
-      -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+      border-radius: var(--glass-r); background: transparent; box-shadow: none; }
     header:not(.light) .logo, header:not(.light) .links a:not(.btn) { padding: 7px 12px; }
     header:not(.light) .links { gap: 10px; }
     .links .btn, .menu-btn { border-radius: var(--glass-r); }
@@ -399,6 +399,8 @@
 </head>
 <body>
   <canvas id="rain" aria-hidden="true"></canvas>
+  <!-- Lens layer: redraws the rain behind each glass pane, slightly magnified -->
+  <canvas id="lens" aria-hidden="true"></canvas>
   <div class="veil" aria-hidden="true"></div>
 
   <header>
@@ -691,9 +693,11 @@
       // from the rain by staying put; neon1's own names glow in its green
       const GOLD = "#ffd77a";
       const WORDS = [
-        { weight: 3, color: GOLD, alpha: 0.95, words: ["listen", "simplicity", "ownership", "transparency", "recovery", "service", "automation", "networks", "cameras", "pipelines", "migration", "security", "cloud", "aws", "terraform", "python", "rag", "llm", "ci/cd", "iot", "linux"] },
+        { weight: 3, color: GOLD, alpha: 0.95, words: ["listen", "simplicity", "ownership", "transparency", "recovery", "service", "automation", "networks", "cameras", "pipelines", "migration", "security", "cloud"] },
+        // Tech stack words, off for now: "aws", "terraform", "python", "rag", "llm", "ci/cd", "iot", "linux"
         { weight: 2, color: "#6CFFA8", alpha: 1, glow: 6, words: ["neon1", "1withtechnology", "1isgladtobeofservice", "1NEON", "onion"] },
-        { weight: 1.3, color: GOLD, alpha: 0.75, words: ["neo", "trinity", "morpheus", "the matrix", "white rabbit", "red pill", "no spoon", "bicentennial man", "robin williams"] },
+        // Matrix and movie words, off for now
+        // { weight: 1.3, color: GOLD, alpha: 0.75, words: ["neo", "trinity", "morpheus", "the matrix", "white rabbit", "red pill", "no spoon", "bicentennial man", "robin williams"] },
       ];
       const TOTAL = WORDS.reduce((a, g) => a + g.weight, 0);
       const WORD_RATE = 0.06; // chance per step that some column starts a word
@@ -725,7 +729,9 @@
 
       // Fits the canvas to the window and pixel ratio, then restarts every column
       function resize() {
-        const dpr = Math.min(devicePixelRatio || 1, 2);
+        dpr = Math.min(devicePixelRatio || 1, 2);
+        lens.width = innerWidth * dpr; lens.height = innerHeight * dpr;
+        lctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         size = innerWidth < 640 ? 17 : 21;
         canvas.width = innerWidth * dpr; canvas.height = innerHeight * dpr;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -780,9 +786,45 @@
         });
       }
 
-      // Draws every third frame, and not while paused or the tab is hidden
+      // Steps the rain about 15 times a second, and not while paused or the tab is hidden
+      // Glass panes act as a lens: each shows the rain behind it slightly magnified,
+      // like looking through thick convex glass, with a touch of softening
+      const lens = document.getElementById("lens"), lctx = lens.getContext("2d");
+      const ZOOM = 1.15, STEP_MS = 66;
+      let dpr = 1, last = 0;
+      const panes = () => document.querySelectorAll(".hero-pane, header .logo, header .links a, #menuBtn, .rainctl .chip");
+      const RIM = 5;
+      // Draws the rain behind rect r, inset by `inset` px, scaled by `zoom` around its center
+      function lens1(r, inset, zoom) {
+        const x = r.left + inset, y = r.top + inset, w = r.width - inset * 2, h = r.height - inset * 2;
+        const sw = w / zoom, sh = h / zoom, sx = x + (w - sw) / 2, sy = y + (h - sh) / 2;
+        lctx.save();
+        lctx.beginPath(); lctx.roundRect(x, y, w, h, Math.max(2, 8 - inset)); lctx.clip();
+        lctx.fillRect(x, y, w, h);
+        lctx.drawImage(canvas, sx * dpr, sy * dpr, sw * dpr, sh * dpr, x, y, w, h);
+        lctx.restore();
+      }
+
+      function refract() {
+        lctx.clearRect(0, 0, innerWidth, innerHeight);
+        if (document.querySelector("header").classList.contains("light")) return;
+        for (const el of panes()) {
+          const r = el.getBoundingClientRect();
+          if (!r.width || r.bottom < 0 || r.top > innerHeight) continue;
+          lctx.save();
+          lctx.fillStyle = "#0D0208";
+          lctx.filter = "blur(0.6px)";
+          // Rim: the edge of the glass bends the rain inward, showing a little more of it
+          lens1(r, 0, 0.9);
+          // Body: inside the rim, the rain is magnified like through thick convex glass
+          lens1(r, RIM, ZOOM);
+          lctx.restore();
+        }
+      }
+
       function loop() {
-        if (running && !document.hidden && ++frame % 3 === 0) draw();
+        const now = performance.now();
+        if (running && !document.hidden && now - last >= STEP_MS) { last = now; draw(); refract(); }
         requestAnimationFrame(loop);
       }
 
@@ -812,7 +854,7 @@
       const veil = document.querySelector(".veil"), ctl = document.querySelector(".rainctl"), header = document.querySelector("header");
       function onScroll() {
         const t = Math.min(1, scrollY / (innerHeight * 0.9));
-        canvas.style.opacity = String(0.8 * (1 - t));
+        canvas.style.opacity = lens.style.opacity = String(0.8 * (1 - t));
         veil.style.opacity = String(1 - t);
         ctl.style.opacity = t > 0.6 ? "0" : "1";
         ctl.style.pointerEvents = t > 0.6 ? "none" : "auto";
