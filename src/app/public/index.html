@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="version" content="0.9.2" />
+  <meta name="version" content="0.9.3" />
   <title>neon1</title>
   <meta name="description" content="neon1 is a one-person technology practice in New York: cloud and AI engineering, business automation, networks, and cameras." />
   <meta name="theme-color" content="#0D0208" />
@@ -229,11 +229,11 @@
     .split { display: grid; grid-template-columns: minmax(220px, 1fr) 2fr; gap: 48px; align-items: start; }
     .split h2 { position: sticky; top: 96px; }
     .timeline { display: block; border-left: 1px solid rgba(18,36,26,.16); margin-left: 6px; }
-    .timeline div { position: relative; border: 0; padding: 0 0 40px 32px; }
+    .timeline div { position: relative; border: 0; padding: 0 0 clamp(14px, 2.6vh, 28px) 32px; }
     .timeline div:last-child { padding-bottom: 0; }
     .timeline div::after { content: ""; position: absolute; left: -5px; top: 6px; width: 9px; height: 9px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 0 4px var(--paper); }
-    .timeline h3 { font-size: 19px; margin: 4px 0 6px; }
-    .timeline p { font-size: 16px; max-width: 520px; }
+    .timeline h3 { font-size: 18px; margin: 2px 0 4px; }
+    .timeline p { font-size: 15.5px; line-height: 1.5; max-width: 640px; }
     @media (max-width: 760px) { .split { grid-template-columns: 1fr; gap: 8px; } .split h2 { position: static; } }
 
     /* Story column and project rows on the same rules. */
@@ -364,7 +364,7 @@
           <p class="line"><strong>Security training and readiness.</strong> <span>Plain-language sessions on networks, cameras, connected devices, fraud, and data brokers, plus SOC 2 and other security readiness for companies heading into an audit.</span></p>
         </div>
       </div>
-      <p class="lead quote reveal-on">The first call is free and takes 15 minutes. If I can help, you get a fixed price for the whole job before any work starts. If a settings change will fix it, I'll just tell you on the call. Accounts and bills stay in your name.</p>
+      <p class="lead quote reveal-on">The first call is free and takes 15 minutes. If I can help, you get a short proposal with a few options and a fixed price for each, before any work starts. If a settings change will fix it, I'll just tell you on the call. Accounts and bills stay in your name.</p>
     </section>
 
     <section id="projects" class="view" aria-labelledby="projects-h">
@@ -410,9 +410,10 @@
       <h2 id="how-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>how it works</h2>
       <div class="steps timeline">
         <div class="reveal-on"><h3>Listen</h3><p>Show me how the work gets done today. One real example is enough.</p></div>
-        <div class="reveal-on"><h3>Decide</h3><p>Sometimes that means a new system. Often it's a setting, a cleanup, or leaving it alone.</p></div>
+        <div class="reveal-on"><h3>Propose</h3><p>A few options, from the quickest fix to the fuller build, each with its price, effort, and what it gets you.</p></div>
+        <div class="reveal-on"><h3>Decide</h3><p>You pick. Sometimes that means a new system. Often it's a setting, a cleanup, or leaving it alone.</p></div>
         <div class="reveal-on"><h3>Build</h3><p>Small changes, tested, and shown to you as they land.</p></div>
-        <div class="reveal-on"><h3>Hand over</h3><p>I show you how it works and write it down, so you can run it without me. Ongoing care if you want it.</p></div>
+        <div class="reveal-on"><h3>Hand over</h3><p>I show you how it works and write it down, so you can run it without me. Then I check it's doing what we agreed, and keep improving it if you want ongoing care.</p></div>
       </div>
     </section>
 
@@ -432,7 +433,7 @@
         <div class="row reveal-on">
           <h3>1NEON</h3>
           <p class="state">pre-release</p>
-          <p><b>Project management in layers.</b> One workspace for the four layers of a client project: Needs, Engineering, Operations, and Nurture. The plan, the work, files, and decisions stay together from the first call to ongoing care. Pronounced "onion".</p>
+          <p><b>1 portal. Needs. Execution. Observation. Next.</b> Project management in layers: what the client needs, the work to deliver it, measuring how it actually performs, and what to improve next. Proposals, decisions, files, and results stay together from the first call to ongoing care. Pronounced "onion".</p>
         </div>
       </div>
     </section>
@@ -441,7 +442,7 @@
       <h2 id="why-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>about</h2>
       <div class="story">
         <p class="reveal-on">neon1 started small, at a grade school. I'd wanted to put what I know to work in my own community for a long time, and that school was where I first got the chance. I helped budget and set up a new STEM edtech system, then invited teachers and parents to free sessions on staying safe online.</p>
-        <p class="reveal-on">People left those sessions knowing a little more and worrying a little less. That's still the whole job: plain answers, a fixed price, accounts in your name, and docs you can actually use, so you're better off with your tech than before.</p>
+        <p class="reveal-on">People left those sessions knowing a little more and worrying a little less. That's still the whole job: plain answers, clear options with fixed prices, accounts in your name, docs you can actually use, and a check afterward that it works, so you're better off with your tech than before.</p>
         <p class="reveal-on">The name nods to Neo from <em>The Matrix</em>, who helps people see clearly, and to Andrew from <em>Bicentennial Man</em>, who spends two centuries being of service.</p>
         <p class="sign reveal-on">Neo means new. Neon is unmissable.<br>1 is glad to be of service.</p>
       </div>
@@ -453,7 +454,7 @@
         <details class="reveal-on"><summary>Do you come on site?</summary><p>Yes. I also work remotely, or on your own network through a secure connection that I set up for the job and that's removed when it's done.</p></details>
         <details class="reveal-on"><summary>When do you work?</summary><p>Saturdays and Sundays from 8am to 8pm, and weekday evenings from 6pm (until 9pm Monday to Thursday, 8pm on Friday), Eastern time. That's about 10 to 20 hours a week of project time. The booking calendar shows what's open.</p></details>
         <details class="reveal-on"><summary>How long does a project take?</summary><p>Small jobs take a week or two, medium ones two to four weeks, and bigger projects four to six. I take on up to two clients at a time so each one gets proper attention.</p></details>
-        <details class="reveal-on"><summary>How is the price set?</summary><p>After the free call I send a fixed price for the whole job. It doesn't change unless you change what you're asking for.</p></details>
+        <details class="reveal-on"><summary>How is the price set?</summary><p>After the free call I send a short proposal with options, usually a quick fix, a solid setup, and a fuller build. Each one has a fixed price and says what it covers, how much effort and engineering it takes, and what quality to expect. You pick the one that fits, and that price holds unless you change what you're asking for.</p></details>
         <details class="reveal-on"><summary>Do you run security training?</summary><p>Yes, for anyone from parents and teachers to engineers and executives. I've run sessions in Manhattan for groups of 30 or more, covering home and business networks, cameras and IoT, fraud, data brokers, the dark web, and the security of physical spaces.</p></details>
         <details class="reveal-on"><summary>What don't you do?</summary><p>I don't repair electronics, though I can debug software and hardware installs and get them working together. I don't handle personal or health data without the right agreements in place, such as a Business Associate Agreement, but I can help you get them. I'm not a lawyer, but I'll work alongside yours on the technical side.</p></details>
       </div>
@@ -489,7 +490,7 @@
     </div>
     <div class="legal">
       <span>© <span id="yr"></span> NEON1 LLC, New York</span>
-      <span>No tracking or cookies. v0.9.2</span>
+      <span>No tracking or cookies. v0.9.3</span>
     </div>
   </footer>
   </div>
