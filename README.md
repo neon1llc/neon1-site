@@ -2,6 +2,8 @@
 
 The neon1.tech website. It's a static page in `src/app/public/`, served from a private S3 bucket through CloudFront. The hosting itself lives in [neon1-aws-infrastructure](https://github.com/neon1llc/neon1-aws-infrastructure) under `site/`.
 
+`src/app/public/shared/` holds the design that [1NEON](https://github.com/neon1llc/1NEON) loads from this site at runtime: fonts, brand colors, the rain, and its controls. Changes there show up in both, so check the 1NEON sign-in screen too.
+
 ## Check and preview
 
 You need Python 3 and Node.js. Gitleaks is used if it's installed, otherwise the secret scan runs it in Docker.
