@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="version" content="0.3.1" />
+  <meta name="version" content="0.4.0" />
   <title>neon1 — technology that works together</title>
   <meta name="description" content="neon1 helps people and small businesses make their technology work together: cloud, AI, automation, networks and devices, built to stay yours." />
   <meta name="theme-color" content="#0D0208" />
@@ -25,6 +25,8 @@
       --glow: #00FF41;
       --brand: #035704;
       --mark: #327641;
+      --paper: #F2F4F2;   /* very light grey: the professional surface */
+      --ink: #12241A;
       --text: #d6f5dc;
       --muted: #84a98c;
       --panel: rgba(13, 2, 8, 0.72);
@@ -60,8 +62,11 @@
     /* ---- Nav ---- */
     header { position: sticky; top: 0; z-index: 5; background: rgba(13,2,8,.88); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
     header { transition: background .4s, border-color .4s; }
-    header.light { background: rgba(244,249,245,.9); border-bottom-color: rgba(3,87,4,.14); }
-    header.light .logo, header.light .btn-ghost { color: #035704; border-color: #035704; }
+    header.light { background: rgba(242,244,242,.92); border-bottom-color: rgba(3,87,4,.14); }
+    header.light .logo, header.light .btn-ghost { color: var(--brand); border-color: var(--brand); }
+    header.light .logo { text-shadow: 0 0 10px rgba(0,255,65,.35); }
+    .mark-light { font: 700 22px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .06em; color: var(--brand);
+      text-shadow: 0 0 10px rgba(0,255,65,.4), 0 0 22px rgba(0,255,65,.18); margin: 0 0 10px; }
     header.light nav ul a:not(.btn) { color: #4f6b5a; }
     nav { max-width: 1100px; margin: 0 auto; padding: 12px 20px; display: flex; align-items: center; gap: 20px; }
     .logo { display: inline-flex; align-items: center; gap: 10px; color: var(--glow); text-decoration: none; font: 600 18px var(--mono); }
@@ -79,6 +84,16 @@
     h2::before { content: "> "; color: var(--mid); }
     .lead { color: var(--muted); max-width: 620px; }
     .grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+    /* Rate sheet and project list: rows on a rule, not a card kit. */
+    .rows { border-top: 1px solid var(--line); }
+    .row { display: grid; grid-template-columns: 1fr 140px 2fr; gap: 24px; align-items: baseline; padding: 22px 0;
+      border-bottom: 1px solid var(--line); color: inherit; text-decoration: none; }
+    .row h3 { margin: 0; font-size: 17px; }
+    .row .price, .row .state { margin: 0; font: 500 14px var(--mono); color: var(--glow); }
+    .row .state.dim { color: var(--muted); }
+    .row p:last-child { margin: 0; color: var(--muted); font-size: 15px; }
+    a.row:hover h3 { color: var(--glow); }
+    @media (max-width: 700px) { .row { grid-template-columns: 1fr auto; gap: 6px 16px; } .row p:last-child { grid-column: 1 / -1; } }
     .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 24px; transition: border-color .2s, transform .2s; color: inherit; }
     a.card { text-decoration: none; }
     .card:hover { border-color: rgba(0,255,65,.45); transform: translateY(-2px); }
@@ -121,7 +136,7 @@
     /* ---- Footer ---- */
     footer { border-top: 1px solid var(--line); background: rgba(13,2,8,.92); }
     .foot { max-width: 1100px; margin: 0 auto; padding: 40px 20px 28px; display: grid; gap: 28px; grid-template-columns: 2fr 1fr 1fr; font-size: 14px; color: var(--muted); }
-    .foot h4 { font: 500 12px var(--mono); color: var(--text); letter-spacing: .08em; text-transform: uppercase; margin: 0 0 10px; }
+    .foot h4 { font: 600 13px var(--mono); color: var(--text); margin: 0 0 10px; }
     .foot ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
     .foot a { color: var(--muted); text-decoration: none; } .foot a:hover { color: var(--glow); }
     .legal { max-width: 1100px; margin: 0 auto; padding: 16px 20px 28px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
@@ -136,16 +151,16 @@
 
     /* ---- Waking up: content below the hero fades from the Matrix into a light surface ---- */
     .awake { position: relative; z-index: 2;
-      background: linear-gradient(to bottom, rgba(244,249,245,0) 0, #f4f9f5 320px);
-      --text: #10241a; --muted: #4f6b5a; --glow: #035704; --mid: #327641;
-      --panel: #ffffff; --line: rgba(3,87,4,.14); color: var(--text); padding-top: 160px; }
+      background: linear-gradient(to bottom, rgba(242,244,242,0) 0, var(--paper) 320px);
+      --text: var(--ink); --muted: #56665c; --glow: var(--brand); --mid: var(--mark);
+      --panel: #ffffff; --line: rgba(3,87,4,.16); color: var(--text); padding-top: 160px; }
     .awake .card { box-shadow: 0 1px 2px rgba(16,36,26,.04); }
     .awake .card:hover { border-color: rgba(3,87,4,.4); box-shadow: 0 8px 24px rgba(16,36,26,.08); }
     .awake .tag { color: #fff; }
     .awake .btn-primary { box-shadow: none; color: #fff; }
     .awake .btn-primary:hover { box-shadow: 0 6px 18px rgba(3,87,4,.25); }
     .awake h2::before { color: var(--mid); }
-    .awake footer { background: #eaf3ec; }
+    .awake footer { background: #e8ece8; }
 
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
@@ -179,7 +194,7 @@
 
   <main id="top">
     <section class="hero">
-      <h1 class="brand reveal">neon<span class="one">1</span></h1>
+      <h1 class="brand" aria-label="neon1"><span class="dec" aria-hidden="true">neon</span><span class="one dec" aria-hidden="true">1</span></h1>
       <p class="tagline reveal d1">Technology that works together, and stays yours.</p>
       <div class="btns reveal d2">
         <a class="btn btn-primary" href="mailto:1isgladtobeofservice@neon1.tech?subject=Fit%20call">book a free 15-min call</a>
@@ -192,22 +207,22 @@
   <main>
     <section id="services" aria-labelledby="services-h">
       <h2 id="services-h">services</h2>
-      <div class="grid">
-        <article class="card">
+      <div class="rows">
+        <div class="row">
           <h3>Home &amp; local tech</h3>
           <p class="price">from $125/hr</p>
           <p>Cameras, Wi-Fi and networks, device setup and everyday security training, done once and done right.</p>
-        </article>
-        <article class="card">
+        </div>
+        <div class="row">
           <h3>Business workflows</h3>
           <p class="price">from $175/hr</p>
           <p>Untangle the email, spreadsheets, POS and SaaS your day runs on. Automate the repetitive parts, keep the control.</p>
-        </article>
-        <article class="card">
+        </div>
+        <div class="row">
           <h3>Cloud &amp; AI engineering</h3>
           <p class="price">from $225/hr</p>
           <p>AWS foundations as code, CI/CD pipelines, RAG and LLM systems, migrations and recovery, delivered in clear phases.</p>
-        </article>
+        </div>
       </div>
       <p class="lead" style="margin-top:22px">Projects get a fixed quote after a free fit call. You own every account, every bill and the docs to run it.</p>
     </section>
@@ -224,20 +239,20 @@
 
     <section id="work" aria-labelledby="work-h">
       <h2 id="work-h">open source</h2>
-      <div class="grid">
-        <a class="card" href="https://github.com/neon1llc/aws-clip">
-          <span class="tag">available</span>
+      <div class="rows">
+        <a class="row" href="https://github.com/neon1llc/aws-clip">
           <h3>aws-clip</h3>
+          <p class="state">available</p>
           <p>A safer AWS CLI: profile guards, explainable command policy and redacted output.</p>
         </a>
-        <div class="card">
-          <span class="tag dim">in development</span>
+        <div class="row">
           <h3>DeployOps</h3>
+          <p class="state dim">in development</p>
           <p>Deployments across clouds and engines with approvals, evidence and rollback.</p>
         </div>
-        <div class="card">
-          <span class="tag dim">in development</span>
+        <div class="row">
           <h3>1NEON</h3>
+          <p class="state dim">in development</p>
           <p>Say "onion". One place for every layer of a client project: plan, work, files, decisions and care.</p>
         </div>
       </div>
@@ -264,7 +279,7 @@
   <footer>
     <div class="foot">
       <div>
-        <h4>neon1</h4>
+        <p class="mark-light">neon<span style="font-size:.8em">1</span></p>
         <p style="margin:0">Technology that works together, and stays yours.<br />1 is glad to be of service.</p>
       </div>
       <div>
@@ -284,8 +299,8 @@
       </div>
     </div>
     <div class="legal">
-      <span>© <span id="yr"></span> NEON1 LLC · New York</span>
-      <span>no tracking, no cookies · v0.3.1</span>
+      <span>© <span id="yr"></span> NEON1 LLC, New York</span>
+      <span>No tracking or cookies. v0.4.0</span>
     </div>
   </footer>
   </div>
@@ -406,6 +421,21 @@
       if (reduce.matches) setRunning(false);
       onScroll();
       loop();
+
+      // ---- Wordmark decode: each letter cycles glyphs, then locks in, left to right ----
+      if (!reduce.matches) {
+        const spans = [...document.querySelectorAll(".brand .dec")];
+        const finals = spans.map((el) => el.textContent);
+        const total = finals.join("").length;
+        let tick = 0;
+        const timer = setInterval(() => {
+          let n = 0;
+          spans.forEach((el, si) => {
+            el.textContent = [...finals[si]].map((ch) => (n++ < tick / 4 ? ch : glyphs[(Math.random() * glyphs.length) | 0])).join("");
+          });
+          if (++tick > total * 4) { clearInterval(timer); spans.forEach((el, si) => (el.textContent = finals[si])); }
+        }, 45);
+      }
 
       // ---- Easter eggs: type a phrase anywhere ----
       const eggs = {

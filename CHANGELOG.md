@@ -2,6 +2,14 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.4.0
+
+- Two-mode palette: Matrix dark for the hero, very light grey (#F2F4F2) with document green (#035704) and logo green (#327641) for the rest.
+- The wordmark bridges both: Matrix glow on dark, document green with a faint Matrix halo on light (nav and footer).
+- The wordmark decodes out of random glyphs on load (skipped with reduced motion).
+- Services and open source are now a rate sheet of ruled rows instead of identical cards.
+- Footer copy and labels tidied.
+
 ## v0.3.1
 
 - Wordmark and tagline return to the v0.1.0 style: system monospace, wide tracking, soft double glow.
