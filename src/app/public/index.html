@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="version" content="0.9.1" />
+  <meta name="version" content="0.9.2" />
   <title>neon1</title>
   <meta name="description" content="neon1 is a one-person technology practice in New York: cloud and AI engineering, business automation, networks, and cameras." />
   <meta name="theme-color" content="#0D0208" />
@@ -282,6 +282,9 @@
     .view { min-height: calc(var(--vh, 100svh) - 64px); display: flex; flex-direction: column; justify-content: center; scroll-margin-top: 64px;
       padding-top: clamp(28px, 5vh, 56px); padding-bottom: clamp(28px, 5vh, 56px); }
     .view > .btn { align-self: center; }
+    /* Some phone browsers draw their toolbar over the page without shrinking the
+       viewport, so leave room for it at the end of each view. */
+    @media (pointer: coarse) { .view { padding-bottom: calc(clamp(28px, 5vh, 56px) + 72px); } }
     .awake { padding-top: 0; }
     .story { display: block; max-width: 720px; }
     .story p { font-size: 18px; line-height: 1.65; margin: 0 0 18px; }
@@ -486,7 +489,7 @@
     </div>
     <div class="legal">
       <span>© <span id="yr"></span> NEON1 LLC, New York</span>
-      <span>No tracking or cookies. v0.9.1</span>
+      <span>No tracking or cookies. v0.9.2</span>
     </div>
   </footer>
   </div>

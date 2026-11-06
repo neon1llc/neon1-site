@@ -16,8 +16,8 @@
   const { animate, stagger } = M;
 
   const HEADER = 64;
-  const THRESHOLD = 176;   // input distance (px) needed to move to the next view
-  const GIVE = 0.36;       // how far the page moves per px of input while resisting
+  const THRESHOLD = 141;   // input distance (px) needed to move to the next view
+  const GIVE = 0.43;       // how far the page moves per px of input while resisting
   const MAX_GIVE = 72;     // the most the page gives before it settles
   const IDLE = 160;        // ms without input that ends a gesture
   const settleEase = [0.22, 1, 0.36, 1];
@@ -113,7 +113,7 @@
   }
 
   // One step of input, positive is down.
-  function input(d) {
+  function input(d, direct) {
     if (settling || !menu.hidden || !d) return;
     const now = performance.now();
     const newGesture = now - lastInput > IDLE;
@@ -126,7 +126,7 @@
       const i = indexAt(target), [top, bottom] = range(i);
       if (newGesture) gestureFromEdge = (d > 0 && target >= bottom - 1) || (d < 0 && target <= top + 1);
       const next = target + d;
-      if (next >= top && next <= bottom) { target = next; return; }
+      if (next >= top && next <= bottom) { target = next; if (direct) { y = target; scrollTo(0, y); } return; }
       const dir = next > bottom ? 1 : -1;
       target = dir > 0 ? bottom : top;
       if ((dir > 0 && i === views.length - 1) || (dir < 0 && i === 0)) return;
@@ -176,7 +176,7 @@
     const now = performance.now();
     vel = dy / Math.max(1, now - tLast);
     tLast = now; tY = cy; tX = cx;
-    input(dy);
+    input(dy, true);
   }, { passive: false });
   addEventListener("touchend", () => {
     if (axis !== "y" || settling) return;
