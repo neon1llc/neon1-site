@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="version" content="0.6.0" />
   <title>neon1</title>
-  <meta name="description" content="neon1 is a small technology practice in New York: cloud and AI engineering, business automation, networks and cameras." />
+  <meta name="description" content="neon1 is a one-person technology practice in New York: cloud and AI engineering, business automation, networks and cameras." />
   <meta name="theme-color" content="#0D0208" />
   <meta property="og:title" content="neon1" />
   <meta property="og:description" content="1 is glad to be of service." />
@@ -187,6 +187,88 @@
       .cue span { animation: none; transform: translateY(14px); }
       .card, .card:hover { transition: none; transform: none; }
     }
+
+    /* ---- v0.6.0: measured from the reference study (see CHANGELOG) ---- */
+    /* Header: fixed and clear over the rain, frosted light once the page wakes up. */
+    header { position: fixed; left: 0; right: 0; top: 0; height: 64px; background: transparent; border-bottom: 0;
+      backdrop-filter: none; transition: background .24s cubic-bezier(.28,.11,.32,1), box-shadow .24s cubic-bezier(.28,.11,.32,1); }
+    header nav { height: 64px; padding-top: 0; padding-bottom: 0; }
+    header.light { background: rgba(242,244,242,.8); -webkit-backdrop-filter: saturate(1.8) blur(20px); backdrop-filter: saturate(1.8) blur(20px);
+      box-shadow: 0 1px 0 rgba(18,36,26,.08); }
+    .hero { min-height: 100svh; }
+    /* Soft seam between the Matrix and the page. */
+    .awake { background: linear-gradient(to bottom, rgba(242,244,242,0) 0, rgba(242,244,242,.7) 140px, var(--paper) 280px); }
+
+    /* Type scale: big, tight section headings; mono kept for labels and the prompt mark. */
+    section { max-width: 1200px; padding: 112px 24px; }
+    nav { max-width: 1200px; padding-left: 24px; padding-right: 24px; }
+    h2 { font: 600 clamp(34px, 4.6vw, 54px)/1.05 var(--sans); letter-spacing: -.022em; color: var(--text); margin: 0 0 40px; }
+    h2::before { font: 500 .5em var(--mono); vertical-align: .35em; margin-right: .2em; }
+    .lead { font-size: 17px; line-height: 1.55; }
+
+    /* Services: one two-tone sentence per row. */
+    .say-rows { border-top: 1px solid rgba(18,36,26,.12); }
+    .say { padding: 30px 0 32px; border-bottom: 1px solid rgba(18,36,26,.12); }
+    .say .idx { margin: 0 0 10px; font: 500 12px var(--mono); color: var(--glow); }
+    .say .line { margin: 0; max-width: 980px; font: 500 clamp(21px, 2.3vw, 28px)/1.3 var(--sans); letter-spacing: -.02em; }
+    .say .line strong { color: var(--ink); font-weight: 600; }
+    .say .line span { color: #6b7d71; }
+    .quote { margin-top: 32px; max-width: 680px; }
+
+    /* Process: sticky title on the left, a timeline on the right. */
+    .split { display: grid; grid-template-columns: minmax(220px, 1fr) 2fr; gap: 48px; align-items: start; }
+    .split h2 { position: sticky; top: 96px; }
+    .timeline { display: block; border-left: 1px solid rgba(18,36,26,.16); margin-left: 6px; }
+    .timeline div { position: relative; border: 0; padding: 0 0 40px 32px; }
+    .timeline div:last-child { padding-bottom: 0; }
+    .timeline div::after { content: ""; position: absolute; left: -5px; top: 6px; width: 9px; height: 9px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 0 4px var(--paper); }
+    .timeline h3 { font-size: 19px; margin: 4px 0 6px; }
+    .timeline p { font-size: 16px; max-width: 520px; }
+    @media (max-width: 760px) { .split { grid-template-columns: 1fr; gap: 8px; } .split h2 { position: static; } }
+
+    /* Story column and project rows on the same rules. */
+    .story { max-width: 1000px; }
+    .awake .rows, .awake .row { border-color: rgba(18,36,26,.12); }
+    .row h3 { font-size: 18px; }
+
+    /* Buttons: one system, 44px, small corners. */
+    .btn { min-height: 44px; border-radius: 4px; padding: 0 20px; }
+    header .btn { min-height: 36px; padding: 0 14px; }
+    .btn-primary { background: var(--deep); border-color: var(--deep); color: #00FF41; box-shadow: none; }
+    .awake .btn-primary { background: var(--brand); border-color: var(--brand); color: var(--paper); }
+
+    /* One reveal, one curve: fade and rise 8px once, staggered. */
+    /* Recent work: three short cases with one measured line each. */
+    .cases { display: grid; gap: 20px; grid-template-columns: repeat(6, 1fr); }
+    .case { grid-column: span 2; } .case:nth-child(n+4) { grid-column: span 3; }
+    @media (max-width: 960px) { .cases { grid-template-columns: 1fr 1fr; } .case, .case:nth-child(n+4) { grid-column: span 1; } .case:last-child { grid-column: 1 / -1; } }
+    @media (max-width: 640px) { .cases { grid-template-columns: 1fr; } .case:last-child { grid-column: auto; } }
+    .case { background: #fff; border: 1px solid rgba(18,36,26,.1); border-radius: 6px; padding: 28px; display: flex; flex-direction: column; }
+    .case .idx { margin: 0 0 14px; font: 500 12px var(--mono); color: var(--glow); }
+    .case h3 { font: 600 21px/1.25 var(--sans); letter-spacing: -.015em; margin: 0 0 12px; color: var(--ink); }
+    .case p { margin: 0 0 18px; color: var(--muted); font-size: 15.5px; line-height: 1.6; }
+    .case .stat { margin: auto 0 0; padding-top: 16px; border-top: 1px solid rgba(18,36,26,.1); font: 13px var(--mono); color: var(--muted); }
+    .case .stat b { color: var(--brand); font-weight: 600; }
+    /* Questions: native disclosure, ruled rows. */
+    .faq { max-width: 860px; border-top: 1px solid rgba(18,36,26,.12); }
+    .faq details { border-bottom: 1px solid rgba(18,36,26,.12); }
+    .faq summary { cursor: pointer; list-style: none; padding: 20px 32px 20px 0; position: relative; font: 500 19px/1.35 var(--sans); letter-spacing: -.01em; color: var(--ink); }
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary::after { content: "+"; position: absolute; right: 4px; top: 18px; font: 400 22px var(--mono); color: var(--glow); transition: transform .2s; }
+    .faq details[open] summary::after { transform: rotate(45deg); }
+    .faq details p { margin: -4px 0 22px; max-width: 720px; color: var(--muted); }
+    body { transition: background-color .4s; } body.woke { background-color: var(--paper); }
+    .foot, .legal { max-width: 1200px; padding-left: 24px; }
+    /* Views: each section is a "view". Motion (js/motion) runs the entrances; without JS everything is visible. */
+    .motion-ready .view h2, .motion-ready .view .reveal-on { opacity: 0; }
+    @media (min-width: 900px) and (min-height: 640px) and (prefers-reduced-motion: no-preference) {
+      html { scroll-snap-type: y proximity; }
+      .hero, .view { scroll-snap-align: start; scroll-margin-top: 64px; }
+      .view { min-height: calc(100svh - 64px); display: flex; flex-direction: column; justify-content: center; }
+      .view.split { display: grid; align-content: center; }
+    }
+    @media (prefers-reduced-motion: reduce) { header { transition: none; } }
+    .intro { margin: -16px 0 36px; }
   </style>
 </head>
 <body>
@@ -205,9 +287,10 @@
       </a>
       <ul class="links">
         <li><a href="#services">services</a></li>
-        <li><a href="#how">how we work</a></li>
+        <li><a href="#projects">work</a></li>
+        <li><a href="#how">how it works</a></li>
         <li><a href="#work">open source</a></li>
-        <li><a class="btn btn-ghost" href="#contact">contact</a></li>
+        <li><a class="btn btn-ghost" href="#contact">book a call</a></li>
       </ul>
       <button class="chip menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="menu">menu</button>
     </nav>
@@ -217,9 +300,11 @@
   <div class="menu" id="menu" hidden>
     <ul>
       <li><a href="#services">services</a></li>
-      <li><a href="#how">how we work</a></li>
+      <li><a href="#projects">work</a></li>
+      <li><a href="#how">how it works</a></li>
       <li><a href="#work">open source</a></li>
       <li><a href="#why">why neon1</a></li>
+      <li><a href="#faq">questions</a></li>
       <li><a href="#contact">contact</a></li>
     </ul>
   </div>
@@ -234,52 +319,89 @@
 
   <div class="awake">
   <main>
-    <section id="services" aria-labelledby="services-h">
+    <section id="services" class="view" aria-labelledby="services-h">
       <h2 id="services-h">services</h2>
-      <div class="rows">
-        <div class="row">
-          <h3>Home &amp; local tech</h3>
-          <p class="price">homes &amp; small offices</p>
-          <p>Cameras, Wi-Fi, home and office networks, new devices, and enough security training to keep it all safe.</p>
+      <div class="rows say-rows">
+        <div class="say reveal-on">
+          <p class="idx">01 · for homes &amp; small offices</p>
+          <p class="line"><strong>Home &amp; local tech.</strong> <span>Wi-Fi that reaches every room, cameras that record when they should, new laptops set up properly, and a short lesson on spotting phishing.</span></p>
         </div>
-        <div class="row">
-          <h3>Business workflows</h3>
-          <p class="price">small businesses</p>
-          <p>The email, spreadsheets, POS and apps a small business runs on, connected so the repetitive parts happen on their own.</p>
+        <div class="say reveal-on">
+          <p class="idx">02 · for small businesses</p>
+          <p class="line"><strong>Business workflows.</strong> <span>Your email, spreadsheets, POS and booking apps connected to each other, so nobody retypes orders at the end of the day.</span></p>
         </div>
-        <div class="row">
-          <h3>Cloud &amp; AI engineering</h3>
-          <p class="price">technical teams</p>
-          <p>AWS set up as code, CI/CD pipelines, RAG and LLM systems, migrations, backups and recovery.</p>
+        <div class="say reveal-on">
+          <p class="idx">03 · for technical teams</p>
+          <p class="line"><strong>Cloud &amp; AI engineering.</strong> <span>AWS accounts set up as code, deploy pipelines your team can trust, RAG and LLM systems, migrations, and backups that get test restores.</span></p>
+        </div>
+        <div class="say reveal-on">
+          <p class="idx">04 · for teams, schools and families</p>
+          <p class="line"><strong>Security training and readiness.</strong> <span>Plain-language sessions on networks, cameras, connected devices, fraud and data brokers, plus SOC 2 and other security readiness for companies heading into an audit.</span></p>
         </div>
       </div>
-      <p class="lead" style="margin-top:22px">Every project starts with a free 15-minute call and a fixed quote. Accounts and bills stay in your name, and you get the docs to run things yourself.</p>
+      <p class="lead quote reveal-on">The first call is free and takes 15 minutes. If I can help, you get a fixed price for the whole job before any work starts. If a settings change will fix it, I'll just tell you on the call. Accounts and bills stay in your name.</p>
     </section>
 
-    <section id="how" aria-labelledby="how-h">
-      <h2 id="how-h">how we work</h2>
-      <div class="steps">
-        <div><h3>Listen</h3><p>Show us how the work happens today, with a real example.</p></div>
-        <div><h3>Decide</h3><p>Sometimes that means a new system. Often it is a setting, a cleanup, or leaving it alone.</p></div>
-        <div><h3>Build</h3><p>Small changes, tested, and shown to you as they land.</p></div>
-        <div><h3>Hand over</h3><p>Training and written docs so you don't need us to keep it running. Ongoing care if you want it.</p></div>
+    <section id="projects" class="view" aria-labelledby="projects-h">
+      <h2 id="projects-h">work</h2>
+      <p class="lead intro reveal-on">Some of it is cloud systems for companies. Some of it is getting a grandparent into their email. The goal is the same either way: people should be better off with their tech than they were before.</p>
+      <div class="cases">
+        <article class="case reveal-on">
+          <p class="idx">accounting firm · cloud &amp; AI</p>
+          <h3>Answers in seconds, with the source attached</h3>
+          <p>Staff dug through Microsoft 365 for policies and client documents, or interrupted a senior colleague. I built an assistant on AWS Bedrock that answers only from approved documents the person is allowed to see, cites them, and says so when it doesn't know.</p>
+          <p class="stat"><b>~5 min → 14 s</b> median lookup · recall 72% → 94%</p>
+        </article>
+        <article class="case reveal-on">
+          <p class="idx">dermatology practice · workflows</p>
+          <h3>Patient intake out of a shared inbox</h3>
+          <p>A new practice ran intake through one email inbox, chasing missing documents and retyping them into the patient record. I mapped the process with the staff and built a small portal on AWS, so patients upload once and the office can see what's complete.</p>
+          <p class="stat"><b>2.6 days → 3.4 hours</b> turnaround · 24 → 8 min per intake</p>
+        </article>
+        <article class="case reveal-on">
+          <p class="idx">automotive business · migration</p>
+          <h3>Two offices off local servers</h3>
+          <p>The application, database and files lived on two local servers. With their technical lead, I moved everything to AWS, linked both locations over a VPN, tested the real daily tasks from each office, and handed him an environment he runs himself.</p>
+          <p class="stat"><b>2 servers, 2 locations</b> · no app rewrite</p>
+        </article>
+        <article class="case reveal-on">
+          <p class="idx">schools, families &amp; teams · security</p>
+          <h3>Security talks for people who aren't security people</h3>
+          <p>Sessions for teachers, parents, engineers and executives, including seminars in Manhattan for groups of 30 or more. Home and business networks, cameras and connected devices, fraud, data brokers, the dark web, and keeping physical spaces safe.</p>
+          <p class="stat"><b>30+ people</b> per seminar · free for the school that started it</p>
+        </article>
+        <article class="case reveal-on">
+          <p class="idx">family &amp; friends · home tech</p>
+          <h3>From a camera system to Grandma's email</h3>
+          <p>I put a camera system in at my dad's house and moved family onto a password manager. Not every job is a cloud migration, and the small ones count. If someone you know just needs help opening their email, that's a fine reason to call.</p>
+          <p class="stat"><b>small jobs welcome</b> · patience included</p>
+        </article>
+      </div>
+    </section>
+    <section id="how" class="view split" aria-labelledby="how-h">
+      <h2 id="how-h">how it works</h2>
+      <div class="steps timeline">
+        <div class="reveal-on"><h3>Listen</h3><p>Show me how the work gets done today. One real example is enough.</p></div>
+        <div class="reveal-on"><h3>Decide</h3><p>Sometimes that means a new system. Often it's a setting, a cleanup, or leaving it alone.</p></div>
+        <div class="reveal-on"><h3>Build</h3><p>Small changes, tested, and shown to you as they land.</p></div>
+        <div class="reveal-on"><h3>Hand over</h3><p>I show you how it works and write it down, so you can run it without me. Ongoing care if you want it.</p></div>
       </div>
     </section>
 
-    <section id="work" aria-labelledby="work-h">
+    <section id="work" class="view" aria-labelledby="work-h">
       <h2 id="work-h">open source</h2>
       <div class="rows">
-        <a class="row" href="https://github.com/neon1llc/aws-clip">
+        <a class="row reveal-on" href="https://github.com/neon1llc/aws-clip">
           <h3>aws-clip</h3>
           <p class="state">available</p>
           <p>A wrapper around the AWS CLI that checks which account you are in, explains what a command will do, and hides secrets in its output.</p>
         </a>
-        <div class="row">
+        <div class="row reveal-on">
           <h3>DeployOps</h3>
           <p class="state dim">in development</p>
           <p>Deploys to AWS, Azure and Google Cloud with approvals, a record of what happened, and rollback.</p>
         </div>
-        <div class="row">
+        <div class="row reveal-on">
           <h3>1NEON</h3>
           <p class="state dim">in development</p>
           <p>Pronounced "onion". A client workspace for every layer of a project: the plan, the work, files, decisions and ongoing care.</p>
@@ -287,22 +409,34 @@
       </div>
     </section>
 
-    <section id="why" aria-labelledby="why-h">
+    <section id="why" class="view" aria-labelledby="why-h">
       <h2 id="why-h">why neon1</h2>
-      <div class="story">
+      <div class="story reveal-on">
         <div>
-          <p>Neo, "the One", is an ordinary person who chooses to help others see clearly. Andrew, the robot in <em>Bicentennial Man</em>, spends two centuries serving with curiosity and heart.</p>
-          <p class="lead">Neo means new. The 1 is each person we work with, and all of us together. Neon is a light you can't miss.</p>
+          <p>The name comes from two characters. Neo, "the One" in <em>The Matrix</em>, is an ordinary person who chooses to help other people see clearly. Andrew, the robot in <em>Bicentennial Man</em>, spends two hundred years being of service and never stops being curious.</p>
+          <p>neon1 started at a grade school. I helped budget and set up a new STEM edtech system there, and invited teachers and parents to free sessions on staying safe online. Teaching people about tech and security in person is what gave me the confidence to offer the same help more widely.</p>
+          <p class="lead">Neo also means new, and neon is hard to miss. The 1 is whoever I'm working with.</p>
         </div>
-        <blockquote>"1 is glad to be of service."</blockquote>
+        <blockquote class="reveal-on">"1 is glad to be of service."</blockquote>
       </div>
     </section>
 
-    <section id="contact" class="contact" aria-labelledby="contact-h">
+    <section id="faq" class="view" aria-labelledby="faq-h">
+      <h2 id="faq-h">questions</h2>
+      <div class="faq">
+        <details class="reveal-on"><summary>Do you come on site?</summary><p>Yes. I also work remotely, or on your own network through a secure connection that I set up for the job and that's removed when it's done.</p></details>
+        <details class="reveal-on"><summary>When do you work?</summary><p>Weekends from 8am to 8pm, and some weekday evenings from 6 to 9pm. That's about 10 to 20 hours a week of project time.</p></details>
+        <details class="reveal-on"><summary>How long does a project take?</summary><p>Small jobs take a week or two, medium ones two to four weeks, and bigger projects four to six. I take on up to two clients at a time so each one gets proper attention.</p></details>
+        <details class="reveal-on"><summary>How is the price set?</summary><p>After the free call I send a fixed price for the whole job. It doesn't change unless you change what you're asking for.</p></details>
+        <details class="reveal-on"><summary>Do you run security training?</summary><p>Yes, for anyone from parents and teachers to engineers and executives. I've run sessions in Manhattan for groups of 30 or more, covering home and business networks, cameras and IoT, fraud, data brokers, the dark web and the security of physical spaces.</p></details>
+        <details class="reveal-on"><summary>What don't you do?</summary><p>I don't repair electronics, though I can debug software and hardware installs and get them working together. I don't handle personal or health data without the right agreements in place, such as a Business Associate Agreement, but I can help you get them. I'm not a lawyer, but I'll work alongside yours on the technical side.</p></details>
+      </div>
+    </section>
+    <section id="contact" class="view contact" aria-labelledby="contact-h">
       <h2 id="contact-h">contact</h2>
-      <p class="lead">Tell us what's getting in the way. A couple of lines is enough, and the first call is free.</p>
-      <a class="btn btn-primary" href="mailto:1isgladtobeofservice@neon1.tech?subject=Free%2015-minute%20call">book a free 15-minute call</a>
-      <p class="lead" style="margin-top:16px"><a href="mailto:1isgladtobeofservice@neon1.tech">1isgladtobeofservice@neon1.tech</a></p>
+      <p class="lead reveal-on">Tell me what's getting in the way. A couple of lines is enough. Book a free 15-minute call, or just send an email.</p>
+      <a class="btn btn-primary reveal-on" href="mailto:1isgladtobeofservice@neon1.tech?subject=Free%2015-minute%20call">book a call</a>
+      <p class="lead" style="margin-top:16px">or email <a href="mailto:1isgladtobeofservice@neon1.tech">1isgladtobeofservice@neon1.tech</a></p>
     </section>
   </main>
 
@@ -341,6 +475,8 @@
   </div>
   <div class="egg" id="egg" role="status" aria-live="polite"></div>
 
+  <script src="/js/motion-11.18.2.min.js" defer></script>
+  <script defer src="/js/views.js"></script>
   <script>
     (() => {
       "use strict";
@@ -441,6 +577,7 @@
         ctl.style.opacity = t > 0.6 ? "0" : "1";
         ctl.style.pointerEvents = t > 0.6 ? "none" : "auto";
         header.classList.toggle("light", t > 0.95);
+        document.body.classList.toggle("woke", t >= 1);
       }
       addEventListener("scroll", onScroll, { passive: true });
 

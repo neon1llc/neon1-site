@@ -2,6 +2,28 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.7.0
+
+- Each section is a view. The first time you reach one, its heading slides in from the direction you scrolled from, then its main pieces follow one by one. After that, views fade with scroll position and hold their fade when you stop.
+- On larger screens, scrolling settles at the start of each view (proximity snapping, so long views still scroll freely).
+- Motion (motion.dev, MIT, v11.18.2) is self-hosted in /js. Without JavaScript, or with reduced motion, everything shows at once with no snapping.
+- Work grows to five cards, three over two: the three client projects, security talks, and small home and family jobs, with a short intro line.
+
+## v0.6.0
+
+- Header links are back top right. The header is fixed, clear over the rain, and turns frosted light once the page below the hero takes over. On phones the links fold into a menu.
+- Greener glow (#6CFFA8 over #00E676) in place of the lime cast.
+- Plainer copy throughout. The "works together, stays yours" line is gone, services name real jobs, and the quote is explained instead of hidden.
+- Nav: services, how it works, open source, book a call.
+- Larger, tighter section headings. Services read as one sentence per row. The process is a timeline beside a sticky heading.
+- One button system (44px, small corners) and one scroll reveal (fade and rise 8px, once), both off with reduced motion.
+- The page background turns light after the hero, so the seam no longer shows a grey band.
+- Copy is first person ("I"), since neon1 is one person.
+- Recent work: three short client cases (accounting knowledge assistant, dermatology intake, two-office AWS migration), each with one measured result.
+- A fourth service row for security training and SOC 2 readiness.
+- A questions section: on site and remote work, hours, project length, pricing, training, and what's out of scope.
+- The story now includes how neon1 started, at a grade school.
+
 ## v0.5.0
 
 - Hero is only the wordmark, "1 is glad to be of service." and a falling scroll cue.
