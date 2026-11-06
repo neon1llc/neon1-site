@@ -4,6 +4,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## v0.9.1
 
+- Every list of three or more uses a comma before the final "and" or "or".
 - Views size themselves to the browser's visible height, so they end at the bottom edge in Safari, DuckDuckGo, Chrome and Firefox, on desktop and phone. Text no longer enlarges in phone landscape.
 - neon1 marks: "neon" is set 1.3x so its letters match the height of the "1", at a lighter weight so the strokes match. All marks use the self-hosted JetBrains Mono so they look the same in every browser.
 - Rain words can start anywhere on screen, use the same weight as the rain, and appear more often. Values and offerings are most common, then neon1's names and slogans (in neon1 green), then Matrix words. All other words share one gold.
