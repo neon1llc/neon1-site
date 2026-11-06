@@ -357,11 +357,11 @@
     :root { --glass-r: 8px; }
     .glass, .rainctl .chip, header:not(.light) .logo, header:not(.light) .links a, header:not(.light) .menu-btn {
       border-radius: var(--glass-r); background: transparent; box-shadow: none;
-      -webkit-backdrop-filter: blur(7px); backdrop-filter: blur(7px); }
+      -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
     header:not(.light) .logo, header:not(.light) .links a:not(.btn) { padding: 7px 12px; }
     header:not(.light) .links { gap: 10px; }
     .links .btn, .menu-btn { border-radius: var(--glass-r); }
-    .hero-pane { padding: clamp(22px, 4vh, 36px) clamp(28px, 5vw, 56px); }
+    .hero-pane { padding: 14px 20px; }
     /* The 1.3x "neon" adds .3em of empty line space above the letters; pull it back so the pane looks balanced */
     .hero-pane .brand { margin-top: -.3em; }
     body { transition: background-color .4s; } body.woke { background-color: var(--paper); }
