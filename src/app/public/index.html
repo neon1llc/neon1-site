@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="version" content="0.9.0" />
+  <meta name="version" content="0.9.1" />
   <title>neon1</title>
   <meta name="description" content="neon1 is a one-person technology practice in New York: cloud and AI engineering, business automation, networks and cameras." />
   <meta name="theme-color" content="#0D0208" />
@@ -12,6 +12,10 @@
   <meta property="og:url" content="https://neon1.tech/" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐇</text></svg>" />
   <link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <script>
+    // The visible height, which some mobile browsers report differently from CSS vh units.
+    (() => { const set = () => document.documentElement.style.setProperty("--vh", (window.visualViewport ? visualViewport.height : innerHeight) + "px"); set(); addEventListener("resize", set); if (window.visualViewport) visualViewport.addEventListener("resize", set); })();
+  </script>
   <style>
     /* ---- Fonts: self-hosted, SIL OFL (see /fonts) ---- */
     @font-face { font-family: "Inter"; src: url(/fonts/inter-latin-wght-normal.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
@@ -37,7 +41,7 @@
       --r: 14px;
     }
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+    html { scroll-behavior: smooth; scroll-padding-top: 72px; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
     body { margin: 0; background: var(--void); color: var(--text); font: 16px/1.65 var(--sans); }
     a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3px; }
     :focus-visible { outline: 2px solid var(--glow); outline-offset: 3px; border-radius: 6px; }
@@ -80,11 +84,11 @@
     header.light { backdrop-filter: blur(10px); background: rgba(242,244,242,.92); border-bottom-color: rgba(3,87,4,.14); }
     header.light .logo, header.light .btn-ghost { color: var(--brand); border-color: var(--brand); }
     header.light .logo { text-shadow: none; }
-    .mark-light { font: 700 22px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .06em; color: var(--brand);
+    .mark-light { font: 700 17px var(--mono); letter-spacing: .06em; color: var(--brand);
       text-shadow: none; margin: 0 0 10px; }
     header.light .chip { color: var(--brand); background: #fff; border-color: rgba(3,87,4,.25); }
     nav { max-width: 1100px; margin: 0 auto; padding: 12px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo { display: inline-flex; align-items: center; gap: 10px; color: var(--neon); text-decoration: none; font: 700 17px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .06em; text-shadow: 0 0 8px rgba(108,255,168,.45); }
+    .logo { display: inline-flex; align-items: center; gap: 10px; color: var(--neon); text-decoration: none; font: 700 13px var(--mono); letter-spacing: .06em; text-shadow: 0 0 8px rgba(108,255,168,.45); }
     .logo svg { width: 26px; height: 26px; }
     nav ul { list-style: none; display: flex; align-items: center; gap: 18px; margin: 0 0 0 auto; padding: 0; }
     nav ul a:not(.btn) { color: var(--muted); text-decoration: none; font: 13px var(--mono); }
@@ -121,10 +125,13 @@
     /* ---- Hero: quiet, lets the rain carry the drama ---- */
     .hero { min-height: calc(100svh - 56px); display: grid; place-content: center; text-align: center; }
     /* Wordmark + tagline keep the v0.1 look: system monospace, wide tracking, soft double glow. */
-    .brand { font: 700 clamp(38px, 5.5vw, 68px)/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    .brand { font: 700 clamp(29px, 4.2vw, 52px)/1 var(--mono);
       letter-spacing: .06em; margin: 0; color: var(--neon);
       text-shadow: 0 0 8px rgba(108,255,168,.65), 0 0 20px rgba(0,230,118,.35); }
-    .brand .one, .logo .one, .mark-light .one { font-size: .77em; }
+    /* neon1 marks: "neon" is set 1.3x so its letters match the height of "1"
+       (x-height 0.56em vs digit 0.73em), at weight 450 so its strokes match the 700 "1". */
+    .ne { font-size: 1.3em; font-weight: 450; }
+    .brand .one, .logo .one, .mark-light .one { font-size: 1em; font-weight: 700; }
     .tagline { font: clamp(13px, 1.6vw, 16px)/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       color: var(--neon); opacity: .78; margin: 18px auto 0; max-width: 560px; }
     .reveal { opacity: 0; animation: rise .9s ease-out forwards; }
@@ -195,7 +202,7 @@
     header nav { height: 64px; padding-top: 0; padding-bottom: 0; }
     header.light { background: rgba(242,244,242,.8); -webkit-backdrop-filter: saturate(1.8) blur(20px); backdrop-filter: saturate(1.8) blur(20px);
       box-shadow: 0 1px 0 rgba(18,36,26,.08); }
-    .hero { min-height: 100svh; }
+    .hero { min-height: var(--vh, 100svh); }
     /* Soft seam between the Matrix and the page. */
     .awake { background: linear-gradient(to bottom, rgba(242,244,242,0) 0, rgba(242,244,242,.7) 140px, var(--paper) 280px); }
 
@@ -272,7 +279,7 @@
     .foot, .legal { max-width: 1200px; padding-left: 24px; }
     /* Views: each section is a "view". Motion (js/motion) runs the entrances; without JS everything is visible. */
     .motion-ready .view h2, .motion-ready .view .reveal-on { opacity: 0; }
-    .view { min-height: calc(100svh - 64px); display: flex; flex-direction: column; justify-content: center; scroll-margin-top: 64px;
+    .view { min-height: calc(var(--vh, 100svh) - 64px); display: flex; flex-direction: column; justify-content: center; scroll-margin-top: 64px;
       padding-top: clamp(28px, 5vh, 56px); padding-bottom: clamp(28px, 5vh, 56px); }
     .view > .btn { align-self: center; }
     .awake { padding-top: 0; }
@@ -298,7 +305,7 @@
           <path d="M6 6a24 24 0 0 1 24 24v30M6 12a18 18 0 0 1 18 18v30M6 18a12 12 0 0 1 12 12v30M6 24a6 6 0 0 1 6 6v30" />
           <path d="M34 6a24 24 0 0 1 24 24v30M34 12a18 18 0 0 1 18 18v30M34 18a12 12 0 0 1 12 12v30M34 24a6 6 0 0 1 6 6v30" />
         </svg>
-        <span>neon<span class="one">1</span></span>
+        <span><span class="ne">neon</span><span class="one">1</span></span>
       </a>
       <ul class="links">
         <li><a href="#services">services</a></li>
@@ -326,7 +333,7 @@
 
   <div id="top" class="top">
     <section class="hero">
-      <h1 class="brand" aria-label="neon1"><span class="dec" aria-hidden="true">neon</span><span class="one dec" aria-hidden="true">1</span></h1>
+      <h1 class="brand" aria-label="neon1"><span class="ne dec" aria-hidden="true">neon</span><span class="one dec" aria-hidden="true">1</span></h1>
       <p class="tagline reveal d1">1 is glad to be of service.</p>
       <a class="cue reveal d2" href="#services" aria-label="Scroll to services"><span></span></a>
     </section>
@@ -450,16 +457,15 @@
     </section>
     <section id="contact" class="view contact" aria-labelledby="contact-h">
       <h2 id="contact-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>contact</h2>
-      <p class="lead reveal-on">Tell me what's getting in the way. Pick a free 15-minute slot on my calendar, or just send a couple of lines by email.</p>
+      <p class="lead reveal-on">Tell me what's getting in the way. Pick a free 15-minute slot on my calendar, or just send a couple of lines by <a href="mailto:neon1llc@gmail.com">email</a>.</p>
       <a class="btn btn-primary reveal-on" href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a call</a>
-      <p class="lead" style="margin-top:16px">or email <a href="mailto:neon1llc@gmail.com">neon1llc@gmail.com</a></p>
     </section>
   </main>
 
   <footer>
     <div class="foot">
       <div>
-        <p class="mark-light">neon<span class="one">1</span></p>
+        <p class="mark-light"><span class="ne">neon</span><span class="one">1</span></p>
         <p style="margin:0">1 is glad to be of service.</p>
       </div>
       <div>
@@ -467,20 +473,20 @@
         <ul>
           <li><a href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a call</a></li>
           <li><a href="mailto:neon1llc@gmail.com">email</a></li>
-          <li><a href="https://www.linkedin.com/in/pradeep-tathineni/" rel="noopener">LinkedIn</a></li>
+          <li><a href="https://www.linkedin.com/in/pradeep-tathineni/" rel="noopener">linkedin</a></li>
         </ul>
       </div>
       <div>
         <h4>elsewhere</h4>
         <ul>
-          <li><a href="https://github.com/neon1llc" rel="noopener">GitHub</a></li>
-          <li><a href="https://www.linkedin.com/company/neon1llc" rel="noopener">neon1 on LinkedIn</a></li>
+          <li><a href="https://github.com/neon1llc" rel="noopener">github</a></li>
+          <li><a href="https://www.linkedin.com/company/neon1llc" rel="noopener">neon1 on linkedin</a></li>
         </ul>
       </div>
     </div>
     <div class="legal">
       <span>© <span id="yr"></span> NEON1 LLC, New York</span>
-      <span>No tracking or cookies. v0.9.0</span>
+      <span>No tracking or cookies. v0.9.1</span>
     </div>
   </footer>
   </div>
@@ -501,79 +507,101 @@
 
       // ---- Matrix rain ----
       // Columns of glyphs with long fading trails. Now and then a column spells a
-      // word in its group's color and holds it long enough to read.
+      // word where it is and holds it long enough to read.
       // "grid" keeps every column in step on shared rows; "free" lets each fall at its own speed.
-      // The second button cycles the character set.
+      // The second button cycles the characters.
       const canvas = document.getElementById("rain");
       const ctx = canvas.getContext("2d");
+      const EMOJI = ["💻", "🔒", "📡", "🛰️", "🔌", "⚙️", "🧅", "🐇", "💊", "🕶️", "☁️", "🔑", "📷", "🛡️", "🤖", "💾", "📶", "🧠"];
+      const FACES = ["😀", "😃", "😄", "😁", "😆", "😅", "😂", "🙂", "😉", "😊", "😇", "🥰", "😍", "🤩", "😎", "🤓", "🧐", "🤔", "😴", "🤯", "🥳", "😏", "😌", "🙃"];
       const SETS = [
-        { name: "katakana", chars: "ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0123456789neon1" },
-        { name: "symbols", chars: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$#%&*+=<>/\\{}[]()∆∑∏√∞≈≠λΩπμΣΦΨ" },
-        { name: "emoji", chars: ["💻", "🔒", "📡", "🛰️", "🔌", "⚙️", "🧅", "🐇", "💊", "🕶️", "☁️", "🔑", "📷", "🛡️", "🤖", "💾", "📶", "🧠"] },
+        { name: "katakana", chars: [..."ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0123456789neon1"] },
+        { name: "numbers", chars: [..."0123456789"] },
+        { name: "symbols", chars: [..."ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz$#%&*+=<>/\\{}[]()∆∑∏√∞≈≠λΩπμΣΦΨ"] },
+        { name: "emoji", chars: EMOJI },
+        { name: "faces", chars: FACES },
         { name: "mixed", chars: null },
       ];
-      SETS[3].chars = [...SETS[0].chars, ...SETS[1].chars, ...SETS[2].chars, ...SETS[2].chars];
-      SETS.forEach((s) => { if (typeof s.chars === "string") s.chars = [...s.chars]; });
+      // Mixed keeps emoji rare so the text still reads as rain.
+      SETS[5].chars = [...SETS[0].chars, ...SETS[1].chars, ...SETS[2].chars, ...EMOJI.slice(0, 6), ...FACES.slice(0, 4)];
+      const isEmoji = (ch) => /\p{Extended_Pictographic}/u.test(ch);
+      // Word groups by how often they appear. All words share one gold, set apart
+      // from the rain by staying put; neon1's own names glow in its green.
+      const GOLD = "#ffd77a";
       const WORDS = [
-        { color: "#ffffff", words: ["the matrix", "neo", "trinity", "morpheus", "white rabbit", "red pill", "no spoon", "bicentennial man", "robin williams"] },
-        { color: "#8dffb4", words: ["neon1", "1withtechnology", "1isgladtobeofservice", "1NEON", "onion"] },
-        { color: "#7ef4ff", words: ["aws", "terraform", "go", "python", "rag", "llm", "ci/cd", "iot", "linux", "cdk"] },
-        { color: "#ffd77a", words: ["automation", "networks", "cameras", "pipelines", "migration", "security", "cloud"] },
-        { color: "#d3b8ff", words: ["listen", "simplicity", "ownership", "transparency", "recovery", "service"] },
+        { weight: 3, color: GOLD, alpha: 0.95, words: ["listen", "simplicity", "ownership", "transparency", "recovery", "service", "automation", "networks", "cameras", "pipelines", "migration", "security", "cloud", "aws", "terraform", "python", "rag", "llm", "ci/cd", "iot", "linux"] },
+        { weight: 2, color: "#6CFFA8", alpha: 1, glow: 6, words: ["neon1", "1withtechnology", "1isgladtobeofservice", "1NEON", "onion"] },
+        { weight: 1.3, color: GOLD, alpha: 0.75, words: ["neo", "trinity", "morpheus", "the matrix", "white rabbit", "red pill", "no spoon", "bicentennial man", "robin williams"] },
       ];
-      const WORD_CHANCE = 0.03; // per column restart
-      const FADE = 0.045;       // lower means longer trails
-      let size = 20, cols = [], frame = 0, running = true, grid = true, set = 0;
+      const TOTAL = WORDS.reduce((a, g) => a + g.weight, 0);
+      const WORD_RATE = 0.06; // chance per step that some column starts a word
+      const FADE = 0.045;     // lower means longer trails
+      let size = 20, rows = 0, cols = [], frame = 0, running = true, grid = true, set = 0;
       const reduce = matchMedia("(prefers-reduced-motion: reduce)");
 
-      // A column: y in rows, speed in rows per step, and an optional word being spelled.
       const speed = () => (grid ? 1 : 0.35 + Math.random() * 0.75);
-      const newCol = (y) => ({ y, v: speed(), word: null, wi: 0, color: null, wy: 0, hold: 0 });
-      function maybeWord(c) {
-        if (Math.random() > WORD_CHANCE) return;
-        const g = WORDS[(Math.random() * WORDS.length) | 0];
-        c.word = g.words[(Math.random() * g.words.length) | 0];
-        c.wi = 0; c.color = g.color; c.wy = Math.floor(c.y); c.hold = 45;
+      const newCol = (y) => ({ y, v: speed(), word: null, wi: 0, g: null, wy: 0, hold: 0 });
+      function startWord() {
+        let r = Math.random() * TOTAL, g = WORDS[0];
+        for (const w of WORDS) { if ((r -= w.weight) <= 0) { g = w; break; } }
+        const word = g.words[(Math.random() * g.words.length) | 0];
+        // Any free column whose head is far enough from the bottom for the whole word.
+        for (let tries = 0; tries < 8; tries++) {
+          const c = cols[(Math.random() * cols.length) | 0];
+          const wy = Math.floor(c.y);
+          if (c.word || wy < 1 || wy + word.length >= rows) continue;
+          Object.assign(c, { word, wi: 0, g, wy, hold: 45 });
+          return;
+        }
       }
       function resize() {
         const dpr = Math.min(devicePixelRatio || 1, 2);
         size = innerWidth < 640 ? 17 : 21;
         canvas.width = innerWidth * dpr; canvas.height = innerHeight * dpr;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        cols = Array.from({ length: Math.ceil(innerWidth / size) }, () => newCol(Math.random() * innerHeight / size));
-        ctx.textBaseline = "top";
+        rows = Math.floor(innerHeight / size);
+        cols = Array.from({ length: Math.ceil(innerWidth / size) }, () => newCol(Math.random() * rows));
+        ctx.textBaseline = "middle"; ctx.textAlign = "center";
         ctx.fillStyle = "#0D0208"; ctx.fillRect(0, 0, innerWidth, innerHeight);
       }
-      const font = (w) => `${w} ${size}px "JetBrains Mono", ui-monospace, "Apple Color Emoji", "Segoe UI Emoji", monospace`;
+      // Every glyph is centered in its cell; emoji are drawn smaller to match the text.
+      const MONO = `"JetBrains Mono", ui-monospace, monospace`;
+      function glyph(ch, x, y) {
+        if (isEmoji(ch)) ctx.font = `${Math.round(size * 0.72)}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`;
+        else ctx.font = `500 ${size}px ${MONO}`;
+        ctx.fillText(ch, x + size / 2, y + size / 2);
+      }
       function draw() {
+        ctx.globalAlpha = 1;
         ctx.fillStyle = `rgba(13, 2, 8, ${FADE})`;
         ctx.fillRect(0, 0, innerWidth, innerHeight);
+        if (Math.random() < WORD_RATE) startWord();
         const chars = SETS[set].chars;
         cols.forEach((c, i) => {
           const x = i * size;
           if (c.word) {
-            // Spell one letter per step, then hold. Each letter is painted on a
-            // cleared cell with a small glow, so the word stays sharp and readable.
+            // Spell one letter per step, then hold. Each letter sits on a cleared
+            // cell, in the same weight as the rain, so it stays sharp.
             if (c.wi < c.word.length) c.wi++; else c.hold--;
-            ctx.font = font(700);
             for (let k = 0; k < c.wi; k++) {
               const ch = c.word[k], wy = (c.wy + k) * size;
-              ctx.shadowBlur = 0; ctx.fillStyle = "#0D0208"; ctx.fillRect(x, wy, size, size);
+              ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+              ctx.fillStyle = "#0D0208"; ctx.fillRect(x, wy, size, size);
               if (ch === " ") continue;
-              ctx.shadowColor = c.color; ctx.shadowBlur = k === c.wi - 1 && c.wi < c.word.length ? 10 : 4;
-              ctx.fillStyle = c.color; ctx.fillText(ch, x + size * 0.18, wy);
+              ctx.globalAlpha = c.g.alpha;
+              ctx.shadowColor = c.g.color; ctx.shadowBlur = c.g.glow || 0;
+              ctx.fillStyle = c.g.color; glyph(ch, x, wy);
             }
-            ctx.shadowBlur = 0;
-            if (c.hold <= 0) { c.word = null; c.y = c.wy + c.wi; }
+            ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+            if (c.hold <= 0) { c.y = c.wy + c.wi; c.word = null; }
             return;
           }
           const y = (grid ? Math.floor(c.y) : c.y) * size;
           const r = Math.random();
-          ctx.font = font(500);
           ctx.fillStyle = r > 0.96 ? "#e9ffee" : r > 0.45 ? "#22ff7a" : "#00b84f";
-          ctx.fillText(chars[(Math.random() * chars.length) | 0], x, y);
+          glyph(chars[(Math.random() * chars.length) | 0], x, y);
           c.y += c.v;
-          if (c.y * size > innerHeight && Math.random() > 0.97) { Object.assign(c, newCol(0)); maybeWord(c); }
+          if (c.y > rows && Math.random() > 0.97) Object.assign(c, newCol(0));
         });
       }
 
