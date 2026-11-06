@@ -16,6 +16,9 @@ from html.parser import HTMLParser
 from urllib.parse import unquote, urlsplit
 
 
+# Paths served by other apps on the same domain, so not files in this site
+OTHER_APPS = ("/1NEON/",)
+
 # Script types node can check, attributes that hold URLs, and root-relative url() in CSS
 JS_TYPES = {"", "text/javascript", "application/javascript", "module"}
 REF_ATTRS = {"href", "src", "poster", "data"}
@@ -93,6 +96,8 @@ def check_links(path, page):
         if target not in page.ids:
             problems.append(f"{path}:{line}: no element with id '{target}'")
     for line, ref in page.refs:
+        if ref.startswith(OTHER_APPS):
+            continue
         local = unquote(urlsplit(ref).path).lstrip("/")
         if local and not os.path.isfile(os.path.join(root, local)):
             problems.append(f"{path}:{line}: missing file {ref}")
