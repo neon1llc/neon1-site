@@ -69,6 +69,10 @@
   document.addEventListener("click", (e) => {
     const b = e.target.closest("[data-case]");
     if (b) { e.preventDefault(); open(b.dataset.case, b); return; }
+
+    // Anywhere else on a card opens it too
+    const c = layer.hidden && e.target.closest(".case");
+    if (c) { const o = c.querySelector("[data-case]"); open(o.dataset.case, o); return; }
     if (e.target.closest("[data-close]")) close();
   });
 

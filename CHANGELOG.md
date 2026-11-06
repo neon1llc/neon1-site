@@ -4,7 +4,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## v0.10.0
 
-- "work" is now "case studies": six cards, adding a grade-school community project. Each card shows Need, Execution, Observation, and Next as four short lines, keeps its result line, and links to the full case study.
+- "work" is now "case studies": six cards, adding a grade-school community project. Each card shows Need, Execution, Observation, and Next as four short lines, keeps its result line, and opens its full case study from a brand-green ↗ in its corner, or a click anywhere on the card. The open panel closes with ↙ in the same corner.
 - A case study opens by growing out of its card into a panel over the page and shrinks back into the card when closed (×, Esc, or a click outside). The page stays where it was.
 - Rain drops keep falling after a word, trails are shorter, and the rain is a little softer.
 - Scroll resistance between views is cut in half.
