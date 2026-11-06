@@ -43,9 +43,9 @@
     :focus-visible { outline: 2px solid var(--glow); outline-offset: 3px; border-radius: 6px; }
 
     /* ---- Matrix rain: decorative layer behind everything ---- */
-    #rain { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; opacity: .75; }
+    #rain { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; opacity: .95; }
     .veil { position: fixed; inset: 0; z-index: 1; pointer-events: none;
-      background: radial-gradient(80% 60% at 50% 40%, rgba(13,2,8,.55), rgba(13,2,8,.8) 80%); }
+      background: radial-gradient(70% 45% at 50% 48%, rgba(13,2,8,.6), rgba(13,2,8,.15) 75%); }
     main, footer, .top { position: relative; z-index: 2; }
 
     /* ---- Buttons: one system (primary / ghost / chip) ---- */
@@ -79,9 +79,9 @@
     header { transition: background .4s, border-color .4s; }
     header.light { backdrop-filter: blur(10px); background: rgba(242,244,242,.92); border-bottom-color: rgba(3,87,4,.14); }
     header.light .logo, header.light .btn-ghost { color: var(--brand); border-color: var(--brand); }
-    header.light .logo { text-shadow: 0 0 10px rgba(0,230,118,.35); }
+    header.light .logo { text-shadow: none; }
     .mark-light { font: 700 22px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .06em; color: var(--brand);
-      text-shadow: 0 0 10px rgba(0,230,118,.4), 0 0 22px rgba(0,230,118,.18); margin: 0 0 10px; }
+      text-shadow: none; margin: 0 0 10px; }
     header.light .chip { color: var(--brand); background: #fff; border-color: rgba(3,87,4,.25); }
     nav { max-width: 1100px; margin: 0 auto; padding: 12px 20px; display: flex; align-items: center; gap: 20px; }
     .logo { display: inline-flex; align-items: center; gap: 10px; color: var(--neon); text-decoration: none; font: 700 17px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .06em; text-shadow: 0 0 8px rgba(108,255,168,.45); }
@@ -124,7 +124,7 @@
     .brand { font: 700 clamp(38px, 5.5vw, 68px)/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       letter-spacing: .06em; margin: 0; color: var(--neon);
       text-shadow: 0 0 8px rgba(108,255,168,.65), 0 0 20px rgba(0,230,118,.35); }
-    .brand .one { display: inline-block; transform: scale(.8); transform-origin: bottom left; }
+    .brand .one, .logo .one, .mark-light .one { font-size: .77em; }
     .tagline { font: clamp(13px, 1.6vw, 16px)/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       color: var(--neon); opacity: .78; margin: 18px auto 0; max-width: 560px; }
     .reveal { opacity: 0; animation: rise .9s ease-out forwards; }
@@ -202,7 +202,7 @@
     /* Type scale: big, tight section headings; mono kept for labels and the prompt mark. */
     section { max-width: 1200px; padding: 112px 24px; }
     nav { max-width: 1200px; padding-left: 24px; padding-right: 24px; }
-    h2 { font: 600 clamp(34px, 4.6vw, 54px)/1.05 var(--sans); letter-spacing: -.022em; color: var(--text); margin: 0 0 40px; }
+    h2 { font: 600 clamp(32px, 4vw, 48px)/1.05 var(--sans); letter-spacing: -.022em; color: var(--text); margin: 0 0 clamp(20px, 3.5vh, 36px); }
     h2::before { content: none; }
     .awake h2 { color: var(--brand); }
     h2 .pr { display: inline-block; width: .7ex; height: 1ex; margin-right: .3em; vertical-align: baseline; overflow: visible;
@@ -251,13 +251,13 @@
     .cases::-webkit-scrollbar { display: none; }
     .cases:focus-visible { outline-offset: -2px; }
     .case { flex: 0 0 clamp(280px, 30vw, 372px); scroll-snap-align: start; }
-    .rail-nav { display: flex; gap: 8px; justify-content: flex-end; max-width: 1152px; margin: 18px auto 0; padding: 0 24px; }
+    .rail-nav { display: flex; gap: 8px; justify-content: flex-end; max-width: 1152px; margin: 12px auto 0; padding: 0 24px; }
     .rail-nav .chip { font-size: 15px; padding: 6px 14px; }
     @media (max-width: 640px) { .case { flex-basis: 82vw; } .rail-nav { display: none; } }
-    .case { background: #fff; border: 1px solid rgba(18,36,26,.1); border-radius: 6px; padding: 28px; display: flex; flex-direction: column; }
+    .case { background: #fff; border: 1px solid rgba(18,36,26,.1); border-radius: 6px; padding: clamp(20px, 2.6vh, 26px); display: flex; flex-direction: column; }
     .case .idx { margin: 0 0 14px; font: 500 12px var(--mono); color: var(--glow); }
-    .case h3 { font: 600 21px/1.25 var(--sans); letter-spacing: -.015em; margin: 0 0 12px; color: var(--ink); }
-    .case p { margin: 0 0 18px; color: var(--muted); font-size: 15.5px; line-height: 1.6; }
+    .case h3 { font: 600 19px/1.25 var(--sans); letter-spacing: -.015em; margin: 0 0 12px; color: var(--ink); }
+    .case p { margin: 0 0 14px; color: var(--muted); font-size: 15px; line-height: 1.55; }
     .case .stat { margin: auto 0 0; padding-top: 16px; border-top: 1px solid rgba(18,36,26,.1); font: 13px var(--mono); color: var(--muted); }
     .case .stat b { color: var(--brand); font-weight: 600; }
     /* Questions: native disclosure, ruled rows. */
@@ -272,11 +272,18 @@
     .foot, .legal { max-width: 1200px; padding-left: 24px; }
     /* Views: each section is a "view". Motion (js/motion) runs the entrances; without JS everything is visible. */
     .motion-ready .view h2, .motion-ready .view .reveal-on { opacity: 0; }
-    .view { min-height: calc(100svh - 64px); display: flex; flex-direction: column; justify-content: center; scroll-margin-top: 64px; }
+    .view { min-height: calc(100svh - 64px); display: flex; flex-direction: column; justify-content: center; scroll-margin-top: 64px;
+      padding-top: clamp(28px, 5vh, 56px); padding-bottom: clamp(28px, 5vh, 56px); }
+    .view > .btn { align-self: center; }
+    .awake { padding-top: 0; }
+    .story { display: block; max-width: 720px; }
+    .story p { font-size: 18px; line-height: 1.65; margin: 0 0 18px; }
+    .story .sign { font: 500 clamp(17px, 1.8vw, 21px)/1.6 var(--mono); color: var(--brand); margin-top: 28px; }
+    .row p b { color: var(--ink); font-weight: 600; }
     .view.split { display: grid; align-content: center; }
     .glide, .glide body { scroll-behavior: auto; }
     @media (prefers-reduced-motion: reduce) { header { transition: none; } }
-    .intro { margin: -16px 0 36px; }
+    .intro { margin: -6px 0 clamp(18px, 3vh, 30px); }
   </style>
 </head>
 <body>
@@ -291,14 +298,14 @@
           <path d="M6 6a24 24 0 0 1 24 24v30M6 12a18 18 0 0 1 18 18v30M6 18a12 12 0 0 1 12 12v30M6 24a6 6 0 0 1 6 6v30" />
           <path d="M34 6a24 24 0 0 1 24 24v30M34 12a18 18 0 0 1 18 18v30M34 18a12 12 0 0 1 12 12v30M34 24a6 6 0 0 1 6 6v30" />
         </svg>
-        neon1
+        <span>neon<span class="one">1</span></span>
       </a>
       <ul class="links">
         <li><a href="#services">services</a></li>
         <li><a href="#projects">work</a></li>
         <li><a href="#how">how it works</a></li>
         <li><a href="#work">open source</a></li>
-        <li><a class="btn btn-ghost" href="#contact">book a call</a></li>
+        <li><a class="btn btn-ghost" href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a call</a></li>
       </ul>
       <button class="chip menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="menu">menu</button>
     </nav>
@@ -311,7 +318,7 @@
       <li><a href="#projects">work</a></li>
       <li><a href="#how">how it works</a></li>
       <li><a href="#work">open source</a></li>
-      <li><a href="#why">why neon1</a></li>
+      <li><a href="#why">about</a></li>
       <li><a href="#faq">questions</a></li>
       <li><a href="#contact">contact</a></li>
     </ul>
@@ -402,33 +409,31 @@
     <section id="work" class="view" aria-labelledby="work-h">
       <h2 id="work-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>open source</h2>
       <div class="rows">
-        <a class="row reveal-on" href="https://github.com/neon1llc/aws-clip">
+        <a class="row reveal-on" href="https://github.com/neon1llc/aws-clip" target="_blank" rel="noopener">
           <h3>aws-clip</h3>
-          <p class="state">available</p>
-          <p>A wrapper around the AWS CLI that checks which account you are in, explains what a command will do, and hides secrets in its output.</p>
+          <p class="state">pre-release</p>
+          <p><b>AWS CLI Plus.</b> A wrapper around the AWS CLI that checks which account you're in, explains what a command will do before it runs, and hides secrets in its output.</p>
         </a>
         <div class="row reveal-on">
-          <h3>DeployOps</h3>
-          <p class="state dim">in development</p>
-          <p>Deploys to AWS, Azure and Google Cloud with approvals, a record of what happened, and rollback.</p>
+          <h3>deploy-ops</h3>
+          <p class="state">pre-release · v0.42.0</p>
+          <p><b>Cloud automation, bundled.</b> Pipelines for infrastructure and applications on AWS, Azure, Google Cloud or several at once. It sets up CI/CD for one repo or many, works with the IaC you already use, and adds checks, approvals, rollback, monitoring and alerts where your team will see them.</p>
         </div>
         <div class="row reveal-on">
           <h3>1NEON</h3>
-          <p class="state dim">in development</p>
-          <p>Pronounced "onion". A client workspace for every layer of a project: the plan, the work, files, decisions and ongoing care.</p>
+          <p class="state">pre-release</p>
+          <p><b>Project management in layers.</b> One workspace for the four layers of a client project: Needs, Engineering, Operations and Nurture. The plan, the work, files and decisions stay together from the first call to ongoing care. Pronounced "onion".</p>
         </div>
       </div>
     </section>
 
     <section id="why" class="view" aria-labelledby="why-h">
-      <h2 id="why-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>why neon1</h2>
-      <div class="story reveal-on">
-        <div>
-          <p>The name comes from two characters. Neo, "the One" in <em>The Matrix</em>, is an ordinary person who chooses to help other people see clearly. Andrew, the robot in <em>Bicentennial Man</em>, spends two hundred years being of service and never stops being curious.</p>
-          <p>neon1 started at a grade school. I helped budget and set up a new STEM edtech system there, and invited teachers and parents to free sessions on staying safe online. Teaching people about tech and security in person is what gave me the confidence to offer the same help more widely.</p>
-          <p class="lead">Neo also means new, and neon is hard to miss. The 1 is whoever I'm working with.</p>
-        </div>
-        <blockquote class="reveal-on">"1 is glad to be of service."</blockquote>
+      <h2 id="why-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>about</h2>
+      <div class="story">
+        <p class="reveal-on">neon1 started small, at a grade school. I'd wanted to put what I know to work in my own community for a long time, and that school was where I first got the chance. I helped budget and set up a new STEM edtech system, then invited teachers and parents to free sessions on staying safe online.</p>
+        <p class="reveal-on">People left those sessions knowing a little more and worrying a little less. That's still the whole job: plain answers, a fixed price, accounts in your name, and docs you can actually use, so you're better off with your tech than before.</p>
+        <p class="reveal-on">The name nods to Neo from <em>The Matrix</em>, who helps people see clearly, and to Andrew from <em>Bicentennial Man</em>, who spends two centuries being of service.</p>
+        <p class="sign reveal-on">Neo means new. Neon is unmissable.<br>1 is glad to be of service.</p>
       </div>
     </section>
 
@@ -436,7 +441,7 @@
       <h2 id="faq-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>questions</h2>
       <div class="faq">
         <details class="reveal-on"><summary>Do you come on site?</summary><p>Yes. I also work remotely, or on your own network through a secure connection that I set up for the job and that's removed when it's done.</p></details>
-        <details class="reveal-on"><summary>When do you work?</summary><p>Weekends from 8am to 8pm, and some weekday evenings from 6 to 9pm. That's about 10 to 20 hours a week of project time.</p></details>
+        <details class="reveal-on"><summary>When do you work?</summary><p>Saturdays and Sundays from 8am to 8pm, and weekday evenings from 6pm (until 9pm Monday to Thursday, 8pm on Friday), Eastern time. That's about 10 to 20 hours a week of project time. The booking calendar shows what's open.</p></details>
         <details class="reveal-on"><summary>How long does a project take?</summary><p>Small jobs take a week or two, medium ones two to four weeks, and bigger projects four to six. I take on up to two clients at a time so each one gets proper attention.</p></details>
         <details class="reveal-on"><summary>How is the price set?</summary><p>After the free call I send a fixed price for the whole job. It doesn't change unless you change what you're asking for.</p></details>
         <details class="reveal-on"><summary>Do you run security training?</summary><p>Yes, for anyone from parents and teachers to engineers and executives. I've run sessions in Manhattan for groups of 30 or more, covering home and business networks, cameras and IoT, fraud, data brokers, the dark web and the security of physical spaces.</p></details>
@@ -445,8 +450,8 @@
     </section>
     <section id="contact" class="view contact" aria-labelledby="contact-h">
       <h2 id="contact-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>contact</h2>
-      <p class="lead reveal-on">Tell me what's getting in the way. A couple of lines is enough. Book a free 15-minute call, or just send an email.</p>
-      <a class="btn btn-primary reveal-on" href="mailto:neon1llc@gmail.com?subject=Free%2015-minute%20call">book a call</a>
+      <p class="lead reveal-on">Tell me what's getting in the way. Pick a free 15-minute slot on my calendar, or just send a couple of lines by email.</p>
+      <a class="btn btn-primary reveal-on" href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a call</a>
       <p class="lead" style="margin-top:16px">or email <a href="mailto:neon1llc@gmail.com">neon1llc@gmail.com</a></p>
     </section>
   </main>
@@ -454,13 +459,14 @@
   <footer>
     <div class="foot">
       <div>
-        <p class="mark-light">neon<span style="font-size:.8em">1</span></p>
+        <p class="mark-light">neon<span class="one">1</span></p>
         <p style="margin:0">1 is glad to be of service.</p>
       </div>
       <div>
         <h4>contact</h4>
         <ul>
-          <li><a href="mailto:neon1llc@gmail.com">get started</a></li>
+          <li><a href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a call</a></li>
+          <li><a href="mailto:neon1llc@gmail.com">email</a></li>
           <li><a href="https://www.linkedin.com/in/pradeep-tathineni/" rel="noopener">LinkedIn</a></li>
         </ul>
       </div>
@@ -480,8 +486,9 @@
   </div>
 
   <div class="rainctl" role="group" aria-label="Rain controls">
-    <button class="chip" id="mode" type="button" aria-pressed="false" title="Switch between grid and free-falling rain">grid</button>
-    <button class="chip" id="pause" type="button" aria-pressed="false">pause rain</button>
+    <button class="chip" id="mode" type="button" title="Rain motion: grid or free. Click to switch.">grid</button>
+    <button class="chip" id="charset" type="button" title="Rain characters. Click to cycle.">katakana</button>
+    <button class="chip" id="pause" type="button" aria-pressed="false">pause</button>
   </div>
   <div class="egg" id="egg" role="status" aria-live="polite"></div>
 
@@ -493,67 +500,80 @@
       document.getElementById("yr").textContent = new Date().getFullYear();
 
       // ---- Matrix rain ----
-      // Columns of glyphs; occasionally a column spells a word in its group's glow color.
-      // Grid mode snaps every column to shared rows; free mode lets each fall at its own speed.
+      // Columns of glyphs with long fading trails. Now and then a column spells a
+      // word in its group's color and holds it long enough to read.
+      // "grid" keeps every column in step on shared rows; "free" lets each fall at its own speed.
+      // The second button cycles the character set.
       const canvas = document.getElementById("rain");
       const ctx = canvas.getContext("2d");
-      const glyphs = "ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉ0123456789neon1".split("");
+      const SETS = [
+        { name: "katakana", chars: "ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0123456789neon1" },
+        { name: "symbols", chars: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$#%&*+=<>/\\{}[]()∆∑∏√∞≈≠λΩπμΣΦΨ" },
+        { name: "emoji", chars: ["💻", "🔒", "📡", "🛰️", "🔌", "⚙️", "🧅", "🐇", "💊", "🕶️", "☁️", "🔑", "📷", "🛡️", "🤖", "💾", "📶", "🧠"] },
+        { name: "mixed", chars: null },
+      ];
+      SETS[3].chars = [...SETS[0].chars, ...SETS[1].chars, ...SETS[2].chars, ...SETS[2].chars];
+      SETS.forEach((s) => { if (typeof s.chars === "string") s.chars = [...s.chars]; });
       const WORDS = [
         { color: "#ffffff", words: ["the matrix", "neo", "trinity", "morpheus", "white rabbit", "red pill", "no spoon", "bicentennial man", "robin williams"] },
-        { color: "#6CFFA8", words: ["neon1", "1withtechnology", "1isgladtobeofservice", "1NEON", "onion"] },
-        { color: "#5ef0ff", words: ["aws", "terraform", "go", "python", "rag", "llm", "ci/cd", "iot", "linux", "cdk"] },
-        { color: "#ffd166", words: ["automation", "networks", "cameras", "pipelines", "migration", "security", "cloud"] },
-        { color: "#c9a7ff", words: ["listen", "simplicity", "ownership", "transparency", "recovery", "service"] },
+        { color: "#8dffb4", words: ["neon1", "1withtechnology", "1isgladtobeofservice", "1NEON", "onion"] },
+        { color: "#7ef4ff", words: ["aws", "terraform", "go", "python", "rag", "llm", "ci/cd", "iot", "linux", "cdk"] },
+        { color: "#ffd77a", words: ["automation", "networks", "cameras", "pipelines", "migration", "security", "cloud"] },
+        { color: "#d3b8ff", words: ["listen", "simplicity", "ownership", "transparency", "recovery", "service"] },
       ];
-      const WORD_CHANCE = 0.008; // per column reset: roughly one word every few seconds
-      const size = 16;
-      let cols = [], frame = 0, running = true, grid = true;
+      const WORD_CHANCE = 0.03; // per column restart
+      const FADE = 0.045;       // lower means longer trails
+      let size = 20, cols = [], frame = 0, running = true, grid = true, set = 0;
       const reduce = matchMedia("(prefers-reduced-motion: reduce)");
 
-      // A column: y in rows, speed in rows/step, optional word being spelled.
-      const newCol = (y) => ({ y, v: grid ? 1 : 0.45 + Math.random() * 0.8, word: null, wi: 0, color: null, wy: 0, hold: 0 });
-
+      // A column: y in rows, speed in rows per step, and an optional word being spelled.
+      const speed = () => (grid ? 1 : 0.35 + Math.random() * 0.75);
+      const newCol = (y) => ({ y, v: speed(), word: null, wi: 0, color: null, wy: 0, hold: 0 });
       function maybeWord(c) {
         if (Math.random() > WORD_CHANCE) return;
         const g = WORDS[(Math.random() * WORDS.length) | 0];
-        c.word = g.words[(Math.random() * g.words.length) | 0]; c.wi = 0; c.color = g.color; c.wy = c.y; c.hold = 30;
+        c.word = g.words[(Math.random() * g.words.length) | 0];
+        c.wi = 0; c.color = g.color; c.wy = Math.floor(c.y); c.hold = 45;
       }
-
       function resize() {
         const dpr = Math.min(devicePixelRatio || 1, 2);
+        size = innerWidth < 640 ? 17 : 21;
         canvas.width = innerWidth * dpr; canvas.height = innerHeight * dpr;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         cols = Array.from({ length: Math.ceil(innerWidth / size) }, () => newCol(Math.random() * innerHeight / size));
-        ctx.font = size + 'px "JetBrains Mono", monospace';
         ctx.textBaseline = "top";
+        ctx.fillStyle = "#0D0208"; ctx.fillRect(0, 0, innerWidth, innerHeight);
       }
-
+      const font = (w) => `${w} ${size}px "JetBrains Mono", ui-monospace, "Apple Color Emoji", "Segoe UI Emoji", monospace`;
       function draw() {
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = "rgba(13, 2, 8, 0.07)";
+        ctx.fillStyle = `rgba(13, 2, 8, ${FADE})`;
         ctx.fillRect(0, 0, innerWidth, innerHeight);
+        const chars = SETS[set].chars;
         cols.forEach((c, i) => {
-          const y = (grid ? Math.floor(c.y) : c.y) * size;
+          const x = i * size;
           if (c.word) {
-            // Spell the word downward and keep it glowing a moment after it lands,
-            // re-painting the spelled letters so the trail fade doesn't swallow them.
+            // Spell one letter per step, then hold. Each letter is painted on a
+            // cleared cell with a small glow, so the word stays sharp and readable.
             if (c.wi < c.word.length) c.wi++; else c.hold--;
-            ctx.shadowColor = c.color; ctx.shadowBlur = 12; ctx.fillStyle = c.color;
+            ctx.font = font(700);
             for (let k = 0; k < c.wi; k++) {
-              const ch = c.word[k];
-              if (ch !== " ") ctx.fillText(ch, i * size, (Math.floor(c.wy) + k) * size);
+              const ch = c.word[k], wy = (c.wy + k) * size;
+              ctx.fillStyle = "#0D0208"; ctx.fillRect(x, wy, size, size);
+              if (ch === " ") continue;
+              ctx.shadowColor = c.color; ctx.shadowBlur = k === c.wi - 1 && c.wi < c.word.length ? 10 : 4;
+              ctx.fillStyle = c.color; ctx.fillText(ch, x + size * 0.18, wy);
             }
             ctx.shadowBlur = 0;
-            if (c.hold <= 0) c.word = null;
-          } else {
-            const r = Math.random();
-            ctx.fillStyle = r > 0.97 ? "#d6f5dc" : r > 0.5 ? "#00E676" : "#00924A";
-            ctx.fillText(glyphs[(Math.random() * glyphs.length) | 0], i * size, y);
+            if (c.hold <= 0) { c.word = null; c.y = c.wy + c.wi; }
+            return;
           }
+          const y = (grid ? Math.floor(c.y) : c.y) * size;
+          const r = Math.random();
+          ctx.font = font(500);
+          ctx.fillStyle = r > 0.96 ? "#e9ffee" : r > 0.45 ? "#22ff7a" : "#00b84f";
+          ctx.fillText(chars[(Math.random() * chars.length) | 0], x, y);
           c.y += c.v;
-          if (c.y * size > innerHeight && !c.word && Math.random() > 0.975) {
-            Object.assign(c, newCol(0)); maybeWord(c);
-          }
+          if (c.y * size > innerHeight && Math.random() > 0.97) { Object.assign(c, newCol(0)); maybeWord(c); }
         });
       }
 
@@ -565,24 +585,29 @@
       const btn = document.getElementById("pause");
       function setRunning(on) {
         running = on;
-        btn.textContent = on ? "pause rain" : "play rain";
+        btn.textContent = on ? "pause" : "play";
         btn.setAttribute("aria-pressed", String(!on));
       }
       btn.addEventListener("click", () => setRunning(!running));
 
+      // The buttons show the current setting; a click moves to the next one.
       const modeBtn = document.getElementById("mode");
       modeBtn.addEventListener("click", () => {
         grid = !grid;
-        cols.forEach((c) => { c.v = grid ? 1 : 0.45 + Math.random() * 0.8; });
+        cols.forEach((c) => { c.v = speed(); if (grid) c.y = Math.floor(c.y); });
         modeBtn.textContent = grid ? "grid" : "free";
-        modeBtn.setAttribute("aria-pressed", String(!grid));
+      });
+      const setBtn = document.getElementById("charset");
+      setBtn.addEventListener("click", () => {
+        set = (set + 1) % SETS.length;
+        setBtn.textContent = SETS[set].name;
       });
 
       // Waking up: rain and its controls fade as the light content takes over.
       const veil = document.querySelector(".veil"), ctl = document.querySelector(".rainctl"), header = document.querySelector("header");
       function onScroll() {
         const t = Math.min(1, scrollY / (innerHeight * 0.9));
-        canvas.style.opacity = String(0.75 * (1 - t));
+        canvas.style.opacity = String(0.95 * (1 - t));
         veil.style.opacity = String(1 - t);
         ctl.style.opacity = t > 0.6 ? "0" : "1";
         ctl.style.pointerEvents = t > 0.6 ? "none" : "auto";
@@ -594,7 +619,7 @@
       resize();
       addEventListener("resize", resize);
       // Pre-fill so rain is already falling on first paint; reduced motion keeps this still frame.
-      for (let i = 0; i < 12; i++) draw();
+      for (let i = 0; i < 40; i++) draw();
       if (reduce.matches) setRunning(false);
       onScroll();
       loop();
@@ -621,7 +646,7 @@
         const timer = setInterval(() => {
           let n = 0;
           spans.forEach((el, si) => {
-            el.textContent = [...finals[si]].map((ch) => (n++ < tick / 4 ? ch : glyphs[(Math.random() * glyphs.length) | 0])).join("");
+            el.textContent = [...finals[si]].map((ch) => (n++ < tick / 4 ? ch : SETS[0].chars[(Math.random() * SETS[0].chars.length) | 0])).join("");
           });
           if (++tick > total * 4) { clearInterval(timer); spans.forEach((el, si) => (el.textContent = finals[si])); }
         }, 45);

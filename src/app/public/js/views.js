@@ -16,8 +16,8 @@
   const { animate, stagger } = M;
 
   const HEADER = 64;
-  const THRESHOLD = 220;   // input distance (px) needed to move to the next view
-  const GIVE = 0.3;        // how far the page moves per px of input while resisting
+  const THRESHOLD = 176;   // input distance (px) needed to move to the next view
+  const GIVE = 0.36;       // how far the page moves per px of input while resisting
   const MAX_GIVE = 72;     // the most the page gives before it settles
   const IDLE = 160;        // ms without input that ends a gesture
   const settleEase = [0.22, 1, 0.36, 1];
