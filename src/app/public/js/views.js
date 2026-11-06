@@ -16,9 +16,9 @@
   const { animate, stagger } = M;
 
   const HEADER = 64;
-  const THRESHOLD = 141;   // input distance (px) needed to move to the next view
-  const GIVE = 0.43;       // how far the page moves per px of input while resisting
-  const MAX_GIVE = 72;     // the most the page gives before it settles
+  const THRESHOLD = 70;    // input distance (px) needed to move to the next view
+  const GIVE = 0.6;        // how far the page moves per px of input while resisting
+  const MAX_GIVE = 48;     // the most the page gives before it settles
   const IDLE = 160;        // ms without input that ends a gesture
   const settleEase = [0.22, 1, 0.36, 1];
   const enterEase = [0.19, 1, 0.22, 1];
@@ -29,6 +29,7 @@
   const views = [hero, ...document.querySelectorAll(".view")];
   const visited = new Set([hero]);
   const menu = document.getElementById("menu");
+  const paused = () => !menu.hidden || document.body.classList.contains("case-open");
 
   // ---- Layout: where each view starts and how far it scrolls inside ----
   const vh = () => (window.visualViewport ? visualViewport.height : innerHeight);
@@ -114,7 +115,7 @@
 
   // One step of input, positive is down.
   function input(d, direct) {
-    if (settling || !menu.hidden || !d) return;
+    if (settling || paused() || !d) return;
     const now = performance.now();
     const newGesture = now - lastInput > IDLE;
     lastInput = now;
@@ -150,7 +151,7 @@
   // ---- Wheel and trackpad ----
   const rail = document.getElementById("cases");
   addEventListener("wheel", (e) => {
-    if (e.ctrlKey || !menu.hidden) return; // pinch zoom, open menu
+    if (e.ctrlKey || paused()) return; // pinch zoom, open menu or case study
     if (rail && rail.contains(e.target) && (Math.abs(e.deltaX) > Math.abs(e.deltaY) || e.shiftKey)) return; // sideways through the cards
     e.preventDefault();
     const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? vh() : 1;
@@ -164,7 +165,7 @@
     tY = e.touches[0].clientY; tX = e.touches[0].clientX; axis = null; vel = 0; tLast = performance.now();
   }, { passive: true });
   addEventListener("touchmove", (e) => {
-    if (e.touches.length !== 1 || !menu.hidden) return;
+    if (e.touches.length !== 1 || paused()) return;
     const cy = e.touches[0].clientY, cx = e.touches[0].clientX;
     const dy = tY - cy, dx = tX - cx;
     if (!axis) {
@@ -190,7 +191,7 @@
 
   // ---- Keyboard and links ----
   addEventListener("keydown", (e) => {
-    if (e.altKey || e.ctrlKey || e.metaKey || !menu.hidden || settling) return;
+    if (e.altKey || e.ctrlKey || e.metaKey || paused() || settling) return;
     const tag = document.activeElement.tagName;
     if (/^(INPUT|TEXTAREA|SELECT)$/.test(tag)) return;
     if (e.key === " " && /^(BUTTON|A|SUMMARY)$/.test(tag)) return;
@@ -247,6 +248,7 @@
   land();
   addEventListener("load", land);
   if (document.fonts) document.fonts.ready.then(land);
+  if (window.ResizeObserver) new ResizeObserver(land).observe(document.body);
   sync();
   requestAnimationFrame(render);
 })();
