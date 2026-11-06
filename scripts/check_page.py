@@ -16,6 +16,7 @@ from html.parser import HTMLParser
 from urllib.parse import unquote, urlsplit
 
 
+# Script types node can check, attributes that hold URLs, and root-relative url() in CSS
 JS_TYPES = {"", "text/javascript", "application/javascript", "module"}
 REF_ATTRS = {"href", "src", "poster", "data"}
 CSS_URL = re.compile(r"url\(\s*['\"]?(/[^'\")]+)")
@@ -35,11 +36,14 @@ class Page(HTMLParser):
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
         line = self.getpos()[0]
+
+        # Anchors can target an id or a named link
         if attrs.get("id"):
             self.ids.add(attrs["id"])
         if tag == "a" and attrs.get("name"):
             self.ids.add(attrs["name"])
 
+        # In-page anchors and root-relative paths are checked later
         for name in REF_ATTRS:
             value = attrs.get(name) or ""
             if value.startswith("#") and len(value) > 1:
@@ -53,6 +57,7 @@ class Page(HTMLParser):
             if url.startswith("/") and not url.startswith("//"):
                 self.refs.append((line, url))
 
+        # Inline scripts collect their text until the closing tag
         if tag == "script" and not attrs.get("src"):
             kind = (attrs.get("type") or "").lower()
             self._script = [line, kind, []]

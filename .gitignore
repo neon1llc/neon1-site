@@ -1,3 +1,10 @@
+# .gitignore - Local files kept out of the repository.
+
+# macOS folder metadata
 .DS_Store
+
+# Change list from make deploy, removed by make invalidate
 .deploy-changes
+
+# Local Node tools
 node_modules/

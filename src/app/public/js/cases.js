@@ -1,8 +1,13 @@
-// Case studies: "read the case study" grows the card into a full panel over the
-// page, and closing shrinks it back into the card. The scroll position never
-// changes, so you return exactly where you were.
+// src/app/public/js/cases.js - Opens each case study as a full panel over the page.
+//
+// "Read the case study" grows the card into the panel, and closing shrinks it
+// back into the card. The scroll position never changes, so you return exactly
+// where you were.
+
 (() => {
   "use strict";
+  // The panel, its content area and scrim, and the card it was opened from
+  // Without Motion or with reduced motion, the panel just appears and disappears
   const layer = document.getElementById("caseLayer");
   if (!layer) return;
   const panel = layer.querySelector(".case-panel");
@@ -13,12 +18,14 @@
   const spring = { type: "spring", stiffness: 260, damping: 30 };
   let card = null, opener = null;
 
-  // Transform that makes the panel sit exactly over the card.
+  // Transform that makes the panel sit exactly over the card
   function fromCard() {
     const c = card.getBoundingClientRect(), p = panel.getBoundingClientRect();
     return { x: c.left - p.left, y: c.top - p.top, scaleX: c.width / p.width, scaleY: c.height / p.height };
   }
 
+  // Fills the panel from the card's label, title, stat, and template, then grows it out of the card
+  // Focus moves into the panel and returns to the button on close
   function open(id, button) {
     card = document.getElementById("case-" + id);
     opener = button;
@@ -41,6 +48,7 @@
     panel.focus({ preventScroll: true });
   }
 
+  // Shrinks the panel back into its card, then hides it and unlocks the page
   function close() {
     if (layer.hidden) return;
     const done = () => {
@@ -57,11 +65,14 @@
     M.animate(panel, { x: f.x, y: f.y, scaleX: f.scaleX, scaleY: f.scaleY }, spring).then(done);
   }
 
+  // Card buttons open their case study; the scrim and close button close it
   document.addEventListener("click", (e) => {
     const b = e.target.closest("[data-case]");
     if (b) { e.preventDefault(); open(b.dataset.case, b); return; }
     if (e.target.closest("[data-close]")) close();
   });
+
+  // While open, Escape closes the panel and Tab cycles inside it
   addEventListener("keydown", (e) => {
     if (layer.hidden) return;
     if (e.key === "Escape") { e.preventDefault(); close(); }

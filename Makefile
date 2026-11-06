@@ -4,6 +4,8 @@
 # The same targets run locally and in CI. Deploy targets use whatever AWS
 # credentials are in the environment, such as AWS_PROFILE=neon1 locally.
 
+
+# Settings that the command line or environment can override
 SITE_DIR     ?= src/app/public
 BUCKET       ?= neon1-public-website
 DISTRIBUTION ?= EKL1R4AOR1VRG
@@ -13,6 +15,7 @@ PORT         ?= 8000
 BUDGET_KB    ?= 8192
 CHANGES      ?= .deploy-changes
 
+# The AWS CLI reads the region from the environment
 export AWS_REGION
 
 # Pinned tools: Node runs html-validate, and Docker stands in for a missing gitleaks
@@ -25,6 +28,7 @@ LONG_CACHE  := public, max-age=31536000, immutable
 SHORT_CACHE := no-cache
 DOTFILES    := --exclude ".*" --exclude "*/.*"
 
+# Plain make shows the help
 .DEFAULT_GOAL := help
 .PHONY: help check html js links budget secrets serve deploy invalidate verify
 
@@ -67,6 +71,7 @@ serve: ## Serve the site at http://localhost:PORT
 
 ##@ Deploy
 
+# Two passes set the cache headers: long for fonts and media, short for the rest
 deploy: ## Sync the site to the bucket when its content differs
 	@test -n "$(BUCKET)" || { echo "deploy: BUCKET is empty"; exit 1; }
 	@test -f "$(SITE_DIR)/index.html" || { echo "deploy: no $(SITE_DIR)/index.html, refusing to sync"; exit 1; }
@@ -96,6 +101,7 @@ invalidate: ## Invalidate CloudFront after a deploy that changed files (FORCE=1 
 	aws cloudfront wait invalidation-completed --distribution-id "$(DISTRIBUTION)" --id "$$id"; \
 	rm -f $(CHANGES)
 
+# Retries for about a minute while the CDN picks up the new version
 verify: ## Check that each live URL returns 200 and serves the local version
 	@version=$$(sed -n 's/.*<meta name="version" content="\([^"]*\)".*/\1/p' $(SITE_DIR)/index.html); \
 	test -n "$$version" || { echo "verify: no version meta in index.html"; exit 1; }; \
