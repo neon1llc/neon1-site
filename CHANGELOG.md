@@ -2,6 +2,14 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.10.1
+
+- Rain words only form from a drop that has fallen from the top, so they read as part of the rain.
+- Case-study cards are a little wider, with one-line titles and result lines, even spacing, and dividers that line up across cards.
+- The case-study panel animates with the browser's own compositor and no background blur, so it stays smooth on slower machines.
+- Case-study copy: an MCP server for the accounting assistant, EHR filing by patient ID and MRN for the dermatology portal, neon1-ready for keeping security talks current, and on-demand support for home tech.
+- neon1-ready joins open source.
+
 ## v0.10.0
 
 - "work" is now "case studies": six cards, adding a grade-school community project. Each card shows Need, Execution, Observation, and Next as four short lines, keeps its result line, and opens its full case study from a brand-green ↗ in its corner, or a click anywhere on the card. The open panel closes with ↙ in the same corner.

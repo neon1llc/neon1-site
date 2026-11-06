@@ -13,15 +13,16 @@
   const panel = layer.querySelector(".case-panel");
   const body = document.getElementById("caseBody");
   const scrim = layer.querySelector(".case-scrim");
-  const M = window.Motion;
-  const still = !M || matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const spring = { type: "spring", stiffness: 260, damping: 30 };
+  const still = !panel.animate || matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Native animations on transform and opacity only, so the browser runs them off the main thread;
+  // the curve overshoots slightly and settles, like a spring
+  const SPRING = "cubic-bezier(.2, .9, .25, 1.06)";
   let card = null, opener = null;
 
   // Transform that makes the panel sit exactly over the card
   function fromCard() {
     const c = card.getBoundingClientRect(), p = panel.getBoundingClientRect();
-    return { x: c.left - p.left, y: c.top - p.top, scaleX: c.width / p.width, scaleY: c.height / p.height };
+    return `translate(${c.left - p.left}px, ${c.top - p.top}px) scale(${c.width / p.width}, ${c.height / p.height})`;
   }
 
   // Fills the panel from the card's label, title, stat, and template, then grows it out of the card
@@ -41,9 +42,9 @@
     panel.scrollTop = 0;
     if (!still) {
       const f = fromCard();
-      M.animate(scrim, { opacity: [0, 1] }, { duration: 0.3 });
-      M.animate(panel, { x: [f.x, 0], y: [f.y, 0], scaleX: [f.scaleX, 1], scaleY: [f.scaleY, 1] }, spring);
-      M.animate(body, { opacity: [0, 1] }, { duration: 0.35, delay: 0.12 });
+      scrim.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: "ease-out" });
+      panel.animate([{ transform: f }, { transform: "none" }], { duration: 460, easing: SPRING });
+      body.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: 120, easing: "ease-out", fill: "backwards" });
     }
     panel.focus({ preventScroll: true });
   }
@@ -60,9 +61,10 @@
     };
     if (still) return done();
     const f = fromCard();
-    M.animate(body, { opacity: 0 }, { duration: 0.12 });
-    M.animate(scrim, { opacity: 0 }, { duration: 0.3 });
-    M.animate(panel, { x: f.x, y: f.y, scaleX: f.scaleX, scaleY: f.scaleY }, spring).then(done);
+    body.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 120, fill: "forwards" });
+    scrim.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: "forwards" });
+    panel.animate([{ transform: "none" }, { transform: f }], { duration: 380, easing: "cubic-bezier(.4, 0, .2, 1)", fill: "forwards" })
+      .finished.then(() => { done(); panel.getAnimations().concat(body.getAnimations(), scrim.getAnimations()).forEach((a) => a.cancel()); });
   }
 
   // Card buttons open their case study; the scrim and close button close it
