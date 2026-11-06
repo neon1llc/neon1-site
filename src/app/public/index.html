@@ -47,7 +47,7 @@
     :focus-visible { outline: 2px solid var(--glow); outline-offset: 3px; border-radius: 6px; }
 
     /* ---- Matrix rain: decorative layer behind everything ---- */
-    #rain { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; opacity: .95; }
+    #rain { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; opacity: .8; }
     .veil { position: fixed; inset: 0; z-index: 1; pointer-events: none;
       background: radial-gradient(70% 45% at 50% 48%, rgba(13,2,8,.6), rgba(13,2,8,.15) 75%); }
     main, footer, .top { position: relative; z-index: 2; }
@@ -539,7 +539,7 @@
       ];
       const TOTAL = WORDS.reduce((a, g) => a + g.weight, 0);
       const WORD_RATE = 0.06; // chance per step that some column starts a word
-      const FADE = 0.045;     // lower means longer trails
+      const FADE = 0.07;      // lower means longer trails
       let size = 20, rows = 0, cols = [], frame = 0, running = true, grid = true, set = 0;
       const reduce = matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -585,8 +585,9 @@
           const x = i * size;
           if (c.word) {
             // Spell one letter per step, then hold. Each letter sits on a cleared
-            // cell, in the same weight as the rain, so it stays sharp.
-            if (c.wi < c.word.length) c.wi++; else c.hold--;
+            // cell, in the same weight as the rain, so it stays sharp. Once the
+            // word is spelled, the drop carries on falling below it.
+            if (c.wi < c.word.length) { c.wi++; if (c.wi === c.word.length) c.y = c.wy + c.wi; } else c.hold--;
             for (let k = 0; k < c.wi; k++) {
               const ch = c.word[k], wy = (c.wy + k) * size;
               ctx.shadowBlur = 0; ctx.globalAlpha = 1;
@@ -597,15 +598,15 @@
               ctx.fillStyle = c.g.color; glyph(ch, x, wy);
             }
             ctx.shadowBlur = 0; ctx.globalAlpha = 1;
-            if (c.hold <= 0) { c.y = c.wy + c.wi; c.word = null; }
-            return;
+            if (c.hold <= 0) c.word = null;
+            if (c.word && c.wi < c.word.length) return;
           }
           const y = (grid ? Math.floor(c.y) : c.y) * size;
           const r = Math.random();
           ctx.fillStyle = r > 0.96 ? "#e9ffee" : r > 0.45 ? "#22ff7a" : "#00b84f";
           glyph(chars[(Math.random() * chars.length) | 0], x, y);
           c.y += c.v;
-          if (c.y > rows && Math.random() > 0.97) Object.assign(c, newCol(0));
+          if (c.y > rows && !c.word && Math.random() > 0.97) Object.assign(c, newCol(0));
         });
       }
 
@@ -639,7 +640,7 @@
       const veil = document.querySelector(".veil"), ctl = document.querySelector(".rainctl"), header = document.querySelector("header");
       function onScroll() {
         const t = Math.min(1, scrollY / (innerHeight * 0.9));
-        canvas.style.opacity = String(0.95 * (1 - t));
+        canvas.style.opacity = String(0.8 * (1 - t));
         veil.style.opacity = String(1 - t);
         ctl.style.opacity = t > 0.6 ? "0" : "1";
         ctl.style.pointerEvents = t > 0.6 ? "none" : "auto";
