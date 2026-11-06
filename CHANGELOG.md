@@ -9,6 +9,8 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - The case-study panel animates with the browser's own compositor and no background blur, so it stays smooth on slower machines.
 - Case-study copy: an MCP server for the accounting assistant, EHR filing by patient ID and MRN for the dermatology portal, neon1-ready for keeping security talks current, and on-demand support for home tech.
 - neon1-ready joins open source.
+- New default rain, "text": Latin, Greek, Cyrillic, Hebrew, Arabic, Devanagari, Thai, kana, Hangul, and CJK, weighted like the original neon1 rain. The cycle is now text, katakana, numbers, symbols, emoji, faces, mixed.
+- Rain words hold about 0.75 seconds less before fading.
 
 ## v0.10.0
 
