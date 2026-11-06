@@ -1,4 +1,4 @@
-// Views: the page moves one section ("view") at a time.
+// src/app/public/js/views.js - Moves the page one section ("view") at a time.
 //
 // Scrolling at the edge of a view meets resistance: the page gives a little
 // and the next view, if already seen, starts to fade in. Past a threshold the
@@ -9,12 +9,15 @@
 //
 // Motion (motion.dev, MIT) runs the animations. With reduced motion or without
 // Motion, the page scrolls natively and everything is visible.
+
 (() => {
   "use strict";
+  // Native scrolling stays in charge without Motion or with reduced motion
   const M = window.Motion;
   if (!M || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const { animate, stagger } = M;
 
+  // Gesture feel and easing curves
   const HEADER = 64;
   const THRESHOLD = 70;    // input distance (px) needed to move to the next view
   const GIVE = 0.6;        // how far the page moves per px of input while resisting
@@ -23,6 +26,8 @@
   const settleEase = [0.22, 1, 0.36, 1];
   const enterEase = [0.19, 1, 0.22, 1];
 
+  // The hero counts as seen, so it never plays an entrance
+  // Input pauses while the menu or a case study is open
   const root = document.documentElement;
   root.classList.add("motion-ready", "glide");
   const hero = document.querySelector(".hero");
@@ -35,11 +40,15 @@
   const vh = () => (window.visualViewport ? visualViewport.height : innerHeight);
   const maxY = () => root.scrollHeight - vh();
   const docTop = (el) => el.getBoundingClientRect().top + scrollY;
+
+  // First and last scroll positions of view i, clamped to the page
   function range(i) {
     const top = i === 0 ? 0 : Math.round(docTop(views[i]) - HEADER);
     const next = i + 1 < views.length ? Math.round(docTop(views[i + 1]) - HEADER) : maxY() + vh();
     return [Math.min(top, maxY()), Math.min(Math.max(top, next - vh()), maxY())];
   }
+
+  // The last view that starts at or above y
   function indexAt(y) {
     let i = 0;
     for (let k = 0; k < views.length; k++) if (range(k)[0] <= y + 2) i = k;
@@ -47,7 +56,10 @@
   }
 
   // ---- Entrances and fades ----
+  // The heading first, then each piece that rises in order
   const parts = (v) => [v.querySelector("h2"), ...v.querySelectorAll(".reveal-on")].filter(Boolean);
+
+  // A first visit plays the entrance once; later visits only fade the view in
   function enter(v) {
     if (v === hero) return;
     if (visited.has(v)) { animate(v, { opacity: 1 }, { duration: 0.5 }); return; }
@@ -60,14 +72,19 @@
         { duration: 0.55, ease: enterEase, delay: stagger(Math.min(0.14, 1 / items.length), { startDelay: 0.45 }) });
     }
   }
+
+  // Only views already seen fade with a pull, so unseen ones keep their entrance
   const setFade = (v, t) => { if (v && v !== hero && visited.has(v)) v.style.opacity = t.toFixed(3); };
 
   // ---- State ----
+  // Resistance tracks input so far, its direction, the view, and where it started
+  // Trailing momentum after a settle is swallowed until input goes idle
   let y = scrollY, target = scrollY; // rendered and wanted scroll positions
   let pull = 0, pullDir = 0, pullIndex = 0, pullBase = 0;
   let settling = null;
   let lastInput = 0, gestureFromEdge = false, blockUntilIdle = false, idleTimer = 0;
 
+  // Eases the page toward the target every frame, except while a settle runs
   function render() {
     if (!settling) {
       const d = target - y;
@@ -77,11 +94,13 @@
     requestAnimationFrame(render);
   }
 
+  // Settles into view i with one eased scroll, fading the old view out
+  // The new view enters once most of the distance is covered
   function goTo(i, opts = {}) {
     i = Math.max(0, Math.min(views.length - 1, i));
     const from = pullDir ? pullIndex : indexAt(y);
     const [top, bottom] = range(i);
-    // Coming back up lands at the end of a tall view; End goes to the very bottom.
+    // Coming back up lands at the end of a tall view; End goes to the very bottom
     const dest = opts.end ? bottom : !opts.link && i < from ? bottom : top;
     if (settling) settling.stop();
     const fromView = views[from], toView = views[i];
@@ -105,7 +124,8 @@
     });
   }
 
-  function release() { // the gesture ended short of the threshold: spring back
+  // A gesture that ends short of the threshold springs back
+  function release() {
     if (!pullDir) return;
     target = pullBase;
     setFade(views[pullIndex], 1);
@@ -113,7 +133,8 @@
     pull = 0; pullDir = 0;
   }
 
-  // One step of input, positive is down.
+  // One step of input, positive is down
+  // Direct input, from touch, moves the page at once instead of easing
   function input(d, direct) {
     if (settling || paused() || !d) return;
     const now = performance.now();
@@ -123,6 +144,7 @@
     idleTimer = setTimeout(() => { blockUntilIdle = false; release(); }, IDLE);
     if (blockUntilIdle) return; // swallow trailing momentum after a settle
 
+    // Inside a view the input scrolls; past its edge, resistance begins
     if (!pullDir) {
       const i = indexAt(target), [top, bottom] = range(i);
       if (newGesture) gestureFromEdge = (d > 0 && target >= bottom - 1) || (d < 0 && target <= top + 1);
@@ -138,7 +160,7 @@
       if (!pull) { release(); return; }
     } else pull += Math.abs(d);
 
-    // Momentum that runs into an edge is held back; a fresh push from the edge carries on.
+    // Momentum that runs into an edge is held back; a fresh push from the edge carries on
     if (newGesture) gestureFromEdge = true;
     if (!gestureFromEdge) pull = Math.min(pull, THRESHOLD * 0.6);
     const t = Math.min(1, pull / THRESHOLD);
@@ -149,6 +171,7 @@
   }
 
   // ---- Wheel and trackpad ----
+  // Line and page deltas are converted to pixels
   const rail = document.getElementById("cases");
   addEventListener("wheel", (e) => {
     if (e.ctrlKey || paused()) return; // pinch zoom, open menu or case study
@@ -159,11 +182,14 @@
   }, { passive: false });
 
   // ---- Touch ----
+  // The last touch point, the locked axis, and vertical velocity in px per ms
   let tY = 0, tX = 0, axis = null, vel = 0, tLast = 0;
   addEventListener("touchstart", (e) => {
     if (e.touches.length !== 1) return;
     tY = e.touches[0].clientY; tX = e.touches[0].clientX; axis = null; vel = 0; tLast = performance.now();
   }, { passive: true });
+
+  // The first 6px pick the axis; vertical drags drive the views
   addEventListener("touchmove", (e) => {
     if (e.touches.length !== 1 || paused()) return;
     const cy = e.touches[0].clientY, cx = e.touches[0].clientX;
@@ -179,10 +205,12 @@
     tLast = now; tY = cy; tX = cx;
     input(dy, true);
   }, { passive: false });
+
+  // Lifting the finger springs back a pull, or lets a flick glide
   addEventListener("touchend", () => {
     if (axis !== "y" || settling) return;
     if (pullDir) { release(); return; }
-    // A flick inside a tall view keeps gliding, and stops at the view's edge.
+    // A flick inside a tall view keeps gliding, and stops at the view's edge
     if (Math.abs(vel) > 0.3) {
       const [top, bottom] = range(indexAt(target));
       target = Math.max(top, Math.min(bottom, target + vel * 260));
@@ -190,6 +218,8 @@
   });
 
   // ---- Keyboard and links ----
+  // Arrows and paging scroll inside a tall view, then move on at its edge
+  // Form fields keep their keys, and Space still presses buttons and links
   addEventListener("keydown", (e) => {
     if (e.altKey || e.ctrlKey || e.metaKey || paused() || settling) return;
     const tag = document.activeElement.tagName;
@@ -207,6 +237,8 @@
     } else if (e.key === "Home") { e.preventDefault(); goTo(0, { link: true }); }
     else if (e.key === "End") { e.preventDefault(); goTo(views.length - 1, { end: true }); }
   });
+
+  // In-page links settle at the top of their view, closing the menu first
   document.addEventListener("click", (e) => {
     const a = e.target.closest('a[href^="#"]');
     if (!a) return;
@@ -221,6 +253,7 @@
   });
 
   // ---- Cards: previous and next buttons ----
+  // Each press moves one card width plus the gap
   if (rail) {
     const step = () => rail.querySelector(".case").getBoundingClientRect().width + 20;
     document.querySelectorAll("[data-rail]").forEach((b) =>
@@ -235,20 +268,25 @@
     else v.style.opacity = "1";
   }
   addEventListener("scroll", () => { if (!settling && !pullDir && Math.abs(scrollY - y) > 2) sync(); }, { passive: true });
+
+  // A resize keeps the position inside the current view
   addEventListener("resize", () => {
     if (settling) return;
     const [top, bottom] = range(indexAt(target));
     target = y = Math.max(top, Math.min(bottom, target));
   });
+
+  // Opened with a section link: land on that view once fonts and layout settle
   const start = views.indexOf(document.getElementById(location.hash.slice(1)));
-  // Opened with a section link: land on that view once fonts and layout settle.
   history.scrollRestoration = "manual";
-  // Fonts can change heights after the first paint, so land again until the visitor scrolls.
+  // Fonts can change heights after the first paint, so land again until the visitor scrolls
   const land = () => { if (start > 0 && !lastInput && !settling) { scrollTo(0, range(start)[0]); sync(); } };
   land();
   addEventListener("load", land);
   if (document.fonts) document.fonts.ready.then(land);
   if (window.ResizeObserver) new ResizeObserver(land).observe(document.body);
+
+  // Start in step with the current position, then render every frame
   sync();
   requestAnimationFrame(render);
 })();
