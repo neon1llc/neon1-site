@@ -7,6 +7,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - Scrolling moves one view at a time. At the edge of a view the page resists, giving a little per scroll, then settles into the next view, fast at first and slowing as it lands. Views taller than the screen scroll normally until their edge. Works with mouse, trackpad, touch, keyboard and the header links, all at the same speed.
 - First arrival at a view: the heading fades in, then each piece fades and rises into place in order, once. Later visits fade the whole view in and out with the scroll.
 - Work cards sit in one row of equal cards that scrolls sideways (touch, trackpad or the arrow buttons) and fades into both screen edges.
+- Contact links go to neon1llc@gmail.com until the neon1.tech mailboxes are live.
 - Section headings are in the brand green. The prompt mark is its own chevron, one x-height tall, so its point lines up with the middle of the lowercase letters.
 
 ## v0.7.0
