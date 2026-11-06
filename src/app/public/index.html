@@ -384,6 +384,8 @@
     .story { display: block; max-width: 720px; }
     .story p { font-size: 18px; line-height: 1.65; margin: 0 0 18px; }
     .story .sign { font: 500 clamp(17px, 1.8vw, 21px)/1.6 var(--mono); color: var(--brand); margin-top: 28px; }
+    /* The closing line stays on one line past the column, except on narrow screens */
+    @media (min-width: 760px) { .story .sign { white-space: nowrap; } }
     .row p b { color: var(--ink); font-weight: 600; }
 
     /* Process view centers as a grid */
