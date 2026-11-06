@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="version" content="0.2.1" />
+  <meta name="version" content="0.3.0" />
   <title>neon1 — technology that works together</title>
   <meta name="description" content="neon1 helps people and small businesses make their technology work together: cloud, AI, automation, networks and devices, built to stay yours." />
   <meta name="theme-color" content="#0D0208" />
@@ -59,6 +59,10 @@
 
     /* ---- Nav ---- */
     header { position: sticky; top: 0; z-index: 5; background: rgba(13,2,8,.88); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+    header { transition: background .4s, border-color .4s; }
+    header.light { background: rgba(244,249,245,.9); border-bottom-color: rgba(3,87,4,.14); }
+    header.light .logo, header.light .btn-ghost { color: #035704; border-color: #035704; }
+    header.light nav ul a:not(.btn) { color: #4f6b5a; }
     nav { max-width: 1100px; margin: 0 auto; padding: 12px 20px; display: flex; align-items: center; gap: 20px; }
     .logo { display: inline-flex; align-items: center; gap: 10px; color: var(--glow); text-decoration: none; font: 600 18px var(--mono); }
     .logo svg { width: 26px; height: 26px; }
@@ -123,9 +127,22 @@
     @media (max-width: 700px) { .foot { grid-template-columns: 1fr 1fr; } .foot > div:first-child { grid-column: 1 / -1; } }
 
     /* ---- Floating rain control + easter-egg toast ---- */
-    .rainctl { position: fixed; right: 16px; bottom: 16px; z-index: 6; }
+    .rainctl { position: fixed; right: 16px; bottom: 16px; z-index: 6; display: flex; gap: 8px; transition: opacity .3s; }
     .egg { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 6; font: 13px var(--mono); color: var(--glow); background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 16px; opacity: 0; transition: opacity .4s; pointer-events: none; }
     .egg.show { opacity: 1; }
+
+    /* ---- Waking up: content below the hero fades from the Matrix into a light surface ---- */
+    .awake { position: relative; z-index: 2;
+      background: linear-gradient(to bottom, rgba(244,249,245,0) 0, #f4f9f5 320px);
+      --text: #10241a; --muted: #4f6b5a; --glow: #035704; --mid: #327641;
+      --panel: #ffffff; --line: rgba(3,87,4,.14); color: var(--text); padding-top: 160px; }
+    .awake .card { box-shadow: 0 1px 2px rgba(16,36,26,.04); }
+    .awake .card:hover { border-color: rgba(3,87,4,.4); box-shadow: 0 8px 24px rgba(16,36,26,.08); }
+    .awake .tag { color: #fff; }
+    .awake .btn-primary { box-shadow: none; color: #fff; }
+    .awake .btn-primary:hover { box-shadow: 0 6px 18px rgba(3,87,4,.25); }
+    .awake h2::before { color: var(--mid); }
+    .awake footer { background: #eaf3ec; }
 
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
@@ -166,7 +183,10 @@
         <a class="btn btn-ghost" href="#services">see services</a>
       </div>
     </section>
+  </main>
 
+  <div class="awake">
+  <main>
     <section id="services" aria-labelledby="services-h">
       <h2 id="services-h">services</h2>
       <div class="grid">
@@ -262,11 +282,15 @@
     </div>
     <div class="legal">
       <span>© <span id="yr"></span> NEON1 LLC · New York</span>
-      <span>no tracking, no cookies · v0.2.1</span>
+      <span>no tracking, no cookies · v0.3.0</span>
     </div>
   </footer>
+  </div>
 
-  <button class="chip rainctl" id="pause" type="button" aria-pressed="false">pause rain</button>
+  <div class="rainctl" role="group" aria-label="Rain controls">
+    <button class="chip" id="mode" type="button" aria-pressed="false" title="Switch between grid and free-falling rain">grid</button>
+    <button class="chip" id="pause" type="button" aria-pressed="false">pause rain</button>
+  </div>
   <div class="egg" id="egg" role="status" aria-live="polite"></div>
 
   <script>
@@ -274,34 +298,71 @@
       "use strict";
       document.getElementById("yr").textContent = new Date().getFullYear();
 
-      // ---- Matrix rain: one column per glyph width; still for reduced motion, idle when hidden ----
+      // ---- Matrix rain ----
+      // Columns of glyphs; occasionally a column spells a word in its group's glow color.
+      // Grid mode snaps every column to shared rows; free mode lets each fall at its own speed.
       const canvas = document.getElementById("rain");
       const ctx = canvas.getContext("2d");
       const glyphs = "ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉ0123456789neon1".split("");
+      const WORDS = [
+        { color: "#ffffff", words: ["the matrix", "neo", "trinity", "morpheus", "white rabbit", "red pill", "no spoon", "bicentennial man", "robin williams"] },
+        { color: "#00FF41", words: ["neon1", "1withtechnology", "1isgladtobeofservice", "1NEON", "onion"] },
+        { color: "#5ef0ff", words: ["aws", "terraform", "go", "python", "rag", "llm", "ci/cd", "iot", "linux", "cdk"] },
+        { color: "#ffd166", words: ["automation", "networks", "cameras", "pipelines", "migration", "security", "cloud"] },
+        { color: "#c9a7ff", words: ["listen", "simplicity", "ownership", "transparency", "recovery", "service"] },
+      ];
+      const WORD_CHANCE = 0.008; // per column reset: roughly one word every few seconds
       const size = 16;
-      let cols = [], frame = 0, running = true;
+      let cols = [], frame = 0, running = true, grid = true;
       const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+
+      // A column: y in rows, speed in rows/step, optional word being spelled.
+      const newCol = (y) => ({ y, v: grid ? 1 : 0.45 + Math.random() * 0.8, word: null, wi: 0, color: null, wy: 0, hold: 0 });
+
+      function maybeWord(c) {
+        if (Math.random() > WORD_CHANCE) return;
+        const g = WORDS[(Math.random() * WORDS.length) | 0];
+        c.word = g.words[(Math.random() * g.words.length) | 0]; c.wi = 0; c.color = g.color; c.wy = c.y; c.hold = 30;
+      }
 
       function resize() {
         const dpr = Math.min(devicePixelRatio || 1, 2);
         canvas.width = innerWidth * dpr; canvas.height = innerHeight * dpr;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        cols = Array.from({ length: Math.ceil(innerWidth / size) }, () => Math.random() * innerHeight / size);
+        cols = Array.from({ length: Math.ceil(innerWidth / size) }, () => newCol(Math.random() * innerHeight / size));
         ctx.font = size + 'px "JetBrains Mono", monospace';
+        ctx.textBaseline = "top";
       }
 
       function draw() {
+        ctx.shadowBlur = 0;
         ctx.fillStyle = "rgba(13, 2, 8, 0.07)";
         ctx.fillRect(0, 0, innerWidth, innerHeight);
-        cols.forEach((y, i) => {
-          const ch = glyphs[(Math.random() * glyphs.length) | 0];
-          ctx.fillStyle = Math.random() > 0.97 ? "#d6f5dc" : Math.random() > 0.5 ? "#00FF41" : "#008F11";
-          ctx.fillText(ch, i * size, y * size);
-          cols[i] = y * size > innerHeight && Math.random() > 0.975 ? 0 : y + 1;
+        cols.forEach((c, i) => {
+          const y = (grid ? Math.floor(c.y) : c.y) * size;
+          if (c.word) {
+            // Spell the word downward and keep it glowing a moment after it lands,
+            // re-painting the spelled letters so the trail fade doesn't swallow them.
+            if (c.wi < c.word.length) c.wi++; else c.hold--;
+            ctx.shadowColor = c.color; ctx.shadowBlur = 12; ctx.fillStyle = c.color;
+            for (let k = 0; k < c.wi; k++) {
+              const ch = c.word[k];
+              if (ch !== " ") ctx.fillText(ch, i * size, (Math.floor(c.wy) + k) * size);
+            }
+            ctx.shadowBlur = 0;
+            if (c.hold <= 0) c.word = null;
+          } else {
+            const r = Math.random();
+            ctx.fillStyle = r > 0.97 ? "#d6f5dc" : r > 0.5 ? "#00FF41" : "#008F11";
+            ctx.fillText(glyphs[(Math.random() * glyphs.length) | 0], i * size, y);
+          }
+          c.y += c.v;
+          if (c.y * size > innerHeight && !c.word && Math.random() > 0.975) {
+            Object.assign(c, newCol(0)); maybeWord(c);
+          }
         });
       }
 
-      // ~20fps keeps the effect calm and CPU low.
       function loop() {
         if (running && !document.hidden && ++frame % 3 === 0) draw();
         requestAnimationFrame(loop);
@@ -315,11 +376,32 @@
       }
       btn.addEventListener("click", () => setRunning(!running));
 
+      const modeBtn = document.getElementById("mode");
+      modeBtn.addEventListener("click", () => {
+        grid = !grid;
+        cols.forEach((c) => { c.v = grid ? 1 : 0.45 + Math.random() * 0.8; });
+        modeBtn.textContent = grid ? "grid" : "free";
+        modeBtn.setAttribute("aria-pressed", String(!grid));
+      });
+
+      // Waking up: rain and its controls fade as the light content takes over.
+      const veil = document.querySelector(".veil"), ctl = document.querySelector(".rainctl"), header = document.querySelector("header");
+      function onScroll() {
+        const t = Math.min(1, scrollY / (innerHeight * 0.9));
+        canvas.style.opacity = String(0.75 * (1 - t));
+        veil.style.opacity = String(1 - t);
+        ctl.style.opacity = t > 0.6 ? "0" : "1";
+        ctl.style.pointerEvents = t > 0.6 ? "none" : "auto";
+        header.classList.toggle("light", t > 0.95);
+      }
+      addEventListener("scroll", onScroll, { passive: true });
+
       resize();
       addEventListener("resize", resize);
       // Pre-fill so rain is already falling on first paint; reduced motion keeps this still frame.
       for (let i = 0; i < 12; i++) draw();
       if (reduce.matches) setRunning(false);
+      onScroll();
       loop();
 
       // ---- Easter eggs: type a phrase anywhere ----
