@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="version" content="0.6.0" />
+  <meta name="version" content="0.8.0" />
   <title>neon1</title>
   <meta name="description" content="neon1 is a one-person technology practice in New York: cloud and AI engineering, business automation, networks and cameras." />
   <meta name="theme-color" content="#0D0208" />
@@ -46,7 +46,7 @@
     #rain { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; opacity: .75; }
     .veil { position: fixed; inset: 0; z-index: 1; pointer-events: none;
       background: radial-gradient(80% 60% at 50% 40%, rgba(13,2,8,.55), rgba(13,2,8,.8) 80%); }
-    main, footer { position: relative; z-index: 2; }
+    main, footer, .top { position: relative; z-index: 2; }
 
     /* ---- Buttons: one system (primary / ghost / chip) ---- */
     .btn { display: inline-flex; align-items: center; gap: 8px; font: 500 14px var(--mono); letter-spacing: .02em;
@@ -188,7 +188,7 @@
       .card, .card:hover { transition: none; transform: none; }
     }
 
-    /* ---- v0.6.0: measured from the reference study (see CHANGELOG) ---- */
+    /* ---- Layout measured from the reference study (see CHANGELOG v0.6.0) ---- */
     /* Header: fixed and clear over the rain, frosted light once the page wakes up. */
     header { position: fixed; left: 0; right: 0; top: 0; height: 64px; background: transparent; border-bottom: 0;
       backdrop-filter: none; transition: background .24s cubic-bezier(.28,.11,.32,1), box-shadow .24s cubic-bezier(.28,.11,.32,1); }
@@ -317,13 +317,13 @@
     </ul>
   </div>
 
-  <main id="top">
+  <div id="top" class="top">
     <section class="hero">
       <h1 class="brand" aria-label="neon1"><span class="dec" aria-hidden="true">neon</span><span class="one dec" aria-hidden="true">1</span></h1>
       <p class="tagline reveal d1">1 is glad to be of service.</p>
       <a class="cue reveal d2" href="#services" aria-label="Scroll to services"><span></span></a>
     </section>
-  </main>
+  </div>
 
   <div class="awake">
   <main>
@@ -474,7 +474,7 @@
     </div>
     <div class="legal">
       <span>© <span id="yr"></span> NEON1 LLC, New York</span>
-      <span>No tracking or cookies. v0.6.0</span>
+      <span>No tracking or cookies. v0.8.0</span>
     </div>
   </footer>
   </div>
