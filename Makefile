@@ -41,9 +41,9 @@ html: ## Validate index.html against the HTML standard
 	@command -v npx >/dev/null 2>&1 || { echo "html: install Node.js to get npx"; exit 1; }
 	npx --yes $(HTML_VALIDATE) $(SITE_DIR)/index.html
 
-js: ## Syntax-check the JavaScript files and inline scripts
+js: ## Syntax-check the JavaScript files, shared modules, and inline scripts
 	@command -v node >/dev/null 2>&1 || { echo "js: install Node.js"; exit 1; }
-	@for f in $(SITE_DIR)/js/*.js; do node --check "$$f" || exit 1; done
+	@for f in $(SITE_DIR)/js/*.js $(SITE_DIR)/shared/*.js; do node --check "$$f" || exit 1; done
 	@python3 scripts/check_page.py scripts $(SITE_DIR)/index.html
 
 links: ## Check in-page anchors and root-relative asset paths

@@ -2,6 +2,13 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.11.0
+
+- A 1NEON button in the top bar, and in the phone menu, opens the client portal at neon1.tech/1NEON.
+- The rain, its glass lens, its controls, the fonts, and the brand colors now live in `shared/`, so 1NEON uses the same files as the site instead of copies.
+- Rain settings (grid or free, characters, and pause) carry over between the site and 1NEON.
+- A paused rain keeps the glass panes in step while scrolling.
+
 ## v0.10.1
 
 - Rain words only form from a drop that has fallen from the top, so they read as part of the rain.

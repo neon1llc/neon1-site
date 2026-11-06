@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="version" content="0.10.1" />
+  <meta name="version" content="0.11.0" />
   <title>neon1</title>
   <meta name="description" content="neon1 is a one-person technology practice in New York: cloud and AI engineering, business automation, networks, and cameras." />
   <meta name="theme-color" content="#0D0208" />
@@ -13,32 +13,20 @@
   <meta property="og:url" content="https://neon1.tech/" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐇</text></svg>" />
   <link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <!-- Shared with 1NEON: fonts, brand tokens, rain layers, glass, and rain controls -->
+  <link rel="stylesheet" href="/shared/neon1.css" />
+  <link rel="modulepreload" href="/shared/rain.js" />
   <script>
     // The visible height, which some mobile browsers report differently from CSS vh units
     (() => { const set = () => document.documentElement.style.setProperty("--vh", (window.visualViewport ? visualViewport.height : innerHeight) + "px"); set(); addEventListener("resize", set); if (window.visualViewport) visualViewport.addEventListener("resize", set); })();
   </script>
   <style>
-    /* ---- Fonts: self-hosted, SIL OFL (see /fonts) ---- */
-    @font-face { font-family: "Inter"; src: url(/fonts/inter-latin-wght-normal.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
-    @font-face { font-family: "JetBrains Mono"; src: url(/fonts/jetbrains-mono-latin-wght-normal.woff2) format("woff2"); font-weight: 100 800; font-display: swap; }
-
-    /* ---- Tokens: Matrix code palette (dark layer) + brand greens ---- */
+    /* ---- Page tokens; fonts and brand tokens come from /shared/neon1.css ---- */
     :root {
-      --void: #0D0208;
-      --deep: #003B00;
-      --mid: #008F11;
-      --glow: #00E676;
-      --neon: #6CFFA8;    /* the one dark-mode neon: wordmark, mark, buttons, cue (cooler, less lime) */
-      --brand: #035704;
-      --mark: #327641;
-      --paper: #F2F4F2;   /* very light grey: the professional surface */
-      --ink: #12241A;
       --text: #d6f5dc;
       --muted: #84a98c;
       --panel: rgba(13, 2, 8, 0.72);
       --line: rgba(0, 255, 65, 0.16);
-      --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-      --sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
       --r: 14px;
     }
 
@@ -49,9 +37,7 @@
     a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3px; }
     :focus-visible { outline: 2px solid var(--glow); outline-offset: 3px; border-radius: 6px; }
 
-    /* ---- Matrix rain: decorative layer behind everything ---- */
-    #lens { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 1; pointer-events: none; opacity: .8; }
-    #rain { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; opacity: .8; }
+    /* ---- Matrix rain: the canvases are styled in /shared/neon1.css; the veil darkens the hero ---- */
     .veil { position: fixed; inset: 0; z-index: 1; pointer-events: none;
       background: radial-gradient(70% 45% at 50% 48%, rgba(13,2,8,.6), rgba(13,2,8,.15) 75%); }
     main, footer, .top { position: relative; z-index: 2; }
@@ -147,10 +133,6 @@
     .brand { font: 700 clamp(29px, 4.2vw, 52px)/1 var(--mono);
       letter-spacing: .06em; margin: 0; color: var(--neon);
       text-shadow: 0 0 8px rgba(108,255,168,.65), 0 0 20px rgba(0,230,118,.35); }
-    /* neon1 marks: "neon" is set 1.3x so its letters match the height of "1"
-       (x-height 0.56em vs digit 0.73em), at weight 450 so its strokes match the 700 "1" */
-    .ne { font-size: 1.3em; font-weight: 450; }
-    .brand .one, .logo .one, .mark-light .one { font-size: 1em; font-weight: 700; }
     .tagline { font: clamp(13px, 1.6vw, 16px)/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       color: var(--neon); opacity: .78; margin: 18px auto 0; max-width: 560px; }
 
@@ -194,8 +176,7 @@
     @media (max-width: 700px) { .legal { padding-right: 20px; padding-bottom: 72px; } }
     @media (max-width: 700px) { .foot { grid-template-columns: 1fr 1fr; } .foot > div:first-child { grid-column: 1 / -1; } }
 
-    /* ---- Floating rain control + easter-egg toast ---- */
-    .rainctl { position: fixed; right: 16px; bottom: 16px; z-index: 6; display: flex; gap: 8px; transition: opacity .3s; }
+    /* ---- Easter-egg toast; the rain controls are styled in /shared/neon1.css ---- */
     .egg { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 6; font: 13px var(--mono); color: var(--glow); background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 16px; opacity: 0; transition: opacity .4s; pointer-events: none; }
     .egg.show { opacity: 1; }
 
@@ -355,12 +336,17 @@
     /* Page background turns light once the rain has faded */
     /* Clear glass over the rain: no tint, so the black stays black; the lens layer in the script
        magnifies the rain behind each pane; logo, links, button, controls, and hero share one radius */
-    :root { --glass-r: 8px; }
-    .glass, .rainctl .chip, header:not(.light) .logo, header:not(.light) .links a, header:not(.light) .menu-btn {
+    header:not(.light) .logo, header:not(.light) .links a, header:not(.light) .menu-btn {
       border-radius: var(--glass-r); background: transparent; box-shadow: none; }
     header:not(.light) .logo, header:not(.light) .links a:not(.btn) { padding: 7px 12px; }
     header:not(.light) .links { gap: 10px; }
     .links .btn, .menu-btn { border-radius: var(--glass-r); }
+    /* 1NEON button: quieter than book a call, with the portal's rings */
+    .links .portal { color: var(--neon); border-color: var(--line); background: transparent; }
+    .links .portal:hover { border-color: var(--neon); background: rgba(0,230,118,.08); }
+    .links .portal svg { width: 14px; height: 14px; }
+    header.light .links .portal { color: var(--brand); border-color: rgba(3,87,4,.25); }
+    header.light .links .portal:hover { border-color: var(--brand); }
     .hero-pane { padding: 14px 20px; }
     /* The 1.3x "neon" adds .3em of empty line space above the letters; pull it back so the pane looks balanced */
     .hero-pane .brand { margin-top: -.3em; }
@@ -421,6 +407,9 @@
         <li><a href="#how">how it works</a></li>
         <li><a href="#work">open source</a></li>
         <li><a class="btn btn-ghost" href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a call</a></li>
+        <!-- The client portal, a separate app on the same domain -->
+        <li><a class="btn portal" href="/1NEON/" title="1NEON, the client portal">
+          <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="5" aria-hidden="true"><circle cx="32" cy="32" r="28" /><circle cx="32" cy="32" r="19" /><circle cx="32" cy="32" r="10" /><circle cx="32" cy="32" r="2" /></svg>1NEON</a></li>
       </ul>
       <button class="chip menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="menu">menu</button>
     </nav>
@@ -436,6 +425,7 @@
       <li><a href="#why">about</a></li>
       <li><a href="#faq">questions</a></li>
       <li><a href="#contact">contact</a></li>
+      <li><a href="/1NEON/">1NEON</a></li>
     </ul>
   </div>
 
@@ -621,7 +611,7 @@
     </div>
     <div class="legal">
       <span>© <span id="yr"></span> NEON1 LLC, New York</span>
-      <span>No tracking or cookies. v0.10.1</span>
+      <span>No tracking or cookies. v0.11.0</span>
     </div>
   </footer>
   </div>
@@ -637,9 +627,9 @@
 
   <!-- Rain controls and the easter-egg toast -->
   <div class="rainctl" role="group" aria-label="Rain controls">
-    <button class="chip" id="mode" type="button" title="Rain motion: grid or free. Click to switch.">grid</button>
-    <button class="chip" id="charset" type="button" title="Rain characters. Click to cycle.">text</button>
-    <button class="chip" id="pause" type="button" aria-pressed="false">pause</button>
+    <button data-rain="mode" type="button" title="Rain motion: grid or free. Click to switch.">grid</button>
+    <button data-rain="charset" type="button" title="Rain characters. Click to cycle.">text</button>
+    <button data-rain="pause" type="button" aria-pressed="false">pause</button>
   </div>
   <div class="egg" id="egg" role="status" aria-live="polite"></div>
 
@@ -648,212 +638,29 @@
   <script defer src="/js/views.js"></script>
   <script defer src="/js/cases.js"></script>
 
-  <!-- Rain, menu, wordmark, and easter eggs -->
-  <script>
-    (() => {
-      "use strict";
+  <!-- Rain, menu, wordmark, and easter eggs; the rain itself is shared with 1NEON -->
+  <script type="module">
+    import { rain, controls, TEXT } from "/shared/rain.js";
+    {
       // Footer year
       document.getElementById("yr").textContent = new Date().getFullYear();
 
-      // ---- Matrix rain ----
-      // Columns of glyphs with long fading trails. Now and then a column spells a
-      // word where it is and holds it long enough to read.
-      // "grid" keeps every column in step on shared rows; "free" lets each fall at its own speed
-      // The second button cycles the characters
-      const canvas = document.getElementById("rain");
-      const ctx = canvas.getContext("2d");
-
-      // Character sets for the second button
-      const EMOJI = ["💻", "🔒", "📡", "🛰️", "🔌", "⚙️", "🧅", "🐇", "💊", "🕶️", "☁️", "🔑", "📷", "🛡️", "🤖", "💾", "📶", "🧠"];
-      const FACES = ["😀", "😃", "😄", "😁", "😆", "😅", "😂", "🙂", "😉", "😊", "😇", "🥰", "😍", "🤩", "😎", "🤓", "🧐", "🤔", "😴", "🤯", "🥳", "😏", "😌", "🙃"];
-      // "text" mixes many writing systems, weighted like the original neon1 rain;
-      // combining marks are skipped because they can't stand alone in a cell
-      const RANGES = [[0x30, 0x39, 10], [0x41, 0x5a, 20], [0x61, 0x7a, 30], [0xa1, 0xff, 5], [0x370, 0x3ff, 2], [0x400, 0x4ff, 2],
-        [0x5d0, 0x5ea, 1], [0x621, 0x64a, 1], [0x905, 0x939, 1], [0xe01, 0xe2e, 1], [0x3041, 0x3096, 3], [0x30a1, 0x30fa, 3],
-        [0xac00, 0xd7a3, 3], [0x4e00, 0x9fff, 18]];
-      const TEXT = [];
-      for (const [lo, hi, w] of RANGES) {
-        for (let n = 0; n < w * 12; n++) {
-          const ch = String.fromCodePoint(lo + ((Math.random() * (hi - lo + 1)) | 0));
-          if (/^[\p{L}\p{N}\p{S}\p{P}]$/u.test(ch)) TEXT.push(ch);
-        }
-      }
-      const SETS = [
-        { name: "text", chars: TEXT },
-        { name: "katakana", chars: [..."ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0123456789neon1"] },
-        { name: "numbers", chars: [..."0123456789"] },
-        { name: "symbols", chars: [..."ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz$#%&*+=<>/\\{}[]()∆∑∏√∞≈≠λΩπμΣΦΨ"] },
-        { name: "emoji", chars: EMOJI },
-        { name: "faces", chars: FACES },
-        { name: "mixed", chars: null },
-      ];
-      // Mixed keeps emoji rare so the text still reads as rain
-      SETS[6].chars = [...TEXT, ...SETS[1].chars, ...SETS[2].chars, ...SETS[3].chars, ...EMOJI.slice(0, 6), ...FACES.slice(0, 4)];
-      const isEmoji = (ch) => /\p{Extended_Pictographic}/u.test(ch);
-
-      // Word groups by how often they appear. All words share one gold, set apart
-      // from the rain by staying put; neon1's own names glow in its green
-      const GOLD = "#ffd77a";
-      const WORDS = [
-        { weight: 3, color: GOLD, alpha: 0.95, words: ["listen", "simplicity", "ownership", "transparency", "recovery", "service", "automation", "networks", "cameras", "pipelines", "migration", "security", "cloud"] },
-        // Tech stack words, off for now: "aws", "terraform", "python", "rag", "llm", "ci/cd", "iot", "linux"
-        { weight: 2, color: "#6CFFA8", alpha: 1, glow: 6, words: ["neon1", "1withtechnology", "1isgladtobeofservice", "1NEON", "onion"] },
-        // Matrix and movie words, off for now
-        // { weight: 1.3, color: GOLD, alpha: 0.75, words: ["neo", "trinity", "morpheus", "the matrix", "white rabbit", "red pill", "no spoon", "bicentennial man", "robin williams"] },
-      ];
-      const TOTAL = WORDS.reduce((a, g) => a + g.weight, 0);
-      const WORD_RATE = 0.06; // chance per step that some column starts a word
-      const FADE = 0.07;      // lower means longer trails
-
-      // Cell size, grid, columns, and the current controls
-      let size = 20, rows = 0, cols = [], frame = 0, running = true, grid = true, set = 0;
+      // ---- Matrix rain, with the hero pane, header, and controls as glass ----
+      const canvas = document.getElementById("rain"), lens = document.getElementById("lens");
+      const header = document.querySelector("header");
       const reduce = matchMedia("(prefers-reduced-motion: reduce)");
-
-      // Grid columns fall one row per step; free columns at their own speed
-      const speed = () => (grid ? 1 : 0.35 + Math.random() * 0.75);
-      const newCol = (y, top = true) => ({ y, top, v: speed(), word: null, wi: 0, g: null, wy: 0, hold: 0 });
-
-      // Starts a word from a weighted group in a column that has room for it
-      function startWord() {
-        let r = Math.random() * TOTAL, g = WORDS[0];
-        for (const w of WORDS) { if ((r -= w.weight) <= 0) { g = w; break; } }
-        const word = g.words[(Math.random() * g.words.length) | 0];
-        // Any free column whose head is far enough from the bottom for the whole word
-        for (let tries = 0; tries < 8; tries++) {
-          const c = cols[(Math.random() * cols.length) | 0];
-          const wy = Math.floor(c.y);
-          // Only a drop that has fallen from the top, with a trail above it, turns into a word
-          if (c.word || !c.top || wy < 3 || wy + word.length >= rows) continue;
-          Object.assign(c, { word, wi: 0, g, wy, hold: 30 });
-          return;
-        }
-      }
-
-      // Fits the canvas to the window and pixel ratio, then restarts every column
-      function resize() {
-        dpr = Math.min(devicePixelRatio || 1, 2);
-        lens.width = innerWidth * dpr; lens.height = innerHeight * dpr;
-        lctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        size = innerWidth < 640 ? 17 : 21;
-        canvas.width = innerWidth * dpr; canvas.height = innerHeight * dpr;
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        rows = Math.floor(innerHeight / size);
-        cols = Array.from({ length: Math.ceil(innerWidth / size) }, () => newCol(Math.random() * rows, false));
-        ctx.textBaseline = "middle"; ctx.textAlign = "center";
-        ctx.fillStyle = "#0D0208"; ctx.fillRect(0, 0, innerWidth, innerHeight);
-      }
-
-      // Every glyph is centered in its cell; emoji are drawn smaller to match the text
-      const MONO = `"JetBrains Mono", ui-monospace, monospace`;
-      function glyph(ch, x, y) {
-        if (isEmoji(ch)) ctx.font = `${Math.round(size * 0.72)}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`;
-        else ctx.font = `500 ${size}px ${MONO}`;
-        ctx.fillText(ch, x + size / 2, y + size / 2);
-      }
-
-      // One step: fade the trails, maybe start a word, then advance every column
-      function draw() {
-        ctx.globalAlpha = 1;
-        ctx.fillStyle = `rgba(13, 2, 8, ${FADE})`;
-        ctx.fillRect(0, 0, innerWidth, innerHeight);
-        if (Math.random() < WORD_RATE) startWord();
-        const chars = SETS[set].chars;
-        cols.forEach((c, i) => {
-          const x = i * size;
-          if (c.word) {
-            // Spell one letter per step, then hold. Each letter sits on a cleared
-            // cell, in the same weight as the rain, so it stays sharp. Once the
-            // word is spelled, the drop carries on falling below it
-            if (c.wi < c.word.length) { c.wi++; if (c.wi === c.word.length) c.y = c.wy + c.wi; } else c.hold--;
-            for (let k = 0; k < c.wi; k++) {
-              const ch = c.word[k], wy = (c.wy + k) * size;
-              ctx.shadowBlur = 0; ctx.globalAlpha = 1;
-              ctx.fillStyle = "#0D0208"; ctx.fillRect(x, wy, size, size);
-              if (ch === " ") continue;
-              ctx.globalAlpha = c.g.alpha;
-              ctx.shadowColor = c.g.color; ctx.shadowBlur = c.g.glow || 0;
-              ctx.fillStyle = c.g.color; glyph(ch, x, wy);
-            }
-            ctx.shadowBlur = 0; ctx.globalAlpha = 1;
-            if (c.hold <= 0) c.word = null;
-            if (c.word && c.wi < c.word.length) return;
-          }
-          // A random glyph at the head, mostly green with the odd bright one
-          const y = (grid ? Math.floor(c.y) : c.y) * size;
-          const r = Math.random();
-          ctx.fillStyle = r > 0.96 ? "#e9ffee" : r > 0.45 ? "#22ff7a" : "#00b84f";
-          glyph(chars[(Math.random() * chars.length) | 0], x, y);
-          c.y += c.v;
-          if (c.y > rows && !c.word && Math.random() > 0.97) Object.assign(c, newCol(0));
-        });
-      }
-
-      // Steps the rain about 15 times a second, and not while paused or the tab is hidden
-      // Glass panes act as a lens: each shows the rain behind it slightly magnified,
-      // like looking through thick convex glass, with a touch of softening
-      const lens = document.getElementById("lens"), lctx = lens.getContext("2d");
-      const ZOOM = 1.15, STEP_MS = 66;
-      let dpr = 1, last = 0;
-      const panes = () => document.querySelectorAll(".hero-pane, header .logo, header .links a, #menuBtn, .rainctl .chip");
-      const RIM = 5;
-      // Draws the rain behind rect r, inset by `inset` px, scaled by `zoom` around its center
-      function lens1(r, inset, zoom) {
-        const x = r.left + inset, y = r.top + inset, w = r.width - inset * 2, h = r.height - inset * 2;
-        const sw = w / zoom, sh = h / zoom, sx = x + (w - sw) / 2, sy = y + (h - sh) / 2;
-        lctx.save();
-        lctx.beginPath(); lctx.roundRect(x, y, w, h, Math.max(2, 8 - inset)); lctx.clip();
-        lctx.fillRect(x, y, w, h);
-        lctx.drawImage(canvas, sx * dpr, sy * dpr, sw * dpr, sh * dpr, x, y, w, h);
-        lctx.restore();
-      }
-
-      function refract() {
-        lctx.clearRect(0, 0, innerWidth, innerHeight);
-        if (document.querySelector("header").classList.contains("light")) return;
-        for (const el of panes()) {
-          const r = el.getBoundingClientRect();
-          if (!r.width || r.bottom < 0 || r.top > innerHeight) continue;
-          lctx.save();
-          lctx.fillStyle = "#0D0208";
-          lctx.filter = "blur(0.6px)";
-          // Rim: the edge of the glass bends the rain inward, showing a little more of it
-          lens1(r, 0, 0.9);
-          // Body: inside the rim, the rain is magnified like through thick convex glass
-          lens1(r, RIM, ZOOM);
-          lctx.restore();
-        }
-      }
-
-      function loop() {
-        const now = performance.now();
-        if (running && !document.hidden && now - last >= STEP_MS) { last = now; draw(); refract(); }
-        requestAnimationFrame(loop);
-      }
-
-      // Pause and play, reflected in aria-pressed
-      const btn = document.getElementById("pause");
-      function setRunning(on) {
-        running = on;
-        btn.textContent = on ? "pause" : "play";
-        btn.setAttribute("aria-pressed", String(!on));
-      }
-      btn.addEventListener("click", () => setRunning(!running));
-
-      // The buttons show the current setting; a click moves to the next one
-      const modeBtn = document.getElementById("mode");
-      modeBtn.addEventListener("click", () => {
-        grid = !grid;
-        cols.forEach((c) => { c.v = speed(); if (grid) c.y = Math.floor(c.y); });
-        modeBtn.textContent = grid ? "grid" : "free";
+      const r = rain({
+        canvas,
+        lens,
+        panes: () => document.querySelectorAll(".hero-pane, header .logo, header .links a, #menuBtn, .rainctl button"),
+        // The lens rests once the header turns light
+        lensOff: () => header.classList.contains("light"),
       });
-      const setBtn = document.getElementById("charset");
-      setBtn.addEventListener("click", () => {
-        set = (set + 1) % SETS.length;
-        setBtn.textContent = SETS[set].name;
-      });
+      const ctl = document.querySelector(".rainctl");
+      controls(ctl, r);
 
       // Waking up: rain and its controls fade as the light content takes over
-      const veil = document.querySelector(".veil"), ctl = document.querySelector(".rainctl"), header = document.querySelector("header");
+      const veil = document.querySelector(".veil");
       function onScroll() {
         const t = Math.min(1, scrollY / (innerHeight * 0.9));
         canvas.style.opacity = lens.style.opacity = String(0.8 * (1 - t));
@@ -862,17 +669,11 @@
         ctl.style.pointerEvents = t > 0.6 ? "none" : "auto";
         header.classList.toggle("light", t > 0.95);
         document.body.classList.toggle("woke", t >= 1);
+        // A paused rain still needs the lens redrawn as panes move
+        if (!r.running) r.refract();
       }
       addEventListener("scroll", onScroll, { passive: true });
-
-      // Start the rain
-      resize();
-      addEventListener("resize", resize);
-      // Pre-fill so rain is already falling on first paint; reduced motion keeps this still frame
-      for (let i = 0; i < 40; i++) draw();
-      if (reduce.matches) setRunning(false);
       onScroll();
-      loop();
 
       // ---- Menu: open/close, Esc, close on link; returns focus to the button ----
       const menu = document.getElementById("menu"), menuBtn = document.getElementById("menuBtn");
@@ -896,7 +697,7 @@
         const timer = setInterval(() => {
           let n = 0;
           spans.forEach((el, si) => {
-            el.textContent = [...finals[si]].map((ch) => (n++ < tick / 4 ? ch : SETS[0].chars[(Math.random() * SETS[0].chars.length) | 0])).join("");
+            el.textContent = [...finals[si]].map((ch) => (n++ < tick / 4 ? ch : TEXT[(Math.random() * TEXT.length) | 0])).join("");
           });
           if (++tick > total * 4) { clearInterval(timer); spans.forEach((el, si) => (el.textContent = finals[si])); }
         }, 45);
@@ -921,7 +722,7 @@
 
       // A hint for anyone who opens the console
       console.log("%cfollow the white rabbit.", "color:#00FF41;font:14px monospace");
-    })();
+    }
   </script>
 </body>
 </html>

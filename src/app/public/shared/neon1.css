@@ -1,0 +1,40 @@
+/* shared/neon1.css - neon1 design shared by neon1.tech and 1NEON: fonts, brand tokens, the rain
+ * layers, glass panes, and the rain controls. Pages add their own layout on top. */
+
+/* Fonts: self-hosted, SIL OFL (see /fonts) */
+@font-face { font-family: "Inter"; src: url(/fonts/inter-latin-wght-normal.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "JetBrains Mono"; src: url(/fonts/jetbrains-mono-latin-wght-normal.woff2) format("woff2"); font-weight: 100 800; font-display: swap; }
+
+/* Brand tokens: the Matrix code palette (dark layer), brand greens, and the type */
+:root {
+  --void: #0D0208;
+  --deep: #003B00;
+  --mid: #008F11;
+  --glow: #00E676;
+  --neon: #6CFFA8;    /* the one dark-mode neon: wordmark, mark, buttons, cue (cooler, less lime) */
+  --brand: #035704;
+  --mark: #327641;
+  --paper: #F2F4F2;   /* very light grey: the professional surface */
+  --ink: #12241A;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --glass-r: 8px;
+}
+
+/* Rain: the canvas behind everything, and the lens layer that magnifies it behind glass */
+#rain { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; opacity: .8; }
+#lens { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 1; pointer-events: none; opacity: .8; }
+
+/* Clear glass over the rain: no tint, so the black stays black; the lens draws what shows through */
+.glass { border-radius: var(--glass-r); background: transparent; box-shadow: none; }
+
+/* neon1 wordmark: "neon" is set 1.3x so its letters match the height of "1"
+   (x-height 0.56em vs digit 0.73em), at weight 450 so its strokes match the 700 "1" */
+.ne { font-size: 1.3em; font-weight: 450; }
+.one { font-size: 1em; font-weight: 700; }
+
+/* Rain controls: three glass chips in the bottom-right corner */
+.rainctl { position: fixed; right: 16px; bottom: 16px; z-index: 6; display: flex; gap: 8px; transition: opacity .3s; }
+.rainctl button { font: 12px var(--mono); color: #84a98c; background: transparent; border: 1px solid rgba(0, 255, 65, .16);
+  border-radius: var(--glass-r); padding: 6px 12px; cursor: pointer; }
+.rainctl button:hover, .rainctl button[aria-pressed="true"] { color: var(--glow); border-color: rgba(0, 230, 118, .45); }
