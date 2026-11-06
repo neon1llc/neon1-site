@@ -102,7 +102,7 @@ verify: ## Check that each live URL returns 200 and serves the local version
 	for url in $(VERIFY_URLS); do \
 		ok=; \
 		for try in 1 2 3 4 5 6; do \
-			if curl -fsSL --max-time 15 "$$url" | grep -qF "name=\"version\" content=\"$$version\""; then \
+			if curl -fsSL --max-time 15 "$$url" | grep -F "name=\"version\" content=\"$$version\"" >/dev/null; then \
 				ok=1; break; \
 			fi; \
 			sleep 10; \
