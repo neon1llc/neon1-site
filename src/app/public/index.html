@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="version" content="0.9.3" />
+  <meta name="version" content="0.10.0" />
   <title>neon1</title>
   <meta name="description" content="neon1 is a one-person technology practice in New York: cloud and AI engineering, business automation, networks, and cameras." />
   <meta name="theme-color" content="#0D0208" />
@@ -258,12 +258,12 @@
     .cases::-webkit-scrollbar { display: none; }
     .cases:focus-visible { outline-offset: -2px; }
     .case { flex: 0 0 clamp(280px, 30vw, 372px); scroll-snap-align: start; }
-    .rail-nav { display: flex; gap: 8px; justify-content: flex-end; max-width: 1152px; margin: 12px auto 0; padding: 0 24px; }
+    .rail-nav { display: flex; gap: 8px; justify-content: flex-end; max-width: 1152px; margin: 6px auto 0; padding: 0 24px; }
     .rail-nav .chip { font-size: 15px; padding: 6px 14px; }
     @media (max-width: 640px) { .case { flex-basis: 82vw; } .rail-nav { display: none; } }
     .case { background: #fff; border: 1px solid rgba(18,36,26,.1); border-radius: 6px; padding: clamp(20px, 2.6vh, 26px); display: flex; flex-direction: column; }
     .case .idx { margin: 0 0 14px; font: 500 12px var(--mono); color: var(--glow); }
-    .case h3 { font: 600 19px/1.25 var(--sans); letter-spacing: -.015em; margin: 0 0 12px; color: var(--ink); }
+    .case h3 { font: 600 19px/1.25 var(--sans); letter-spacing: -.015em; margin: 0 0 8px; color: var(--ink); }
     .case p { margin: 0 0 14px; color: var(--muted); font-size: 15px; line-height: 1.55; }
     .case .stat { margin: auto 0 0; padding-top: 16px; border-top: 1px solid rgba(18,36,26,.1); font: 13px var(--mono); color: var(--muted); }
     .case .stat b { color: var(--brand); font-weight: 600; }
@@ -275,6 +275,35 @@
     .faq summary::after { content: "+"; position: absolute; right: 4px; top: 18px; font: 400 22px var(--mono); color: var(--glow); transition: transform .2s; }
     .faq details[open] summary::after { transform: rotate(45deg); }
     .faq details p { margin: -4px 0 22px; max-width: 720px; color: var(--muted); }
+    /* Case studies: N, E, O, N rows on each card, and a full case study that opens over the page. */
+    .nl { color: var(--brand); font-weight: 700; }
+    .neon { display: grid; grid-template-columns: 1.1em 1fr; gap: 5px 10px; margin: 0 0 10px; font-size: 14px; line-height: 1.4; }
+    .neon dt { font: 700 14px/1.45 var(--mono); color: var(--brand); }
+    .neon dd { margin: 0; color: var(--muted); }
+    .case .more { align-self: flex-start; margin-top: 10px; padding: 0; border: 0; background: none; cursor: pointer;
+      font: 500 13px var(--mono); color: var(--brand); text-decoration: underline; text-underline-offset: 3px; }
+    .case .more span { display: inline-block; transition: transform .2s; }
+    .case .more:hover span { transform: translateX(3px); }
+    .case-layer { position: fixed; inset: 64px 0 0; z-index: 9; }
+    .case-layer[hidden] { display: none; }
+    html.case-lock { overflow: hidden; }
+    .case-scrim { position: absolute; inset: 0; background: rgba(242,244,242,.82); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+    .case-panel { position: absolute; inset: 16px max(16px, calc(50vw - 440px)); background: #fff; border: 1px solid rgba(18,36,26,.12);
+      border-radius: 8px; box-shadow: 0 24px 60px rgba(18,36,26,.16); overflow: auto; overscroll-behavior: contain; transform-origin: 0 0; outline: none; }
+    .case-close { position: sticky; top: 12px; float: right; margin: 12px 12px 0 0; width: 40px; height: 40px; border-radius: 50%;
+      border: 1px solid rgba(18,36,26,.16); background: #fff; font: 400 24px/1 var(--sans); color: var(--ink); cursor: pointer; z-index: 1; }
+    .case-body { padding: clamp(22px, 4vw, 44px); max-width: 760px; color: var(--ink); }
+    .case-body .idx { font: 500 12px var(--mono); color: var(--brand); margin: 0 0 10px; }
+    .case-body h3 { font: 600 clamp(24px, 3vw, 32px)/1.15 var(--sans); letter-spacing: -.02em; margin: 0 0 6px; }
+    .case-body h4 { font: 600 19px var(--sans); margin: 30px 0 8px; } .case-body h4 span { font-family: var(--mono); color: var(--brand); }
+    .case-body p, .case-body li { color: #3b4a40; font-size: 16px; line-height: 1.6; }
+    .case-body ul { padding-left: 20px; } .case-body li { margin-bottom: 6px; }
+    .case-body table { width: 100%; border-collapse: collapse; font-size: 15px; margin: 6px 0 10px; }
+    .case-body th, .case-body td { text-align: left; padding: 9px 10px 9px 0; border-bottom: 1px solid rgba(18,36,26,.1); vertical-align: top; }
+    .case-body th { font: 500 12px var(--mono); color: var(--brand); }
+    .case-body .stat { font: 13px var(--mono); color: var(--muted); }
+    .case-body .stat b { color: var(--brand); }
+    @media (max-width: 640px) { .case-layer { inset: 64px 0 0; } .case-panel { inset: 0; border-radius: 0; border: 0; } }
     body { transition: background-color .4s; } body.woke { background-color: var(--paper); }
     .foot, .legal { max-width: 1200px; padding-left: 24px; }
     /* Views: each section is a "view". Motion (js/motion) runs the entrances; without JS everything is visible. */
@@ -312,7 +341,7 @@
       </a>
       <ul class="links">
         <li><a href="#services">services</a></li>
-        <li><a href="#projects">work</a></li>
+        <li><a href="#projects">case studies</a></li>
         <li><a href="#how">how it works</a></li>
         <li><a href="#work">open source</a></li>
         <li><a class="btn btn-ghost" href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a call</a></li>
@@ -325,7 +354,7 @@
   <div class="menu" id="menu" hidden>
     <ul>
       <li><a href="#services">services</a></li>
-      <li><a href="#projects">work</a></li>
+      <li><a href="#projects">case studies</a></li>
       <li><a href="#how">how it works</a></li>
       <li><a href="#work">open source</a></li>
       <li><a href="#why">about</a></li>
@@ -368,40 +397,59 @@
     </section>
 
     <section id="projects" class="view" aria-labelledby="projects-h">
-      <h2 id="projects-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>work</h2>
-      <p class="lead intro reveal-on">Some of it is cloud systems for companies. Some of it is getting a grandparent into their email. Either way, the goal is to leave people better off with their tech than they were before.</p>
+      <h2 id="projects-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>case studies</h2>
+      <p class="lead intro reveal-on">From cloud systems to a grandparent's email, every one runs the same way: <b class="nl">N</b>eed, <b class="nl">E</b>xecution, <b class="nl">O</b>bservation, <b class="nl">N</b>ext.</p>
       <div class="rail-wrap">
-        <div class="cases" id="cases" tabindex="0" aria-label="Work, scrolls sideways">
-        <article class="case reveal-on">
+        <div class="cases" id="cases" tabindex="0" aria-label="Case studies, scroll sideways">
+        <article class="case reveal-on" id="case-accounting">
           <p class="idx">accounting firm · cloud &amp; AI</p>
           <h3>Answers in seconds, with the source attached</h3>
-          <p>Staff dug through Microsoft 365 for policies and client documents, or interrupted a senior colleague. I built an assistant on AWS Bedrock that answers only from approved documents the person is allowed to see, cites them, and says so when it doesn't know.</p>
+          <dl class="neon"><dt>N</dt><dd>Staff spent minutes hunting through Microsoft 365, or interrupted a senior colleague.</dd><dt>E</dt><dd>An assistant on AWS Bedrock that answers only from approved documents each person may see.</dd><dt>O</dt><dd>Timed real lookups before and after, and scored 80 test questions for accuracy.</dd><dt>N</dt><dd>Add an agent only where there&#x27;s a safe, useful action for it to take.</dd></dl>
           <p class="stat"><b>~5 min → 14 s</b> median lookup · recall 72% → 94%</p>
+          <button class="more" type="button" data-case="accounting" aria-haspopup="dialog">read the case study <span aria-hidden="true">→</span></button>
+          <template class="deep"><h4><span>N</span>eed</h4><p>The firm's knowledge was spread across Microsoft 365: policies, procedure manuals, Word files, PDFs, and client documents. Staff could usually find an answer, but a routine lookup took 2 to 10 minutes, and often meant asking a senior colleague who knew where things lived. Drafts, old versions, and client-restricted files sat right next to the right answer, so a simple chatbot would have been risky.</p><p>The ask was simple: let staff ask normal questions, return the approved answer with its document, and never make the AI more authoritative than the source.</p><h4><span>E</span>xecution</h4><p>This was my first project with an AWS partner, Xenoss, who helped with design and now with maintenance. I handled ingestion, embeddings, retrieval, and answer quality.</p><ul><li>Only documents in approved Microsoft 365 libraries are synced into versioned, encrypted S3, keeping their source, version, and access details.</li><li>Bedrock Knowledge Bases with Titan embeddings and OpenSearch Serverless run hybrid search, so exact accounting terms and form numbers match as well as differently worded questions.</li><li>Each question is checked against what that person is allowed to see before anything is retrieved. Answers come only from the retrieved passages, with citations, or the assistant says it doesn't know.</li><li>Built with Terraform and deployed through GitHub Actions, with CloudWatch tracking ingestion, retrieval, and answer time separately.</li></ul><h4><span>O</span>bservation</h4><table><tr><th>Measure</th><th>Before</th><th>After</th></tr><tr><td>Median lookup, answer and source checked</td><td>~4.8 min</td><td>13.6 s</td></tr><tr><td>Slowest 5% of lookups</td><td>up to 10 min</td><td>~24 s</td></tr><tr><td>Right passage found (recall at 8)</td><td>72%</td><td>94%</td></tr><tr><td>Answers fully supported by their source</td><td>78%</td><td>92%</td></tr><tr><td>Interruptions of senior staff per week</td><td>~18</td><td>~7</td></tr></table><p>Measured on 80 representative questions, including ones the assistant should refuse, and judged by two reviewers. A fast answer from the wrong document counted as a failure.</p><h4><span>N</span>ext</h4><p>Microsoft 365 stays the source of truth, and the search index can be rebuilt from it at any time. The firm owns which documents are approved and who can see them. An agent that takes actions comes later, and only for narrow, reviewable tasks.</p></template>
         </article>
-        <article class="case reveal-on">
+        <article class="case reveal-on" id="case-dermatology">
           <p class="idx">dermatology practice · workflows</p>
           <h3>Patient intake, out of the shared inbox</h3>
-          <p>A new practice ran intake through one email inbox, chasing missing documents and retyping them into the patient record. I mapped the process with the staff and built a small portal on AWS. Patients upload once, and the office can see at a glance what's complete.</p>
+          <dl class="neon"><dt>N</dt><dd>Intake ran through one inbox, with staff chasing documents and retyping them.</dd><dt>E</dt><dd>A small AWS portal where patients upload once and staff see what&#x27;s complete.</dd><dt>O</dt><dd>Compared four weeks before and after, on the same appointment types.</dd><dt>N</dt><dd>Connect to the EHR once the vendor&#x27;s interface is worth the wait.</dd></dl>
           <p class="stat"><b>2.6 days → 3.4 hours</b> turnaround · 24 → 8 min per intake</p>
+          <button class="more" type="button" data-case="dermatology" aria-haspopup="dialog">read the case study <span aria-hidden="true">→</span></button>
+          <template class="deep"><h4><span>N</span>eed</h4><p>A newly opened practice handled intake through a shared Microsoft 365 inbox, and its sister location did the same. Patients replied with forms, insurance cards, referrals, and phone photos. Staff downloaded attachments, renamed them, tracked status in Outlook flags and a spreadsheet, then uploaded each one into a slow EHR. If something was missing, another round of emails began.</p><h4><span>E</span>xecution</h4><p>I mapped the process with the staff using a questionnaire and conversations, separating the time patients spent waiting from the time staff spent handling documents. Then I built a Terraform-managed serverless portal, with Xenoss helping on design and maintenance.</p><ul><li>CloudFront, WAF, and a private S3 site serve the portal. API Gateway, Cognito, and Python Lambda run the workflow.</li><li>Every intake has one clear state in DynamoDB. Documents upload straight to an encrypted S3 vault and stay locked until a malware scan passes.</li><li>Staff see one queue of what's complete and what's missing, and link each intake to the patient's record in the EHR.</li><li>Email notifications never include patient details, and access, encryption, and audit logging were decided up front.</li></ul><h4><span>O</span>bservation</h4><table><tr><th>Measure</th><th>Before</th><th>After</th></tr><tr><td>Median time to a complete intake</td><td>~2.6 business days</td><td>~3.4 hours</td></tr><tr><td>Staff time per intake</td><td>~24 min</td><td>~8 min</td></tr><tr><td>Finding and opening a document</td><td>~2 min 18 s</td><td>~12 s</td></tr><tr><td>Intakes needing a missing-document follow-up</td><td>~34%</td><td>~10%</td></tr></table><p>Four weeks before and four weeks after, with the same definitions. At about 250 intakes a month, the time saved is roughly 67 staff hours a month.</p><h4><span>N</span>ext</h4><p>The EHR stays the clinical record. Once the vendor's interface access is in place, a background connector can send completed intakes straight into it, without ever making a patient wait on a slow system.</p></template>
         </article>
-        <article class="case reveal-on">
+        <article class="case reveal-on" id="case-migration">
           <p class="idx">automotive business · migration</p>
           <h3>Two offices off local servers</h3>
-          <p>The application, database, and files lived on two local servers. With their technical lead, I moved everything to AWS, linked both locations over a VPN, tested the real daily tasks from each office, and handed him an environment he runs himself.</p>
+          <dl class="neon"><dt>N</dt><dd>The app, database, and files lived on two local servers both offices relied on.</dd><dt>E</dt><dd>Moved them to AWS with the client&#x27;s technical lead, linked over a VPN.</dd><dt>O</dt><dd>Re-ran the real daily tasks from each office and reconciled every record.</dd><dt>N</dt><dd>Change more only when reliability, capacity, or cost data says so.</dd></dl>
           <p class="stat"><b>2 servers, 2 locations</b> · no app rewrite</p>
+          <button class="more" type="button" data-case="migration" aria-haspopup="dialog">read the case study <span aria-hidden="true">→</span></button>
+          <template class="deep"><h4><span>N</span>eed</h4><p>An automotive business ran its application, database, and files on two local servers, and both of its locations had to keep working through any move. Their technical lead already patched and supported those servers, so he knew the environment best.</p><h4><span>E</span>xecution</h4><p>He led the inventory and dependency discovery. I owned the AWS design, sizing, and migration plan.</p><ul><li>An isolated VPC built with Terraform, EC2 for the application, RDS for the database, and S3 for files that suit object storage.</li><li>Site-to-Site VPN connects both offices, with separate access paths for the app, the database, and management.</li><li>Sized from measured CPU, memory, database activity, and storage growth, not by copying the old hardware.</li><li>Data was seeded ahead of time, and the final cutover kept a fallback ready until both offices signed off.</li></ul><h4><span>O</span>bservation</h4><table><tr><th>Check</th><th>Result</th></tr><tr><td>Daily business tasks, both offices</td><td>Passed from each location</td></tr><tr><td>Records and files after migration</td><td>Reconciled against the originals</td></tr><tr><td>Backup and restore</td><td>Tested with the technical lead</td></tr><tr><td>Application changes needed</td><td>None</td></tr></table><h4><span>N</span>ext</h4><p>The technical lead runs the environment, with the architecture, access, backup, restore, and monitoring steps written down. Containers or a bigger platform come later, only if a measured reliability, capacity, or cost problem makes the case.</p></template>
         </article>
-        <article class="case reveal-on">
+        <article class="case reveal-on" id="case-security">
           <p class="idx">schools, families, &amp; teams · security</p>
-          <h3>Security talks for people who aren't security people</h3>
-          <p>Sessions for teachers, parents, engineers, and executives, including seminars in Manhattan for groups of 30 or more. Home and business networks, cameras and connected devices, fraud, data brokers, the dark web, and keeping physical spaces safe.</p>
-          <p class="stat"><b>30+ people</b> per seminar · free for the school that started it</p>
+          <h3>Security talks for people who aren&#x27;t security people</h3>
+          <dl class="neon"><dt>N</dt><dd>People knew they were exposed online, but not where to start.</dd><dt>E</dt><dd>Plain-language sessions on networks, cameras, devices, fraud, and data brokers.</dd><dt>O</dt><dd>Live checkups during sessions, and the questions people brought back later.</dd><dt>N</dt><dd>Short refreshers as new scams appear.</dd></dl>
+          <p class="stat"><b>30+ people</b> per seminar</p>
+          <button class="more" type="button" data-case="security" aria-haspopup="dialog">read the case study <span aria-hidden="true">→</span></button>
+          <template class="deep"><h4><span>N</span>eed</h4><p>Teachers, parents, engineers, and executives all had the same worry: they knew their accounts, homes, and businesses were exposed, but security advice was either too technical or too vague to act on.</p><h4><span>E</span>xecution</h4><p>I've run sessions at every level, from small groups of parents to cross-team seminars in Manhattan for 30 or more people. Topics include:</p><ul><li>Securing home and business networks, cameras, and connected devices.</li><li>Fraud, phishing, data brokers, and what's sold on the dark web.</li><li>Software and account hygiene, including password managers and two-factor sign-in.</li><li>The security of physical spaces, not just screens.</li></ul><p>Each session is built around what that audience actually uses, with time to work through real settings together.</p><h4><span>O</span>bservation</h4><p>The most useful measure has been what people do afterward: turning on two-factor sign-in during the session, changing default camera and router passwords, and coming back with specific questions about their own setups.</p><h4><span>N</span>ext</h4><p>Shorter refreshers as new scams appear, and SOC 2 and other security readiness work for companies heading into an audit.</p></template>
         </article>
-        <article class="case reveal-on">
+        <article class="case reveal-on" id="case-home">
           <p class="idx">family &amp; friends · home tech</p>
-          <h3>From a camera system to Grandma's email</h3>
-          <p>I put a camera system in at my dad's house and moved family onto a password manager. Not every job is a cloud migration, and the small ones count. If someone you know just needs help opening their email, that's a fine reason to call.</p>
+          <h3>From a camera system to Grandma&#x27;s email</h3>
+          <dl class="neon"><dt>N</dt><dd>A house with no cameras, and passwords reused everywhere.</dd><dt>E</dt><dd>A camera system at my dad&#x27;s house, and a password manager for the family.</dd><dt>O</dt><dd>Checked that recordings, alerts, and logins all work without me there.</dd><dt>N</dt><dd>Small jobs welcome, including helping someone open their email.</dd></dl>
           <p class="stat"><b>small jobs welcome</b> · patience included</p>
+          <button class="more" type="button" data-case="home" aria-haspopup="dialog">read the case study <span aria-hidden="true">→</span></button>
+          <template class="deep"><h4><span>N</span>eed</h4><p>Not every job is a cloud migration. My dad's house had no camera coverage, and like most families, we reused a handful of passwords across everything.</p><h4><span>E</span>xecution</h4><ul><li>Planned camera placement around the entrances and blind spots, then installed and configured the system, including recording and alerts.</li><li>Moved the family onto a password manager, one person at a time, and turned on two-factor sign-in for the accounts that matter most.</li></ul><h4><span>O</span>bservation</h4><p>The test was simple: could everyone use it without calling me? Recordings and alerts work, and everyone can sign in and find their passwords on their own.</p><h4><span>N</span>ext</h4><p>The same patience goes to every small job, whether it's Wi-Fi that doesn't reach a room, a new laptop, or helping a grandparent open their email.</p></template>
         </article>
+        <article class="case reveal-on" id="case-community">
+          <p class="idx">grade school · community</p>
+          <h3>Where neon1 started</h3>
+          <dl class="neon"><dt>N</dt><dd>A grade school wanted real STEM tools on a small budget.</dd><dt>E</dt><dd>Budgeted and set up a new STEM edtech system, free of charge.</dd><dt>O</dt><dd>Watched how teachers and students used it, and adjusted.</dd><dt>N</dt><dd>Free security sessions for teachers and parents, which became neon1.</dd></dl>
+          <p class="stat"><b>free for the school</b> · where it began</p>
+          <button class="more" type="button" data-case="community" aria-haspopup="dialog">read the case study <span aria-hidden="true">→</span></button>
+          <template class="deep"><h4><span>N</span>eed</h4><p>I'd wanted to put my experience to work in my own community for a long time. A local grade school needed a STEM edtech setup that would actually get used, on a budget that couldn't afford mistakes.</p><h4><span>E</span>xecution</h4><p>I budgeted the new system, compared the realistic options, and set it up for the classrooms, all as volunteer work. Along the way, I invited teachers and parents to free sessions on staying safe online.</p><h4><span>O</span>bservation</h4><p>Seeing teachers use it in class, and parents leave those sessions knowing a little more and worrying a little less, showed me the same help was worth offering more widely.</p><h4><span>N</span>ext</h4><p>That's how neon1 began. Community and nonprofit work is still part of it, so if your school or organization needs a hand, reach out.</p></template>
+        </article>
+
       </div>
         <div class="rail-nav"><button class="chip" type="button" data-rail="-1" aria-label="Previous">←</button><button class="chip" type="button" data-rail="1" aria-label="Next">→</button></div>
       </div>
@@ -490,11 +538,18 @@
     </div>
     <div class="legal">
       <span>© <span id="yr"></span> NEON1 LLC, New York</span>
-      <span>No tracking or cookies. v0.9.3</span>
+      <span>No tracking or cookies. v0.10.0</span>
     </div>
   </footer>
   </div>
 
+  <div class="case-layer" id="caseLayer" hidden>
+    <div class="case-scrim" data-close></div>
+    <div class="case-panel" role="dialog" aria-modal="true" aria-labelledby="casePanelTitle" tabindex="-1">
+      <button class="case-close" type="button" data-close aria-label="Close case study">×</button>
+      <div class="case-body" id="caseBody"></div>
+    </div>
+  </div>
   <div class="rainctl" role="group" aria-label="Rain controls">
     <button class="chip" id="mode" type="button" title="Rain motion: grid or free. Click to switch.">grid</button>
     <button class="chip" id="charset" type="button" title="Rain characters. Click to cycle.">katakana</button>
@@ -504,6 +559,7 @@
 
   <script src="/js/motion-11.18.2.min.js" defer></script>
   <script defer src="/js/views.js"></script>
+  <script defer src="/js/cases.js"></script>
   <script>
     (() => {
       "use strict";
