@@ -44,7 +44,7 @@
   // First and last scroll positions of view i, clamped to the page
   function range(i) {
     const top = i === 0 ? 0 : Math.round(docTop(views[i]) - HEADER);
-    const next = i + 1 < views.length ? Math.round(docTop(views[i + 1]) - HEADER) : maxY() + vh();
+    const next = i + 1 < views.length ? Math.round(docTop(views[i + 1])) : maxY() + vh(); // the bottom of a view ends where the next one begins, under no header
     return [Math.min(top, maxY()), Math.min(Math.max(top, next - vh()), maxY())];
   }
 
