@@ -2,6 +2,12 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.9.3
+
+- How it works has five steps: Listen, Propose, Decide, Build, Hand over. Proposals give a few options with a fixed price, effort, and what each gets you, and the hand-over includes checking results.
+- Pricing in questions, services, and about follows the same options-based approach.
+- 1NEON: "1 portal. Needs. Execution. Observation. Next."
+
 ## v0.9.2
 
 - On touch screens each view leaves room at its end for browser toolbars that sit over the page (DuckDuckGo, Safari), so the last lines aren't hidden.
