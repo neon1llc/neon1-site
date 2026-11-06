@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="version" content="0.10.0" />
+  <meta name="version" content="0.10.1" />
   <title>neon1</title>
   <meta name="description" content="neon1 is a one-person technology practice in New York: cloud and AI engineering, business automation, networks, and cameras." />
   <meta name="theme-color" content="#0D0208" />
@@ -286,7 +286,7 @@
       mask-image: linear-gradient(to right, transparent, #000 min(8vw, 120px), #000 calc(100% - min(8vw, 120px)), transparent); }
     .cases::-webkit-scrollbar { display: none; }
     .cases:focus-visible { outline-offset: -2px; }
-    .case { flex: 0 0 clamp(280px, 30vw, 372px); scroll-snap-align: start; }
+    .case { flex: 0 0 clamp(290px, 31vw, 392px); scroll-snap-align: start; }
 
     /* Previous and next buttons; phones swipe instead */
     .rail-nav { display: flex; gap: 8px; justify-content: flex-end; max-width: 1152px; margin: 6px auto 0; padding: 0 24px; }
@@ -296,9 +296,9 @@
     /* Card face: label, title, NEON rows, and a stat pinned to the bottom */
     .case { background: #fff; border: 1px solid rgba(18,36,26,.1); border-radius: 6px; padding: clamp(20px, 2.6vh, 26px); display: flex; flex-direction: column; }
     .case .idx { margin: 0 0 14px; font: 500 12px var(--mono); color: var(--glow); }
-    .case h3 { font: 600 19px/1.25 var(--sans); letter-spacing: -.015em; margin: 0 0 8px; color: var(--ink); }
+    .case h3 { font: 600 19px/1.25 var(--sans); letter-spacing: -.015em; margin: 0 0 12px; color: var(--ink); }
     .case p { margin: 0 0 14px; color: var(--muted); font-size: 15px; line-height: 1.55; }
-    .case .stat { margin: auto 0 0; padding-top: 16px; border-top: 1px solid rgba(18,36,26,.1); font: 13px var(--mono); color: var(--muted); }
+    .case .stat { margin: auto 0 0; padding-top: 12px; border-top: 1px solid rgba(18,36,26,.1); font: 13px var(--mono); color: var(--muted); }
     .case .stat b { color: var(--brand); font-weight: 600; }
 
     /* Questions: native disclosure, ruled rows */
@@ -312,7 +312,7 @@
 
     /* Case studies: N, E, O, N rows on each card, and a full case study that opens over the page */
     .nl { color: var(--brand); font-weight: 700; }
-    .neon { display: grid; grid-template-columns: 1.1em 1fr; gap: 5px 10px; margin: 0 0 10px; font-size: 14px; line-height: 1.4; }
+    .neon { display: grid; grid-template-columns: 1.1em 1fr; gap: 6px 10px; margin: 0 0 14px; font-size: 14px; line-height: 1.4; }
     .neon dt { font: 700 14px/1.45 var(--mono); color: var(--brand); }
     .neon dd { margin: 0; color: var(--muted); }
 
@@ -330,8 +330,8 @@
     .case-layer { position: fixed; inset: 64px 0 0; z-index: 9; }
     .case-layer[hidden] { display: none; }
     html.case-lock { overflow: hidden; }
-    .case-scrim { position: absolute; inset: 0; background: rgba(242,244,242,.82); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
-    .case-panel { position: absolute; inset: 16px max(16px, calc(50vw - 440px)); background: #fff; border: 1px solid rgba(18,36,26,.12);
+    .case-scrim { position: absolute; inset: 0; background: rgba(242,244,242,.9); }
+    .case-panel { will-change: transform; position: absolute; inset: 16px max(16px, calc(50vw - 440px)); background: #fff; border: 1px solid rgba(18,36,26,.12);
       border-radius: 8px; box-shadow: 0 24px 60px rgba(18,36,26,.16); overflow: auto; overscroll-behavior: contain; transform-origin: 0 0; outline: none; }
     .case-close { position: sticky; top: 12px; float: right; margin: 12px 12px 0 0; z-index: 1; }
 
@@ -463,43 +463,43 @@
         <div class="cases" id="cases" tabindex="0" aria-label="Case studies, scroll sideways">
         <article class="case reveal-on" id="case-accounting">
           <p class="idx">accounting firm · cloud &amp; AI</p>
-          <h3>Answers in seconds, with the source attached</h3>
-          <dl class="neon"><dt>N</dt><dd>Staff spent minutes hunting through Microsoft 365, or interrupted a senior colleague.</dd><dt>E</dt><dd>An assistant on AWS Bedrock that answers only from approved documents each person may see.</dd><dt>O</dt><dd>Timed real lookups before and after, and scored 80 test questions for accuracy.</dd><dt>N</dt><dd>Add an agent only where there&#x27;s a safe, useful action for it to take.</dd></dl>
-          <p class="stat"><b>~5 min → 14 s</b> median lookup · recall 72% → 94%</p>
+          <h3>Answers in seconds, with sources</h3>
+          <dl class="neon"><dt>N</dt><dd>Staff spent minutes hunting through Microsoft 365, or interrupted a senior colleague.</dd><dt>E</dt><dd>An assistant on AWS Bedrock that answers only from approved documents each person may see.</dd><dt>O</dt><dd>Timed real lookups before and after, and scored 80 test questions for accuracy.</dd><dt>N</dt><dd>An MCP server over the same search, so agents get answers with the same permissions.</dd></dl>
+          <p class="stat"><b>~5 min → 14 s</b> lookup · recall 72% → 94%</p>
           <button class="open" type="button" data-case="accounting" aria-haspopup="dialog" aria-label="Open case study"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></button>
-          <template class="deep"><h4><span>N</span>eed</h4><p>The firm's knowledge was spread across Microsoft 365: policies, procedure manuals, Word files, PDFs, and client documents. Staff could usually find an answer, but a routine lookup took 2 to 10 minutes, and often meant asking a senior colleague who knew where things lived. Drafts, old versions, and client-restricted files sat right next to the right answer, so a simple chatbot would have been risky.</p><p>The ask was simple: let staff ask normal questions, return the approved answer with its document, and never make the AI more authoritative than the source.</p><h4><span>E</span>xecution</h4><p>This was my first project with an AWS partner, Xenoss, who helped with design and now with maintenance. I handled ingestion, embeddings, retrieval, and answer quality.</p><ul><li>Only documents in approved Microsoft 365 libraries are synced into versioned, encrypted S3, keeping their source, version, and access details.</li><li>Bedrock Knowledge Bases with Titan embeddings and OpenSearch Serverless run hybrid search, so exact accounting terms and form numbers match as well as differently worded questions.</li><li>Each question is checked against what that person is allowed to see before anything is retrieved. Answers come only from the retrieved passages, with citations, or the assistant says it doesn't know.</li><li>Built with Terraform and deployed through GitHub Actions, with CloudWatch tracking ingestion, retrieval, and answer time separately.</li></ul><h4><span>O</span>bservation</h4><table><tr><th>Measure</th><th>Before</th><th>After</th></tr><tr><td>Median lookup, answer and source checked</td><td>~4.8 min</td><td>13.6 s</td></tr><tr><td>Slowest 5% of lookups</td><td>up to 10 min</td><td>~24 s</td></tr><tr><td>Right passage found (recall at 8)</td><td>72%</td><td>94%</td></tr><tr><td>Answers fully supported by their source</td><td>78%</td><td>92%</td></tr><tr><td>Interruptions of senior staff per week</td><td>~18</td><td>~7</td></tr></table><p>Measured on 80 representative questions, including ones the assistant should refuse, and judged by two reviewers. A fast answer from the wrong document counted as a failure.</p><h4><span>N</span>ext</h4><p>Microsoft 365 stays the source of truth, and the search index can be rebuilt from it at any time. The firm owns which documents are approved and who can see them. An agent that takes actions comes later, and only for narrow, reviewable tasks.</p></template>
+          <template class="deep"><h4><span>N</span>eed</h4><p>The firm's knowledge was spread across Microsoft 365: policies, procedure manuals, Word files, PDFs, and client documents. Staff could usually find an answer, but a routine lookup took 2 to 10 minutes, and often meant asking a senior colleague who knew where things lived. Drafts, old versions, and client-restricted files sat right next to the right answer, so a simple chatbot would have been risky.</p><p>The ask was simple: let staff ask normal questions, return the approved answer with its document, and never make the AI more authoritative than the source.</p><h4><span>E</span>xecution</h4><p>This was my first project with an AWS partner, Xenoss, who helped with design and now with maintenance. I handled ingestion, embeddings, retrieval, and answer quality.</p><ul><li>Only documents in approved Microsoft 365 libraries are synced into versioned, encrypted S3, keeping their source, version, and access details.</li><li>Bedrock Knowledge Bases with Titan embeddings and OpenSearch Serverless run hybrid search, so exact accounting terms and form numbers match as well as differently worded questions.</li><li>Each question is checked against what that person is allowed to see before anything is retrieved. Answers come only from the retrieved passages, with citations, or the assistant says it doesn't know.</li><li>Built with Terraform and deployed through GitHub Actions, with CloudWatch tracking ingestion, retrieval, and answer time separately.</li></ul><h4><span>O</span>bservation</h4><table><tr><th>Measure</th><th>Before</th><th>After</th></tr><tr><td>Median lookup, answer and source checked</td><td>~4.8 min</td><td>13.6 s</td></tr><tr><td>Slowest 5% of lookups</td><td>up to 10 min</td><td>~24 s</td></tr><tr><td>Right passage found (recall at 8)</td><td>72%</td><td>94%</td></tr><tr><td>Answers fully supported by their source</td><td>78%</td><td>92%</td></tr><tr><td>Interruptions of senior staff per week</td><td>~18</td><td>~7</td></tr></table><p>Measured on 80 representative questions, including ones the assistant should refuse, and judged by two reviewers. A fast answer from the wrong document counted as a failure.</p><h4><span>N</span>ext</h4><p>Microsoft 365 stays the source of truth, and the search index can be rebuilt from it at any time. The firm owns which documents are approved and who can see them. Next is an MCP server in front of the same retrieval, so assistants and agents can use the firm's knowledge with the same per-person permissions, followed by narrow, reviewable agent actions where they save real time.</p></template>
         </article>
         <article class="case reveal-on" id="case-dermatology">
           <p class="idx">dermatology practice · workflows</p>
-          <h3>Patient intake, out of the shared inbox</h3>
-          <dl class="neon"><dt>N</dt><dd>Intake ran through one inbox, with staff chasing documents and retyping them.</dd><dt>E</dt><dd>A small AWS portal where patients upload once and staff see what&#x27;s complete.</dd><dt>O</dt><dd>Compared four weeks before and after, on the same appointment types.</dd><dt>N</dt><dd>Connect to the EHR once the vendor&#x27;s interface is worth the wait.</dd></dl>
-          <p class="stat"><b>2.6 days → 3.4 hours</b> turnaround · 24 → 8 min per intake</p>
+          <h3>Intake, out of the shared inbox</h3>
+          <dl class="neon"><dt>N</dt><dd>Intake ran through one inbox, with staff chasing documents and retyping them.</dd><dt>E</dt><dd>A small AWS portal where patients upload once and staff see what&#x27;s complete.</dd><dt>O</dt><dd>Compared four weeks before and after, on the same appointment types.</dd><dt>N</dt><dd>Ongoing maintenance with Xenoss, and tuning as the practice grows.</dd></dl>
+          <p class="stat"><b>2.6 days → 3.4 hours</b> · 24 → 8 min staff time</p>
           <button class="open" type="button" data-case="dermatology" aria-haspopup="dialog" aria-label="Open case study"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></button>
-          <template class="deep"><h4><span>N</span>eed</h4><p>A newly opened practice handled intake through a shared Microsoft 365 inbox, and its sister location did the same. Patients replied with forms, insurance cards, referrals, and phone photos. Staff downloaded attachments, renamed them, tracked status in Outlook flags and a spreadsheet, then uploaded each one into a slow EHR. If something was missing, another round of emails began.</p><h4><span>E</span>xecution</h4><p>I mapped the process with the staff using a questionnaire and conversations, separating the time patients spent waiting from the time staff spent handling documents. Then I built a Terraform-managed serverless portal, with Xenoss helping on design and maintenance.</p><ul><li>CloudFront, WAF, and a private S3 site serve the portal. API Gateway, Cognito, and Python Lambda run the workflow.</li><li>Every intake has one clear state in DynamoDB. Documents upload straight to an encrypted S3 vault and stay locked until a malware scan passes.</li><li>Staff see one queue of what's complete and what's missing, and link each intake to the patient's record in the EHR.</li><li>Email notifications never include patient details, and access, encryption, and audit logging were decided up front.</li></ul><h4><span>O</span>bservation</h4><table><tr><th>Measure</th><th>Before</th><th>After</th></tr><tr><td>Median time to a complete intake</td><td>~2.6 business days</td><td>~3.4 hours</td></tr><tr><td>Staff time per intake</td><td>~24 min</td><td>~8 min</td></tr><tr><td>Finding and opening a document</td><td>~2 min 18 s</td><td>~12 s</td></tr><tr><td>Intakes needing a missing-document follow-up</td><td>~34%</td><td>~10%</td></tr></table><p>Four weeks before and four weeks after, with the same definitions. At about 250 intakes a month, the time saved is roughly 67 staff hours a month.</p><h4><span>N</span>ext</h4><p>The EHR stays the clinical record. Once the vendor's interface access is in place, a background connector can send completed intakes straight into it, without ever making a patient wait on a slow system.</p></template>
+          <template class="deep"><h4><span>N</span>eed</h4><p>A newly opened practice handled intake through a shared Microsoft 365 inbox, and its sister location did the same. Patients replied with forms, insurance cards, referrals, and phone photos. Staff downloaded attachments, renamed them, tracked status in Outlook flags and a spreadsheet, then uploaded each one into a slow EHR. If something was missing, another round of emails began.</p><h4><span>E</span>xecution</h4><p>I mapped the process with the staff using a questionnaire and conversations, separating the time patients spent waiting from the time staff spent handling documents. Then I built a Terraform-managed serverless portal, with Xenoss helping on design and maintenance.</p><ul><li>CloudFront, WAF, and a private S3 site serve the portal. API Gateway, Cognito, and Python Lambda run the workflow.</li><li>Every intake has one clear state in DynamoDB. Documents upload straight to an encrypted S3 vault and stay locked until a malware scan passes.</li><li>Staff see one queue of what's complete and what's missing. Completed documents are filed into the EHR under the patient's ID and MRN, so they land in the right chart.</li><li>Email notifications never include patient details, and access, encryption, and audit logging were decided up front.</li></ul><h4><span>O</span>bservation</h4><table><tr><th>Measure</th><th>Before</th><th>After</th></tr><tr><td>Median time to a complete intake</td><td>~2.6 business days</td><td>~3.4 hours</td></tr><tr><td>Staff time per intake</td><td>~24 min</td><td>~8 min</td></tr><tr><td>Finding and opening a document</td><td>~2 min 18 s</td><td>~12 s</td></tr><tr><td>Intakes needing a missing-document follow-up</td><td>~34%</td><td>~10%</td></tr></table><p>Four weeks before and four weeks after, with the same definitions. At about 250 intakes a month, the time saved is roughly 67 staff hours a month.</p><h4><span>N</span>ext</h4><p>The EHR stays the clinical record. Xenoss and I maintain the portal, watch the intake measures, and tune the workflow as the practice and its sister location grow.</p></template>
         </article>
         <article class="case reveal-on" id="case-migration">
           <p class="idx">automotive business · migration</p>
           <h3>Two offices off local servers</h3>
-          <dl class="neon"><dt>N</dt><dd>The app, database, and files lived on two local servers both offices relied on.</dd><dt>E</dt><dd>Moved them to AWS with the client&#x27;s technical lead, linked over a VPN.</dd><dt>O</dt><dd>Re-ran the real daily tasks from each office and reconciled every record.</dd><dt>N</dt><dd>Change more only when reliability, capacity, or cost data says so.</dd></dl>
-          <p class="stat"><b>2 servers, 2 locations</b> · no app rewrite</p>
+          <dl class="neon"><dt>N</dt><dd>The app, database, and files lived on two local servers both offices relied on.</dd><dt>E</dt><dd>Moved them to AWS with their technical lead, linked over a VPN.</dd><dt>O</dt><dd>Re-ran the real daily tasks from each office and reconciled every record.</dd><dt>N</dt><dd>Change more only when reliability, capacity, or cost data says so.</dd></dl>
+          <p class="stat"><b>2 servers · 2 offices</b> · no app rewrite</p>
           <button class="open" type="button" data-case="migration" aria-haspopup="dialog" aria-label="Open case study"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></button>
           <template class="deep"><h4><span>N</span>eed</h4><p>An automotive business ran its application, database, and files on two local servers, and both of its locations had to keep working through any move. Their technical lead already patched and supported those servers, so he knew the environment best.</p><h4><span>E</span>xecution</h4><p>He led the inventory and dependency discovery. I owned the AWS design, sizing, and migration plan.</p><ul><li>An isolated VPC built with Terraform, EC2 for the application, RDS for the database, and S3 for files that suit object storage.</li><li>Site-to-Site VPN connects both offices, with separate access paths for the app, the database, and management.</li><li>Sized from measured CPU, memory, database activity, and storage growth, not by copying the old hardware.</li><li>Data was seeded ahead of time, and the final cutover kept a fallback ready until both offices signed off.</li></ul><h4><span>O</span>bservation</h4><table><tr><th>Check</th><th>Result</th></tr><tr><td>Daily business tasks, both offices</td><td>Passed from each location</td></tr><tr><td>Records and files after migration</td><td>Reconciled against the originals</td></tr><tr><td>Backup and restore</td><td>Tested with the technical lead</td></tr><tr><td>Application changes needed</td><td>None</td></tr></table><h4><span>N</span>ext</h4><p>The technical lead runs the environment, with the architecture, access, backup, restore, and monitoring steps written down. Containers or a bigger platform come later, only if a measured reliability, capacity, or cost problem makes the case.</p></template>
         </article>
         <article class="case reveal-on" id="case-security">
           <p class="idx">schools, families, &amp; teams · security</p>
-          <h3>Security talks for people who aren&#x27;t security people</h3>
-          <dl class="neon"><dt>N</dt><dd>People knew they were exposed online, but not where to start.</dd><dt>E</dt><dd>Plain-language sessions on networks, cameras, devices, fraud, and data brokers.</dd><dt>O</dt><dd>Live checkups during sessions, and the questions people brought back later.</dd><dt>N</dt><dd>Short refreshers as new scams appear.</dd></dl>
-          <p class="stat"><b>30+ people</b> per seminar</p>
+          <h3>Security for non-security people</h3>
+          <dl class="neon"><dt>N</dt><dd>People knew they were exposed online, but not where to start.</dd><dt>E</dt><dd>Plain-language sessions on networks, cameras, devices, fraud, and data brokers.</dd><dt>O</dt><dd>Live checkups during sessions, and the questions people brought back later.</dd><dt>N</dt><dd>Stay current with neon1-ready and other sources as threats change.</dd></dl>
+          <p class="stat"><b>30+ people</b> per seminar · every level</p>
           <button class="open" type="button" data-case="security" aria-haspopup="dialog" aria-label="Open case study"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></button>
-          <template class="deep"><h4><span>N</span>eed</h4><p>Teachers, parents, engineers, and executives all had the same worry: they knew their accounts, homes, and businesses were exposed, but security advice was either too technical or too vague to act on.</p><h4><span>E</span>xecution</h4><p>I've run sessions at every level, from small groups of parents to cross-team seminars in Manhattan for 30 or more people. Topics include:</p><ul><li>Securing home and business networks, cameras, and connected devices.</li><li>Fraud, phishing, data brokers, and what's sold on the dark web.</li><li>Software and account hygiene, including password managers and two-factor sign-in.</li><li>The security of physical spaces, not just screens.</li></ul><p>Each session is built around what that audience actually uses, with time to work through real settings together.</p><h4><span>O</span>bservation</h4><p>The most useful measure has been what people do afterward: turning on two-factor sign-in during the session, changing default camera and router passwords, and coming back with specific questions about their own setups.</p><h4><span>N</span>ext</h4><p>Shorter refreshers as new scams appear, and SOC 2 and other security readiness work for companies heading into an audit.</p></template>
+          <template class="deep"><h4><span>N</span>eed</h4><p>Teachers, parents, engineers, and executives all had the same worry: they knew their accounts, homes, and businesses were exposed, but security advice was either too technical or too vague to act on.</p><h4><span>E</span>xecution</h4><p>I've run sessions at every level, from small groups of parents to cross-team seminars in Manhattan for 30 or more people. Topics include:</p><ul><li>Securing home and business networks, cameras, and connected devices.</li><li>Fraud, phishing, data brokers, and what's sold on the dark web.</li><li>Software and account hygiene, including password managers and two-factor sign-in.</li><li>The security of physical spaces, not just screens.</li></ul><p>Each session is built around what that audience actually uses, with time to work through real settings together.</p><h4><span>O</span>bservation</h4><p>The most useful measure has been what people do afterward: turning on two-factor sign-in during the session, changing default camera and router passwords, and coming back with specific questions about their own setups.</p><h4><span>N</span>ext</h4><p>The landscape keeps moving, so the material does too. neon1-ready, neon1's security readiness guide, tracks what's worth doing for each kind of space, alongside other trusted sources. Companies heading into an audit get SOC 2 and other readiness work.</p></template>
         </article>
         <article class="case reveal-on" id="case-home">
           <p class="idx">family &amp; friends · home tech</p>
-          <h3>From a camera system to Grandma&#x27;s email</h3>
-          <dl class="neon"><dt>N</dt><dd>A house with no cameras, and passwords reused everywhere.</dd><dt>E</dt><dd>A camera system at my dad&#x27;s house, and a password manager for the family.</dd><dt>O</dt><dd>Checked that recordings, alerts, and logins all work without me there.</dd><dt>N</dt><dd>Small jobs welcome, including helping someone open their email.</dd></dl>
+          <h3>From cameras to Grandma&#x27;s email</h3>
+          <dl class="neon"><dt>N</dt><dd>A house with no cameras, and passwords reused everywhere.</dd><dt>E</dt><dd>A camera system at my dad&#x27;s house, and a password manager for the family.</dd><dt>O</dt><dd>Checked that recordings, alerts, and logins all work without me there.</dd><dt>N</dt><dd>Advice, tech support, and on-demand troubleshooting when something acts up.</dd></dl>
           <p class="stat"><b>small jobs welcome</b> · patience included</p>
           <button class="open" type="button" data-case="home" aria-haspopup="dialog" aria-label="Open case study"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></button>
-          <template class="deep"><h4><span>N</span>eed</h4><p>Not every job is a cloud migration. My dad's house had no camera coverage, and like most families, we reused a handful of passwords across everything.</p><h4><span>E</span>xecution</h4><ul><li>Planned camera placement around the entrances and blind spots, then installed and configured the system, including recording and alerts.</li><li>Moved the family onto a password manager, one person at a time, and turned on two-factor sign-in for the accounts that matter most.</li></ul><h4><span>O</span>bservation</h4><p>The test was simple: could everyone use it without calling me? Recordings and alerts work, and everyone can sign in and find their passwords on their own.</p><h4><span>N</span>ext</h4><p>The same patience goes to every small job, whether it's Wi-Fi that doesn't reach a room, a new laptop, or helping a grandparent open their email.</p></template>
+          <template class="deep"><h4><span>N</span>eed</h4><p>Not every job is a cloud migration. My dad's house had no camera coverage, and like most families, we reused a handful of passwords across everything.</p><h4><span>E</span>xecution</h4><ul><li>Planned camera placement around the entrances and blind spots, then installed and configured the system, including recording and alerts.</li><li>Moved the family onto a password manager, one person at a time, and turned on two-factor sign-in for the accounts that matter most.</li></ul><h4><span>O</span>bservation</h4><p>The test was simple: could everyone use it without calling me? Recordings and alerts work, and everyone can sign in and find their passwords on their own.</p><h4><span>N</span>ext</h4><p>Ongoing advice, tech support, and on-demand troubleshooting when something acts up, with the same patience for every small job, whether it's Wi-Fi that doesn't reach a room, a new laptop, or helping a grandparent open their email.</p></template>
         </article>
         <article class="case reveal-on" id="case-community">
           <p class="idx">grade school · community</p>
@@ -537,6 +537,11 @@
           <h3>deploy-ops</h3>
           <p class="state">pre-release · v0.42.0</p>
           <p><b>Cloud automation, bundled.</b> Pipelines for infrastructure and applications on AWS, Azure, Google Cloud, or several at once. It sets up CI/CD for one repo or many, works with the IaC you already use, and adds checks, approvals, rollback, monitoring, and alerts where your team will see them.</p>
+        </div>
+        <div class="row reveal-on">
+          <h3>neon1-ready</h3>
+          <p class="state">pre-release</p>
+          <p><b>Security readiness for every space.</b> Plain-language guidance for a phone, a home network, a classroom, a small office, or a company heading into SOC 2: five things worth doing first, then what's next.</p>
         </div>
         <div class="row reveal-on">
           <h3>1NEON</h3>
@@ -598,7 +603,7 @@
     </div>
     <div class="legal">
       <span>© <span id="yr"></span> NEON1 LLC, New York</span>
-      <span>No tracking or cookies. v0.10.0</span>
+      <span>No tracking or cookies. v0.10.1</span>
     </div>
   </footer>
   </div>
@@ -673,7 +678,7 @@
 
       // Grid columns fall one row per step; free columns at their own speed
       const speed = () => (grid ? 1 : 0.35 + Math.random() * 0.75);
-      const newCol = (y) => ({ y, v: speed(), word: null, wi: 0, g: null, wy: 0, hold: 0 });
+      const newCol = (y, top = true) => ({ y, top, v: speed(), word: null, wi: 0, g: null, wy: 0, hold: 0 });
 
       // Starts a word from a weighted group in a column that has room for it
       function startWord() {
@@ -684,7 +689,8 @@
         for (let tries = 0; tries < 8; tries++) {
           const c = cols[(Math.random() * cols.length) | 0];
           const wy = Math.floor(c.y);
-          if (c.word || wy < 1 || wy + word.length >= rows) continue;
+          // Only a drop that has fallen from the top, with a trail above it, turns into a word
+          if (c.word || !c.top || wy < 3 || wy + word.length >= rows) continue;
           Object.assign(c, { word, wi: 0, g, wy, hold: 45 });
           return;
         }
@@ -697,7 +703,7 @@
         canvas.width = innerWidth * dpr; canvas.height = innerHeight * dpr;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         rows = Math.floor(innerHeight / size);
-        cols = Array.from({ length: Math.ceil(innerWidth / size) }, () => newCol(Math.random() * rows));
+        cols = Array.from({ length: Math.ceil(innerWidth / size) }, () => newCol(Math.random() * rows, false));
         ctx.textBaseline = "middle"; ctx.textAlign = "center";
         ctx.fillStyle = "#0D0208"; ctx.fillRect(0, 0, innerWidth, innerHeight);
       }
