@@ -2,6 +2,13 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.8.0
+
+- Scrolling moves one view at a time. At the edge of a view the page resists, giving a little per scroll, then settles into the next view, fast at first and slowing as it lands. Views taller than the screen scroll normally until their edge. Works with mouse, trackpad, touch, keyboard and the header links, all at the same speed.
+- First arrival at a view: the heading fades in, then each piece fades and rises into place in order, once. Later visits fade the whole view in and out with the scroll.
+- Work cards sit in one row of equal cards that scrolls sideways (touch, trackpad or the arrow buttons) and fades into both screen edges.
+- Section headings are in the brand green. The prompt mark is its own chevron, one x-height tall, so its point lines up with the middle of the lowercase letters.
+
 ## v0.7.0
 
 - Each section is a view. The first time you reach one, its heading slides in from the direction you scrolled from, then its main pieces follow one by one. After that, views fade with scroll position and hold their fade when you stop.
