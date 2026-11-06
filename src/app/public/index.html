@@ -178,7 +178,7 @@
     .awake .tag { color: #fff; }
     .awake .btn-primary { box-shadow: none; color: #fff; background: var(--brand); border-color: var(--brand); }
     .awake .btn-primary:hover { box-shadow: 0 6px 18px rgba(3,87,4,.25); }
-    .awake h2::before { color: var(--mid); }
+
     .awake footer { background: #e8ece8; }
 
     @media (prefers-reduced-motion: reduce) {
@@ -203,7 +203,10 @@
     section { max-width: 1200px; padding: 112px 24px; }
     nav { max-width: 1200px; padding-left: 24px; padding-right: 24px; }
     h2 { font: 600 clamp(34px, 4.6vw, 54px)/1.05 var(--sans); letter-spacing: -.022em; color: var(--text); margin: 0 0 40px; }
-    h2::before { font: 500 .5em var(--mono); vertical-align: .35em; margin-right: .2em; }
+    h2::before { content: none; }
+    .awake h2 { color: var(--brand); }
+    h2 .pr { display: inline-block; width: .7ex; height: 1ex; margin-right: .3em; vertical-align: baseline; overflow: visible;
+      fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; color: var(--mark); }
     .lead { font-size: 17px; line-height: 1.55; }
 
     /* Services: one two-tone sentence per row. */
@@ -239,10 +242,18 @@
 
     /* One reveal, one curve: fade and rise 8px once, staggered. */
     /* Recent work: three short cases with one measured line each. */
-    .cases { display: grid; gap: 20px; grid-template-columns: repeat(6, 1fr); }
-    .case { grid-column: span 2; } .case:nth-child(n+4) { grid-column: span 3; }
-    @media (max-width: 960px) { .cases { grid-template-columns: 1fr 1fr; } .case, .case:nth-child(n+4) { grid-column: span 1; } .case:last-child { grid-column: 1 / -1; } }
-    @media (max-width: 640px) { .cases { grid-template-columns: 1fr; } .case:last-child { grid-column: auto; } }
+    /* Work: one row of equal cards that fades into both screen edges. */
+    .rail-wrap { position: relative; margin-inline: calc(50% - 50vw); }
+    .cases { display: flex; gap: 20px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory;
+      padding: 4px max(24px, calc(50vw - 576px)) 8px; scroll-padding-inline: max(24px, calc(50vw - 576px)); scrollbar-width: none;
+      -webkit-mask-image: linear-gradient(to right, transparent, #000 min(8vw, 120px), #000 calc(100% - min(8vw, 120px)), transparent);
+      mask-image: linear-gradient(to right, transparent, #000 min(8vw, 120px), #000 calc(100% - min(8vw, 120px)), transparent); }
+    .cases::-webkit-scrollbar { display: none; }
+    .cases:focus-visible { outline-offset: -2px; }
+    .case { flex: 0 0 clamp(280px, 30vw, 372px); scroll-snap-align: start; }
+    .rail-nav { display: flex; gap: 8px; justify-content: flex-end; max-width: 1152px; margin: 18px auto 0; padding: 0 24px; }
+    .rail-nav .chip { font-size: 15px; padding: 6px 14px; }
+    @media (max-width: 640px) { .case { flex-basis: 82vw; } .rail-nav { display: none; } }
     .case { background: #fff; border: 1px solid rgba(18,36,26,.1); border-radius: 6px; padding: 28px; display: flex; flex-direction: column; }
     .case .idx { margin: 0 0 14px; font: 500 12px var(--mono); color: var(--glow); }
     .case h3 { font: 600 21px/1.25 var(--sans); letter-spacing: -.015em; margin: 0 0 12px; color: var(--ink); }
@@ -261,12 +272,9 @@
     .foot, .legal { max-width: 1200px; padding-left: 24px; }
     /* Views: each section is a "view". Motion (js/motion) runs the entrances; without JS everything is visible. */
     .motion-ready .view h2, .motion-ready .view .reveal-on { opacity: 0; }
-    @media (min-width: 900px) and (min-height: 640px) and (prefers-reduced-motion: no-preference) {
-      html { scroll-snap-type: y proximity; }
-      .hero, .view { scroll-snap-align: start; scroll-margin-top: 64px; }
-      .view { min-height: calc(100svh - 64px); display: flex; flex-direction: column; justify-content: center; }
-      .view.split { display: grid; align-content: center; }
-    }
+    .view { min-height: calc(100svh - 64px); display: flex; flex-direction: column; justify-content: center; scroll-margin-top: 64px; }
+    .view.split { display: grid; align-content: center; }
+    .glide, .glide body { scroll-behavior: auto; }
     @media (prefers-reduced-motion: reduce) { header { transition: none; } }
     .intro { margin: -16px 0 36px; }
   </style>
@@ -320,7 +328,7 @@
   <div class="awake">
   <main>
     <section id="services" class="view" aria-labelledby="services-h">
-      <h2 id="services-h">services</h2>
+      <h2 id="services-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>services</h2>
       <div class="rows say-rows">
         <div class="say reveal-on">
           <p class="idx">01 · for homes &amp; small offices</p>
@@ -343,9 +351,10 @@
     </section>
 
     <section id="projects" class="view" aria-labelledby="projects-h">
-      <h2 id="projects-h">work</h2>
-      <p class="lead intro reveal-on">Some of it is cloud systems for companies. Some of it is getting a grandparent into their email. The goal is the same either way: people should be better off with their tech than they were before.</p>
-      <div class="cases">
+      <h2 id="projects-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>work</h2>
+      <p class="lead intro reveal-on">Some of it is cloud systems for companies. Some of it is getting a grandparent into their email. Either way, the goal is to leave people better off with their tech than they were before.</p>
+      <div class="rail-wrap">
+        <div class="cases" id="cases" tabindex="0" aria-label="Work, scrolls sideways">
         <article class="case reveal-on">
           <p class="idx">accounting firm · cloud &amp; AI</p>
           <h3>Answers in seconds, with the source attached</h3>
@@ -354,8 +363,8 @@
         </article>
         <article class="case reveal-on">
           <p class="idx">dermatology practice · workflows</p>
-          <h3>Patient intake out of a shared inbox</h3>
-          <p>A new practice ran intake through one email inbox, chasing missing documents and retyping them into the patient record. I mapped the process with the staff and built a small portal on AWS, so patients upload once and the office can see what's complete.</p>
+          <h3>Patient intake, out of the shared inbox</h3>
+          <p>A new practice ran intake through one email inbox, chasing missing documents and retyping them into the patient record. I mapped the process with the staff and built a small portal on AWS. Patients upload once, and the office can see at a glance what's complete.</p>
           <p class="stat"><b>2.6 days → 3.4 hours</b> turnaround · 24 → 8 min per intake</p>
         </article>
         <article class="case reveal-on">
@@ -377,9 +386,11 @@
           <p class="stat"><b>small jobs welcome</b> · patience included</p>
         </article>
       </div>
+        <div class="rail-nav"><button class="chip" type="button" data-rail="-1" aria-label="Previous">←</button><button class="chip" type="button" data-rail="1" aria-label="Next">→</button></div>
+      </div>
     </section>
     <section id="how" class="view split" aria-labelledby="how-h">
-      <h2 id="how-h">how it works</h2>
+      <h2 id="how-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>how it works</h2>
       <div class="steps timeline">
         <div class="reveal-on"><h3>Listen</h3><p>Show me how the work gets done today. One real example is enough.</p></div>
         <div class="reveal-on"><h3>Decide</h3><p>Sometimes that means a new system. Often it's a setting, a cleanup, or leaving it alone.</p></div>
@@ -389,7 +400,7 @@
     </section>
 
     <section id="work" class="view" aria-labelledby="work-h">
-      <h2 id="work-h">open source</h2>
+      <h2 id="work-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>open source</h2>
       <div class="rows">
         <a class="row reveal-on" href="https://github.com/neon1llc/aws-clip">
           <h3>aws-clip</h3>
@@ -410,7 +421,7 @@
     </section>
 
     <section id="why" class="view" aria-labelledby="why-h">
-      <h2 id="why-h">why neon1</h2>
+      <h2 id="why-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>why neon1</h2>
       <div class="story reveal-on">
         <div>
           <p>The name comes from two characters. Neo, "the One" in <em>The Matrix</em>, is an ordinary person who chooses to help other people see clearly. Andrew, the robot in <em>Bicentennial Man</em>, spends two hundred years being of service and never stops being curious.</p>
@@ -422,7 +433,7 @@
     </section>
 
     <section id="faq" class="view" aria-labelledby="faq-h">
-      <h2 id="faq-h">questions</h2>
+      <h2 id="faq-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>questions</h2>
       <div class="faq">
         <details class="reveal-on"><summary>Do you come on site?</summary><p>Yes. I also work remotely, or on your own network through a secure connection that I set up for the job and that's removed when it's done.</p></details>
         <details class="reveal-on"><summary>When do you work?</summary><p>Weekends from 8am to 8pm, and some weekday evenings from 6 to 9pm. That's about 10 to 20 hours a week of project time.</p></details>
@@ -433,7 +444,7 @@
       </div>
     </section>
     <section id="contact" class="view contact" aria-labelledby="contact-h">
-      <h2 id="contact-h">contact</h2>
+      <h2 id="contact-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>contact</h2>
       <p class="lead reveal-on">Tell me what's getting in the way. A couple of lines is enough. Book a free 15-minute call, or just send an email.</p>
       <a class="btn btn-primary reveal-on" href="mailto:1isgladtobeofservice@neon1.tech?subject=Free%2015-minute%20call">book a call</a>
       <p class="lead" style="margin-top:16px">or email <a href="mailto:1isgladtobeofservice@neon1.tech">1isgladtobeofservice@neon1.tech</a></p>
