@@ -2,6 +2,12 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.9.2
+
+- On touch screens each view leaves room at its end for browser toolbars that sit over the page (DuckDuckGo, Safari), so the last lines aren't hidden.
+- Touch scrolling follows the finger directly, which removes the stutter in Chrome on phones.
+- Resistance between views is about 20% softer again.
+
 ## v0.9.1
 
 - Every list of three or more uses a comma before the final "and" or "or".
