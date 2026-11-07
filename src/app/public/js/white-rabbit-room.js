@@ -7,6 +7,7 @@
 // into one mesh, so the whole room draws in about twenty calls, phones included.
 
 import * as T from "/js/vendor/three-0.187.0.rabbit.min.js";
+import { paintSign, signOutline } from "/js/white-rabbit-sign.js";
 
 
 // Palette: pale walls with the brand greens as trim, walnut and bakelite for the set, oxblood leather
@@ -264,6 +265,17 @@ export function furnish(scene, { win, sc, sw, sh }) {
   add(merged(panes, standard({ color: "#DCEBF2", roughness: 0.05, transparent: true, opacity: 0.08, depthWrite: false })));
   add(merged([box(0.012, 0.012, 0.05, [-1.975, mid + lift + 0.03, win.z]), box(0.014, 0.01, 0.06, [-1.973, y0 + lift + 0.02, win.z - 0.3]),
     box(0.014, 0.01, 0.06, [-1.973, y0 + lift + 0.02, win.z + 0.3])], standard({ color: BRASS, metalness: 0.7, roughness: 0.3 })));
+
+  // ---- The carved sign above the window, hung a hair off level ----
+  const sw3 = 0.78, sh3 = 0.2, plaque = new T.Shape();
+  signOutline(sw3, sh3).forEach(([x, y], i) => plaque[i ? "lineTo" : "moveTo"](x, y));
+  const signAt = { p: [-1.95, y1 + 0.255, win.z + 0.01], r: [0.012, Math.PI / 2, 0], order: "YXZ" };
+  add(merged([place(new T.ExtrudeGeometry(plaque, { depth: 0.016, bevelEnabled: true, bevelThickness: 0.003, bevelSize: 0.003, bevelSegments: 1 }), signAt)],
+    standard({ color: "#5E3D24", map: grain(13), roughness: 0.6 })));
+  const face = new T.CanvasTexture(paintSign(512, sw3, sh3));
+  face.colorSpace = T.SRGBColorSpace;
+  const signFace = place(new T.PlaneGeometry(sw3, sh3), { p: [0, 0, 0.0225] });
+  add(merged([place(signFace, signAt)], standard({ map: face, roughness: 0.55, alphaTest: 0.5 })));
 
   // ---- Wainscot, and the green trim: baseboards, chair rail, and crown moulding ----
   // Each run is [length, center x, center z, turn]; the panels face into the room. Every wall
