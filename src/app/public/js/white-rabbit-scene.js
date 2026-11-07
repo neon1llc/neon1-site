@@ -7,7 +7,7 @@
 // window, the sun, and a white-out. Everything is built in code: no images or models.
 
 import * as T from "/js/vendor/three-0.187.0.rabbit.min.js";
-import { createSky, LIGHT } from "/js/white-rabbit-sky.js";
+import { createSky, createShafts, LIGHT } from "/js/white-rabbit-sky.js";
 
 
 // Room colors, the TV, and where its screen sits (meters; the floor is y 0, the TV faces +z)
@@ -373,9 +373,11 @@ export function createScene({ onLost }) {
   glow.position.set(0, SC.y, -1.55);
   scene.add(hemi, sun, glow);
 
-  // ---- Postprocessing: the scene, bloom on desktops, the grade, then sRGB output ----
+  // ---- Postprocessing: the scene, light shafts, bloom on desktops, the grade, then sRGB output ----
   const composer = new T.EffectComposer(renderer, new T.WebGLRenderTarget(1, 1, { type: T.HalfFloatType, samples: touch ? 0 : 4 }));
   composer.addPass(new T.RenderPass(scene, camera));
+  const shafts = createShafts({ touch });
+  composer.addPass(shafts);
   const bloom = new T.UnrealBloomPass(new T.Vector2(innerWidth / 2, innerHeight / 2), 0, 0.2, 1.2);
   bloom.enabled = false;
   composer.addPass(bloom);
@@ -484,6 +486,7 @@ export function createScene({ onLost }) {
     grade.uniforms.uWhite.value = ramp(p, [[0.94, 0], [0.985, 1]]);
     bloom.strength = bloomOn ? ramp(p, [[0.6, 0], [0.94, 0.12]]) : 0;
     bloom.enabled = bloom.strength > 0.001;
+    sky.aim(camera, shafts, ramp(p, [[0.55, 0], [0.75, 1]]) * 0.55);
     composer.render();
 
     // Slow frames step the pixel ratio down, and bloom goes first
