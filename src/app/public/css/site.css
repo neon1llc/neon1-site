@@ -437,3 +437,12 @@ body.white-rabbit-cover .white-rabbit[data-mode="card"][data-leaving] .white-rab
 .skip { position: fixed; left: 12px; top: -64px; z-index: 30; padding: 10px 16px; border-radius: 4px;
   font: 500 14px var(--mono); color: var(--void); background: var(--neon); text-decoration: none; }
 .skip:focus { top: 12px; }
+
+/* Links out of the about story and the legal line: brand green with a small arrow, like the case studies' */
+.story a.ext, .legal a.ext { color: var(--brand); font-weight: 600; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.story a.ext::after, .legal a.ext::after { content: "↗"; font-size: .8em; margin-left: 2px; }
+.story a.ext:hover, .legal a.ext:hover { color: var(--brand); text-decoration-thickness: 2px; }
+
+/* Backslashes between the legal line's items */
+.legal .policies { gap: 8px; align-items: baseline; }
+.legal .sep { opacity: .6; }
