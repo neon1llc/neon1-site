@@ -32,6 +32,8 @@ Two query flags help with testing, and in production they only add rabbits:
 
 `make three` rebuilds the bundle from `scripts/three/entry.js` with pinned three.js and esbuild versions.
 
+The scene's models and images are in `media/white-rabbit/`, with their credits in `media/white-rabbit/CREDITS.txt`. The car model is based on "2019 Chevrolet Camaro" by IsaacOldton (CC BY 4.0), modified: unbranded, recolored, and optimized. The trees and photographed textures come from Poly Haven (CC0).
+
 ## Deploy
 
 Pushing to `main` runs the checks and then deploys from GitHub Actions. The workflow assumes an AWS role through OIDC, so the repo holds no AWS keys. The role ARN is the repository variable `AWS_DEPLOY_ROLE_ARN`.
