@@ -1,11 +1,13 @@
 // src/app/public/js/white-rabbit-sky.js - The sky behind the white rabbit's window: clouds, the sun, and its light.
-// Usage: const sky = createSky({ scene, win }); sky.update(dt, level); sky.sun
+// Usage: const sky = createSky({ scene, win }); sky.update(dt, level); sky.aim(camera, shafts, amount)
 //
 // Imported by white-rabbit-scene.js. The sky is painted on a far wall outside the
 // window: a blue gradient, a sun, and puffy clouds that drift across it on their
 // own clock. The clouds are a few dozen soft circles, so the same shapes can be
 // measured here in JS: sun tells the room how much of the sun is showing, and the
-// window's panes of sunlight on the floor follow it.
+// window's panes of sunlight on the floor follow it. Light shafts are a screen pass
+// that smears only the brightest pixels away from the sun, so they stream from the
+// window, break at the mullions, and fade by themselves when a cloud covers it.
 
 import * as T from "/js/vendor/three-0.187.0.rabbit.min.js";
 
@@ -109,6 +111,40 @@ function patch(win) {
 }
 
 
+// Shafts: march from each pixel toward the sun, adding up only what is brighter than the room
+const SHAFT_FRAG = (n) => /* glsl */`
+  uniform sampler2D tDiffuse;
+  uniform vec2 uSun;
+  uniform float uAmount;
+  varying vec2 vUv;
+  float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+  void main() {
+    vec4 base = texture2D(tDiffuse, vUv);
+    vec2 d = (vUv - uSun) * (0.85 / ${n}.0);
+    vec2 uv = vUv - d * hash(vUv * 913.0);
+    vec3 sum = vec3(0.0);
+    float w = 1.0;
+    for (int i = 0; i < ${n}; i++) {
+      uv -= d;
+      vec3 c = texture2D(tDiffuse, clamp(uv, 0.0, 1.0)).rgb;
+      sum += min(c, vec3(3.0)) * min(max(dot(c, vec3(0.3, 0.5, 0.2)) - 1.2, 0.0), 1.0) * w;
+      w *= 0.97;
+    }
+    gl_FragColor = vec4(base.rgb + sum * vec3(1.0, 0.8, 0.52) * (uAmount / ${n}.0), base.a);
+  }`;
+
+/** A postprocessing pass for light shafts; fewer samples on phones */
+export function createShafts({ touch }) {
+  const pass = new T.ShaderPass({
+    uniforms: { tDiffuse: { value: null }, uSun: { value: new T.Vector2(0.5, 0.5) }, uAmount: { value: 0 } },
+    vertexShader: "varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
+    fragmentShader: SHAFT_FRAG(touch ? 16 : 24),
+  });
+  pass.enabled = false;
+  return pass;
+}
+
+
 /** Paints the sky outside the window `win`; update(dt, level) drifts the clouds and lights the floor; sun is 0 (hidden) to 1 (out) */
 export function createSky({ scene, win }) {
   // The circles, laid out once and moved each frame; w is the cloud's base
@@ -153,5 +189,14 @@ export function createSky({ scene, win }) {
   }
   update(0);
 
-  return { update, get sun() { return sun; } };
+  // Points the shafts at the sun on screen; none while it is behind the camera
+  const at = new T.Vector3();
+  function aim(camera, shafts, amount) {
+    at.set(FAR, SUN.y, SUN.z).project(camera);
+    shafts.uniforms.uSun.value.set((at.x + 1) / 2, (at.y + 1) / 2);
+    shafts.uniforms.uAmount.value = at.z < 1 ? amount : 0;
+    shafts.enabled = shafts.uniforms.uAmount.value > 0.001;
+  }
+
+  return { update, aim, get sun() { return sun; } };
 }
