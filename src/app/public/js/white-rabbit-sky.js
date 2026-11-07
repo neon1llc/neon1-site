@@ -4,8 +4,7 @@
 // Imported by white-rabbit-scene.js. The sky is painted on a far wall outside the
 // window: a blue gradient, a sun, and puffy clouds that drift across it on their
 // own clock. The clouds are a few dozen soft circles, so the same shapes can be
-// measured here in JS: sun tells the room how much of the sun is showing, and the
-// window's panes of sunlight on the floor follow it. Light shafts are a screen pass
+// measured here in JS: sun tells the room how much of the sun is showing. Light shafts are a screen pass
 // that smears only the brightest pixels away from the sun, so they stream from the
 // window, break at the mullions, and fade by themselves when a cloud covers it.
 // Beams from the panes to the floor, and dust glinting in them, follow the sun too.
@@ -84,36 +83,6 @@ const FRAG = /* glsl */`
   }`;
 
 
-// The window's four panes as a soft light texture, the mullion and frame left dark
-function panes() {
-  const c = document.createElement("canvas");
-  c.width = c.height = 256;
-  const g = c.getContext("2d");
-  g.filter = "blur(7px)"; g.fillStyle = "#fff";
-  for (const [x, y] of [[14, 14], [134, 14], [14, 134], [134, 134]]) g.fillRect(x, y, 108, 108);
-  const tex = new T.CanvasTexture(c);
-  tex.colorSpace = T.SRGBColorSpace;
-  return tex;
-}
-
-// Sunlight through the window onto the floor: each corner of the opening carried along the light to y 0
-function patch(win) {
-  const pts = [], uv = [];
-  for (const [u, v] of [[0, 0], [1, 0], [1, 1], [0, 1]]) {
-    const c = new T.Vector3(-1.95, win.y - win.h / 2 + v * win.h, win.z + win.w / 2 - u * win.w);
-    c.addScaledVector(LIGHT, -c.y / LIGHT.y).setY(0.004);
-    pts.push(c.x, c.y, c.z); uv.push(u, v);
-  }
-  const geo = new T.BufferGeometry();
-  geo.setAttribute("position", new T.Float32BufferAttribute(pts, 3));
-  geo.setAttribute("uv", new T.Float32BufferAttribute(uv, 2));
-  geo.setIndex([0, 1, 2, 0, 2, 3]);
-  return new T.Mesh(geo, new T.MeshBasicMaterial({
-    map: panes(), color: "#FFD9A0", transparent: true, opacity: 0, blending: T.AdditiveBlending, depthWrite: false,
-  }));
-}
-
-
 // A point on the window opening, by its across (u, from the left as seen inside) and up (v) fractions
 function onWindow(win, u, v) { return new T.Vector3(-1.95, win.y - win.h / 2 + v * win.h, win.z + win.w / 2 - u * win.w); }
 
@@ -123,15 +92,15 @@ const toFloor = (p) => p.y / LIGHT.y;
 // Beams: thin sheets of light from the panes down to the floor, fading along their length,
 // with a gap at the mullion and slow streaks that drift through them
 const BEAM_VERT = /* glsl */`
-  attribute vec2 aBeam;
-  varying vec2 vB;
+  attribute vec3 aBeam;
+  varying vec3 vB;
   void main() { vB = aBeam; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
 const BEAM_FRAG = /* glsl */`
   uniform float uLevel, uTime;
-  varying vec2 vB;
+  varying vec3 vB;
   void main() {
     float edge = smoothstep(0.0, 0.12, vB.x) * smoothstep(1.0, 0.88, vB.x);
-    float gap = smoothstep(0.02, 0.07, abs(vB.x - 0.5));
+    float gap = vB.z < 0.0 ? 1.0 : smoothstep(0.02, 0.07, abs(vB.x - vB.z));
     float streak = 0.6 + 0.4 * sin(vB.x * 37.0 + uTime * 0.4) * sin(vB.x * 13.0 - uTime * 0.25 + vB.y * 3.0);
     float a = uLevel * edge * gap * streak * (1.0 - vB.y) * smoothstep(0.0, 0.3, vB.y);
     gl_FragColor = vec4(vec3(1.0, 0.8, 0.5) * a, 1.0);
@@ -140,16 +109,17 @@ const BEAM_FRAG = /* glsl */`
 // Sheets across the window at a few heights, and up it at a few widths, all in one draw
 function beams(win) {
   const pos = [], uv = [], index = [];
-  const sheet = (a, b) => {
+  const sheet = (a, b, bar = -1) => {
     const k = pos.length / 3, a2 = a.clone().addScaledVector(LIGHT, -toFloor(a)), b2 = b.clone().addScaledVector(LIGHT, -toFloor(b));
-    for (const [p, x, y] of [[a, 0, 0], [b, 1, 0], [b2, 1, 1], [a2, 0, 1]]) { pos.push(p.x, Math.max(p.y, 0.005), p.z); uv.push(x, y); }
+    for (const [p, x, y] of [[a, 0, 0], [b, 1, 0], [b2, 1, 1], [a2, 0, 1]]) { pos.push(p.x, Math.max(p.y, 0.005), p.z); uv.push(x, y, bar); }
     index.push(k, k + 1, k + 2, k, k + 2, k + 3);
   };
-  for (const v of [0.2, 0.36, 0.64, 0.8]) sheet(onWindow(win, 0.05, v), onWindow(win, 0.95, v));
-  for (const u of [0.22, 0.38, 0.62, 0.78]) sheet(onWindow(win, u, 0.05), onWindow(win, u, 0.95));
+  // Across the sashes at a few heights, and up them at a few widths, broken where the meeting rails cross
+  for (const v of [0.2, 0.36, 0.72, 0.86]) sheet(onWindow(win, 0.05, v), onWindow(win, 0.95, v));
+  for (const u of [0.22, 0.4, 0.6, 0.78]) sheet(onWindow(win, u, 0.05), onWindow(win, u, 0.95), 0.6);
   const geo = new T.BufferGeometry();
   geo.setAttribute("position", new T.Float32BufferAttribute(pos, 3));
-  geo.setAttribute("aBeam", new T.Float32BufferAttribute(uv, 2));
+  geo.setAttribute("aBeam", new T.Float32BufferAttribute(uv, 3));
   geo.setIndex(index);
   return new T.Mesh(geo, new T.ShaderMaterial({
     uniforms: { uLevel: { value: 0 }, uTime: { value: 0 } }, vertexShader: BEAM_VERT, fragmentShader: BEAM_FRAG,
@@ -245,8 +215,8 @@ export function createSky({ scene, win, touch }) {
   mesh.rotation.y = Math.PI / 2;
   mesh.position.set(FAR, 12, -6);
   scene.add(mesh);
-  const floor = patch(win), beam = beams(win), motes = dust(win, touch ? 140 : 280);
-  scene.add(floor, beam, motes);
+  const beam = beams(win), motes = dust(win, touch ? 140 : 280);
+  scene.add(beam, motes);
 
   // Cloud cover at a point of the sky, the same sum the shader draws
   function cover(z, y) {
@@ -276,7 +246,6 @@ export function createSky({ scene, win, touch }) {
     let seen = 0;
     for (const [oz, oy] of [[0, 0], [0.6, 0], [-0.6, 0], [0, 0.6], [0, -0.6]]) seen += Math.exp(-5 * cover(SUN.z + oz * SUN.r, SUN.y + oy * SUN.r));
     sun = seen / 5;
-    floor.material.opacity = level * sun * 0.9;
     beam.material.uniforms.uLevel.value = level * sun * 0.09;
     beam.material.uniforms.uTime.value = time;
     const m = motes.material.uniforms;
