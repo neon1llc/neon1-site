@@ -2,12 +2,13 @@
 //
 // esbuild keeps only these exports and what they depend on.
 
-// Core: renderer, scene graph, geometry, materials, lights, and math
+// Core: renderer, scene graph, geometry, materials, lights, math, picking, and a generated environment map
 export { WebGLRenderer, WebGLRenderTarget, Scene, PerspectiveCamera, CanvasTexture, Mesh, Group, BoxGeometry,
   PlaneGeometry, CylinderGeometry, ShaderMaterial, MeshStandardMaterial, MeshLambertMaterial, MeshBasicMaterial,
   DirectionalLight, HemisphereLight, PointLight, CatmullRomCurve3, Vector3, Vector2, Color,
   MathUtils, SRGBColorSpace, LinearFilter, AdditiveBlending, HalfFloatType, Vector4, Points, BufferGeometry,
-  Float32BufferAttribute, DoubleSide, Shape, ExtrudeGeometry, LatheGeometry, RepeatWrapping, PCFSoftShadowMap } from "three";
+  Float32BufferAttribute, DoubleSide, BackSide, Shape, ShapeGeometry, ExtrudeGeometry, LatheGeometry, SphereGeometry,
+  RepeatWrapping, PCFSoftShadowMap, MeshPhysicalMaterial, PMREMGenerator, Raycaster } from "three";
 
 // Add-ons: postprocessing, the rounded cabinet, and merging the furniture into a few draws
 export { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
