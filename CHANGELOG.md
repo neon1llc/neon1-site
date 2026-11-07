@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.12.6
+
+- Unknown paths get a real not-found page, with a 404 status: the rain behind a glitching 404 and a way home. The glitch is shared with 1NEON.
+
 ## v0.12.5
 
 - The rabbit's glitch lets the rain run a little longer before its last stutter.
