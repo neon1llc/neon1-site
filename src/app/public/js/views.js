@@ -8,13 +8,16 @@
 // piece rises into place in order. Later visits fade the whole view.
 //
 // Motion (motion.dev, MIT) runs the animations. With reduced motion or without
-// Motion, the page scrolls natively and everything is visible.
+// Motion, the page scrolls natively and everything is visible. Turning on reduced
+// motion while the page is open hands scrolling back to the browser at once, and
+// a setup error shows everything rather than leaving views hidden.
 
 (() => {
   "use strict";
   // Native scrolling stays in charge without Motion or with reduced motion
   const M = window.Motion;
-  if (!M || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+  if (!M || reduce.matches) return;
   const { animate, stagger } = M;
 
   // Gesture feel and easing curves
@@ -30,11 +33,13 @@
   // Input pauses while the menu, a case study, or the white rabbit is open
   const root = document.documentElement;
   root.classList.add("motion-ready", "glide");
+  try {
   const hero = document.querySelector(".hero");
   const views = [hero, ...document.querySelectorAll(".view")];
   const visited = new Set([hero]);
   const menu = document.getElementById("menu");
-  const paused = () => !menu.hidden || document.body.classList.contains("case-open") || document.body.classList.contains("white-rabbit-on");
+  let off = false; // reduced motion turned on mid-visit
+  const paused = () => off || !menu.hidden || document.body.classList.contains("case-open") || document.body.classList.contains("white-rabbit-on");
 
   // ---- Layout: where each view starts and how far it scrolls inside ----
   const vh = () => (window.visualViewport ? visualViewport.height : innerHeight);
@@ -85,14 +90,18 @@
   let lastInput = 0, gestureFromEdge = false, blockUntilIdle = false, idleTimer = 0;
 
   // Eases the page toward the target every frame, except while a settle runs
+  // The loop stops once the page is at rest, and input wakes it, so a still page costs nothing
+  let looping = false;
   function render() {
     if (!settling) {
       const d = target - y;
       y = Math.abs(d) < 0.5 ? target : y + d * 0.2;
       if (Math.abs(y - scrollY) >= 1) scrollTo(0, y);
+      if (y === target) { looping = false; return; }
     }
     requestAnimationFrame(render);
   }
+  const wake = () => { if (!looping) { looping = true; requestAnimationFrame(render); } };
 
   // Settles into view i with one eased scroll, fading the old view out
   // The new view enters once most of the distance is covered
@@ -127,6 +136,7 @@
   // A gesture that ends short of the threshold springs back
   function release() {
     if (!pullDir) return;
+    wake();
     target = pullBase;
     setFade(views[pullIndex], 1);
     setFade(views[pullIndex + pullDir], 0);
@@ -137,6 +147,7 @@
   // Direct input, from touch, moves the page at once instead of easing
   function input(d, direct) {
     if (settling || paused() || !d) return;
+    wake();
     const now = performance.now();
     const newGesture = now - lastInput > IDLE;
     lastInput = now;
@@ -212,6 +223,7 @@
     if (pullDir) { release(); return; }
     // A flick inside a tall view keeps gliding, and stops at the view's edge
     if (Math.abs(vel) > 0.3) {
+      wake();
       const [top, bottom] = range(indexAt(target));
       target = Math.max(top, Math.min(bottom, target + vel * 260));
     }
@@ -230,6 +242,7 @@
     const up = ["ArrowUp", "PageUp"].includes(e.key) || (e.key === " " && e.shiftKey);
     if (down || up) {
       e.preventDefault();
+      wake();
       const step = e.key.startsWith("Arrow") ? 80 : vh() * 0.85;
       if (down && target < bottom - 1) target = Math.min(bottom, target + step);
       else if (up && target > top + 1) target = Math.max(top, target - step);
@@ -243,7 +256,7 @@
   document.addEventListener("click", (e) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
     const a = e.target.closest('a[href^="#"], a[data-view]');
-    if (!a) return;
+    if (!a || off) return;
     const id = a.dataset.view || a.getAttribute("href").slice(1);
     const el = document.getElementById(id);
     const v = el && (el.closest(".view") || el.closest(".hero") || (el.id === "top" ? hero : null));
@@ -289,7 +302,20 @@
   if (document.fonts) document.fonts.ready.then(land);
   if (window.ResizeObserver) new ResizeObserver(land).observe(document.body);
 
-  // Start in step with the current position, then render every frame
+  // Reduced motion turned on mid-visit: stop steering, show every view, and scroll natively
+  reduce.addEventListener("change", (e) => {
+    if (!e.matches || off) return;
+    off = true;
+    if (settling) settling.stop();
+    root.classList.remove("motion-ready", "glide");
+    views.forEach((v) => { v.style.opacity = ""; parts(v).forEach((el) => { el.style.opacity = ""; el.style.transform = ""; }); });
+  });
+
+  // Start in step with the current position; the render loop runs only while the page moves
   sync();
-  requestAnimationFrame(render);
+  } catch (err) {
+    // Fail open: native scrolling, every view visible
+    root.classList.remove("motion-ready", "glide");
+    throw err;
+  }
 })();

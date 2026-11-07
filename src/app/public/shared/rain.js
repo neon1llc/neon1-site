@@ -81,8 +81,9 @@ function save(s) {
  * rabbit, when given, lets a rabbit drop in: { rate, hold, ok, avoid }. rate is the chance per
  * step, hold its steps on screen, ok() allows one, and avoid() lists elements it must not sit under.
  * Without it there are no rabbits and the rain is unchanged.
+ * idle() skips drawing while it returns true, such as while the rain is scrolled out of sight.
  */
-export function rain({ canvas, lens = null, panes = () => [], lensOff = () => false, words = WORDS, rabbit = null }) {
+export function rain({ canvas, lens = null, panes = () => [], lensOff = () => false, words = WORDS, rabbit = null, idle = () => false }) {
   const ctx = canvas.getContext("2d");
   const lctx = lens && lens.getContext("2d");
   const reduce = matchMedia("(prefers-reduced-motion: reduce)");
@@ -311,12 +312,12 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
     glitch.until = now + STEP_MS;
   }
 
-  // Steps the rain at the current gap, and not while paused, held, or the tab is hidden
+  // Steps the rain at the current gap, and not while paused, held, idle, or the tab is hidden
   function loop() {
     const now = performance.now();
     const g = stepGap(now);
     if (glitch) { if (!document.hidden) glitchStep(now); }
-    else if (running && !held && !document.hidden && now - last >= g) { last = now; draw(); refract(); }
+    else if (running && !held && !document.hidden && !idle() && now - last >= g) { last = now; draw(); refract(); }
     raf = requestAnimationFrame(loop);
   }
 
