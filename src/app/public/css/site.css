@@ -443,7 +443,7 @@ body.white-rabbit-scene > :not(.white-rabbit) { visibility: hidden; }
 .white-rabbit-sash::before, .white-rabbit-sash::after { content: ""; position: absolute; left: 0; right: 0; border: solid #EFEDE5; }
 .white-rabbit-sash::before { top: 0; bottom: 52%; border-width: 7px 7px 5px; }
 .white-rabbit-sash::after { top: 46%; bottom: 0; border-width: 11px 9px 18px; box-shadow: 0 -2px 4px rgba(18,36,26,.25), inset 0 2px 3px rgba(18,36,26,.15); }
-.white-rabbit-lock { position: absolute; left: 50%; top: calc(46% - 3px); width: 18px; height: 6px; margin-left: -9px; border-radius: 2px; background: #b08d57; z-index: 1; }
+.white-rabbit-latch { position: absolute; left: 50%; top: calc(46% - 3px); width: 18px; height: 6px; margin-left: -9px; border-radius: 2px; background: #b08d57; z-index: 1; }
 
 /* The sill under it */
 .white-rabbit-sill { width: calc(min(54vw, 34vh, 300px) + 52px); height: 14px; background: linear-gradient(#F3F1EA, #D8D4C8);
