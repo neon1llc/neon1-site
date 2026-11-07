@@ -6,8 +6,8 @@
 // shows the rain behind it slightly magnified, like thick convex glass.
 
 
-// Character sets the charset control cycles through
-const EMOJI = ["💻", "🔒", "📡", "🛰️", "🔌", "⚙️", "🧅", "🐇", "💊", "🕶️", "☁️", "🔑", "📷", "🛡️", "🤖", "💾", "📶", "🧠"];
+// Character sets the charset control cycles through; the white rabbit is kept out of them on purpose
+const EMOJI = ["💻", "🔒", "📡", "🛰️", "🔌", "⚙️", "🧅", "💊", "🕶️", "☁️", "🔑", "📷", "🛡️", "🤖", "💾", "📶", "🧠"];
 const FACES = ["😀", "😃", "😄", "😁", "😆", "😅", "😂", "🙂", "😉", "😊", "😇", "🥰", "😍", "🤩", "😎", "🤓", "🧐", "🤔", "😴", "🤯", "🥳", "😏", "😌", "🙃"];
 
 // "text" mixes many writing systems, weighted like the original neon1 rain;

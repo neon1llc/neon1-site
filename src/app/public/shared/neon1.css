@@ -21,9 +21,10 @@
   --glass-r: 8px;
 }
 
-/* Rain: the canvas behind everything, and the lens layer that magnifies it behind glass */
-#rain { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; opacity: .8; }
-#lens { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 1; pointer-events: none; opacity: .8; }
+/* Rain: the canvas behind everything, and the lens layer that magnifies it behind glass; both
+   stay partly see-through so the content in front reads first */
+#rain { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; opacity: .6; }
+#lens { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 1; pointer-events: none; opacity: .6; }
 
 /* Clear glass over the rain: no tint, so the black stays black; the lens draws what shows through */
 .glass { border-radius: var(--glass-r); background: transparent; box-shadow: none; }
@@ -32,6 +33,14 @@
    (x-height 0.56em vs digit 0.73em), at weight 450 so its strokes match the 700 "1" */
 .ne { font-size: 1.3em; font-weight: 450; }
 .one { font-size: 1em; font-weight: 700; }
+
+/* The top bar and the neon1 logo in it, placed the same on every neon1 page */
+.n1-bar { position: fixed; left: 0; right: 0; top: 0; height: 64px; z-index: 8; }
+.n1-inner { max-width: 1200px; height: 64px; margin: 0 auto; display: flex; align-items: center; gap: 20px;
+  padding: 0 max(24px, env(safe-area-inset-right)) 0 max(24px, env(safe-area-inset-left)); }
+.n1-logo { display: inline-flex; align-items: center; gap: 10px; padding: 7px 12px; border-radius: var(--glass-r); color: var(--neon);
+  text-decoration: none; font: 700 13px var(--mono); letter-spacing: .06em; text-shadow: 0 0 8px rgba(108, 255, 168, .45); }
+.n1-logo svg { width: 26px; height: 26px; }
 
 /* Rain controls: three glass chips in the bottom-right corner */
 .rainctl { position: fixed; right: 16px; bottom: 16px; z-index: 6; display: flex; gap: 8px; transition: opacity .3s; }
