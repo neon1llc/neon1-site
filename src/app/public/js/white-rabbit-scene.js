@@ -280,7 +280,7 @@ export function createScene({ onLost }) {
   const camera = new T.PerspectiveCamera(40, innerWidth / innerHeight, 0.02, 5000);
 
   // ---- Sky, sun, and clouds, seen only through the window ----
-  const sky = createSky({ scene, win: WINDOW });
+  const sky = createSky({ scene, win: WINDOW, touch });
 
   // ---- The room: boxes, with the left wall built around the window opening ----
   const mats = {
@@ -365,7 +365,7 @@ export function createScene({ onLost }) {
 
   // ---- Lights, and the colors the room shifts between as the sun comes and goes ----
   const COOL = new T.Color("#D8E2F0"), WARM = new T.Color("#F6EEE2");
-  const WHITE = new T.Vector3(1, 1, 1), TINT_COOL = new T.Vector3(0.94, 0.97, 1.04), TINT_WARM = new T.Vector3(1.08, 1.0, 0.86);
+  const WHITE = new T.Vector3(1, 1, 1), TINT_COOL = new T.Vector3(0.95, 0.98, 1.03), TINT_WARM = new T.Vector3(1.05, 1.0, 0.93);
   const hemi = new T.HemisphereLight("#E6F0F8", FLOOR, 0);
   const sun = new T.DirectionalLight("#FFE2B0", 0);
   sun.position.copy(LIGHT).multiplyScalar(10);
@@ -378,7 +378,7 @@ export function createScene({ onLost }) {
   composer.addPass(new T.RenderPass(scene, camera));
   const shafts = createShafts({ touch });
   composer.addPass(shafts);
-  const bloom = new T.UnrealBloomPass(new T.Vector2(innerWidth / 2, innerHeight / 2), 0, 0.2, 1.2);
+  const bloom = new T.UnrealBloomPass(new T.Vector2(innerWidth / 2, innerHeight / 2), 0, 0.2, 2.5);
   bloom.enabled = false;
   composer.addPass(bloom);
   const grade = new T.ShaderPass(GRADE);
@@ -469,11 +469,11 @@ export function createScene({ onLost }) {
     // and lays the window's panes on the floor, and the room cools again when a cloud covers it
     const light = ramp(p, [[0.12, 0], [0.28, 0.12], [0.4, 0.3], [0.6, 0.7], [0.82, 1]]);
     const room = ramp(p, [[0.4, 0], [0.6, 1]]);
-    sky.update(dt, ramp(p, [[0.5, 0], [0.7, 1]]));
+    sky.update(dt, ramp(p, [[0.5, 0], [0.7, 1]]), ratio);
     const s = sky.sun;
-    hemi.intensity = light * (0.95 + 0.2 * s);
+    hemi.intensity = light * (0.62 + 0.15 * s);
     hemi.color.copy(COOL).lerp(WARM, s);
-    sun.intensity = light * (0.2 + 1.5 * s);
+    sun.intensity = light * (0.15 + 1.2 * s);
     glow.intensity = ramp(p, [[0, 0], [0.28, 0.6], [0.6, 0.3], [0.82, 0.2]]) * 0.02;
     grade.uniforms.uTint.value.copy(WHITE).lerp(TINT_COOL.clone().lerp(TINT_WARM, s), room);
 
