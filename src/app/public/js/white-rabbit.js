@@ -248,15 +248,19 @@ export function whiteRabbit({ rain, root }) {
       catchIt();
       return;
     }
-    if (state !== "caught") return;
+    if (state !== "caught") {
+      if (scene && handed && mode === "scene" && state !== "exiting" && scene.pick(e.clientX, e.clientY)) { e.preventDefault(); e.stopPropagation(); }
+      return;
+    }
     if (pauseBtn && pauseBtn.contains(e.target)) { e.preventDefault(); e.stopPropagation(); leave(); return; }
     if (e.target.closest("a, button, summary")) leave();
   }, { capture: true });
 
-  // A pointer over the rabbit shows it can be clicked
+  // A pointer over the rabbit, or over the car on the sill, shows it can be clicked
   addEventListener("pointermove", (e) => {
     if (e.pointerType !== "mouse") return;
-    body.classList.toggle("white-rabbit-hover", state === "idle" && ready() && rain.rabbitAt(e.clientX, e.clientY));
+    const car = scene && handed && mode === "scene" && scene.over(e.clientX, e.clientY);
+    body.classList.toggle("white-rabbit-hover", car || (state === "idle" && ready() && rain.rabbitAt(e.clientX, e.clientY)));
   }, { passive: true });
 
   // A new size redraws the TV picture and the framing; progress is kept
