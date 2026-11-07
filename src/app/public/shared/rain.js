@@ -53,8 +53,12 @@ const RABBIT = { color: "#ffffff", alpha: 1, glow: 6, words: ["🐇"] };
 const WORD_RATE = 0.06; // chance per step that some column starts a word
 const FADE = 0.07;      // lower means longer trails
 const STEP_MS = 66;     // about 15 steps a second
-const HALT_MS = 600;    // the step gap the rain slows to before it stops
+const HALT_MS = 600;    // the step gap the rain picks up from after a halt
 const HOLD = 30;        // steps a word holds once spelled
+
+// The halt, a Matrix glitch: a hard freeze, a lag jump that skips several steps at once
+// with a one-frame flicker, then uneven stutters before the final freeze (about 1.1 s)
+const GLITCH = [["freeze", 260], ["jump", 6], ["freeze", 340], ["run", 2], ["freeze", 170], ["run", 1]];
 const ZOOM = 1.15, RIM = 5;
 const VOID = "#0D0208";
 const MONO = `"JetBrains Mono", ui-monospace, monospace`;
@@ -91,7 +95,7 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
   let running = !saved.paused && !reduce.matches;
   // The live rabbit, the step count, and a halt that is not saved as a pause
   const bunny = rabbit && { rate: 0.005, hold: 60, ok: () => true, avoid: () => [], ...rabbit };
-  let rab = null, steps = 0, held = false, ramp = null, gap = STEP_MS, bunnySprite = null;
+  let rab = null, steps = 0, held = false, ramp = null, gap = STEP_MS, bunnySprite = null, glitch = null;
   const listeners = new Set();
   const emit = () => listeners.forEach((f) => f(api));
 
@@ -273,7 +277,7 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
     }
   }
 
-  // The gap between steps: STEP_MS, or eased along a halt or resume ramp
+  // The gap between steps: STEP_MS, or eased along the ramp back up after a halt
   function stepGap(now) {
     if (!ramp) return gap;
     const t = Math.min(1, (now - ramp.t0) / ramp.ms), e = 1 - (1 - t) ** 3;
@@ -282,11 +286,33 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
     return gap;
   }
 
+  // Plays the halt's glitch one move at a time; the last move leaves the rain held
+  function glitchStep(now) {
+    if (now < glitch.until) return;
+    const move = glitch.moves.shift();
+    if (!move) { const done = glitch.done; glitch = null; held = true; done(); return; }
+    const [kind, n] = move;
+    if (kind === "freeze") { glitch.until = now + n; return; }
+    if (kind === "jump") {
+      // Dropped frames: several steps land at once, and the canvas flickers for a frame
+      for (let k = 0; k < n; k++) draw();
+      refract();
+      canvas.style.filter = "brightness(1.4) contrast(1.1)";
+      setTimeout(() => (canvas.style.filter = ""), 50);
+      glitch.until = now + 50;
+      return;
+    }
+    draw(); refract();
+    if (n > 1) glitch.moves.unshift(["run", n - 1]);
+    glitch.until = now + STEP_MS;
+  }
+
   // Steps the rain at the current gap, and not while paused, held, or the tab is hidden
   function loop() {
     const now = performance.now();
     const g = stepGap(now);
-    if (running && !held && !document.hidden && now - last >= g) { last = now; draw(); refract(); }
+    if (glitch) { if (!document.hidden) glitchStep(now); }
+    else if (running && !held && !document.hidden && now - last >= g) { last = now; draw(); refract(); }
     raf = requestAnimationFrame(loop);
   }
 
@@ -328,12 +354,14 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
     // Drops a rabbit in now if there is room; for testing
     spawnRabbit() { return !!bunny && !rab && running && !held && startRabbit(); },
 
-    // Slows the rain to a stop over ms without saving a pause; resolves once it is still
-    halt(ms = 1100) {
+    // Stops the rain with a short glitch, without saving a pause; resolves once it is still
+    // A rain that isn't moving (paused, or reduced motion) just holds
+    halt() {
       pin();
       return new Promise((done) => {
+        ramp = null;
         if (!running) { held = true; done(); return; }
-        ramp = { from: gap, to: HALT_MS, t0: performance.now(), ms, end: () => { held = true; done(); } };
+        glitch = { moves: GLITCH.map((m) => [...m]), until: 0, done };
       });
     },
 
@@ -342,9 +370,10 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
     resume(ms = 800) {
       if (rab) { const c = cols[rab.col]; if (c && c.g === RABBIT) c.hold = 0; }
       rab = null;
+      if (glitch) { glitch = null; canvas.style.filter = ""; }
       if (held && reduce.matches) { held = false; onResize(); return; }
       held = false;
-      ramp = { from: Math.max(gap, STEP_MS), to: STEP_MS, t0: performance.now(), ms };
+      ramp = { from: HALT_MS, to: STEP_MS, t0: performance.now(), ms };
     },
     stop() { cancelAnimationFrame(raf); removeEventListener("resize", onResize); },
   };
