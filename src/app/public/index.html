@@ -407,7 +407,8 @@
     /* Touch screens have no hover, so the marks stay faintly visible */
     @media (hover: none) { .go, .lock { opacity: .7; } }
     .lock { position: relative; cursor: help; border-radius: 6px; outline-offset: 2px; }
-    .lock::after { content: "currently\Aprivate"; white-space: pre; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+    /* The note sits to the right of the lock, centered on it */
+    .lock::after { content: "currently\Aprivate"; white-space: pre; position: absolute; left: calc(100% + 8px); top: 50%; transform: translateY(-50%);
       font: 500 12px/1.35 var(--mono); color: var(--brand); text-align: center; background: #fff; border: 1px solid var(--brand); border-radius: 8px;
       padding: 6px 12px; opacity: 0; pointer-events: none; transition: opacity .2s; }
     .lock:hover::after, .lock:focus::after { opacity: 1; }
