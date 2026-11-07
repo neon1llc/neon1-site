@@ -303,15 +303,34 @@ export function furnish(scene, { win, sc, sw, sh }) {
   add(merged(light, standard({ color: MARK, roughness: 0.55 })));
 
   // ---- The rug, and soft shadows where things meet ----
-  add(merged([place(new T.PlaneGeometry(3.0, 1.9), { p: [0.06, 0.004, -1.35], r: [-Math.PI / 2, 0, 0] })], lambert({ map: rug() })));
+  // The rug: a slab with real thickness, then a shag pile in three thinning layers, pressed flat
+  // where the chair and table legs stand on it
+  const RUG = { x: 0.06, z: -1.35, w: 3.0, d: 1.9 }, rugMap = rug(), feet = [];
+  for (const [lx, lz] of [[-0.43, -0.22], [0.43, -0.22], [-0.43, 0.22], [0.43, 0.22]]) feet.push([sc.x + 0.06 + lx, -1.98 + lz]);
+  for (const [x, z, t] of CHAIRS) for (const [lx, lz] of [[-0.34, 0.31], [0.34, 0.31], [-0.34, -0.33], [0.34, -0.33]]) {
+    feet.push([x + lx * Math.cos(t) + lz * Math.sin(t), z - lx * Math.sin(t) + lz * Math.cos(t)]);
+  }
+  add(merged([place(new T.RoundedBoxGeometry(RUG.w, 0.014, RUG.d, 1, 0.006), { p: [RUG.x, 0.007, RUG.z] })], lambert({ map: rugMap })));
+  [[0.62, 0.018, 1.6], [0.42, 0.023, 2.2], [0.24, 0.028, 2.9]].forEach(([density, y, dent], k) => {
+    const r = seeded(21 + k), fibres = painted(512, 320, (g, w, h) => {
+      g.fillStyle = "#000"; g.fillRect(0, 0, w, h); g.fillStyle = "#fff";
+      for (let i = 0; i < w * h * density * 0.45; i++) g.fillRect(r() * w, r() * h, 1 + r(), 1 + r());
+      g.fillStyle = "#000";
+      for (const [fx, fz] of feet) {
+        g.beginPath(); g.arc(((fx - RUG.x + RUG.w / 2) / RUG.w) * w, ((fz - RUG.z + RUG.d / 2) / RUG.d) * h, 4 * dent, 0, 6.3); g.fill();
+      }
+    }, false);
+    add(merged([place(new T.PlaneGeometry(RUG.w - 0.02, RUG.d - 0.02), { p: [RUG.x, y, RUG.z], r: [-Math.PI / 2, 0, 0] })],
+      lambert({ map: rugMap, alphaMap: fibres, alphaTest: 0.5, color: new T.Color(1, 1, 1).multiplyScalar(0.92 + k * 0.05) })));
+  });
   const ao = [];
   for (const [len, x, z, t] of runs) {
     const [px, pz] = inward(x, z, t, 0.17);
     ao.push(place(new T.PlaneGeometry(len, 0.34), { p: [px, 0.002, pz], r: [-Math.PI / 2, t, 0], order: "YXZ" }));
   }
   add(merged(ao, new T.MeshBasicMaterial({ map: edge(), transparent: true, depthWrite: false })));
-  const blobs = [place(new T.PlaneGeometry(1.25, 0.82), { p: [0.06, 0.006, -1.98], r: [-Math.PI / 2, 0, 0] })];
-  for (const [x, z, t] of CHAIRS) blobs.push(place(new T.PlaneGeometry(1.05, 1.0), { p: [x, 0.006, z], r: [-Math.PI / 2, t, 0], order: "YXZ" }));
+  const blobs = [place(new T.PlaneGeometry(1.25, 0.82), { p: [0.06, 0.031, -1.98], r: [-Math.PI / 2, 0, 0] })];
+  for (const [x, z, t] of CHAIRS) blobs.push(place(new T.PlaneGeometry(1.05, 1.0), { p: [x, 0.031, z], r: [-Math.PI / 2, t, 0], order: "YXZ" }));
   add(merged(blobs, new T.MeshBasicMaterial({ map: shadow(true), transparent: true, depthWrite: false })));
 
   // ---- The table: a low walnut side table with turned legs ----
