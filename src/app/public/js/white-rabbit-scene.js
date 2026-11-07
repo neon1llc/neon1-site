@@ -248,6 +248,25 @@ async function picture(out) {
 }
 
 
+// A small blurred environment map of the room for reflections: pale walls, a darker floor, a soft
+// ceiling, and the bright window on the left wall, seen from beside the TV. Drawn once
+function environment(renderer) {
+  const env = new T.Scene(), pm = new T.PMREMGenerator(renderer), stuff = [];
+  const part = (geo, color, p, r = [0, 0, 0], back = false) => {
+    const m = new T.Mesh(geo, new T.MeshBasicMaterial({ color: new T.Color(...color), side: back ? T.BackSide : T.DoubleSide, toneMapped: false }));
+    m.position.set(...p); m.rotation.set(...r); env.add(m); stuff.push(m);
+  };
+  part(new T.BoxGeometry(4, 2.6, 5), [0.62, 0.61, 0.58], [0, 1.3, 0], [0, 0, 0], true);
+  part(new T.PlaneGeometry(4, 5), [0.36, 0.3, 0.24], [0, 0.01, 0], [-Math.PI / 2, 0, 0]);
+  part(new T.PlaneGeometry(1.2, 1.3), [7, 6.8, 6.2], [-1.98, 1.45, 0.6], [0, Math.PI / 2, 0]);
+  part(new T.PlaneGeometry(1.6, 1.6), [1.1, 1.1, 1.08], [0, 2.58, 0], [Math.PI / 2, 0, 0]);
+  const tex = pm.fromScene(env, 0.03, 0.05, 20, { size: 128, position: new T.Vector3(0, 0.6, -1.2) }).texture;
+  stuff.forEach((m) => { m.geometry.dispose(); m.material.dispose(); });
+  pm.dispose();
+  return tex;
+}
+
+
 /** Builds the scene on a new canvas in #whiteRabbit; throws without WebGL. onLost() runs if the context goes */
 export function createScene({ onLost }) {
   const root = document.getElementById("whiteRabbit");
@@ -272,7 +291,8 @@ export function createScene({ onLost }) {
   const sky = createSky({ scene, win: WINDOW, touch });
 
   // ---- The room, the TV around its screen, the table, and the chairs ----
-  furnish(scene, { win: WINDOW, sc: SC, sw: SW, sh: SH });
+  const env = environment(renderer);
+  const { glossy } = furnish(scene, { win: WINDOW, sc: SC, sw: SW, sh: SH, env });
 
   // Screen and glass, both curved by the same bulge
   const screenU = {
@@ -308,6 +328,17 @@ export function createScene({ onLost }) {
   renderer.shadowMap.autoUpdate = false;
   renderer.shadowMap.needsUpdate = true;
   scene.add(sun.target);
+  // Skylight from the window falls across the set from the front left, so the knobs, bezel, and
+  // feet throw small shadows to the right; its own small shadow map covers only the TV and table
+  const fill = new T.DirectionalLight("#EEF3FA", 0);
+  fill.target.position.set(SC.x + 0.06, 0.4, SC.z - 0.1);
+  fill.position.copy(fill.target.position).add(new T.Vector3(-1.95, 0.95, 2.2).normalize().multiplyScalar(3));
+  fill.castShadow = true;
+  fill.shadow.mapSize.setScalar(touch ? 512 : 1024);
+  Object.assign(fill.shadow.camera, { left: -1.1, right: 1.1, top: 1, bottom: -0.7, near: 1, far: 6 });
+  fill.shadow.camera.updateProjectionMatrix();
+  fill.shadow.bias = -0.0001; fill.shadow.normalBias = 0.001; fill.shadow.radius = 2;
+  scene.add(fill, fill.target);
   const glow = new T.PointLight("#6CFFA8", 0, 2.5, 2);
   glow.position.set(0, SC.y, -1.55);
   scene.add(hemi, sun, glow);
@@ -413,6 +444,8 @@ export function createScene({ onLost }) {
     hemi.intensity = light * (0.62 + 0.15 * s) * ramp(p, [[0.55, 3.5], [0.86, 1.3]]); // the room dims a little as the window takes over
     hemi.color.copy(COOL).lerp(WARM, s);
     sun.intensity = light * (0.15 + 1.2 * s);
+    fill.intensity = light * (0.55 + 0.35 * s);
+    for (const [m, k] of glossy) m.envMapIntensity = k * light;
     glow.intensity = ramp(p, [[0, 0], [0.28, 0.6], [0.6, 0.3], [0.82, 0.2]]) * 0.02;
     grade.uniforms.uTint.value.copy(WHITE).lerp(TINT_COOL.clone().lerp(TINT_WARM, s), room);
 
@@ -461,6 +494,7 @@ export function createScene({ onLost }) {
       }
     });
     if (tex) tex.dispose();
+    env.dispose();
     composer.passes.forEach((pass) => pass.dispose && pass.dispose());
     composer.dispose();
     renderer.dispose();
