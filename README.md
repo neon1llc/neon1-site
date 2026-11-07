@@ -15,6 +15,12 @@ make serve   # http://localhost:8000
 
 Run `make help` to list every target.
 
+## Content Security Policy
+
+CloudFront serves the page with a strict policy: scripts, styles, fonts, and connections only from neon1.tech, and images from neon1.tech or `data:` URLs. Keep scripts and styles in their own files, since inline `<script>`, `<style>`, `style=""` attributes, and `on…` handlers are blocked. Setting styles from JavaScript (`el.style.x = …`) is fine. A new outside origin needs a change to the policy in neon1-aws-infrastructure first.
+
+`robots.txt`, `sitemap.xml`, and `.well-known/security.txt` are published with the page. Update the security contact's `Expires` date before it passes.
+
 ## The white rabbit
 
 Now and then a white rabbit drops into the rain on the landing. Catching it stops the rain, and scrolling down pulls back out of an old TV into a sunlit room that ends on "go touch grass". Scrolling up plays it back. The controller is `js/white-rabbit.js`. The 3D scene in `js/white-rabbit-scene.js` and the three.js bundle in `js/vendor/` load only after a catch. Reduced motion, or a browser without WebGL, gets a still card instead.

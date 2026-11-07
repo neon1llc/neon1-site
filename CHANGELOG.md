@@ -2,6 +2,17 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.13.0
+
+- Scripts and styles moved out of the page into their own files, so the site can run under a strict Content Security Policy.
+- Footer links to the privacy policy, browser storage notice, and terms, and the footer now says "No ads or trackers" rather than promising no storage at all.
+- A skip-to-content link, case study buttons named after their case, card arrows on phones, darker service text for contrast, and rain controls that leave the tab order once they fade out.
+- The phone menu keeps focus inside itself while open and closes if the window widens past it.
+- The rain stops drawing once it's scrolled out of sight, the section scroller rests when the page is still, and turning on reduced motion mid-visit hands scrolling back to the browser.
+- A descriptive title, a canonical link, link-preview text and image, and structured data for the practice.
+- robots.txt, sitemap.xml, and a security.txt contact.
+- The accounting case labels its MCP server as next, matching the full case study. The projects section says which projects are public or private, and the about section names who runs neon1.
+
 ## v0.12.8
 
 - The rain sizes itself to its own box rather than the window, so an on-screen keyboard or a zoom no longer leaves a dense band of stuck rain.

@@ -1,0 +1,5 @@
+# neon1.tech crawler rules: everything public may be crawled; the portal's API is not content
+User-agent: *
+Disallow: /1NEON/api/
+
+Sitemap: https://neon1.tech/sitemap.xml

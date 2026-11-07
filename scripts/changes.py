@@ -14,10 +14,10 @@ import sys
 
 
 def local_files(root):
-    """Map object keys to MD5 hex digests, skipping dotfiles like the sync does."""
+    """Map object keys to MD5 hex digests, skipping dotfiles like the sync does, except .well-known."""
     files = {}
     for folder, dirs, names in os.walk(root):
-        dirs[:] = [d for d in dirs if not d.startswith(".")]
+        dirs[:] = [d for d in dirs if not d.startswith(".") or (folder == root and d == ".well-known")]
         for name in names:
             if name.startswith("."):
                 continue

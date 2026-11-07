@@ -27,6 +27,8 @@ GITLEAKS_IMAGE := ghcr.io/gitleaks/gitleaks:v8.30.1
 LONG_CACHE  := public, max-age=31536000, immutable
 SHORT_CACHE := no-cache
 DOTFILES    := --exclude ".*" --exclude "*/.*"
+# .well-known is the one dot folder the site publishes (security.txt)
+WELL_KNOWN  := --include ".well-known/*"
 
 # Plain make shows the help
 .DEFAULT_GOAL := help
@@ -88,7 +90,7 @@ deploy: ## Sync the site to the bucket when its content differs
 		--exclude "*" --include "fonts/*" --include "media/*" $(DOTFILES) \
 		--cache-control "$(LONG_CACHE)"; \
 	aws s3 sync $(SITE_DIR) "s3://$(BUCKET)" --delete --no-progress \
-		--exclude "fonts/*" --exclude "media/*" $(DOTFILES) \
+		--exclude "fonts/*" --exclude "media/*" $(DOTFILES) $(WELL_KNOWN) \
 		--cache-control "$(SHORT_CACHE)"
 
 # One wildcard path is billed as a single path, and HTML and JS revalidate anyway,
