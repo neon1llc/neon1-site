@@ -70,19 +70,22 @@ const CLOUD_FRAG = /* glsl */`
     vec4 c = texture2D(uMap, vec2(vUv.x + uDrift, vUv.y));
     gl_FragColor = vec4(mix(c.rgb, vec3(1.0, 0.99, 0.97), 0.25) * 1.18, c.a);  // fair-weather white, not storm grey
   }`;
-// The treetops in the wind: slow gusts roll across the row, crowns lean and breathe more toward their
-// tops, and leaves flutter faster in small patches; uDrift sets each row's phase and strength
+// The treetops in the wind: slow waves roll across the row, crowns lean and breathe more toward their
+// tops, and leaves flutter faster in small patches; uDrift sets each row's phase and strength. uGust is
+// the wind heard outside (0 calm to 1 at a gust's peak): the crowns lean downwind and toss harder, and
+// the leaves flutter more and faster, on a clock (uPhase) that runs quicker in the gusts
 const TREE_FRAG = /* glsl */`
   uniform sampler2D uMap;
-  uniform float uTime, uDrift;
+  uniform float uTime, uDrift, uGust, uPhase;
   varying vec2 vUv, vQ;
   void main() {
     vec2 uv = vUv;
-    float gust = 0.55 + 0.45 * sin(uTime * 0.21 - uv.x * 3.0 + uDrift * 7.0) * sin(uTime * 0.13 + uv.x * 1.7);
+    float gust = (0.55 + 0.45 * sin(uTime * 0.21 - uv.x * 3.0 + uDrift * 7.0) * sin(uTime * 0.13 + uv.x * 1.7)) * (1.0 + 1.8 * uGust);
     float top = smoothstep(0.1, 0.95, uv.y);
-    uv.x += (sin(uTime * 0.7 + uv.x * 9.0 + uDrift * 3.0) * 0.0022 + sin(uTime * 1.6 + uv.x * 31.0 + uv.y * 7.0) * 0.0007) * gust * top * uDrift;
-    uv.y += sin(uTime * 0.9 + uv.x * 13.0 + uDrift) * 0.0012 * gust * top * uDrift;
-    uv += vec2(sin(uTime * 4.1 + uv.y * 220.0), cos(uTime * 3.7 + uv.x * 260.0)) * 0.00018 * gust * top;
+    uv.x += (sin(uPhase * 0.7 + uv.x * 9.0 + uDrift * 3.0) * 0.0022 + sin(uPhase * 1.6 + uv.x * 31.0 + uv.y * 7.0) * 0.0007) * gust * top * uDrift;
+    uv.x -= uGust * 0.0035 * top * top * uDrift;
+    uv.y += sin(uPhase * 0.9 + uv.x * 13.0 + uDrift) * 0.0012 * gust * top * uDrift;
+    uv += vec2(sin(uPhase * 4.1 + uv.y * 220.0), cos(uPhase * 3.7 + uv.x * 260.0)) * 0.00018 * (gust + 1.5 * uGust) * top;
     // Below the picture (only the near row reaches there), the lower foliage again, mirrored and in deeper shade
     if (uv.y < 0.03) {
       vec4 m = texture2D(uMap, vec2(uv.x, 0.06 + mod(0.03 - uv.y, 0.4)));
@@ -230,7 +233,7 @@ export function createShafts({ touch }) {
 
 /**
  * Puts the outside layers behind the window `win`; ready resolves once their images are in.
- * update(dt, level) drifts the clouds, sways the trees, and lights the floor; sun is 0 (hidden) to 1 (out)
+ * update(dt, level) drifts the clouds, sways the trees, and lights the floor; sun is 0 (hidden) to 1 (out), and wind is the gust level (0 to 1) the trees and the sound share
  */
 export function createSky({ scene, win, touch }) {
   const loader = new T.TextureLoader(), textures = [], uniforms = {};
@@ -239,7 +242,7 @@ export function createSky({ scene, win, touch }) {
   // One plane per layer, sized to its rect carried out to its depth; drawn back to front
   const loads = Object.entries(LAYERS).map(([name, [url, [z0, z1, y0, y1], x]], order) => {
     const [za, ya] = along(x, z0, y0), [zb, yb] = along(x, z1, y1);
-    const u = { uMap: { value: null }, uSun: { value: new T.Vector3() }, uDrift: { value: 0 }, uTime: { value: 0 } };
+    const u = { uMap: { value: null }, uSun: { value: new T.Vector3() }, uDrift: { value: 0 }, uTime: { value: 0 }, uGust: { value: 0 }, uPhase: { value: 0 } };
     uniforms[name] = u;
     if (name === "treesFar") u.uDrift.value = 0.6;
     if (name === "treesNear") u.uDrift.value = 1;
@@ -287,13 +290,30 @@ export function createSky({ scene, win, touch }) {
     return cover.d[(Math.floor((1 - v) * 127) * 256 + Math.floor(((u + 1) % 1) * 255)) * 4 + 3] / 255;
   }
 
+  // The wind: a gust every so often, rising, holding, and dying away; its level drives the trees here
+  // and the rustle in the sound
+  let gust = { start: 4 + Math.random() * 6, rise: 2, hold: 1, fall: 2.5 }, wind = 0, phase = 0;
+  function blow(t) {
+    const g = gust, x = t - g.start;
+    if (x > g.rise + g.hold + g.fall) gust = { start: t + 6 + Math.random() * 14, rise: 1 + Math.random() * 2, hold: Math.random() * 1.5, fall: 1.5 + Math.random() * 2 };
+    if (x < 0) return 0;
+    if (x < g.rise) return Math.sin((x / g.rise) * Math.PI / 2) ** 2;
+    if (x < g.rise + g.hold) return 1;
+    return Math.max(0, 1 - (x - g.rise - g.hold) / g.fall) ** 2;
+  }
+
   // Drifts the clouds and sways the leaves on their own clock, measures the sun through the clouds,
   // and lights the floor to match
   let time = 0, sun = 1;
   function update(dt, level = 0, ratio = 1) {
-    time += Math.min(dt, 0.1);
+    const step = Math.min(dt, 0.1);
+    time += step;
+    wind = blow(time);
+    phase += step * (1 + 1.3 * wind);
     uniforms.clouds.uDrift.value = (time * DRIFT) % 1;
     uniforms.treesFar.uTime.value = uniforms.treesNear.uTime.value = time;
+    uniforms.treesFar.uPhase.value = uniforms.treesNear.uPhase.value = phase;
+    uniforms.treesFar.uGust.value = uniforms.treesNear.uGust.value = wind;
     let seen = 0;
     for (const [oz, oy] of [[0, 0], [0.6, 0], [-0.6, 0], [0, 0.6], [0, -0.6]]) seen += 1 - 0.9 * cloudAt(SUN.z + oz * SUN.r, SUN.y + oy * SUN.r);
     sun = seen / 5;
@@ -319,5 +339,5 @@ export function createSky({ scene, win, touch }) {
   // Frees the layers' images; the meshes go with the scene
   function dispose() { textures.forEach((t) => t.dispose()); }
 
-  return { update, aim, block, dispose, ready, get sun() { return sun; } };
+  return { update, aim, block, dispose, ready, get sun() { return sun; }, get wind() { return wind; } };
 }
