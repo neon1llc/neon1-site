@@ -46,8 +46,8 @@ export const WORDS = [
   { weight: 2, color: NEON, alpha: 1, glow: 6, words: ["neon1", "1withtechnology", "1isgladtobeofservice", "1NEON", "onion"] },
 ];
 
-// The rabbit: one glyph, white, with a soft glow
-const RABBIT = { color: "#ffffff", alpha: 1, glow: 10, words: ["🐇"] };
+// The rabbit: one glyph, drawn white whatever color the platform's emoji is, with a faint white glow
+const RABBIT = { color: "#ffffff", alpha: 1, glow: 6, words: ["🐇"] };
 
 // Rain timing and look
 const WORD_RATE = 0.06; // chance per step that some column starts a word
@@ -91,7 +91,7 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
   let running = !saved.paused && !reduce.matches;
   // The live rabbit, the step count, and a halt that is not saved as a pause
   const bunny = rabbit && { rate: 0.005, hold: 60, ok: () => true, avoid: () => [], ...rabbit };
-  let rab = null, steps = 0, held = false, ramp = null, gap = STEP_MS;
+  let rab = null, steps = 0, held = false, ramp = null, gap = STEP_MS, bunnySprite = null;
   const listeners = new Set();
   const emit = () => listeners.forEach((f) => f(api));
 
@@ -144,9 +144,7 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
       if (!cols[i] || !fits(i, row)) continue;
       ctx.shadowBlur = 0; ctx.globalAlpha = 1;
       ctx.fillStyle = VOID; ctx.fillRect(i * size, row * size, size, size);
-      ctx.shadowColor = RABBIT.color; ctx.shadowBlur = RABBIT.glow; ctx.fillStyle = RABBIT.color;
-      glyph(RABBIT.words[0], i * size, row * size);
-      ctx.shadowBlur = 0;
+      drawRabbit(i * size, row * size);
       rab = { col: i, row, until: Infinity };
       return;
     }
@@ -163,6 +161,36 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
     cols = Array.from({ length: Math.ceil(innerWidth / size) }, () => newCol(Math.random() * rows, false));
     ctx.textBaseline = "middle"; ctx.textAlign = "center";
     ctx.fillStyle = VOID; ctx.fillRect(0, 0, innerWidth, innerHeight);
+    if (rabbit) bunnySprite = whiteRabbit();
+  }
+
+  // The rabbit emoji turned white: each pixel keeps its alpha and some shading, minus its color.
+  // Some platforms draw this emoji tan, and canvas filters aren't everywhere yet
+  function whiteRabbit() {
+    const px = Math.ceil(size * dpr), c = document.createElement("canvas");
+    c.width = c.height = px;
+    const g = c.getContext("2d", { willReadFrequently: true });
+    g.textBaseline = "middle"; g.textAlign = "center";
+    g.font = `${Math.round(px * 0.8)}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`;
+    g.fillText(RABBIT.words[0], px / 2, px / 2);
+    try {
+      const img = g.getImageData(0, 0, px, px), d = img.data;
+      for (let i = 0; i < d.length; i += 4) {
+        const v = 205 + 50 * (Math.max(d[i], d[i + 1], d[i + 2]) / 255);
+        d[i] = d[i + 1] = d[i + 2] = v;
+      }
+      g.putImageData(img, 0, 0);
+    } catch { /* pixels unreadable: the emoji keeps its own colors */ }
+    return c;
+  }
+
+  // The white rabbit in its cell, with a faint white glow so it reads against the rain
+  function drawRabbit(x, y) {
+    ctx.save();
+    ctx.globalAlpha = 1;
+    ctx.shadowColor = "rgba(255, 255, 255, .6)"; ctx.shadowBlur = RABBIT.glow;
+    ctx.drawImage(bunnySprite, x, y, size, size);
+    ctx.restore();
   }
 
   // Every glyph is centered in its cell; emoji are drawn smaller to match the text
@@ -195,6 +223,7 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
           ctx.shadowBlur = 0; ctx.globalAlpha = 1;
           ctx.fillStyle = VOID; ctx.fillRect(x, wy, size, size);
           if (ch === " ") continue;
+          if (c.g === RABBIT) { drawRabbit(x, wy); continue; }
           ctx.globalAlpha = c.g.alpha;
           ctx.shadowColor = c.g.color; ctx.shadowBlur = c.g.glow || 0;
           ctx.fillStyle = c.g.color; glyph(ch, x, wy);
