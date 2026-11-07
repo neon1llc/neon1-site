@@ -1,5 +1,5 @@
 // src/app/public/js/white-rabbit-sky.js - The sky behind the white rabbit's window: clouds, the sun, and its light.
-// Usage: const sky = createSky({ scene, win, touch }); sky.update(dt, level, ratio); sky.aim(camera, shafts, amount)
+// Usage: const sky = createSky({ scene, win, touch }); sky.update(dt, level, ratio); sky.aim(camera, shafts, amount); sky.block(min, max)
 //
 // Imported by white-rabbit-scene.js. The sky is painted on a far wall outside the
 // window: a blue gradient, a sun, wispy cirrus, and soft cumulus that drift on their
@@ -113,20 +113,28 @@ function onWindow(win, u, v) { return new T.Vector3(-1.95, win.y - win.h / 2 + v
 // How far a point travels along the light before it reaches the floor
 const toFloor = (p) => p.y / LIGHT.y;
 
-// Beams: thin sheets of light from the panes down to the floor, fading along their length,
+// Beams: thin sheets of light from the panes down to the floor, fading in away from the glass and along their length,
 // with a gap at the mullion and slow streaks that drift through them
 const BEAM_VERT = /* glsl */`
   attribute vec3 aBeam;
-  varying vec3 vB;
-  void main() { vB = aBeam; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
+  varying vec3 vB, vW;
+  void main() { vB = aBeam; vW = (modelMatrix * vec4(position, 1.0)).xyz; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
 const BEAM_FRAG = /* glsl */`
   uniform float uLevel, uTime;
-  varying vec3 vB;
+  uniform vec3 uLight, uBlockMin, uBlockMax;
+  varying vec3 vB, vW;
+  // True when the way back toward the sun from here crosses the box: the beam is in its shadow
+  float blocked(vec3 p) {
+    vec3 t0 = (uBlockMin - p) / uLight, t1 = (uBlockMax - p) / uLight;
+    vec3 lo = min(t0, t1), hi = max(t0, t1);
+    float a = max(max(lo.x, lo.y), lo.z), b = min(min(hi.x, hi.y), hi.z);
+    return step(max(a, 0.0), b);
+  }
   void main() {
     float edge = smoothstep(0.0, 0.12, vB.x) * smoothstep(1.0, 0.88, vB.x);
     float gap = vB.z < 0.0 ? 1.0 : smoothstep(0.02, 0.07, abs(vB.x - vB.z));
     float streak = 0.6 + 0.4 * sin(vB.x * 37.0 + uTime * 0.4) * sin(vB.x * 13.0 - uTime * 0.25 + vB.y * 3.0);
-    float a = uLevel * edge * gap * streak * (1.0 - vB.y) * smoothstep(0.0, 0.3, vB.y);
+    float a = uLevel * edge * gap * streak * (1.0 - vB.y) * smoothstep(0.0, 0.3, vB.y) * (1.0 - 0.92 * blocked(vW)) * smoothstep(0.05, 0.4, vW.x + 1.95);
     gl_FragColor = vec4(vec3(1.0, 0.8, 0.5) * a, 1.0);
   }`;
 
@@ -146,7 +154,9 @@ function beams(win) {
   geo.setAttribute("aBeam", new T.Float32BufferAttribute(uv, 3));
   geo.setIndex(index);
   return new T.Mesh(geo, new T.ShaderMaterial({
-    uniforms: { uLevel: { value: 0 }, uTime: { value: 0 } }, vertexShader: BEAM_VERT, fragmentShader: BEAM_FRAG,
+    uniforms: { uLevel: { value: 0 }, uTime: { value: 0 }, uLight: { value: LIGHT.clone() },
+      uBlockMin: { value: new T.Vector3(99, 99, 99) }, uBlockMax: { value: new T.Vector3(99, 99, 99) } },
+    vertexShader: BEAM_VERT, fragmentShader: BEAM_FRAG,
     transparent: true, blending: T.AdditiveBlending, depthWrite: false, side: T.DoubleSide,
   }));
 }
@@ -287,5 +297,8 @@ export function createSky({ scene, win, touch }) {
     shafts.enabled = shafts.uniforms.uAmount.value > 0.001;
   }
 
-  return { update, aim, get sun() { return sun; } };
+  // Something standing in the window's light, as a world box [min, max]: the beams behind it go dark
+  function block(min, max) { beam.material.uniforms.uBlockMin.value.copy(min); beam.material.uniforms.uBlockMax.value.copy(max); }
+
+  return { update, aim, block, get sun() { return sun; } };
 }
