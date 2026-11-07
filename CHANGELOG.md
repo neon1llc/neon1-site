@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.13.1
+
+- The white rabbit's room: a rounded vintage tube TV with a domed glass screen, knobs, and a grille, on a walnut table between two tufted leather wingback chairs, with brand-green moulding, wainscot walls, and an oak floor with a rug.
+
 ## v0.13.0
 
 - Scripts and styles moved out of the page into their own files, so the site can run under a strict Content Security Policy.
