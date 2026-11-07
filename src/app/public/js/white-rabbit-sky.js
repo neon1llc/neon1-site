@@ -1,109 +1,85 @@
 // src/app/public/js/white-rabbit-sky.js - The sky behind the white rabbit's window: clouds, the sun, and its light.
-// Usage: const sky = createSky({ scene, win, touch }); sky.update(dt, level, ratio); sky.aim(camera, shafts, amount); sky.block(min, max)
+// Usage: const sky = createSky({ scene, win, touch }); await sky.ready; sky.update(dt, level, ratio); sky.aim(camera, shafts, amount)
 //
-// Imported by white-rabbit-scene.js. The sky is painted on a far wall outside the
-// window: a blue gradient, a sun, wispy cirrus, and soft cumulus that drift on their
-// own clock above autumn treetops, as seen from a second story. The cumulus are soft
-// circles, so the same shapes are measured here in JS: sun tells the room how much of
-// the sun is showing. Light shafts are a screen pass that smears only the brightest
-// pixels away from the sun, so they stream from the window, break at the sash rails,
-// and fade by themselves when a cloud covers it. Beams from the panes to the floor,
-// and dust glinting in them, follow the sun too.
+// Imported by white-rabbit-scene.js. Outside is three images rendered in Blender (see
+// the planning folder's blender/outside.py) from one viewpoint in the room: a sky, a
+// layer of volumetric cumulus, and autumn treetops seen from a second story. Each sits
+// on a plane at its own depth, so the view shifts a little as the camera moves; the
+// clouds drift and wrap, and the leaves sway. The sun disc is drawn here, brighter than
+// an image can hold, and the cloud layer's alpha at the sun is read on the CPU, so sun
+// tells the room how much of it is showing. Light shafts are a screen pass that smears
+// only the brightest pixels away from the sun, so they stream from the window, break at
+// the sash rails, and fade by themselves when a cloud covers it. Beams from the panes to
+// the floor, and dust glinting in them, follow the sun too.
 
 import * as T from "/js/vendor/three-0.187.0.rabbit.min.js";
 
 
-// Where the sky is painted, and the sun on it (meters, in the plane's z and y)
-const FAR = -30;
+// The viewpoint the layers were rendered from, the reference plane their rects are given on,
+// and the sun as a point and radius on it (meters; these match blender/outside.py)
+const VIEW = new T.Vector3(0.2, 1.1, 1.0), REF = -30;
 const SUN = { z: -11.4, y: 12.4, r: 1.3 };
+const FAR = REF;
+
+// Each layer: its image, rect on the reference plane (z0, z1, y0, y1), and the depth of its plane
+const LAYERS = {
+  sky: ["/media/white-rabbit/sky.webp", [-25, 15, -3, 37], -60],
+  clouds: ["/media/white-rabbit/clouds.webp", [-25, 15, 4, 24], -45],
+  trees: ["/media/white-rabbit/trees.webp", [-25, 15, -3, 7], -16],
+};
 
 // Sunlight comes in steeper than the painted sun sits, so its patch lands on the floor
 export const LIGHT = new T.Vector3(-1.6, 1.5, -0.7).normalize();
 
-// Clouds drift toward the right of the window and wrap off screen
-const DRIFT = 0.9;            // meters a second
-const SPAN = 80, ZMIN = -46;  // the wrap, wider than any view through the window
-const PUFF = [[0, 1.0, 1.35], [1.5, 0.75, 1.05], [-1.5, 0.65, 1.0], [0.6, 1.85, 1.0], [-0.7, 1.6, 0.9], [2.5, 0.45, 0.6]];
+// Clouds drift toward the right of the window, in widths of their layer a second
+const DRIFT = 0.006;
 
-// Each cloud: where it starts, the height of its flat base, and its size
-// The first three cross the sun's height; the rest keep above it, clear of the treetops below
-const CLOUDS = [[2, 11.4, 1.0], [30, 10.8, 1.25], [57, 11.9, 0.85], [16, 15.2, 1.1], [-8, 17.5, 1.4],
-  [43, 7.4, 0.7], [70, 7.8, 0.6], [24, 14.4, 0.8], [64, 16.0, 1.2]];
-const N = CLOUDS.length * PUFF.length;
+// A point on the reference plane, carried out along the view to a plane at depth x
+function along(x, z, y) { const k = (VIEW.x - x) / (VIEW.x - REF); return [VIEW.z + (z - VIEW.z) * k, VIEW.y + (y - VIEW.y) * k]; }
 
-// Smooth union, so the circles merge into one puffy outline
-function smin(a, b, k) { const h = Math.max(k - Math.abs(a - b), 0) / k; return Math.min(a, b) - h * h * k * 0.25; }
-const wobble = (z, y) => 0.3 * Math.sin(z * 0.9 + y * 0.4) * Math.sin(y * 1.3 - z * 0.5);
-
-// The sky: gradient, sun, and clouds, with the sun glowing through thin cloud
-const VERT = /* glsl */`
-  varying vec2 vQ;
+// The layers share one vertex shader; each fragment shader adds its own touch
+const LAYER_VERT = /* glsl */`
+  varying vec2 vUv, vQ;
   void main() {
+    vUv = uv;
     vec4 w = modelMatrix * vec4(position, 1.0);
     vQ = w.zy;
     gl_Position = projectionMatrix * viewMatrix * w;
   }`;
-const FRAG = /* glsl */`
-  uniform vec4 uCirc[${N}];
+// The sky, and the sun disc and halo over it, far brighter than the image so the shafts and bloom catch it
+const SKY_FRAG = /* glsl */`
+  uniform sampler2D uMap;
   uniform vec3 uSun;
-  uniform float uDrift, uTime;
-  varying vec2 vQ;
-  float smin(float a, float b, float k) { float h = max(k - abs(a - b), 0.0) / k; return min(a, b) - h * h * k * 0.25; }
-  float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-  float noise(vec2 p) {
-    vec2 i = floor(p), f = fract(p), u = f * f * (3.0 - 2.0 * f);
-    return mix(mix(hash(i), hash(i + vec2(1, 0)), u.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), u.x), u.y);
-  }
-  float fbm(vec2 p) { float v = 0.0, a = 0.5; for (int i = 0; i < 4; i++) { v += a * noise(p); p *= 2.03; a *= 0.5; } return v; }
+  varying vec2 vUv, vQ;
   void main() {
-    vec2 q = vQ;
-    // Deeper blue up high, lighter toward the horizon
-    float h = clamp((q.y + 2.0) / 24.0, 0.0, 1.0);
-    vec3 sky = mix(vec3(0.3, 0.58, 1.0), vec3(0.015, 0.11, 0.62), pow(h, 0.7)) * 1.2;
-
-    // Clouds: a smooth union of circles, flat along each cloud's base, with wobbly edges that travel with them
-    float sd = 1e3, base = 0.0;
-    for (int i = 0; i < ${N}; i++) {
-      vec4 c = uCirc[i];
-      float d = length(q - c.xy) - c.z;
-      if (d < sd) base = c.w;
-      sd = smin(sd, d, 0.9);
-    }
-    // Edges eroded by noise that travels with the clouds, so no two look alike
-    float zd = q.x + uDrift;
-    sd += 0.3 * sin(zd * 0.9 + q.y * 0.4) * sin(q.y * 1.3 - zd * 0.5);
-    sd += (fbm(vec2(zd, q.y) * 0.55) - 0.5) * 1.4;
-    float a = smoothstep(0.6, -0.6, sd) * smoothstep(base - 0.4, base + 0.9, q.y);
-
-    // Sunlit tops, blue-grey bellies, and a silver edge on clouds near the sun
-    float ds = length(q - uSun.xy);
-    float near = exp(-ds / 5.0);
-    vec3 cloud = mix(vec3(0.5, 0.56, 0.7), vec3(1.25, 1.22, 1.18), clamp((q.y - base) / 3.5, 0.0, 1.0));
-    cloud += vec3(1.8, 1.45, 1.0) * near * (1.0 - a) * 3.0;
-
-    // The sun shows through thin cloud and hides behind thick
-    float disc = smoothstep(uSun.z, uSun.z * 0.8, ds);
-    float halo = exp(-ds / (uSun.z * 2.2));
-    vec3 col = mix(sky, cloud, a);
-
-    // Cirrus: thin streaks high up, drifting slower than the cumulus
-    float ci = fbm(vec2((q.x + uDrift * 0.4) * 0.07, q.y * 0.45)) * fbm(vec2((q.x + uDrift * 0.4) * 0.3, q.y * 1.6));
-    col = mix(col, vec3(1.1, 1.1, 1.12), smoothstep(0.2, 0.42, ci) * smoothstep(9.0, 15.0, q.y) * 0.55 * (1.0 - a));
-    col += vec3(1.0, 0.86, 0.62) * halo * 1.4 * exp(-2.5 * a);
-    col += vec3(16.0, 13.5, 9.5) * disc * exp(-5.0 * a);
-
-    // Autumn treetops along the bottom, swaying a little more toward their tips
-    float z = q.x + sin(uTime * 0.7 + q.x * 0.35) * 0.12 * clamp(q.y / 4.0, 0.0, 1.0);
-    float top = 2.2 + 0.9 * sin(z * 0.33) + 0.5 * sin(z * 0.81 + 1.3) + 1.1 * fbm(vec2(z * 0.4, 0.0)) + 0.5 * fbm(vec2(z * 2.2, 3.0));
-    float leaf = fbm(vec2(z, q.y) * 3.2), clump = fbm(vec2(z, q.y) * 0.9);
-    if (q.y < top - (1.0 - leaf) * 0.7 && !(q.y > top - 0.9 && leaf < 0.38)) {
-      // Each crown leans to its own color, mixed at the edges, and darker inside and lower down
-      float t = fract(clump * 2.7 + hash(vec2(floor(z / 3.5), 3.0)) * 0.6);
-      vec3 tint = t < 0.3 ? vec3(0.78, 0.26, 0.05) : t < 0.55 ? vec3(0.8, 0.52, 0.08) : t < 0.8 ? vec3(0.52, 0.09, 0.04) : vec3(0.2, 0.33, 0.09);
-      float lit = 0.3 + 0.95 * leaf * leaf + 0.35 * clamp((q.y - top + 1.5) / 1.5, 0.0, 1.0);
-      col = tint * lit * (0.5 + 0.5 * clamp(q.y / 2.5, 0.0, 1.0));
-    }
+    vec3 col = texture2D(uMap, vUv).rgb;
+    float l = dot(col, vec3(0.2126, 0.7152, 0.0722));
+    col = mix(vec3(l), col, 1.9) * vec3(0.7, 0.88, 1.18);  // a deeper, clearer blue than the hazy render
+    float ds = length(vQ - uSun.xy);
+    col += vec3(1.0, 0.86, 0.62) * exp(-ds / (uSun.z * 2.2)) * 1.1;
+    col += vec3(16.0, 13.5, 9.5) * smoothstep(uSun.z, uSun.z * 0.8, ds);
     gl_FragColor = vec4(col, 1.0);
+  }`;
+// The clouds, drifting and wrapping
+const CLOUD_FRAG = /* glsl */`
+  uniform sampler2D uMap;
+  uniform float uDrift;
+  varying vec2 vUv, vQ;
+  void main() {
+    vec4 c = texture2D(uMap, vec2(vUv.x + uDrift, vUv.y));
+    gl_FragColor = vec4(mix(c.rgb, vec3(1.0, 0.99, 0.97), 0.25) * 1.18, c.a);  // fair-weather white, not storm grey
+  }`;
+// The treetops, swaying a little more toward the top of the layer
+const TREE_FRAG = /* glsl */`
+  uniform sampler2D uMap;
+  uniform float uTime;
+  varying vec2 vUv, vQ;
+  void main() {
+    vec2 uv = vUv;
+    uv.x += sin(uTime * 0.8 + uv.x * 38.0 + uv.y * 5.0) * 0.0011 * uv.y + sin(uTime * 1.9 + uv.x * 140.0) * 0.00025 * uv.y;
+    vec4 c = texture2D(uMap, uv);
+    if (c.a < 0.35) discard;
+    gl_FragColor = vec4(c.rgb, 1.0);
   }`;
 
 
@@ -240,46 +216,63 @@ export function createShafts({ touch }) {
 }
 
 
-/** Paints the sky outside the window `win`; update(dt, level) drifts the clouds and lights the floor; sun is 0 (hidden) to 1 (out) */
+/**
+ * Puts the outside layers behind the window `win`; ready resolves once their images are in.
+ * update(dt, level) drifts the clouds, sways the trees, and lights the floor; sun is 0 (hidden) to 1 (out)
+ */
 export function createSky({ scene, win, touch }) {
-  // The circles, laid out once and moved each frame; w is the cloud's base
-  const circ = Array.from({ length: N }, () => new T.Vector4());
-  const uniforms = { uCirc: { value: circ }, uSun: { value: new T.Vector3(SUN.z, SUN.y, SUN.r) }, uDrift: { value: 0 }, uTime: { value: 0 } };
-  const mesh = new T.Mesh(new T.PlaneGeometry(90, 50), new T.ShaderMaterial({ uniforms, vertexShader: VERT, fragmentShader: FRAG }));
-  mesh.rotation.y = Math.PI / 2;
-  mesh.position.set(FAR, 12, -6);
-  scene.add(mesh);
+  const loader = new T.TextureLoader(), textures = [], uniforms = {};
+  let cover = null; // the cloud layer's alpha, small, for measuring the sun
+
+  // One plane per layer, sized to its rect carried out to its depth; drawn back to front
+  const loads = Object.entries(LAYERS).map(([name, [url, [z0, z1, y0, y1], x]], order) => {
+    const [za, ya] = along(x, z0, y0), [zb, yb] = along(x, z1, y1);
+    const u = { uMap: { value: null }, uSun: { value: new T.Vector3() }, uDrift: { value: 0 }, uTime: { value: 0 } };
+    uniforms[name] = u;
+    if (name === "sky") { const [sz, sy] = along(x, SUN.z, SUN.y), [rz] = along(x, SUN.z + SUN.r, SUN.y); u.uSun.value.set(sz, sy, rz - sz); }
+    const mesh = new T.Mesh(new T.PlaneGeometry(zb - za, yb - ya), new T.ShaderMaterial({
+      uniforms: u, vertexShader: LAYER_VERT, fragmentShader: name === "sky" ? SKY_FRAG : name === "clouds" ? CLOUD_FRAG : TREE_FRAG,
+      transparent: name === "clouds", depthWrite: name !== "clouds",
+    }));
+    mesh.rotation.y = Math.PI / 2;
+    mesh.position.set(x, (ya + yb) / 2, (za + zb) / 2);
+    mesh.renderOrder = order - 10;
+    scene.add(mesh);
+    return new Promise((done) => loader.load(url, (tex) => {
+      tex.colorSpace = T.SRGBColorSpace;
+      if (name === "clouds") {
+        tex.wrapS = T.RepeatWrapping;
+        const c = document.createElement("canvas"); c.width = 256; c.height = 128;
+        const g = c.getContext("2d", { willReadFrequently: true });
+        g.drawImage(tex.image, 0, 0, 256, 128);
+        const d = g.getImageData(0, 0, 256, 128).data;
+        cover = { d, rect: [za, zb, ya, yb] };
+      }
+      u.uMap.value = tex; textures.push(tex); done();
+    }, undefined, () => done()));
+  });
+  const ready = Promise.all(loads);
   const beam = beams(win), motes = dust(win, touch ? 140 : 280);
   scene.add(beam, motes);
 
-  // Cloud cover at a point of the sky, the same sum the shader draws
-  function cover(z, y) {
-    let sd = 1e3, base = 0;
-    for (const c of circ) {
-      const d = Math.hypot(z - c.x, y - c.y) - c.z;
-      if (d < sd) base = c.w;
-      sd = smin(sd, d, 0.9);
-    }
-    sd += wobble(z + uniforms.uDrift.value, y);
-    const s = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
-    return s(0.45, -0.45, sd) * s(base - 0.3, base + 0.7, y);
+  // How much cloud covers a point on the reference plane, from the cloud layer's alpha as it has drifted
+  function cloudAt(z, y) {
+    if (!cover) return 0;
+    const [za, zb, ya, yb] = cover.rect, [cz, cy] = along(LAYERS.clouds[2], z, y);
+    const u = ((zb - cz) / (zb - za) + uniforms.clouds.uDrift.value) % 1, v = (cy - ya) / (yb - ya);
+    if (v < 0 || v > 1) return 0;
+    return cover.d[(Math.floor((1 - v) * 127) * 256 + Math.floor(((u + 1) % 1) * 255)) * 4 + 3] / 255;
   }
 
-  // Moves the clouds along on their own clock, measures the sun through them, and lights the floor to match
+  // Drifts the clouds and sways the leaves on their own clock, measures the sun through the clouds,
+  // and lights the floor to match
   let time = 0, sun = 1;
   function update(dt, level = 0, ratio = 1) {
     time += Math.min(dt, 0.1);
-    const shift = DRIFT * time;
-    uniforms.uDrift.value = shift % 1000;
-    uniforms.uTime.value = time;
-    let k = 0;
-    for (const [z0, base, s] of CLOUDS) {
-      const z = ZMIN + ((((z0 - ZMIN - shift) % SPAN) + SPAN) % SPAN);
-      for (const [dz, dy, r] of PUFF) circ[k++].set(z + dz * s * 1.6, base + dy * s * 1.4, r * s * 1.5, base);
-    }
-    // The disc's center and four points around it, through the same cloud
+    uniforms.clouds.uDrift.value = (time * DRIFT) % 1;
+    uniforms.trees.uTime.value = time;
     let seen = 0;
-    for (const [oz, oy] of [[0, 0], [0.6, 0], [-0.6, 0], [0, 0.6], [0, -0.6]]) seen += Math.exp(-5 * cover(SUN.z + oz * SUN.r, SUN.y + oy * SUN.r));
+    for (const [oz, oy] of [[0, 0], [0.6, 0], [-0.6, 0], [0, 0.6], [0, -0.6]]) seen += 1 - 0.9 * cloudAt(SUN.z + oz * SUN.r, SUN.y + oy * SUN.r);
     sun = seen / 5;
     beam.material.uniforms.uLevel.value = level * sun * 0.09;
     beam.material.uniforms.uTime.value = time;
@@ -300,5 +293,8 @@ export function createSky({ scene, win, touch }) {
   // Something standing in the window's light, as a world box [min, max]: the beams behind it go dark
   function block(min, max) { beam.material.uniforms.uBlockMin.value.copy(min); beam.material.uniforms.uBlockMax.value.copy(max); }
 
-  return { update, aim, block, get sun() { return sun; } };
+  // Frees the layers' images; the meshes go with the scene
+  function dispose() { textures.forEach((t) => t.dispose()); }
+
+  return { update, aim, block, dispose, ready, get sun() { return sun; } };
 }

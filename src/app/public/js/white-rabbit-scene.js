@@ -368,7 +368,7 @@ export function createScene({ onLost, onSound = () => {} }) {
   const pic = document.createElement("canvas");
   let tex = null, fit = { h: SH, d0: 0.5 };
   async function compose() {
-    const { cw, ch, rh } = await picture(pic);
+    const [{ cw, ch, rh }] = await Promise.all([picture(pic), sky.ready]);
     if (disposed) return;
     if (!tex || tex.image.width !== cw || tex.image.height !== ch) {
       if (tex) tex.dispose();
@@ -517,7 +517,7 @@ export function createScene({ onLost, onSound = () => {} }) {
       }
     });
     if (tex) tex.dispose();
-    env.dispose();
+    env.dispose(); sky.dispose();
     composer.passes.forEach((pass) => pass.dispose && pass.dispose());
     composer.dispose();
     renderer.dispose();
