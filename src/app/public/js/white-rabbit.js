@@ -95,6 +95,8 @@ export function whiteRabbit({ rain, root }) {
     if (audio || !AC || !wanted()) return;
     const ctx = (audio = new AC());
     ctx.resume();
+    // The device interrupted while the page is still showing (a call, another app's audio): try again
+    ctx.onstatechange = () => { if (ctx === audio && ctx.state !== "running") setTimeout(wake, 300); };
     import(SOUND).then((m) => {
       if (audio !== ctx) return;
       sound = m.createSound(ctx);
@@ -109,11 +111,18 @@ export function whiteRabbit({ rain, root }) {
     audio = sound = null;
   }
 
-  // A hidden tab goes quiet
+  // A hidden tab goes quiet, and the sound comes back with it. Phones may refuse to resume until
+  // the next touch, or interrupt the device on their own, so any touch, click, or key retries
   document.addEventListener("visibilitychange", () => {
     if (!audio) return;
-    if (document.hidden) audio.suspend(); else audio.resume();
+    if (document.hidden) audio.suspend().catch(() => {}); else wake();
   });
+  function wake() {
+    if (audio && !document.hidden && audio.state !== "running" && audio.state !== "closed") audio.resume().catch(() => {});
+  }
+  for (const type of ["pointerup", "touchend", "keydown"]) addEventListener(type, wake, { capture: true, passive: true });
+  addEventListener("pageshow", wake);
+  addEventListener("focus", wake);
 
   // ---- Catching ----
   // The rabbit only drops in on the landing, with nothing open and the egg at rest
@@ -351,7 +360,7 @@ export function whiteRabbit({ rain, root }) {
     }
     const q = clamp(p, 0, 1);
     scene.render(q, { speed: Math.abs(v) });
-    if (sound) sound.update(q, scene.facing);
+    if (sound) sound.update(q, scene.facing, scene.wind);
     root.dataset.progress = q.toFixed(3);
     grass.parentElement.style.opacity = smooth(0.97, 1, q).toFixed(3);
     if (q > 0.995) announce(true);

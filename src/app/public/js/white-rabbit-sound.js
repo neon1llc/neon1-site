@@ -1,5 +1,5 @@
 // src/app/public/js/white-rabbit-sound.js - The white rabbit's sounds, synthesized live with the Web Audio API.
-// Usage: const sound = createSound(new AudioContext()); sound.start("scene"); sound.update(p, tv); sound.close()
+// Usage: const sound = createSound(new AudioContext()); sound.start("scene"); sound.update(p, tv, wind); sound.close()
 //
 // Imported by white-rabbit.js after a catch, with an AudioContext made in that same click
 // or tap, and silent until the scroll out of the TV begins. The tube's low mains hum and
@@ -7,16 +7,18 @@
 // outdoors (a breeze, leaves rustling in gusts, birds now and then, a faint creek), and the
 // glitch as the rain stops are built from oscillators, noise, and filters. The car's
 // ignition is a real V8 recording, fetched only after the car is first clicked, played
-// slower and deeper, then held on a looped stretch of its idle; until it loads, or if it
-// can't, the starter and idle are synthesized too. Everything is kept quiet.
+// slower and deeper, then held on its idle, rebuilt from overlapping slices of the recording
+// that each start somewhere new and drift a little in speed and level, so it never audibly
+// repeats; until it loads, or if it can't, the starter and idle are synthesized too.
+// Everything is kept quiet.
 
 
 // Overall level, and the time constant for smooth level changes (seconds)
 const LEVEL = 0.55, GLIDE = 0.08;
 
 // The V8 recording: played slower (which also lowers it), the crank, catch, and first revs up
-// to CUT seconds into it, then a clean idle stretch looped (seconds into the recording)
-export const V8 = { url: "/media/white-rabbit-v8.m4a", rate: 0.85, cut: 10, idle: [12.5, 14.5], caught: 2.25 };
+// to CUT seconds into it, then slices of its clean idle stretch (seconds into the recording)
+export const V8 = { url: "/media/white-rabbit-v8.m4a", rate: 0.85, cut: 6.7, idle: [12.0, 14.6], caught: 2.25 };
 
 // Piecewise linear through [progress, value] pairs, flat outside them
 function ramp(p, pts) {
@@ -137,27 +139,19 @@ export function createSound(ctx) {
     () => { const f = 470 + Math.random() * 60; return [[0, 0.32, f * 0.95, f, 0.6], [0.45, 0.5, f * 1.08, f, 1], [1.05, 0.3, f, f * 0.94, 0.6], [1.45, 0.3, f, f * 0.94, 0.55]]; },
   ];
 
-  // The clock outside: when the next gust and bird come, and how the current gust is shaped
-  let gust = { start: 4 + Math.random() * 6, rise: 2, hold: 1, fall: 2.5 }, nextBird = 2 + Math.random() * 5;
-  const gustLevel = (t) => {
-    const g = gust, x = t - g.start;
-    if (x < 0) return 0;
-    if (x < g.rise) return Math.sin((x / g.rise) * Math.PI / 2) ** 2;
-    if (x < g.rise + g.hold) return 1;
-    return Math.max(0, 1 - (x - g.rise - g.hold) / g.fall) ** 2;
-  };
+  // When the next bird comes
+  let nextBird = 2 + Math.random() * 5;
 
-  // Outside, each frame: gusts come and go with grains of rustle thickest at their peak, birds sing now
-  // and then, and the window's openness sets how much of it reaches the room
+  // Outside, each frame: the wind (g, 0 calm to 1 at a gust's peak, the same wind that moves the trees)
+  // swells the breeze with grains of rustle thickest at its peak, birds sing now and then, and the
+  // window's openness sets how much of it reaches the room
   let last = 0;
-  function outdoors(level, openness) {
+  function outdoors(level, openness, g) {
     const t = now(), dt = last ? Math.min(0.1, t - last) : 0;
     last = t;
     glide(outside.gain, level, 0.4);
     glide(through.frequency, 700 + 8000 * openness * openness, 0.3);
     if (level < 0.01) return;
-    const g = gustLevel(t);
-    if (t > gust.start + gust.rise + gust.hold + gust.fall) gust = { start: t + 6 + Math.random() * 14, rise: 1 + Math.random() * 2, hold: Math.random() * 1.5, fall: 1.5 + Math.random() * 2 };
     glide(bed.gain, 0.01 + 0.012 * g, 0.5);
     glide(bedTone.frequency, 380 + 260 * g, 0.5);
     for (let n = dt * (6 + 140 * g); n > 0; n--) if (Math.random() < n) grain(0.02 + 0.05 * g * Math.random());
@@ -175,7 +169,7 @@ export function createSound(ctx) {
 
   // Follows the scene: the tube's low hum fades as the camera turns from the set, static comes with the
   // snow on the screen, and the outdoors comes in with the room and opens up toward the window
-  function update(p, tv) {
+  function update(p, tv, wind = 0) {
     if (mode !== "scene") return;
     // Silent at the landing; the sound fades in as the scroll out of the TV begins, and out on the way back
     heard = p >= 0.002;
@@ -185,7 +179,7 @@ export function createSound(ctx) {
     glide(fizz.gain, 0.06 * ramp(p, [[0.36, 0], [0.4, 1], [0.46, 0]]));
     glide(muffle.frequency, ramp(p, [[0, 7000], [0.28, 4000], [0.45, 1400], [0.7, 900]]));
     glide(air.gain, ramp(p, [[0.3, 0.01], [0.5, 0.04], [0.9, 0.05]]));
-    outdoors(ramp(p, [[0.38, 0], [0.55, 0.45], [0.85, 1]]), ramp(p, [[0.6, 0], [0.88, 1]]));
+    outdoors(ramp(p, [[0.38, 0], [0.55, 0.45], [0.85, 1]]), ramp(p, [[0.6, 0], [0.88, 1]]), wind);
   }
 
   // ---- The glitch as the rain stops ----
@@ -247,24 +241,70 @@ export function createSound(ctx) {
       .then((b) => ctx.decodeAudioData(b)).then((buf) => { v8 = buf; }).catch(() => {});
   }
 
-  // The recording through a low shelf for weight, into its own gain
-  function recorded(offset, len, loop) {
-    const g = gain(0), shelf = filter("lowshelf", 160, 0.7, g), src = ctx.createBufferSource();
+  // The recording's own gain behind a low shelf for weight
+  function weighted() {
+    const g = gain(0), shelf = filter("lowshelf", 160, 0.7, g);
     shelf.gain.value = 5;
-    src.buffer = v8; src.playbackRate.value = V8.rate; src.connect(shelf);
-    if (loop) { src.loop = true; src.loopStart = V8.idle[0]; src.loopEnd = V8.idle[1]; }
-    return { g, src, go: (at) => (loop ? src.start(at, offset) : src.start(at, offset, len)) };
+    return { g, shelf };
   }
 
-  // The ignition from the recording: crank, catch, and revs, then a crossfade into the looping idle
+  // The idle, from slices of the recording's idle stretch: each starts at a random place, overlaps the
+  // last with an equal-power crossfade, and runs a touch faster or slower and louder or softer, with the
+  // speed wandering slowly and now and then a lazier beat, the way an engine's idle hunts and lopes.
+  // Slices are scheduled a little ahead on a timer
+  const RISE = Float32Array.from({ length: 33 }, (_, i) => Math.sin((i / 32) * Math.PI / 2));
+  function idler(from) {
+    const { g, shelf } = weighted(), [a, b] = V8.idle, live = new Set();
+    let next = from, drift = 0, timer = 0;
+    function slice(t) {
+      const len = 0.7 + Math.random() * 0.6, x = len * 0.42, lope = Math.random() < 0.12;
+      drift = drift * 0.85 + (Math.random() - 0.5) * 0.012;
+      const rate = V8.rate * (1 + drift + (Math.random() - 0.5) * 0.01 - (lope ? 0.03 : 0));
+      const level = 0.9 + Math.random() * 0.2 - (lope ? 0.12 : 0), span = len * rate;
+      const src = ctx.createBufferSource(), env = ctx.createGain();
+      src.buffer = v8; src.playbackRate.value = rate; env.gain.value = 0;
+      env.gain.setValueCurveAtTime(RISE.map((v) => v * level), t, x);
+      env.gain.setValueCurveAtTime(RISE.map((v, i) => RISE[32 - i] * level), t + len - x, x);
+      src.connect(env).connect(shelf);
+      src.start(t, a + Math.random() * Math.max(0, b - a - span), span + 0.02);
+      src.onended = () => { env.disconnect(); live.delete(src); };
+      live.add(src);
+      return t + len - x;
+    }
+    (function pump() {
+      const horizon = now() + 0.8;
+      while (next < horizon) next = slice(Math.max(next, now() + 0.02));
+      timer = setTimeout(pump, 200);
+    })();
+    return {
+      g,
+      stop(t) {
+        clearTimeout(timer);
+        g.gain.cancelScheduledValues(t); g.gain.setTargetAtTime(0, t, 0.18);
+        live.forEach((src) => { src.playbackRate.setTargetAtTime(src.playbackRate.value * 0.7, t, 0.25); try { src.stop(t + 1); } catch { /* already done */ } });
+        setTimeout(() => g.disconnect(), 1200);
+      },
+    };
+  }
+
+  // The ignition from the recording: crank, catch, and the first revs, then a crossfade into the idle
   function ignition() {
-    const t = now(), end = t + V8.cut / V8.rate, fade = 0.7;
-    const rec = recorded(0, V8.cut + 0.2, false), idle = recorded(V8.idle[0], 0, true);
+    const t = now(), end = t + V8.cut / V8.rate, fade = 1;
+    const rec = weighted(), src = ctx.createBufferSource();
+    src.buffer = v8; src.playbackRate.value = V8.rate; src.connect(rec.shelf);
     rec.g.gain.setValueAtTime(0, t); rec.g.gain.linearRampToValueAtTime(0.5, t + 0.08);
     rec.g.gain.setValueAtTime(0.5, end - fade); rec.g.gain.linearRampToValueAtTime(0, end);
+    src.start(t, 0, V8.cut + 0.2);
+    const idle = idler(end - fade);
     idle.g.gain.setValueAtTime(0, end - fade); idle.g.gain.linearRampToValueAtTime(0.42, end);
-    rec.go(t); idle.go(end - fade);
-    engine = { parts: [rec, idle] };
+    engine = {
+      stop(at) {
+        rec.g.gain.cancelScheduledValues(at); rec.g.gain.setTargetAtTime(0, at, 0.18);
+        try { src.stop(at + 1); } catch { /* already done */ }
+        setTimeout(() => rec.g.disconnect(), 1200);
+        idle.stop(at);
+      },
+    };
   }
 
   // The starter: a geared whine that labors at each compression; the engine: a blip, then idle
@@ -288,16 +328,15 @@ export function createSound(ctx) {
       src.connect(filter("lowpass", 520, 0.8, g)); src.start();
       src.playbackRate.setValueAtTime(1, t); src.playbackRate.linearRampToValueAtTime(2.1, t + 0.25); src.playbackRate.setTargetAtTime(1, t + 0.3, 0.35);
       g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.32, t + 0.06); g.gain.setTargetAtTime(0.16, t + 0.4, 0.4);
-      engine = { parts: [{ g, src }] };
+      engine = {
+        stop(at) {
+          src.playbackRate.setTargetAtTime(0.6, at, 0.25); g.gain.cancelScheduledValues(at); g.gain.setTargetAtTime(0, at, 0.18);
+          src.stop(at + 1); setTimeout(() => g.disconnect(), 1200);
+        },
+      };
     } else if (kind === "stop") {
       stopStarter();
-      if (engine) {
-        for (const { g, src } of engine.parts) {
-          src.playbackRate.setTargetAtTime(0.6, t, 0.25); g.gain.cancelScheduledValues(t); g.gain.setTargetAtTime(0, t, 0.18);
-          src.stop(t + 1); setTimeout(() => g.disconnect(), 1200);
-        }
-        engine = null;
-      }
+      if (engine) { engine.stop(t); engine = null; }
     }
   }
   function stopStarter() {
@@ -312,6 +351,7 @@ export function createSound(ctx) {
   // Fades everything out and closes the context, freeing the audio device and the recording
   function close() {
     glide(master.gain, 0, 0.08);
+    if (engine) engine.stop(now());
     v8 = null; engine = null;
     setTimeout(() => { sources.forEach((s) => { try { s.stop(); } catch { /* already stopped */ } }); ctx.close().catch(() => {}); }, 300);
   }
