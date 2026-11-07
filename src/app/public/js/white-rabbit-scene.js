@@ -91,15 +91,16 @@ const SCREEN_FRAG = /* glsl */`
     gl_FragColor = vec4(col, 1.0);
   }`;
 
-// Glass: a faint reflection of the window, stronger toward the edges of the tube
+// Glass: the window reflected as a soft diagonal band, a bright spot up high, and a sheen toward the rim
 const GLASS_FRAG = /* glsl */`
   uniform float uStrength;
   varying vec2 vUv;
   void main() {
     vec2 c = vUv * 2.0 - 1.0;
-    float band = smoothstep(0.25, 0.0, abs(vUv.x * 0.8 - vUv.y + 0.35)) * 0.7;
+    float band = smoothstep(0.22, 0.0, abs(vUv.x * 0.8 - vUv.y + 0.35)) * 0.7;
+    float spot = exp(-dot(c - vec2(-0.45, 0.5), c - vec2(-0.45, 0.5)) * 9.0) * 1.6;
     float edge = smoothstep(0.55, 1.1, length(c));
-    gl_FragColor = vec4(vec3(0.85, 0.92, 1.0) * uStrength * (band + edge), 1.0);
+    gl_FragColor = vec4(vec3(0.85, 0.92, 1.0) * uStrength * (band + spot + edge), 1.0);
   }`;
 
 // Grade: grain, outer vignette, exposure, the room's warm or cool tint, a filmic curve for the lit room, and the white-out
@@ -389,7 +390,7 @@ export function createScene({ onLost }) {
     screenU.uRoll.value = ramp(p, [[0.3, 0], [0.33, 1], [0.37, 0]]);
     screenU.uSnow.value = ramp(p, [[0.36, 0], [0.4, 0.15], [0.46, 0]]);
     screenU.uPower.value = ramp(p, [[0.28, 1], [0.6, 0.85]]);
-    glassU.uStrength.value = ramp(p, [[0.12, 0], [0.4, 0.05], [0.82, 0.09]]);
+    glassU.uStrength.value = ramp(p, [[0.12, 0], [0.4, 0.08], [0.6, 0.16], [0.82, 0.12]]);
 
     // Room light comes up as the room appears; then the sun, as the clouds let it, warms the room
     // and lays the window's panes on the floor, and the room cools again when a cloud covers it
