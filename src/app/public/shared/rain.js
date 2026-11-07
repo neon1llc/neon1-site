@@ -56,10 +56,12 @@ const STEP_MS = 66;     // about 15 steps a second
 const HALT_MS = 600;    // the step gap the rain picks up from after a halt
 const HOLD = 30;        // steps a word holds once spelled
 
-// The halt, a Matrix glitch: a hard freeze, a lag jump that skips several steps at once
-// with a one-frame flicker, then uneven stutters (a run of about a third of a second, then one
-// step) before the final freeze (about 1.3 s)
-const GLITCH = [["freeze", 260], ["jump", 6], ["freeze", 340], ["run", 5], ["freeze", 170], ["run", 1]];
+// The halt, a Matrix glitch: hard freezes, lag jumps that skip several steps at once with a
+// one-frame flicker, whole-screen tears that slide bands of the frame sideways, a jolt that
+// shoves and skews the frame, an inverted flash, and uneven stutters before the final freeze
+// (about 1.9 s). Every move but the steps is undone before the next one
+const GLITCH = [["freeze", 220], ["tear", 90], ["jump", 6], ["freeze", 240], ["flash", 55], ["run", 4], ["tear", 70],
+  ["freeze", 170], ["shift", 80], ["jump", 3], ["freeze", 150], ["run", 1]];
 const ZOOM = 1.15, RIM = 5;
 const VOID = "#0D0208";
 const MONO = `"JetBrains Mono", ui-monospace, monospace`;
@@ -294,10 +296,14 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
   // Plays the halt's glitch one move at a time; the last move leaves the rain held
   function glitchStep(now) {
     if (now < glitch.until) return;
+    if (glitch.undo) { glitch.undo(); glitch.undo = null; }
     const move = glitch.moves.shift();
     if (!move) { const done = glitch.done; glitch = null; held = true; done(); return; }
     const [kind, n] = move;
+    glitch.onMove(kind, n);
     if (kind === "freeze") { glitch.until = now + n; return; }
+    if (kind === "tear") { glitch.undo = tear(); glitch.until = now + n; return; }
+    if (kind === "flash" || kind === "shift") { glitch.undo = jolt(kind); glitch.until = now + n; return; }
     if (kind === "jump") {
       // Dropped frames: several steps land at once, and the canvas flickers for a frame
       for (let k = 0; k < n; k++) draw();
@@ -310,6 +316,33 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
     draw(); refract();
     if (n > 1) glitch.moves.unshift(["run", n - 1]);
     glitch.until = now + STEP_MS;
+  }
+
+  // Slides a few bands of the whole frame sideways, one with a ghost beside it; returns the mend
+  function tear() {
+    const w = canvas.width, h = canvas.height, snap = document.createElement("canvas");
+    snap.width = w; snap.height = h;
+    snap.getContext("2d").drawImage(canvas, 0, 0);
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.shadowBlur = 0;
+    for (let i = 0; i < 7; i++) {
+      const y = Math.random() * h, bh = (0.02 + Math.random() * 0.1) * h, dx = (Math.random() - 0.5) * w * 0.14;
+      ctx.globalAlpha = 1; ctx.drawImage(snap, 0, y, w, bh, dx, y, w, bh);
+      if (i === 0) { ctx.globalCompositeOperation = "lighter"; ctx.globalAlpha = 0.4; ctx.drawImage(snap, 0, y, w, bh, dx + 7 * dpr, y, w, bh); ctx.globalCompositeOperation = "source-over"; }
+    }
+    ctx.restore();
+    refract();
+    return () => { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.drawImage(snap, 0, 0); ctx.restore(); refract(); };
+  }
+
+  // Shoves the rain and lens off center for a moment: inverted for a flash, skewed and harsh for a shift
+  function jolt(kind) {
+    const els = [canvas, lens].filter(Boolean), x = (Math.random() < 0.5 ? -1 : 1) * (6 + Math.random() * 10);
+    for (const el of els) {
+      el.style.transform = kind === "flash" ? `translate(${x}px, 0)` : `translate(${x}px, ${(Math.random() - 0.5) * 8}px) skewX(-2deg)`;
+      el.style.filter = kind === "flash" ? "invert(1) hue-rotate(180deg) brightness(1.15)" : "contrast(1.5) saturate(1.6)";
+    }
+    return () => els.forEach((el) => { el.style.transform = ""; el.style.filter = ""; });
   }
 
   // Steps the rain at the current gap, and not while paused, held, idle, or the tab is hidden
@@ -360,13 +393,14 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
     spawnRabbit() { return !!bunny && !rab && running && !held && startRabbit(); },
 
     // Stops the rain with a short glitch, without saving a pause; resolves once it is still
-    // A rain that isn't moving (paused, or reduced motion) just holds
-    halt() {
+    // A rain that isn't moving (paused, or reduced motion) just holds. onMove(kind, ms), when
+    // given, hears each move as it plays, such as to sound it
+    halt(onMove = () => {}) {
       pin();
       return new Promise((done) => {
         ramp = null;
         if (!running) { held = true; done(); return; }
-        glitch = { moves: GLITCH.map((m) => [...m]), until: 0, done };
+        glitch = { moves: GLITCH.map((m) => [...m]), until: 0, done, undo: null, onMove };
       });
     },
 
@@ -375,7 +409,7 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
     resume(ms = 800) {
       if (rab) { const c = cols[rab.col]; if (c && c.g === RABBIT) c.hold = 0; }
       rab = null;
-      if (glitch) { glitch = null; canvas.style.filter = ""; }
+      if (glitch) { if (glitch.undo) glitch.undo(); glitch = null; canvas.style.filter = ""; }
       if (held && reduce.matches) { held = false; onResize(); return; }
       held = false;
       ramp = { from: HALT_MS, to: STEP_MS, t0: performance.now(), ms };
