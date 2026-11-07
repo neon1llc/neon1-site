@@ -52,28 +52,6 @@ function grain(seed) {
   });
 }
 
-// Pale oak planks running along x, with seams, staggered end joints, and grain
-function planks() {
-  const r = seeded(7);
-  return painted(512, 512, (g, w, h) => {
-    const rows = 4, ph = h / rows;
-    for (let i = 0; i < rows; i++) {
-      for (let x = -r() * 200, len; x < w; x += len) {
-        len = 180 + r() * 220;
-        const l = 78 + r() * 7;
-        g.fillStyle = `hsl(34, ${22 + r() * 8}%, ${l}%)`; g.fillRect(x, i * ph, len, ph);
-        for (let k = 0; k < 14; k++) {
-          const y = i * ph + r() * ph;
-          g.strokeStyle = `rgba(110, 80, 50, ${0.05 + r() * 0.08})`; g.lineWidth = 0.6 + r();
-          g.beginPath(); g.moveTo(x, y); g.bezierCurveTo(x + len / 3, y + r() * 6 - 3, x + len * 0.66, y + r() * 6 - 3, x + len, y); g.stroke();
-        }
-        g.fillStyle = "rgba(70, 50, 30, .35)"; g.fillRect(x, i * ph, 1.5, ph);
-      }
-      g.fillStyle = "rgba(70, 50, 30, .4)"; g.fillRect(0, i * ph, w, 1.5);
-    }
-  });
-}
-
 // Plaster: a faint speckle that keeps the walls from looking like flat paint
 function plaster() {
   const r = seeded(11);
@@ -112,22 +90,6 @@ function rug() {
       g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + Math.cos(a + 0.6) * l * 0.6, y + Math.sin(a + 0.6) * l * 0.6, x + Math.cos(a) * l, y + Math.sin(a) * l); g.stroke();
     }
   });
-}
-
-// Carpet fibres as a normal map: thousands of short curled strands, each a little ridge with a lit
-// and a shaded side, so the pile catches light and shadow as the camera moves
-function fibres() {
-  const r = seeded(31);
-  return painted(512, 512, (g, w, h) => {
-    g.fillStyle = "rgb(128, 128, 255)"; g.fillRect(0, 0, w, h);
-    g.lineCap = "round";
-    for (let i = 0; i < 26000; i++) {
-      const x = r() * w, y = r() * h, a = r() * Math.PI * 2, l = 2 + r() * 4, nx = Math.cos(a + Math.PI / 2), ny = Math.sin(a + Math.PI / 2);
-      g.strokeStyle = `rgba(${Math.round(128 + nx * 70)}, ${Math.round(128 - ny * 70)}, 225, ${0.35 + r() * 0.4})`;
-      g.lineWidth = 0.8 + r() * 0.9;
-      g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + Math.cos(a + 0.7) * l * 0.6, y + Math.sin(a + 0.7) * l * 0.6, x + Math.cos(a) * l, y + Math.sin(a) * l); g.stroke();
-    }
-  }, false);
 }
 
 // The speaker cloth behind the brass slats: a dark, fine weave
@@ -188,26 +150,6 @@ function tufting() {
     g.putImageData(img, 0, 0);
   }, false);
   return { color, normal };
-}
-
-// Smooth leather with scuffs and paler rubbed patches, light on white so the color tints it
-function worn() {
-  const r = seeded(17);
-  return painted(256, 256, (g, w, h) => {
-    g.fillStyle = "#d6d6d6"; g.fillRect(0, 0, w, h);
-    for (let i = 0; i < 26; i++) {
-      const x = r() * w, y = r() * h, rad = 10 + r() * 50, grad = g.createRadialGradient(x, y, 0, x, y, rad);
-      const light = r() < 0.6;
-      grad.addColorStop(0, light ? `rgba(255,245,235,${0.25 + r() * 0.3})` : `rgba(40,20,10,${0.15 + r() * 0.2})`);
-      grad.addColorStop(1, "rgba(0,0,0,0)");
-      g.fillStyle = grad; g.fillRect(x - rad, y - rad, rad * 2, rad * 2);
-    }
-    for (let i = 0; i < 40; i++) {
-      const x = r() * w, y = r() * h;
-      g.strokeStyle = `rgba(255,240,225,${0.15 + r() * 0.25})`; g.lineWidth = 0.6;
-      g.beginPath(); g.moveTo(x, y); g.lineTo(x + (r() - 0.5) * 24, y + (r() - 0.5) * 10); g.stroke();
-    }
-  });
 }
 
 // A soft round or square shadow, dark at the middle and clear at the edge
@@ -281,7 +223,6 @@ function rounded(shape, w, h, r) {
   shape.lineTo(x, y + r); shape.quadraticCurveTo(x, y, x + r, y);
   return shape;
 }
-
 
 // A big cat's head carved from one piece of wood, facing +z, about 11 cm across: a sphere pushed
 // and pulled by smooth bumps and hollows into a broad skull, heavy brow over eyes set in sockets,
@@ -448,12 +389,22 @@ function capital(profile, { x, za, zb, y, back = 0 }) {
 /**
  * Builds the room around the window `win` and the TV whose screen (sw by sh) is centered at `sc`.
  * env is a small environment map for the furniture's reflections; returns { glossy }, the
- * materials that reflect it as [material, full strength], so the scene can dim them with the room
+ * materials that reflect it as [material, full strength], so the scene can dim them with the room,
+ * and ready, which resolves once the photographed maps are in
  */
 export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
   const wood = grain(1), lambert = (o) => new T.MeshLambertMaterial(o), standard = (o) => new T.MeshStandardMaterial(o);
   // Varnish, plastic, brass, and leather reflect the room, so highlights slide as the camera moves
   const glossy = [];
+  // Photographed maps from Poly Haven (CC0), prepared by blender/textures.py; ready resolves when all are in
+  const loads = [], loader = new T.TextureLoader();
+  const photo = (name, repeat, color = false) => {
+    let t;
+    loads.push(new Promise((done) => { t = loader.load(`/media/white-rabbit/tex/${name}.webp`, done, undefined, done); }));
+    t.wrapS = t.wrapT = T.RepeatWrapping; t.repeat.set(...repeat);
+    if (color) t.colorSpace = T.SRGBColorSpace;
+    return t;
+  };
   const shiny = (k, o, Kind = T.MeshStandardMaterial) => { const m = new Kind({ ...o, envMap: env, envMapIntensity: 0 }); glossy.push([m, k]); return m; };
   // Lit meshes cast and take the window light's shadows; glass and the painted shadows don't
   // Each mesh gets a stable name in build order, which the baked lighting is keyed to (blender/room.py);
@@ -477,9 +428,9 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
     box(4, 2.6, 0.1, [0, 1.3, -2.5], [4, 2.6]), box(0.1, 2.6, 5, [2.0, 1.3, 0], [5, 2.6]), box(4, 2.6, 0.1, [0, 1.3, 2.5], [4, 2.6]),
     box(0.1, y0, 5, [-2.0, y0 / 2, 0], [5, y0]), box(0.1, 2.6 - y1, 5, [-2.0, (2.6 + y1) / 2, 0], [5, 2.6 - y1]),
     box(0.1, win.h, z0 + 2.5, [-2.0, win.y, (z0 - 2.5) / 2], [z0 + 2.5, win.h]), box(0.1, win.h, 2.5 - z1, [-2.0, win.y, (z1 + 2.5) / 2], [2.5 - z1, win.h]),
-  ], lambert({ color: WALL, map: plaster() })));
+  ], lambert({ color: WALL, map: plaster(), normalMap: photo("plaster-normal", [1, 1]), normalScale: new T.Vector2(0.35, 0.35) })));
   add(merged([box(4, 0.02, 5, [0, 2.61, 0])], lambert({ color: CEILING })));
-  add(merged([place(new T.PlaneGeometry(4, 5), { r: [-Math.PI / 2, 0, 0], uv: [4 / 2.4, 5 / 0.6] })], lambert({ map: planks() })));
+  add(merged([place(new T.PlaneGeometry(4, 5), { r: [-Math.PI / 2, 0, 0], uv: [4 / 2.4, 5 / 0.6] })], lambert({ map: photo("floor-color", [1.2, 0.3], true), normalMap: photo("floor-normal", [1.2, 0.3]) })));
 
   // ---- The window: an inset double-hung sash, its casing, and a sill shaped like a Doric capital ----
   // Jamb liners line the opening; the casing frames it on the room side with a capped head
@@ -542,7 +493,7 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
     strip(0.035, 0.026, RAIL, light); strip(0.012, 0.034, RAIL + 0.02, light);
     strip(0.1, 0.022, ROOM.h - 0.05, light); strip(0.035, 0.05, ROOM.h - 0.0175, light); strip(0.012, 0.03, ROOM.h - 0.106, dark);
   }
-  add(merged(panels, standard({ color: WALL, map: plaster(), roughness: 0.75 })));
+  add(merged(panels, standard({ color: WALL, map: plaster(), normalMap: photo("plaster-normal", [1, 1]), normalScale: new T.Vector2(0.3, 0.3), roughness: 0.75 })));
   add(merged(dark, standard({ color: BRAND, roughness: 0.55 })));
   add(merged(light, standard({ color: MARK, roughness: 0.55 })));
 
@@ -555,8 +506,7 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
     feet.push([x + lx * Math.cos(t) + lz * Math.sin(t), z - lx * Math.sin(t) + lz * Math.cos(t), 0.022]);
   }
   const onRug = feet.filter(([fx, fz]) => Math.abs(fx - RUG.x) < RUG.w / 2 - 0.05 && Math.abs(fz - RUG.z) < RUG.d / 2 - 0.05);
-  const pile = fibres();
-  pile.repeat.set(6, 4);
+  const pile = photo("carpet-normal", [7, 4.5]);
   add(merged([place(new T.RoundedBoxGeometry(RUG.w, SLAB, RUG.d, 2, 0.01), { p: [RUG.x, SLAB / 2, RUG.z] })],
     standard({ map: rug(), normalMap: pile, normalScale: new T.Vector2(0.9, 0.9), roughness: 0.95 })));
   add(merged(onRug.map(([fx, fz, f]) => place(new T.PlaneGeometry(f * 4.5, f * 4.5), { p: [fx, SLAB + 0.002, fz], r: [-Math.PI / 2, 0, 0] })),
@@ -688,9 +638,9 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
   const both = (parts, tinted = false) => CHAIRS.flatMap(([x, z, t], k) => moved(parts.map((g) => (tinted ? tone(g.clone(), k) : g.clone())), { p: [x, 0, z], r: [0, t, 0] }));
   const leather = { color: LEATHER, vertexColors: true, roughness: 0.62 };
   add(merged(both(chair.tufted, true), shiny(0.3, { ...leather, map: tuft.color, normalMap: tuft.normal, normalScale: new T.Vector2(0.9, 0.9) })));
-  add(merged(both(chair.plain, true), shiny(0.3, { ...leather, map: worn() })));
+  add(merged(both(chair.plain, true), shiny(0.3, { ...leather, map: photo("leather-detail", [2.5, 2.5], true), normalMap: photo("leather-normal", [2.5, 2.5]), normalScale: new T.Vector2(0.8, 0.8) })));
   chair.wood.forEach((g) => { if (!g.attributes.color) g.setAttribute("color", new T.Float32BufferAttribute(new Float32Array(g.attributes.position.count * 3).fill(1), 3)); });
-  add(merged(both(chair.wood), shiny(0.7, { color: LEG_WOOD, map: wood, roughness: 0.38, vertexColors: true })));
+  add(merged(both(chair.wood), shiny(0.7, { color: "#7A563C", map: photo("walnut-color", [2, 2], true), normalMap: photo("walnut-normal", [2, 2]), roughness: 0.38, vertexColors: true })));
   Object.values(chair).flat().forEach((g) => g.dispose());
-  return { glossy };
+  return { glossy, ready: Promise.all(loads) };
 }
