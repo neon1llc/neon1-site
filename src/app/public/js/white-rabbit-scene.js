@@ -16,7 +16,7 @@ import { furnish } from "/js/white-rabbit-room.js";
 const PAPER = "#F2F4F2", FLOOR = "#D9CDB8", VOID = "#0D0208";
 const SW = 0.48, SH = 0.36;                  // screen size
 const SC = new T.Vector3(0, 0.51, -1.775);  // screen center
-const WINDOW = { z: 0.6, y: 1.55, w: 1.2, h: 1.4 };
+const WINDOW = { z: 0.6, y: 1.45, w: 1.2, h: 1.3 };
 
 // Beats: progress, then camera position and look target; B0 to B2 are filled in from the picture's fit
 const KEYS = [0, 0.12, 0.28, 0.40, 0.60, 0.82, 0.94, 1];
@@ -295,7 +295,19 @@ export function createScene({ onLost }) {
   const WHITE = new T.Vector3(1, 1, 1), TINT_COOL = new T.Vector3(0.95, 0.98, 1.03), TINT_WARM = new T.Vector3(1.05, 1.0, 0.93);
   const hemi = new T.HemisphereLight("#E6F0F8", FLOOR, 0);
   const sun = new T.DirectionalLight("#FFE2B0", 0);
-  sun.position.copy(LIGHT).multiplyScalar(10);
+  // The sun casts the room's one set of shadows; the room doesn't move, so they're drawn once
+  sun.position.set(0, 1, 0.5).addScaledVector(LIGHT, 8);
+  sun.target.position.set(0, 1, 0.5);
+  sun.castShadow = true;
+  sun.shadow.mapSize.setScalar(touch ? 512 : 1024);
+  Object.assign(sun.shadow.camera, { left: -3.4, right: 3.4, top: 3.4, bottom: -3.4, near: 1, far: 18 });
+  sun.shadow.camera.updateProjectionMatrix();
+  sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.025;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = T.PCFSoftShadowMap;
+  renderer.shadowMap.autoUpdate = false;
+  renderer.shadowMap.needsUpdate = true;
+  scene.add(sun.target);
   const glow = new T.PointLight("#6CFFA8", 0, 2.5, 2);
   glow.position.set(0, SC.y, -1.55);
   scene.add(hemi, sun, glow);

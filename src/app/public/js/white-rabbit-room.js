@@ -214,7 +214,13 @@ function rounded(shape, w, h, r) {
 /** Builds the room around the window `win` and the TV whose screen (sw by sh) is centered at `sc` */
 export function furnish(scene, { win, sc, sw, sh }) {
   const wood = grain(1), lambert = (o) => new T.MeshLambertMaterial(o), standard = (o) => new T.MeshStandardMaterial(o);
-  const add = (mesh) => { scene.add(mesh); return mesh; };
+  // Lit meshes cast and take the window light's shadows; glass and the painted shadows don't
+  const add = (mesh) => {
+    const lit = !mesh.material.isMeshBasicMaterial && !mesh.material.transparent;
+    mesh.castShadow = mesh.receiveShadow = lit;
+    scene.add(mesh);
+    return mesh;
+  };
 
   // ---- Walls, ceiling, and floor ----
   // The left wall is four pieces around the window opening
@@ -228,13 +234,36 @@ export function furnish(scene, { win, sc, sw, sh }) {
   add(merged([box(4, 0.02, 5, [0, 2.61, 0])], lambert({ color: CEILING })));
   add(merged([place(new T.PlaneGeometry(4, 5), { r: [-Math.PI / 2, 0, 0], uv: [4 / 2.4, 5 / 0.6] })], lambert({ map: planks() })));
 
-  // Window frame, cross mullion, and sill
-  add(merged([
-    box(0.12, 0.06, win.w, [-2.0, y1 - 0.03, win.z]), box(0.12, 0.06, win.w, [-2.0, y0 + 0.03, win.z]),
-    box(0.12, win.h, 0.06, [-2.0, win.y, z0 + 0.03]), box(0.12, win.h, 0.06, [-2.0, win.y, z1 - 0.03]),
-    box(0.08, win.h, 0.04, [-2.0, win.y, win.z]), box(0.08, 0.04, win.w, [-2.0, win.y, win.z]),
-    box(0.2, 0.04, 1.32, [-1.88, y0 - 0.02, win.z]),
-  ], lambert({ color: WINDOW_TRIM })));
+  // ---- The window: an inset double-hung sash, its casing, and a sill shaped like a squat capital ----
+  // Jamb liners line the opening; the casing frames it on the room side with a capped head
+  const trim = [
+    box(0.1, win.h, 0.012, [-2.0, win.y, z0 + 0.006]), box(0.1, win.h, 0.012, [-2.0, win.y, z1 - 0.006]),
+    box(0.1, 0.012, win.w, [-2.0, y1 - 0.006, win.z]),
+    box(0.022, win.h + 0.1, 0.09, [-1.94, (y0 + y1 + 0.1) / 2, z0 - 0.045]), box(0.022, win.h + 0.1, 0.09, [-1.94, (y0 + y1 + 0.1) / 2, z1 + 0.045]),
+    box(0.026, 0.11, win.w + 0.22, [-1.938, y1 + 0.055, win.z]), box(0.04, 0.025, win.w + 0.27, [-1.93, y1 + 0.122, win.z]),
+    box(0.02, 0.07, win.w + 0.16, [-1.94, y0 - 0.095, win.z]),
+  ];
+
+  // The sill: a flat top that rolls over into a curve, then steps down twice toward the wall
+  const sill = new T.Shape();
+  sill.moveTo(-0.1, 0); sill.lineTo(0.07, 0); sill.quadraticCurveTo(0.09, -0.012, 0.045, -0.034);
+  sill.lineTo(0.045, -0.044); sill.lineTo(0.028, -0.044); sill.lineTo(0.028, -0.06); sill.lineTo(-0.1, -0.06); sill.closePath();
+  trim.push(place(new T.ExtrudeGeometry(sill, { depth: win.w + 0.26, bevelEnabled: false, curveSegments: 8 }), { p: [-1.95, y0, z0 - 0.13] }));
+
+  // Two sashes on their tracks; the lower one is raised a little, so the window is open at the bottom
+  const lift = 0.13, mid = y0 + win.h / 2, sw2 = 0.045, sashes = [], panes = [];
+  const sash = (x, bottom, top, meet) => {
+    const h = top - bottom, cy = (bottom + top) / 2;
+    sashes.push(box(0.03, sw2, win.w - 0.02, [x, top - sw2 / 2, win.z]), box(0.03, meet ? 0.05 : sw2, win.w - 0.02, [x, bottom + (meet ? 0.025 : sw2 / 2), win.z]),
+      box(0.03, h, sw2, [x, cy, z0 + 0.01 + sw2 / 2]), box(0.03, h, sw2, [x, cy, z1 - 0.01 - sw2 / 2]));
+    panes.push(place(new T.PlaneGeometry(win.w - 0.02 - 2 * sw2, h - 2 * sw2), { p: [x, cy, win.z], r: [0, Math.PI / 2, 0] }));
+  };
+  sash(-2.028, mid - 0.025, y1, true);
+  sash(-1.992, y0 + lift, mid + 0.025 + lift, false);
+  add(merged([...trim, ...sashes], standard({ color: WINDOW_TRIM, roughness: 0.5 })));
+  add(merged(panes, standard({ color: "#DCEBF2", roughness: 0.05, transparent: true, opacity: 0.08, depthWrite: false })));
+  add(merged([box(0.012, 0.012, 0.05, [-1.975, mid + lift + 0.03, win.z]), box(0.014, 0.01, 0.06, [-1.973, y0 + lift + 0.02, win.z - 0.3]),
+    box(0.014, 0.01, 0.06, [-1.973, y0 + lift + 0.02, win.z + 0.3])], standard({ color: BRASS, metalness: 0.7, roughness: 0.3 })));
 
   // ---- Wainscot, and the green trim: baseboards, chair rail, and crown moulding ----
   // Each run is [length, center x, center z, turn]; the panels face into the room. Every wall
