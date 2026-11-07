@@ -176,10 +176,6 @@
     @media (max-width: 700px) { .legal { padding-right: 20px; padding-bottom: 72px; } }
     @media (max-width: 700px) { .foot { grid-template-columns: 1fr 1fr; } .foot > div:first-child { grid-column: 1 / -1; } }
 
-    /* ---- Easter-egg toast; the rain controls are styled in /shared/neon1.css ---- */
-    .egg { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 6; font: 13px var(--mono); color: var(--glow); background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 16px; opacity: 0; transition: opacity .4s; pointer-events: none; }
-    .egg.show { opacity: 1; }
-
     /* ---- Waking up: content below the hero fades from the Matrix into a light surface ---- */
     .awake { position: relative; z-index: 2;
       background: linear-gradient(to bottom, rgba(242,244,242,0) 0, var(--paper) 320px);
@@ -665,20 +661,19 @@
     </div>
   </div>
 
-  <!-- Rain controls and the easter-egg toast -->
+  <!-- Rain controls -->
   <div class="rainctl" role="group" aria-label="Rain controls">
     <button data-rain="mode" type="button" title="Rain motion: grid or free. Click to switch.">grid</button>
     <button data-rain="charset" type="button" title="Rain characters. Click to cycle.">text</button>
     <button data-rain="pause" type="button" aria-pressed="false">pause</button>
   </div>
-  <div class="egg" id="egg" role="status" aria-live="polite"></div>
 
   <!-- Deferred scripts run in order, so Motion loads before the views and case studies -->
   <script src="/js/motion-11.18.2.min.js" defer></script>
   <script defer src="/js/views.js"></script>
   <script defer src="/js/cases.js"></script>
 
-  <!-- Rain, menu, wordmark, and easter eggs; the rain itself is shared with 1NEON -->
+  <!-- Rain, menu, and wordmark; the rain itself is shared with 1NEON -->
   <script type="module">
     import { rain, controls, TEXT } from "/shared/rain.js";
     {
@@ -752,26 +747,6 @@
           if (++tick > total * 4) { clearInterval(timer); spans.forEach((el, si) => (el.textContent = finals[si])); }
         }, 45);
       }
-
-      // ---- Easter eggs: type a phrase anywhere ----
-      const eggs = {
-        "white rabbit": "follow it → github.com/neon1llc",
-        "neo": "there is no spoon. there is a plan.",
-        "red pill": "neon1llc@gmail.com",
-      };
-      const egg = document.getElementById("egg");
-      let typed = "", hide;
-      addEventListener("keydown", (e) => {
-        if (e.ctrlKey || e.metaKey || e.altKey || e.key.length !== 1) return;
-        typed = (typed + e.key.toLowerCase()).slice(-16);
-        const hit = Object.keys(eggs).find((k) => typed.endsWith(k));
-        if (!hit) return;
-        egg.textContent = eggs[hit]; egg.classList.add("show");
-        clearTimeout(hide); hide = setTimeout(() => egg.classList.remove("show"), 3500);
-      });
-
-      // A hint for anyone who opens the console
-      console.log("%cfollow the white rabbit.", "color:#00FF41;font:14px monospace");
     }
   </script>
 </body>
