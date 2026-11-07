@@ -7,6 +7,7 @@
 // window, the sun, and a white-out. Everything is built in code: no images or models.
 
 import * as T from "/js/vendor/three-0.187.0.rabbit.min.js";
+import { createSky, LIGHT } from "/js/white-rabbit-sky.js";
 
 
 // Room colors, the TV, and where its screen sits (meters; the floor is y 0, the TV faces +z)
@@ -14,8 +15,6 @@ const PAPER = "#F2F4F2", FLOOR = "#E3E8E3", TRIM = "#E8ECE8", BASE = "#C9D3C9";
 const KHAKI = "#A8AC8F", BEZEL = "#9DA185", STAND = "#CFC8B4", VOID = "#0D0208";
 const SW = 0.48, SH = 0.36;                  // screen size
 const SC = new T.Vector3(0, 0.51, -1.775);  // screen center
-const SUN = new T.Vector3(-2.4, 1.05, -1.0).normalize();
-const LIFT = 0.45;                          // how far the sky is tilted up behind the window
 const WINDOW = { z: 0.6, y: 1.55, w: 1.2, h: 1.4 };
 
 // Beats: progress, then camera position and look target; B0 to B2 are filled in from the picture's fit
@@ -102,11 +101,12 @@ const GLASS_FRAG = /* glsl */`
     gl_FragColor = vec4(vec3(0.85, 0.92, 1.0) * uStrength * (band + edge), 1.0);
   }`;
 
-// Grade: grain, outer vignette, exposure, a filmic curve for the lit room, and the white-out
+// Grade: grain, outer vignette, exposure, the room's warm or cool tint, a filmic curve for the lit room, and the white-out
 const GRADE = {
   uniforms: {
     tDiffuse: { value: null }, uGrain: { value: 0 }, uVignette: { value: 0 }, uExposure: { value: 1 },
     uTone: { value: 0 }, uWhite: { value: 0 }, uTime: { value: 0 }, uPaper: { value: new T.Color(PAPER) },
+    uTint: { value: new T.Vector3(1, 1, 1) },
   },
   vertexShader: /* glsl */`
     varying vec2 vUv;
@@ -114,13 +114,13 @@ const GRADE = {
   fragmentShader: /* glsl */`
     uniform sampler2D tDiffuse;
     uniform float uGrain, uVignette, uExposure, uTone, uWhite, uTime;
-    uniform vec3 uPaper;
+    uniform vec3 uPaper, uTint;
     varying vec2 vUv;
     float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
     vec3 aces(vec3 x) { return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), 0.0, 1.0); }
     void main() {
       vec4 t = texture2D(tDiffuse, vUv);
-      vec3 c = t.rgb * uExposure;
+      vec3 c = t.rgb * uExposure * uTint;
       c = mix(c, aces(c * 0.9), uTone);
       c += (hash(vUv * 1000.0 + fract(uTime) * 100.0) - 0.5) * uGrain;
       c *= 1.0 - uVignette * smoothstep(0.35, 0.95, distance(vUv, vec2(0.5)));
@@ -280,21 +280,7 @@ export function createScene({ onLost }) {
   const camera = new T.PerspectiveCamera(40, innerWidth / innerHeight, 0.02, 5000);
 
   // ---- Sky, sun, and clouds, seen only through the window ----
-  const sky = new T.Sky();
-  sky.scale.setScalar(4500);
-  const su = sky.material.uniforms;
-  su.sunPosition.value.copy(SUN).add(new T.Vector3(0, LIFT, 0)).normalize();
-  su.turbidity.value = 2; su.rayleigh.value = 1.6;
-  su.cloudCoverage.value = 0.58; su.cloudDensity.value = 0.8; su.cloudSpeed.value = 0.00012;
-  // The stock sky is meant for a darker exposure than the room: scale it down, and cap the sun so bloom stays a glow
-  // The window only sees low in the sky, so the view is lifted toward the blue and the clouds; the sun moves with it
-  su.uSkyExposure = { value: 0.12 };
-  sky.material.fragmentShader = sky.material.fragmentShader
-    .replace("void main() {", "uniform float uSkyExposure;\nvoid main() {")
-    .replace("vec3 direction = normalize( vWorldPosition - cameraPosition );",
-      `vec3 direction = normalize( normalize( vWorldPosition - cameraPosition ) + vec3( 0.0, ${LIFT}, 0.0 ) );`)
-    .replace("gl_FragColor = vec4( texColor, 1.0 );", "gl_FragColor = vec4( min( texColor * uSkyExposure, vec3( 3.0 ) ), 1.0 );");
-  scene.add(sky);
+  const sky = createSky({ scene, win: WINDOW });
 
   // ---- The room: boxes, with the left wall built around the window opening ----
   const mats = {
@@ -334,14 +320,12 @@ export function createScene({ onLost }) {
   box(0.02, 0.08, 4.9, 1.94, 0.04, 0, mats.base);
   box(0.02, 0.08, 4.9, -1.94, 0.04, 0, mats.base);
 
-  // Soft spots: the TV's shadow, and the sunlight on the floor under the window
+  // A soft shadow under the TV
   const flat = (w, h, tex, x, y, z, extra) => {
     const m = new T.Mesh(new T.PlaneGeometry(w, h), new T.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, ...extra }));
     m.rotation.x = -Math.PI / 2; m.position.set(x, y, z); scene.add(m); return m;
   };
   flat(1.5, 1.0, spot([[0, "rgba(40,48,40,.45)"], [1, "rgba(40,48,40,0)"]]), 0, 0.002, -2.0);
-  const patch = flat(1.8, 1.3, spot([[0, "rgba(255,244,214,1)"], [0.6, "rgba(255,244,214,.5)"], [1, "rgba(255,244,214,0)"]]),
-    -0.9, 0.003, 1.0, { blending: T.AdditiveBlending, opacity: 0 });
 
   // ---- The TV ----
   const tv = new T.Group();
@@ -379,20 +363,15 @@ export function createScene({ onLost }) {
   }));
   glass.position.copy(SC).add(new T.Vector3(0, 0, 0.002)); tv.add(glass);
 
-  // ---- Lights and the sun's glow ----
+  // ---- Lights, and the colors the room shifts between as the sun comes and goes ----
+  const COOL = new T.Color("#D8E2F0"), WARM = new T.Color("#F6EEE2");
+  const WHITE = new T.Vector3(1, 1, 1), TINT_COOL = new T.Vector3(0.94, 0.97, 1.04), TINT_WARM = new T.Vector3(1.08, 1.0, 0.86);
   const hemi = new T.HemisphereLight("#E6F0F8", FLOOR, 0);
-  const sun = new T.DirectionalLight("#FFF1DC", 0);
-  sun.position.copy(SUN).multiplyScalar(10);
+  const sun = new T.DirectionalLight("#FFE2B0", 0);
+  sun.position.copy(LIGHT).multiplyScalar(10);
   const glow = new T.PointLight("#6CFFA8", 0, 2.5, 2);
   glow.position.set(0, SC.y, -1.55);
   scene.add(hemi, sun, glow);
-  const sunGlow = new T.Sprite(new T.SpriteMaterial({
-    map: spot([[0, "rgba(255,250,235,1)"], [0.25, "rgba(255,240,200,.55)"], [1, "rgba(255,230,180,0)"]]),
-    blending: T.AdditiveBlending, transparent: true, depthWrite: false, opacity: 0,
-  }));
-  sunGlow.position.set(0.5, 1.0, 1.9).addScaledVector(SUN, 40);
-  sunGlow.scale.setScalar(14);
-  scene.add(sunGlow);
 
   // ---- Postprocessing: the scene, bloom on desktops, the grade, then sRGB output ----
   const composer = new T.EffectComposer(renderer, new T.WebGLRenderTarget(1, 1, { type: T.HalfFloatType, samples: touch ? 0 : 4 }));
@@ -446,10 +425,11 @@ export function createScene({ onLost }) {
 
   // ---- One frame ----
   const P = new T.Vector3(), L = new T.Vector3(), D = new T.Vector3();
-  let frames = 0, spent = 0, lastFrame = 0;
+  let frames = 0, spent = 0, lastFrame = 0, prev = 0;
   function render(p, { speed = 0, still = false } = {}) {
     if (disposed || !posCurve) return;
-    const now = performance.now(), time = now / 1000;
+    const now = performance.now(), time = now / 1000, dt = prev ? (now - prev) / 1000 : 0;
+    prev = now;
     const aspect = innerWidth / innerHeight, u = along(p);
 
     // Camera: curve, portrait widening and pull-back, a little handheld sway, and the room's walls
@@ -483,13 +463,17 @@ export function createScene({ onLost }) {
     screenU.uPower.value = ramp(p, [[0.28, 1], [0.6, 0.85]]);
     glassU.uStrength.value = ramp(p, [[0.12, 0], [0.4, 0.05], [0.82, 0.09]]);
 
-    // Room light comes up as the room appears, then the sun takes over
+    // Room light comes up as the room appears; then the sun, as the clouds let it, warms the room
+    // and lays the window's panes on the floor, and the room cools again when a cloud covers it
     const light = ramp(p, [[0.12, 0], [0.28, 0.12], [0.4, 0.3], [0.6, 0.7], [0.82, 1]]);
-    hemi.intensity = light * 1.8; sun.intensity = light * 1.2;
+    const room = ramp(p, [[0.4, 0], [0.6, 1]]);
+    sky.update(dt, ramp(p, [[0.5, 0], [0.7, 1]]));
+    const s = sky.sun;
+    hemi.intensity = light * (0.95 + 0.2 * s);
+    hemi.color.copy(COOL).lerp(WARM, s);
+    sun.intensity = light * (0.2 + 1.5 * s);
     glow.intensity = ramp(p, [[0, 0], [0.28, 0.6], [0.6, 0.3], [0.82, 0.2]]) * 0.02;
-    patch.material.opacity = ramp(p, [[0.6, 0], [0.82, 0.55]]);
-    sunGlow.material.opacity = ramp(p, [[0.6, 0], [0.94, 1]]);
-    su.time.value = time;
+    grade.uniforms.uTint.value.copy(WHITE).lerp(TINT_COOL.clone().lerp(TINT_WARM, s), room);
 
     // Grade and bloom; both are off at 0 so the first frame matches the page
     grade.uniforms.uTime.value = time;
@@ -498,7 +482,7 @@ export function createScene({ onLost }) {
     grade.uniforms.uTone.value = ramp(p, [[0.12, 0], [0.4, 1]]);
     grade.uniforms.uExposure.value = ramp(p, [[0.82, 1], [0.94, 1.15], [1, 1.6]]);
     grade.uniforms.uWhite.value = ramp(p, [[0.94, 0], [0.985, 1]]);
-    bloom.strength = bloomOn ? ramp(p, [[0.6, 0], [0.94, 0.3]]) : 0;
+    bloom.strength = bloomOn ? ramp(p, [[0.6, 0], [0.94, 0.12]]) : 0;
     bloom.enabled = bloom.strength > 0.001;
     composer.render();
 
