@@ -30,7 +30,7 @@ DOTFILES    := --exclude ".*" --exclude "*/.*"
 
 # Plain make shows the help
 .DEFAULT_GOAL := help
-.PHONY: help check html js links budget secrets serve deploy invalidate verify
+.PHONY: help check html js links budget secrets serve three deploy invalidate verify
 
 
 ##@ Checks
@@ -41,9 +41,9 @@ html: ## Validate index.html against the HTML standard
 	@command -v npx >/dev/null 2>&1 || { echo "html: install Node.js to get npx"; exit 1; }
 	npx --yes $(HTML_VALIDATE) $(SITE_DIR)/index.html
 
-js: ## Syntax-check the JavaScript files, shared modules, and inline scripts
+js: ## Syntax-check the JavaScript files, vendored modules, shared modules, and inline scripts
 	@command -v node >/dev/null 2>&1 || { echo "js: install Node.js"; exit 1; }
-	@for f in $(SITE_DIR)/js/*.js $(SITE_DIR)/shared/*.js; do node --check "$$f" || exit 1; done
+	@for f in $(SITE_DIR)/js/*.js $(SITE_DIR)/js/vendor/*.js $(SITE_DIR)/shared/*.js; do node --check "$$f" || exit 1; done
 	@python3 scripts/check_page.py scripts $(SITE_DIR)/index.html
 
 links: ## Check in-page anchors and root-relative asset paths
@@ -67,6 +67,10 @@ secrets: ## Scan the git history for secrets with gitleaks
 
 serve: ## Serve the site at http://localhost:PORT
 	python3 -m http.server $(PORT) --bind 127.0.0.1 --directory $(SITE_DIR)
+
+# The white rabbit's three.js bundle is generated, so it is rebuilt rather than edited
+three: ## Rebuild the vendored three.js bundle for the white rabbit
+	scripts/three/build.sh
 
 
 ##@ Deploy
