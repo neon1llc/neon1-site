@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.12.3
+
+- Catching the white rabbit now glitches the rain: a hard freeze, a dropped-frame jump with one flicker, and uneven stop-start stutters before it holds still.
+- The rabbit is drawn white, as a white rabbit should be.
+
 ## v0.12.2
 
 - Menu links glow in the logo's neon, and the header turns dark with the menu open, even over the light page.
