@@ -15,6 +15,17 @@ make serve   # http://localhost:8000
 
 Run `make help` to list every target.
 
+## The white rabbit
+
+Now and then a white rabbit drops into the rain on the landing. Catching it stops the rain, and scrolling down pulls back out of an old TV into a sunlit room that ends on "go touch grass". Scrolling up plays it back. The controller is `js/white-rabbit.js`. The 3D scene in `js/white-rabbit-scene.js` and the three.js bundle in `js/vendor/` load only after a catch. Reduced motion, or a browser without WebGL, gets a still card instead.
+
+Two query flags help with testing, and in production they only add rabbits:
+
+- `?rabbit=now` keeps a rabbit on the landing and writes its position to `#whiteRabbit` as `data-spot`.
+- `?rabbit=p0.5` catches a rabbit and jumps to that point in the scene, from `p0` to `p1`.
+
+`make three` rebuilds the bundle from `scripts/three/entry.js` with pinned three.js and esbuild versions.
+
 ## Deploy
 
 Pushing to `main` runs the checks and then deploys from GitHub Actions. The workflow assumes an AWS role through OIDC, so the repo holds no AWS keys. The role ARN is the repository variable `AWS_DEPLOY_ROLE_ARN`.
