@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.12.4
+
+- The four stages are named as actions on what's needed: Needs, Execute, Observe, and Normalize.
+
 ## v0.12.3
 
 - Catching the white rabbit now glitches the rain: a hard freeze, a dropped-frame jump with one flicker, and uneven stop-start stutters before it holds still.
