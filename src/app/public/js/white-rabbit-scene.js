@@ -471,7 +471,7 @@ export function createScene({ onLost }) {
     const room = ramp(p, [[0.4, 0], [0.6, 1]]);
     sky.update(dt, ramp(p, [[0.5, 0], [0.7, 1]]), ratio);
     const s = sky.sun;
-    hemi.intensity = light * (0.62 + 0.15 * s);
+    hemi.intensity = light * (0.62 + 0.15 * s) * ramp(p, [[0.55, 2.1], [0.86, 1]]); // the room dims a little as the window takes over
     hemi.color.copy(COOL).lerp(WARM, s);
     sun.intensity = light * (0.15 + 1.2 * s);
     glow.intensity = ramp(p, [[0, 0], [0.28, 0.6], [0.6, 0.3], [0.82, 0.2]]) * 0.02;
