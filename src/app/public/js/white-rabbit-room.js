@@ -18,7 +18,7 @@ const BRASS = "#A8834E", LEATHER = "#5C2C20";
 // The room's inside faces, the height of the wainscot, and where the chairs sit (x, z, turn)
 const ROOM = { x: 1.95, z: 2.45, h: 2.6 };
 const RAIL = 0.8, BASE = 0.13;
-const CHAIRS = [[-1.14, -1.5, 0.52], [1.26, -1.5, -0.52]];
+const CHAIRS = [[-1.12, -1.46, 0.48], [1.29, -1.54, -0.57]]; // set down by hand, not mirrored
 
 // A small seeded random, so the textures look the same on every visit
 function seeded(n) { return () => ((n = (n * 16807) % 2147483647) - 1) / 2147483646; }
@@ -82,6 +82,11 @@ function plaster() {
       g.fillStyle = `rgba(${r() < 0.5 ? "0,0,0" : "255,255,255"}, ${r() * 0.022})`;
       g.fillRect(r() * w, r() * h, 1 + r() * 2, 1 + r() * 2);
     }
+    for (let i = 0; i < 6; i++) {
+      const x = r() * w, y = r() * h, rad = 14 + r() * 30, grad = g.createRadialGradient(x, y, 0, x, y, rad);
+      grad.addColorStop(0, "rgba(90, 80, 60, .035)"); grad.addColorStop(1, "rgba(90, 80, 60, 0)");
+      g.fillStyle = grad; g.fillRect(x - rad, y - rad, rad * 2, rad * 2);
+    }
   });
 }
 
@@ -130,6 +135,12 @@ function tufting() {
       img.data.set([l, l, l, 255], i * 4);
     }
     g.putImageData(img, 0, 0);
+    // Wear: paler, rubbed patches where people lean, and darker grime in the creases
+    for (let i = 0; i < 9; i++) {
+      const x = r() * n, y = r() * n, rad = 18 + r() * 40, grad = g.createRadialGradient(x, y, 0, x, y, rad);
+      grad.addColorStop(0, `rgba(255, 235, 215, ${0.12 + r() * 0.12})`); grad.addColorStop(1, "rgba(255, 235, 215, 0)");
+      g.fillStyle = grad; g.fillRect(x - rad, y - rad, rad * 2, rad * 2);
+    }
     // Buttons where the creases meet
     g.fillStyle = "rgba(20, 5, 3, .75)";
     for (let k = -1; k <= n / s * 2 + 1; k++) for (let j = -1; j <= n / s * 2 + 1; j++) {
@@ -148,6 +159,26 @@ function tufting() {
     g.putImageData(img, 0, 0);
   }, false);
   return { color, normal };
+}
+
+// Smooth leather with scuffs and paler rubbed patches, light on white so the color tints it
+function worn() {
+  const r = seeded(17);
+  return painted(256, 256, (g, w, h) => {
+    g.fillStyle = "#d6d6d6"; g.fillRect(0, 0, w, h);
+    for (let i = 0; i < 26; i++) {
+      const x = r() * w, y = r() * h, rad = 10 + r() * 50, grad = g.createRadialGradient(x, y, 0, x, y, rad);
+      const light = r() < 0.6;
+      grad.addColorStop(0, light ? `rgba(255,245,235,${0.25 + r() * 0.3})` : `rgba(40,20,10,${0.15 + r() * 0.2})`);
+      grad.addColorStop(1, "rgba(0,0,0,0)");
+      g.fillStyle = grad; g.fillRect(x - rad, y - rad, rad * 2, rad * 2);
+    }
+    for (let i = 0; i < 40; i++) {
+      const x = r() * w, y = r() * h;
+      g.strokeStyle = `rgba(255,240,225,${0.15 + r() * 0.25})`; g.lineWidth = 0.6;
+      g.beginPath(); g.moveTo(x, y); g.lineTo(x + (r() - 0.5) * 24, y + (r() - 0.5) * 10); g.stroke();
+    }
+  });
 }
 
 // A soft round or square shadow, dark at the middle and clear at the edge
@@ -380,6 +411,17 @@ export function furnish(scene, { win, sc, sw, sh }) {
   }
   add(merged(brass, standard({ color: BRASS, metalness: 0.6, roughness: 0.35 })));
 
+  // A seat cushion that has been sat in: its top dips toward the middle
+  const sag = (geo) => {
+    const pos = geo.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i) / 0.28, z = (pos.getZ(i) - 0.07) / 0.3;
+      if (pos.getY(i) > 0.46) pos.setY(i, pos.getY(i) - 0.018 * Math.max(0, 1 - x * x) * Math.max(0, 1 - z * z));
+    }
+    geo.computeVertexNormals();
+    return geo;
+  };
+
   // ---- Two wingback armchairs, built facing +z, then turned toward the space in front of the set ----
   const tuft = tufting(), rb = (w, h, d, seg, rad, o) => place(new T.RoundedBoxGeometry(w, h, d, seg, rad), o);
   const chair = { tufted: [], plain: [], wood: [] };
@@ -389,7 +431,7 @@ export function furnish(scene, { win, sc, sw, sh }) {
     rb(0.15, 0.48, 0.36, 3, 0.06, { p: [0.37, 0.9, -0.17], r: [0, -0.22, 0], uv: [0.5, 0.7] }));
   chair.plain.push(
     rb(0.84, 0.22, 0.78, 2, 0.04, { p: [0, 0.28, 0] }),
-    rb(0.56, 0.12, 0.6, 3, 0.05, { p: [0, 0.45, 0.07] }),
+    sag(rb(0.56, 0.12, 0.6, 3, 0.05, { p: [0, 0.45, 0.07] })),
     rb(0.13, 0.2, 0.72, 3, 0.05, { p: [-0.36, 0.48, 0.02] }), rb(0.13, 0.2, 0.72, 3, 0.05, { p: [0.36, 0.48, 0.02] }),
     place(new T.CylinderGeometry(0.075, 0.075, 0.7, 14), { p: [-0.37, 0.6, 0.02], r: [Math.PI / 2, 0, 0] }),
     place(new T.CylinderGeometry(0.075, 0.075, 0.7, 14), { p: [0.37, 0.6, 0.02], r: [Math.PI / 2, 0, 0] }));
@@ -402,7 +444,7 @@ export function furnish(scene, { win, sc, sw, sh }) {
   const both = (parts) => CHAIRS.flatMap(([x, z, t]) => moved(parts.map((g) => g.clone()), { p: [x, 0, z], r: [0, t, 0] }));
   const leather = { color: LEATHER, map: tuft.color, roughness: 0.48 };
   add(merged(both(chair.tufted), standard({ ...leather, normalMap: tuft.normal, normalScale: new T.Vector2(0.9, 0.9) })));
-  add(merged(both(chair.plain), standard({ color: LEATHER, map: grain(9), roughness: 0.42 })));
+  add(merged(both(chair.plain), standard({ color: LEATHER, map: worn(), roughness: 0.46 })));
   add(merged(both(chair.wood), standard({ color: LEG_WOOD, map: wood, roughness: 0.4 })));
   Object.values(chair).flat().forEach((g) => g.dispose());
 }
