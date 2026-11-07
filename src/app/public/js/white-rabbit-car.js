@@ -134,18 +134,18 @@ export function createCar({ scene, env, at, onSound = () => {} }) {
   car.add(shell); scene.add(car);
   const lit = (m) => { m.castShadow = m.receiveShadow = true; return m; };
 
-  // Pearl black: dark base with metal flakes, a smooth clear coat, and a faint pearl shift at an angle
+  // Pearl black: glossy black over fine metal flakes that glint only where light catches them
   const paint = new T.MeshPhysicalMaterial({
-    color: "#040507", metalness: 0.15, roughness: 0.5, normalMap: flakes(), normalScale: new T.Vector2(0.7, 0.7),
-    clearcoat: 1, clearcoatRoughness: 0.04, iridescence: 0.18, iridescenceIOR: 1.5, envMap: env, envMapIntensity: 0,
+    color: "#060607", metalness: 0.7, roughness: 0.3, normalMap: flakes(), normalScale: new T.Vector2(0.9, 0.9),
+    clearcoat: 1, clearcoatRoughness: 0.03, envMap: env, envMapIntensity: 0,
   });
   const glass = new T.MeshStandardMaterial({ color: "#07080A", metalness: 0.2, roughness: 0.06, envMap: env, envMapIntensity: 0 });
   const trim = new T.MeshStandardMaterial({ color: "#111214", roughness: 0.5 });
-  const rubber = new T.MeshStandardMaterial({ color: "#151515", roughness: 0.85 });
+  const rubber = new T.MeshStandardMaterial({ color: "#0B0B0B", roughness: 0.85 });
   const rims = new T.MeshStandardMaterial({ color: "#2A2C30", metalness: 0.8, roughness: 0.3, envMap: env, envMapIntensity: 0 });
   const lamps = new T.MeshStandardMaterial({ color: "#20242A", emissive: "#FFF4E2", emissiveIntensity: 0, roughness: 0.2 });
   const tails = new T.MeshStandardMaterial({ color: "#3A0806", emissive: "#FF2010", emissiveIntensity: 0, roughness: 0.3 });
-  const glossy = [[paint, 0.55], [glass, 0.7], [rims, 0.8]];
+  const glossy = [[paint, 0.3], [glass, 0.45], [rims, 0.8]];
 
   // Body and greenhouse
   shell.add(lit(new T.Mesh(loft(-L / 2, L / 2, 44, 28, body), paint)));
@@ -227,5 +227,12 @@ export function createCar({ scene, env, at, onSound = () => {} }) {
     shell.rotation.z = 0.004 * shake * pulse;
   }
 
-  return { pick, update, get running() { return running; } };
+  // The car's box in the room as [min, max], for whatever needs to know where it stands
+  car.updateMatrixWorld();
+  const box = [new T.Vector3(Infinity, Infinity, Infinity), new T.Vector3(-Infinity, -Infinity, -Infinity)], c = new T.Vector3();
+  for (const x of [-0.053, 0.053]) for (const y of [0, 0.075]) for (const z of [-L / 2, L / 2]) {
+    c.set(x, y, z).applyMatrix4(car.matrixWorld); box[0].min(c); box[1].max(c);
+  }
+
+  return { pick, update, box, get running() { return running; } };
 }
