@@ -268,6 +268,25 @@ function environment(renderer) {
 }
 
 
+// The car's reflections: a deep blue dome over dark ground with a bright band at the horizon, and
+// the window's glow, so the clear coat stays black but draws a crisp line along the shoulder
+function outdoors(renderer) {
+  const env = new T.Scene(), pm = new T.PMREMGenerator(renderer), stuff = [];
+  const part = (geo, color, p, r = [0, 0, 0]) => {
+    const m = new T.Mesh(geo, new T.MeshBasicMaterial({ color: new T.Color(...color), side: T.BackSide, toneMapped: false }));
+    m.position.set(...p); m.rotation.set(...r); env.add(m); stuff.push(m);
+  };
+  part(new T.SphereGeometry(10, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2), [0.22, 0.28, 0.4], [0, 0, 0]);
+  part(new T.CylinderGeometry(9.8, 9.8, 1.6, 32, 1, true), [2.2, 2.3, 2.4], [0, 0.9, 0]);
+  part(new T.SphereGeometry(10, 24, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), [0.05, 0.045, 0.04], [0, 0, 0]);
+  part(new T.PlaneGeometry(3, 3), [9, 8.6, 7.6], [-9.5, 2.5, -2], [0, Math.PI / 2, 0]);
+  const tex = pm.fromScene(env, 0.01, 0.1, 30, { size: 128 }).texture;
+  stuff.forEach((m) => { m.geometry.dispose(); m.material.dispose(); });
+  pm.dispose();
+  return tex;
+}
+
+
 /**
  * Builds the scene on a new canvas in #whiteRabbit; throws without WebGL. onLost() runs if the
  * context goes; onSound(kind) hears the car on the sill ("click", "crank", "fire", "stop")
@@ -299,7 +318,8 @@ export function createScene({ onLost, onSound = () => {} }) {
   const { glossy } = furnish(scene, { win: WINDOW, sc: SC, sw: SW, sh: SH, env, touch });
 
   // The model car on the sill, nose turned a little toward the room, kept inside the glass
-  const car = createCar({ scene, env, at: { p: [-1.872, WINDOW.y - WINDOW.h / 2 + 0.028, 0.9], turn: 0.1, scale: 1.25 }, onSound });
+  const carEnv = outdoors(renderer);
+  const car = createCar({ scene, env: carEnv, at: { p: [-1.872, WINDOW.y - WINDOW.h / 2 + 0.028, 0.9], turn: 0.1, scale: 1.25 }, onSound });
   sky.block(...car.box);
 
   // Screen and glass, both curved by the same bulge
@@ -517,7 +537,7 @@ export function createScene({ onLost, onSound = () => {} }) {
       }
     });
     if (tex) tex.dispose();
-    env.dispose(); sky.dispose(); car.dispose();
+    env.dispose(); carEnv.dispose(); sky.dispose(); car.dispose();
     composer.passes.forEach((pass) => pass.dispose && pass.dispose());
     composer.dispose();
     renderer.dispose();
