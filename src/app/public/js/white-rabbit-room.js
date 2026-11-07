@@ -11,7 +11,7 @@ import { paintSign, signOutline } from "/js/white-rabbit-sign.js";
 
 
 // Palette: pale walls with the brand greens as trim, walnut and bakelite for the set, oxblood leather
-const WALL = "#EEF0EC", CEILING = "#F5F6F3", WINDOW_TRIM = "#E8ECE8", BRAND = "#035704", MARK = "#327641";
+const WALL = "#F7F8F5", CEILING = "#F5F6F3", WINDOW_TRIM = "#E8ECE8", BRAND = "#035704", MARK = "#327641";
 const WALNUT = "#8A5A34", DARK_WOOD = "#6A4426", LEG_WOOD = "#3A2416", BAKELITE = "#3E2B1E", IVORY = "#D9CCAA";
 const BRASS = "#A8834E", LEATHER = "#5C2C20";
 
@@ -320,13 +320,25 @@ export function furnish(scene, { win, sc, sw, sh }) {
     panels.push(place(new T.PlaneGeometry(len, RAIL - BASE), { p: [px, (RAIL + BASE) / 2, pz], r: [0, t, 0], uv: [len, RAIL - BASE] }));
     const n = Math.max(1, Math.round(len / 0.62)), pw = len / n, ph = RAIL - BASE - 0.13;
     for (let i = 0; i < n; i++) {
-      const along = -len / 2 + pw * (i + 0.5), [fx, fz] = inward(x, z, t, 0.013);
-      panels.push(place(new T.RoundedBoxGeometry(pw - 0.13, ph, 0.022, 2, 0.008), {
+      const along = -len / 2 + pw * (i + 0.5), [fx, fz] = inward(x, z, t, 0.03);
+      // A deep raised field with a dark green edge: a green block behind, a white face in front
+      const [gx, gz] = inward(x, z, t, 0.022);
+      dark.push(place(new T.BoxGeometry(pw - 0.114, ph + 0.016, 0.04), { p: [gx + Math.cos(t) * along, (RAIL + BASE) / 2, gz - Math.sin(t) * along], r: [0, t, 0] }));
+      panels.push(place(new T.RoundedBoxGeometry(pw - 0.13, ph, 0.05, 2, 0.008), {
         p: [fx + Math.cos(t) * along, (RAIL + BASE) / 2, fz - Math.sin(t) * along], r: [0, t, 0], uv: [pw, ph] }));
     }
     const strip = (h, d, y, list) => { const [sx, sz] = inward(x, z, t, d / 2); list.push(place(new T.BoxGeometry(len, h, d), { p: [sx, y, sz], r: [0, t, 0] })); };
     strip(BASE, 0.02, BASE / 2, dark); strip(0.014, 0.03, BASE + 0.007, dark);
-    strip(0.035, 0.026, RAIL, light); strip(0.012, 0.034, RAIL + 0.02, light);
+    // The chair rail stops at the window casing, so the window sits in front of it
+    if (t === Math.PI / 2) {
+      for (const [a, b] of [[-ROOM.z, z0 - 0.09], [z1 + 0.09, ROOM.z]]) {
+        const c = (a + b) / 2, L = b - a, rail = (h, d, y) => {
+          const [sx, sz] = inward(x, z, t, d / 2);
+          light.push(place(new T.BoxGeometry(L, h, d), { p: [sx, y, c + sz - z], r: [0, t, 0] }));
+        };
+        rail(0.035, 0.026, RAIL); rail(0.012, 0.034, RAIL + 0.02);
+      }
+    } else { strip(0.035, 0.026, RAIL, light); strip(0.012, 0.034, RAIL + 0.02, light); }
     strip(0.1, 0.022, ROOM.h - 0.05, light); strip(0.035, 0.05, ROOM.h - 0.0175, light); strip(0.012, 0.03, ROOM.h - 0.106, dark);
   }
   add(merged(panels, standard({ color: WALL, map: plaster(), roughness: 0.75 })));

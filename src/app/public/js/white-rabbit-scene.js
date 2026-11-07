@@ -421,7 +421,7 @@ export function createScene({ onLost }) {
     grade.uniforms.uGrain.value = ramp(p, [[0, 0], [0.12, 0.015]]);
     grade.uniforms.uVignette.value = ramp(p, [[0.28, 0], [0.6, 0.25], [0.94, 0.1]]);
     grade.uniforms.uTone.value = ramp(p, [[0.12, 0], [0.4, 1]]);
-    grade.uniforms.uExposure.value = ramp(p, [[0.82, 1], [0.94, 1.15], [1, 1.6]]);
+    grade.uniforms.uExposure.value = ramp(p, [[0.4, 1], [0.58, 1.15], [0.82, 1.15], [0.94, 1.25], [1, 1.6]]); // brighter once out of the TV
     grade.uniforms.uWhite.value = ramp(p, [[0.94, 0], [0.985, 1]]);
     bloom.strength = bloomOn ? ramp(p, [[0.6, 0], [0.94, 0.12]]) : 0;
     bloom.enabled = bloom.strength > 0.001;
