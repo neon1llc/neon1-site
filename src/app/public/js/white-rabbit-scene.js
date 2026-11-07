@@ -9,7 +9,7 @@
 import * as T from "/js/vendor/three-0.187.0.rabbit.min.js";
 import { createSky, createShafts, LIGHT } from "/js/white-rabbit-sky.js";
 import { furnish } from "/js/white-rabbit-room.js";
-import { createCar } from "/js/white-rabbit-car.js";
+import { createCar, unpacked } from "/js/white-rabbit-car.js";
 
 
 // The white-out, the floor's bounce light, the landing's void, and where the screen sits
@@ -317,6 +317,29 @@ export function createScene({ onLost, onSound = () => {} }) {
   const env = environment(renderer);
   const { glossy } = furnish(scene, { win: WINDOW, sc: SC, sw: SW, sh: SH, env, touch });
 
+  // Baked light: the room's lit meshes take geometry with a second UV map from room.glb and a baked
+  // occlusion map on it (made by blender/room.py from this same build); the painted stand-in
+  // contact shadows go once it is in. If it fails, the room simply stays as built
+  const bakedTextures = [];
+  const baked = new Promise((done) => new T.GLTFLoader().load("/media/white-rabbit/room.glb", (gltf) => {
+    gltf.scene.updateMatrixWorld(true);
+    const byName = new Map();
+    scene.traverse((o) => { if (o.isMesh && o.userData.bake) byName.set(o.name, o); });
+    const loader = new T.TextureLoader();
+    gltf.scene.traverse((o) => {
+      const target = o.isMesh && byName.get(o.name);
+      if (!target) return;
+      const g = unpacked(o.geometry).applyMatrix4(o.matrixWorld);
+      o.geometry.dispose(); target.geometry.dispose(); target.geometry = g;
+      const t = loader.load(`/media/white-rabbit/lm/${o.name}.webp`);
+      t.channel = 1; t.flipY = false; bakedTextures.push(t);
+      target.material.aoMap = t; target.material.aoMapIntensity = 1; target.material.needsUpdate = true;
+    });
+    scene.traverse((o) => { if (o.userData.standIn) o.visible = false; });
+    renderer.shadowMap.needsUpdate = true;
+    done();
+  }, undefined, () => done()));
+
   // The model car on the sill, nose turned a little toward the room, kept inside the glass
   const carEnv = outdoors(renderer);
   const car = createCar({ scene, env: carEnv, at: { p: [-1.872, WINDOW.y - WINDOW.h / 2 + 0.028, 0.9], turn: 0.1, scale: 1.25 }, onSound });
@@ -388,7 +411,7 @@ export function createScene({ onLost, onSound = () => {} }) {
   const pic = document.createElement("canvas");
   let tex = null, fit = { h: SH, d0: 0.5 };
   async function compose() {
-    const [{ cw, ch, rh }] = await Promise.all([picture(pic), sky.ready, car.ready]);
+    const [{ cw, ch, rh }] = await Promise.all([picture(pic), sky.ready, car.ready, baked]);
     if (disposed) return;
     if (!tex || tex.image.width !== cw || tex.image.height !== ch) {
       if (tex) tex.dispose();
@@ -537,7 +560,7 @@ export function createScene({ onLost, onSound = () => {} }) {
       }
     });
     if (tex) tex.dispose();
-    env.dispose(); carEnv.dispose(); sky.dispose(); car.dispose();
+    env.dispose(); carEnv.dispose(); sky.dispose(); car.dispose(); bakedTextures.forEach((t) => t.dispose());
     composer.passes.forEach((pass) => pass.dispose && pass.dispose());
     composer.dispose();
     renderer.dispose();

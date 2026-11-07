@@ -456,9 +456,15 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
   const glossy = [];
   const shiny = (k, o, Kind = T.MeshStandardMaterial) => { const m = new Kind({ ...o, envMap: env, envMapIntensity: 0 }); glossy.push([m, k]); return m; };
   // Lit meshes cast and take the window light's shadows; glass and the painted shadows don't
+  // Each mesh gets a stable name in build order, which the baked lighting is keyed to (blender/room.py);
+  // lit ones are marked for baking, and painted contact shadows as stand-ins that baking replaces
+  let count = 0;
   const add = (mesh) => {
     const lit = !mesh.material.isMeshBasicMaterial && !mesh.material.transparent;
     mesh.castShadow = mesh.receiveShadow = lit;
+    mesh.name = `room-${count++}`;
+    mesh.userData.bake = lit;
+    mesh.userData.standIn = mesh.material.isMeshBasicMaterial && mesh.material.transparent;
     scene.add(mesh);
     return mesh;
   };
