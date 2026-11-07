@@ -11,7 +11,7 @@
   <meta property="og:title" content="neon1" />
   <meta property="og:description" content="1 is glad to be of service." />
   <meta property="og:url" content="https://neon1.tech/" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐇</text></svg>" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22 fill=%22none%22 stroke=%22%2300B84F%22 stroke-width=%225%22 stroke-linecap=%22round%22><path d=%22M6 6a24 24 0 0 1 24 24v30M6 18a12 12 0 0 1 12 12v30M34 6a24 24 0 0 1 24 24v30M34 18a12 12 0 0 1 12 12v30%22/></svg>" />
   <link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
   <!-- Shared with 1NEON: fonts, brand tokens, rain layers, glass, and rain controls -->
   <link rel="stylesheet" href="/shared/neon1.css" />
@@ -328,6 +328,10 @@
     .case-body th, .case-body td { text-align: left; padding: 9px 10px 9px 0; border-bottom: 1px solid rgba(18,36,26,.1); vertical-align: top; }
     .case-body th { font: 500 12px var(--mono); color: var(--brand); }
     .case-body .stat { font: 13px var(--mono); color: var(--muted); }
+    /* Links to other sites inside a case study: brand green, a fine underline, and a small arrow */
+    .case-body a.ext { color: var(--brand); font-weight: 600; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+    .case-body a.ext::after { content: "↗"; font-size: .8em; margin-left: 2px; }
+    .case-body a.ext:hover { text-decoration-thickness: 2px; }
     .case-body .stat b { color: var(--brand); }
 
     /* Phones: the panel fills the screen below the header */
@@ -347,7 +351,8 @@
     .links .portal svg { width: 14px; height: 14px; }
     header.light .links .portal { color: var(--brand); border-color: rgba(3,87,4,.25); }
     header.light .links .portal:hover { border-color: var(--brand); }
-    .hero-pane { padding: 14px 20px; }
+    /* Room around the wordmark and slogan, about the size of the gap between them */
+    .hero-pane { padding: 20px 30px; }
     /* The 1.3x "neon" adds .3em of empty line space above the letters; pull it back so the pane looks balanced */
     .hero-pane .brand { margin-top: -.3em; }
     body { transition: background-color .4s; } body.woke { background-color: var(--paper); }
@@ -381,6 +386,10 @@
     .glide, .glide body { scroll-behavior: auto; }
     @media (prefers-reduced-motion: reduce) { header { transition: none; } }
 
+    /* Leaving for 1NEON: everything but the rain fades out, so the portal can fade in over the same rain */
+    body.leaving header, body.leaving .top, body.leaving .awake, body.leaving .rainctl, body.leaving .menu { opacity: 0; transition: opacity .4s ease; }
+    body.leaving .awake { pointer-events: none; }
+
     /* Case studies intro line, with the four stages on a line of their own */
     .intro { margin: -6px 0 clamp(18px, 3vh, 30px); }
     .intro .stages { display: block; }
@@ -392,7 +401,10 @@
 
     /* Nav items stay on one line with centered text; below the width they fit in, they fold into the menu */
     .links a { white-space: nowrap; justify-content: center; text-align: center; }
-    @media (max-width: 960px) { .links { display: none; } .menu-btn { display: inline-block; } }
+    /* Five links and two buttons sit closer together, and fold into the menu below the width they need */
+    @media (max-width: 1040px) { .links { display: none; } .menu-btn { display: inline-block; } }
+    header .links { gap: 4px; }
+    header .links .btn { margin-left: 6px; }
 
     /* Open source: a public project shows the case-study arrow on hover, a private one a lock that explains itself */
     .row h3 { display: flex; align-items: center; gap: 8px; }
@@ -415,9 +427,10 @@
   <canvas id="lens" aria-hidden="true"></canvas>
   <div class="veil" aria-hidden="true"></div>
 
-  <header>
-    <nav aria-label="Main">
-      <a class="logo" href="#top" aria-label="neon1 home">
+  <header class="n1-bar">
+    <nav class="n1-inner" aria-label="Main">
+      <!-- A plain link to neon1.tech, so it can be dragged to the bookmarks bar; a click springs back to the top -->
+      <a class="logo n1-logo" href="/" data-view="top" aria-label="neon1 home">
         <!-- Brand mark: two arches of nested arcs falling into columns (from the neon1 logo) -->
         <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
           <path d="M6 6a24 24 0 0 1 24 24v30M6 12a18 18 0 0 1 18 18v30M6 18a12 12 0 0 1 12 12v30M6 24a6 6 0 0 1 6 6v30" />
@@ -427,12 +440,13 @@
       </a>
       <ul class="links">
         <li><a href="#services">services</a></li>
+        <li><a href="#process">process</a></li>
         <li><a href="#projects">case studies</a></li>
-        <li><a href="#how">how it works</a></li>
         <li><a href="#work">open source</a></li>
+        <li><a href="#why">about</a></li>
         <li><a class="btn btn-ghost" href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a call</a></li>
         <!-- The client portal, a separate app on the same domain -->
-        <li><a class="btn portal" href="/1NEON/" title="1NEON, the client portal">
+        <li><a class="btn portal" href="/1NEON/" data-handoff title="1NEON, the client portal">
           <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="5" aria-hidden="true"><circle cx="32" cy="32" r="28" /><circle cx="32" cy="32" r="19" /><circle cx="32" cy="32" r="10" /><circle cx="32" cy="32" r="2" /></svg>1NEON</a></li>
       </ul>
       <button class="chip menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="menu">menu</button>
@@ -443,13 +457,13 @@
   <div class="menu" id="menu" hidden>
     <ul>
       <li><a href="#services">services</a></li>
+      <li><a href="#process">process</a></li>
       <li><a href="#projects">case studies</a></li>
-      <li><a href="#how">how it works</a></li>
       <li><a href="#work">open source</a></li>
       <li><a href="#why">about</a></li>
       <li><a href="#faq">questions</a></li>
       <li><a href="#contact">contact</a></li>
-      <li><a href="/1NEON/">1NEON</a></li>
+      <li><a href="/1NEON/" data-handoff>1NEON</a></li>
     </ul>
   </div>
 
@@ -469,28 +483,39 @@
       <h2 id="services-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>services</h2>
       <div class="rows say-rows">
         <div class="say reveal-on">
-          <p class="idx">01 · for homes &amp; small offices</p>
-          <p class="line"><strong>Home &amp; local tech.</strong> <span>Wi-Fi that reaches every room, cameras that record when they should, new laptops set up properly, and a short lesson on spotting phishing.</span></p>
+          <p class="idx">01 · for small to medium businesses</p>
+          <p class="line"><strong>Business workflows and technology.</strong> <span>Right-fitted systems for how your business actually runs: email, spreadsheets, POS, booking, and accounting tools connected, repetitive steps automated, and data you can trust, so nobody retypes orders at the end of the day.</span></p>
         </div>
         <div class="say reveal-on">
-          <p class="idx">02 · for small businesses</p>
-          <p class="line"><strong>Business workflows.</strong> <span>Your email, spreadsheets, POS, and booking apps connected to each other, so nobody retypes orders at the end of the day.</span></p>
+          <p class="idx">02 · for technical teams</p>
+          <p class="line"><strong>Cloud and AI engineering.</strong> <span>AWS accounts and infrastructure as code, deploy pipelines your team can trust, AI assistants grounded in your own documents, migrations with a way back, and backups proven by test restores.</span></p>
         </div>
         <div class="say reveal-on">
-          <p class="idx">03 · for technical teams</p>
-          <p class="line"><strong>Cloud &amp; AI engineering.</strong> <span>AWS accounts set up as code, deploy pipelines your team can trust, RAG and LLM systems, migrations, and backups that get test restores.</span></p>
+          <p class="idx">03 · for offices, homes, and physical spaces</p>
+          <p class="line"><strong>Networks, devices, and spaces.</strong> <span>Wi-Fi that reaches every room, cameras that record when they should, laptops and phones set up properly, smart devices on their own network, and printers and shared drives that just work.</span></p>
         </div>
         <div class="say reveal-on">
-          <p class="idx">04 · for teams, schools, and families</p>
-          <p class="line"><strong>Security training and readiness.</strong> <span>Plain-language sessions on networks, cameras, connected devices, fraud, and data brokers, plus SOC 2 and other security readiness for companies heading into an audit.</span></p>
+          <p class="idx">04 · for organizations, teams, families, and individuals</p>
+          <p class="line"><strong>Security awareness and readiness.</strong> <span>Plain-language sessions on phishing, fraud, passwords, connected devices, and data brokers, plus SOC 2 and other readiness work for companies heading into an audit.</span></p>
         </div>
       </div>
-      <p class="lead quote reveal-on">The first call is free and takes 15 minutes. If I can help, you get a short proposal with a few options and a fixed price for each, before any work starts. If a settings change will fix it, I'll just tell you on the call. Accounts and bills stay in your name.</p>
+      <p class="lead quote reveal-on">A free 15-minute call is enough to find the main pain points and your options. Longer consultations cover discovery, requirements, and shaping a proposal with you until you're ready to decide, and every option comes with an estimate before any work starts. If a quick, obvious change will fix it, I'll tell you, and the proposal is yours to keep, whether you do it yourself or with neon1. Accounts and bills stay in your name.</p>
+    </section>
+
+    <section id="process" class="view split" aria-labelledby="process-h">
+      <h2 id="process-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>process</h2>
+      <div class="steps timeline">
+        <div class="reveal-on"><h3>Listen</h3><p>Show me how the work gets done today. One real example is enough.</p></div>
+        <div class="reveal-on"><h3>Propose</h3><p>A few options, from the quickest fix to the fuller build, each with an estimate, the effort, and what it gets you.</p></div>
+        <div class="reveal-on"><h3>Decide</h3><p>You pick. Sometimes that means a new system. Often it's a setting, a cleanup, or leaving it alone.</p></div>
+        <div class="reveal-on"><h3>Build</h3><p>Small changes, tested, and shown to you as they land.</p></div>
+        <div class="reveal-on"><h3>Hand over</h3><p>I show you how it works and write it down, so you can run it without me. Then I check it's doing what we agreed, and keep improving it if you want ongoing care.</p></div>
+      </div>
     </section>
 
     <section id="projects" class="view" aria-labelledby="projects-h">
       <h2 id="projects-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>case studies</h2>
-      <p class="lead intro reveal-on">From cloud systems to a grandparent's email, every one runs the same way: <span class="stages"><b class="nl">N</b>eed, <b class="nl">E</b>xecution, <b class="nl">O</b>bservation, <b class="nl">N</b>ext.</span></p>
+      <p class="lead intro reveal-on">From cloud systems to a grandparent's email, every one runs the same way: <span class="stages"><b class="nl">N</b>eed, <b class="nl">E</b>xecution, <b class="nl">O</b>bservation, <b class="nl">N</b>ormalize.</span></p>
       <div class="rail-wrap">
         <div class="cases" id="cases" tabindex="0" aria-label="Case studies, scroll sideways">
         <article class="case reveal-on" id="case-accounting">
@@ -499,7 +524,7 @@
           <dl class="neon"><dt>N</dt><dd>Staff spent minutes hunting through Microsoft 365, or interrupted a senior colleague.</dd><dt>E</dt><dd>An assistant on AWS Bedrock that answers only from approved documents each person may see.</dd><dt>O</dt><dd>Timed real lookups before and after, and scored 80 test questions for accuracy.</dd><dt>N</dt><dd>An MCP server over the same search, so agents get answers with the same permissions.</dd></dl>
           <p class="stat"><b>~5 min → 14 s</b> lookup · recall 72% → 94%</p>
           <button class="open" type="button" data-case="accounting" aria-haspopup="dialog" aria-label="Open case study"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></button>
-          <template class="deep"><h4><span>N</span>eed</h4><p>The firm's knowledge was spread across Microsoft 365: policies, procedure manuals, Word files, PDFs, and client documents. Staff could usually find an answer, but a routine lookup took 2 to 10 minutes, and often meant asking a senior colleague who knew where things lived. Drafts, old versions, and client-restricted files sat right next to the right answer, so a simple chatbot would have been risky.</p><p>The ask was simple: let staff ask normal questions, return the approved answer with its document, and never make the AI more authoritative than the source.</p><h4><span>E</span>xecution</h4><p>This was my first project with an AWS partner, Xenoss, who helped with design and now with maintenance. I handled ingestion, embeddings, retrieval, and answer quality.</p><ul><li>Only documents in approved Microsoft 365 libraries are synced into versioned, encrypted S3, keeping their source, version, and access details.</li><li>Bedrock Knowledge Bases with Titan embeddings and OpenSearch Serverless run hybrid search, so exact accounting terms and form numbers match as well as differently worded questions.</li><li>Each question is checked against what that person is allowed to see before anything is retrieved. Answers come only from the retrieved passages, with citations, or the assistant says it doesn't know.</li><li>Built with Terraform and deployed through GitHub Actions, with CloudWatch tracking ingestion, retrieval, and answer time separately.</li></ul><h4><span>O</span>bservation</h4><table><tr><th>Measure</th><th>Before</th><th>After</th></tr><tr><td>Median lookup, answer and source checked</td><td>~4.8 min</td><td>13.6 s</td></tr><tr><td>Slowest 5% of lookups</td><td>up to 10 min</td><td>~24 s</td></tr><tr><td>Right passage found (recall at 8)</td><td>72%</td><td>94%</td></tr><tr><td>Answers fully supported by their source</td><td>78%</td><td>92%</td></tr><tr><td>Interruptions of senior staff per week</td><td>~18</td><td>~7</td></tr></table><p>Measured on 80 representative questions, including ones the assistant should refuse, and judged by two reviewers. A fast answer from the wrong document counted as a failure.</p><h4><span>N</span>ext</h4><p>Microsoft 365 stays the source of truth, and the search index can be rebuilt from it at any time. The firm owns which documents are approved and who can see them. Next is an MCP server in front of the same retrieval, so assistants and agents can use the firm's knowledge with the same per-person permissions, followed by narrow, reviewable agent actions where they save real time.</p></template>
+          <template class="deep"><h4><span>N</span>eed</h4><p>The firm's knowledge was spread across Microsoft 365: policies, procedure manuals, Word files, PDFs, and client documents. Staff could usually find an answer, but a routine lookup took 2 to 10 minutes, and often meant asking a senior colleague who knew where things lived. Drafts, old versions, and client-restricted files sat right next to the right answer, so a simple chatbot would have been risky.</p><p>The ask was simple: let staff ask normal questions, return the approved answer with its document, and never make the AI more authoritative than the source.</p><h4><span>E</span>xecution</h4><p>This was my first project with an AWS partner, <a class="ext" href="https://xenoss.io" target="_blank" rel="noopener">Xenoss</a>, who helped with design and now with maintenance. I handled ingestion, embeddings, retrieval, and answer quality.</p><ul><li>Only documents in approved Microsoft 365 libraries are synced into versioned, encrypted S3, keeping their source, version, and access details.</li><li>Bedrock Knowledge Bases with Titan embeddings and OpenSearch Serverless run hybrid search, so exact accounting terms and form numbers match as well as differently worded questions.</li><li>Each question is checked against what that person is allowed to see before anything is retrieved. Answers come only from the retrieved passages, with citations, or the assistant says it doesn't know.</li><li>Built with Terraform and deployed through GitHub Actions, with CloudWatch tracking ingestion, retrieval, and answer time separately.</li></ul><h4><span>O</span>bservation</h4><table><tr><th>Measure</th><th>Before</th><th>After</th></tr><tr><td>Median lookup, answer and source checked</td><td>~4.8 min</td><td>13.6 s</td></tr><tr><td>Slowest 5% of lookups</td><td>up to 10 min</td><td>~24 s</td></tr><tr><td>Right passage found (recall at 8)</td><td>72%</td><td>94%</td></tr><tr><td>Answers fully supported by their source</td><td>78%</td><td>92%</td></tr><tr><td>Interruptions of senior staff per week</td><td>~18</td><td>~7</td></tr></table><p>Measured on 80 representative questions, including ones the assistant should refuse, and judged by two reviewers. A fast answer from the wrong document counted as a failure.</p><h4><span>N</span>ormalize</h4><p>Microsoft 365 stays the source of truth, and the search index can be rebuilt from it at any time. The firm owns which documents are approved and who can see them. Next is an MCP server in front of the same retrieval, so assistants and agents can use the firm's knowledge with the same per-person permissions, followed by narrow, reviewable agent actions where they save real time.</p></template>
         </article>
         <article class="case reveal-on" id="case-dermatology">
           <p class="idx">dermatology practice · workflows</p>
@@ -507,7 +532,7 @@
           <dl class="neon"><dt>N</dt><dd>Intake ran through one inbox, with staff chasing documents and retyping them.</dd><dt>E</dt><dd>A small AWS portal where patients upload once and staff see what&#x27;s complete.</dd><dt>O</dt><dd>Compared four weeks before and after, on the same appointment types.</dd><dt>N</dt><dd>Ongoing maintenance with Xenoss, and tuning as the practice grows.</dd></dl>
           <p class="stat"><b>2.6 days → 3.4 hours</b> · 24 → 8 min staff time</p>
           <button class="open" type="button" data-case="dermatology" aria-haspopup="dialog" aria-label="Open case study"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></button>
-          <template class="deep"><h4><span>N</span>eed</h4><p>A newly opened practice handled intake through a shared Microsoft 365 inbox, and its sister location did the same. Patients replied with forms, insurance cards, referrals, and phone photos. Staff downloaded attachments, renamed them, tracked status in Outlook flags and a spreadsheet, then uploaded each one into a slow EHR. If something was missing, another round of emails began.</p><h4><span>E</span>xecution</h4><p>I mapped the process with the staff using a questionnaire and conversations, separating the time patients spent waiting from the time staff spent handling documents. Then I built a Terraform-managed serverless portal, with Xenoss helping on design and maintenance.</p><ul><li>CloudFront, WAF, and a private S3 site serve the portal. API Gateway, Cognito, and Python Lambda run the workflow.</li><li>Every intake has one clear state in DynamoDB. Documents upload straight to an encrypted S3 vault and stay locked until a malware scan passes.</li><li>Staff see one queue of what's complete and what's missing. Completed documents are filed into the EHR under the patient's ID and MRN, so they land in the right chart.</li><li>Email notifications never include patient details, and access, encryption, and audit logging were decided up front.</li></ul><h4><span>O</span>bservation</h4><table><tr><th>Measure</th><th>Before</th><th>After</th></tr><tr><td>Median time to a complete intake</td><td>~2.6 business days</td><td>~3.4 hours</td></tr><tr><td>Staff time per intake</td><td>~24 min</td><td>~8 min</td></tr><tr><td>Finding and opening a document</td><td>~2 min 18 s</td><td>~12 s</td></tr><tr><td>Intakes needing a missing-document follow-up</td><td>~34%</td><td>~10%</td></tr></table><p>Four weeks before and four weeks after, with the same definitions. At about 250 intakes a month, the time saved is roughly 67 staff hours a month.</p><h4><span>N</span>ext</h4><p>The EHR stays the clinical record. Xenoss and I maintain the portal, watch the intake measures, and tune the workflow as the practice and its sister location grow.</p></template>
+          <template class="deep"><h4><span>N</span>eed</h4><p>A newly opened practice handled intake through a shared Microsoft 365 inbox, and its sister location did the same. Patients replied with forms, insurance cards, referrals, and phone photos. Staff downloaded attachments, renamed them, tracked status in Outlook flags and a spreadsheet, then uploaded each one into a slow EHR. If something was missing, another round of emails began.</p><h4><span>E</span>xecution</h4><p>I mapped the process with the staff using a questionnaire and conversations, separating the time patients spent waiting from the time staff spent handling documents. Then I built a Terraform-managed serverless portal, with <a class="ext" href="https://xenoss.io" target="_blank" rel="noopener">Xenoss</a> helping on design and maintenance.</p><ul><li>CloudFront, WAF, and a private S3 site serve the portal. API Gateway, Cognito, and Python Lambda run the workflow.</li><li>Every intake has one clear state in DynamoDB. Documents upload straight to an encrypted S3 vault and stay locked until a malware scan passes.</li><li>Staff see one queue of what's complete and what's missing. Completed documents are filed into the EHR under the patient's ID and MRN, so they land in the right chart.</li><li>Email notifications never include patient details, and access, encryption, and audit logging were decided up front.</li></ul><h4><span>O</span>bservation</h4><table><tr><th>Measure</th><th>Before</th><th>After</th></tr><tr><td>Median time to a complete intake</td><td>~2.6 business days</td><td>~3.4 hours</td></tr><tr><td>Staff time per intake</td><td>~24 min</td><td>~8 min</td></tr><tr><td>Finding and opening a document</td><td>~2 min 18 s</td><td>~12 s</td></tr><tr><td>Intakes needing a missing-document follow-up</td><td>~34%</td><td>~10%</td></tr></table><p>Four weeks before and four weeks after, with the same definitions. At about 250 intakes a month, the time saved is roughly 67 staff hours a month.</p><h4><span>N</span>ormalize</h4><p>The EHR stays the clinical record. Xenoss and I maintain the portal, watch the intake measures, and tune the workflow as the practice and its sister location grow.</p></template>
         </article>
         <article class="case reveal-on" id="case-migration">
           <p class="idx">automotive business · migration</p>
@@ -515,7 +540,7 @@
           <dl class="neon"><dt>N</dt><dd>The app, database, and files lived on two local servers both offices relied on.</dd><dt>E</dt><dd>Moved them to AWS with their technical lead, linked over a VPN.</dd><dt>O</dt><dd>Re-ran the real daily tasks from each office and reconciled every record.</dd><dt>N</dt><dd>Change more only when reliability, capacity, or cost data says so.</dd></dl>
           <p class="stat"><b>2 servers · 2 offices</b> · no app rewrite</p>
           <button class="open" type="button" data-case="migration" aria-haspopup="dialog" aria-label="Open case study"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></button>
-          <template class="deep"><h4><span>N</span>eed</h4><p>An automotive business ran its application, database, and files on two local servers, and both of its locations had to keep working through any move. Their technical lead already patched and supported those servers, so he knew the environment best.</p><h4><span>E</span>xecution</h4><p>He led the inventory and dependency discovery. I owned the AWS design, sizing, and migration plan.</p><ul><li>An isolated VPC built with Terraform, EC2 for the application, RDS for the database, and S3 for files that suit object storage.</li><li>Site-to-Site VPN connects both offices, with separate access paths for the app, the database, and management.</li><li>Sized from measured CPU, memory, database activity, and storage growth, not by copying the old hardware.</li><li>Data was seeded ahead of time, and the final cutover kept a fallback ready until both offices signed off.</li></ul><h4><span>O</span>bservation</h4><table><tr><th>Check</th><th>Result</th></tr><tr><td>Daily business tasks, both offices</td><td>Passed from each location</td></tr><tr><td>Records and files after migration</td><td>Reconciled against the originals</td></tr><tr><td>Backup and restore</td><td>Tested with the technical lead</td></tr><tr><td>Application changes needed</td><td>None</td></tr></table><h4><span>N</span>ext</h4><p>The technical lead runs the environment, with the architecture, access, backup, restore, and monitoring steps written down. Containers or a bigger platform come later, only if a measured reliability, capacity, or cost problem makes the case.</p></template>
+          <template class="deep"><h4><span>N</span>eed</h4><p>An automotive business ran its application, database, and files on two local servers, and both of its locations had to keep working through any move. Their technical lead already patched and supported those servers, so he knew the environment best.</p><h4><span>E</span>xecution</h4><p>He led the inventory and dependency discovery. I owned the AWS design, sizing, and migration plan.</p><ul><li>An isolated VPC built with Terraform, EC2 for the application, RDS for the database, and S3 for files that suit object storage.</li><li>Site-to-Site VPN connects both offices, with separate access paths for the app, the database, and management.</li><li>Sized from measured CPU, memory, database activity, and storage growth, not by copying the old hardware.</li><li>Data was seeded ahead of time, and the final cutover kept a fallback ready until both offices signed off.</li></ul><h4><span>O</span>bservation</h4><table><tr><th>Check</th><th>Result</th></tr><tr><td>Daily business tasks, both offices</td><td>Passed from each location</td></tr><tr><td>Records and files after migration</td><td>Reconciled against the originals</td></tr><tr><td>Backup and restore</td><td>Tested with the technical lead</td></tr><tr><td>Application changes needed</td><td>None</td></tr></table><h4><span>N</span>ormalize</h4><p>The technical lead runs the environment, with the architecture, access, backup, restore, and monitoring steps written down. Containers or a bigger platform come later, only if a measured reliability, capacity, or cost problem makes the case.</p></template>
         </article>
         <article class="case reveal-on" id="case-security">
           <p class="idx">schools, families, &amp; teams · security</p>
@@ -523,7 +548,7 @@
           <dl class="neon"><dt>N</dt><dd>People knew they were exposed online, but not where to start.</dd><dt>E</dt><dd>Plain-language sessions on networks, cameras, devices, fraud, and data brokers.</dd><dt>O</dt><dd>Live checkups during sessions, and the questions people brought back later.</dd><dt>N</dt><dd>Stay current with neon1-ready and other sources as threats change.</dd></dl>
           <p class="stat"><b>30+ people</b> per seminar · every level</p>
           <button class="open" type="button" data-case="security" aria-haspopup="dialog" aria-label="Open case study"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></button>
-          <template class="deep"><h4><span>N</span>eed</h4><p>Teachers, parents, engineers, and executives all had the same worry: they knew their accounts, homes, and businesses were exposed, but security advice was either too technical or too vague to act on.</p><h4><span>E</span>xecution</h4><p>I've run sessions at every level, from small groups of parents to cross-team seminars in Manhattan for 30 or more people. Topics include:</p><ul><li>Securing home and business networks, cameras, and connected devices.</li><li>Fraud, phishing, data brokers, and what's sold on the dark web.</li><li>Software and account hygiene, including password managers and two-factor sign-in.</li><li>The security of physical spaces, not just screens.</li></ul><p>Each session is built around what that audience actually uses, with time to work through real settings together.</p><h4><span>O</span>bservation</h4><p>The most useful measure has been what people do afterward: turning on two-factor sign-in during the session, changing default camera and router passwords, and coming back with specific questions about their own setups.</p><h4><span>N</span>ext</h4><p>The landscape keeps moving, so the material does too. neon1-ready, neon1's security readiness guide, tracks what's worth doing for each kind of space, alongside other trusted sources. Companies heading into an audit get SOC 2 and other readiness work.</p></template>
+          <template class="deep"><h4><span>N</span>eed</h4><p>Teachers, parents, engineers, and executives all had the same worry: they knew their accounts, homes, and businesses were exposed, but security advice was either too technical or too vague to act on.</p><h4><span>E</span>xecution</h4><p>I've run sessions at every level, from small groups of parents to cross-team seminars in Manhattan for 30 or more people. Topics include:</p><ul><li>Securing home and business networks, cameras, and connected devices.</li><li>Fraud, phishing, data brokers, and what's sold on the dark web.</li><li>Software and account hygiene, including password managers and two-factor sign-in.</li><li>The security of physical spaces, not just screens.</li></ul><p>Each session is built around what that audience actually uses, with time to work through real settings together.</p><h4><span>O</span>bservation</h4><p>The most useful measure has been what people do afterward: turning on two-factor sign-in during the session, changing default camera and router passwords, and coming back with specific questions about their own setups.</p><h4><span>N</span>ormalize</h4><p>The landscape keeps moving, so the material does too. neon1-ready, neon1's security readiness guide, tracks what's worth doing for each kind of space, alongside other trusted sources. Companies heading into an audit get SOC 2 and other readiness work.</p></template>
         </article>
         <article class="case reveal-on" id="case-home">
           <p class="idx">family &amp; friends · home tech</p>
@@ -531,7 +556,7 @@
           <dl class="neon"><dt>N</dt><dd>A house with no cameras, and passwords reused everywhere.</dd><dt>E</dt><dd>A camera system at my parents&#x27; house, and a password manager for the family.</dd><dt>O</dt><dd>Checked that recordings, alerts, and logins all work without me there.</dd><dt>N</dt><dd>Advice, tech support, and on-demand troubleshooting when something acts up.</dd></dl>
           <p class="stat"><b>small jobs welcome</b> · patience included</p>
           <button class="open" type="button" data-case="home" aria-haspopup="dialog" aria-label="Open case study"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></button>
-          <template class="deep"><h4><span>N</span>eed</h4><p>Not every job is a cloud migration. My parents' house had no camera coverage, and like most families, we reused a handful of passwords across everything.</p><h4><span>E</span>xecution</h4><ul><li>Planned camera placement around the entrances and blind spots, then installed and configured the system, including recording and alerts.</li><li>Moved the family onto a password manager, one person at a time, and turned on two-factor sign-in for the accounts that matter most.</li></ul><h4><span>O</span>bservation</h4><p>The test was simple: could everyone use it without calling me? Recordings and alerts work, and everyone can sign in and find their passwords on their own.</p><h4><span>N</span>ext</h4><p>Ongoing advice, tech support, and on-demand troubleshooting when something acts up, with the same patience for every small job, whether it's Wi-Fi that doesn't reach a room, a new laptop, or helping a grandparent open their email.</p></template>
+          <template class="deep"><h4><span>N</span>eed</h4><p>Not every job is a cloud migration. My parents' house had no camera coverage, and like most families, we reused a handful of passwords across everything.</p><h4><span>E</span>xecution</h4><ul><li>Planned camera placement around the entrances and blind spots, then installed and configured the system, including recording and alerts.</li><li>Moved the family onto a password manager, one person at a time, and turned on two-factor sign-in for the accounts that matter most.</li></ul><h4><span>O</span>bservation</h4><p>The test was simple: could everyone use it without calling me? Recordings and alerts work, and everyone can sign in and find their passwords on their own.</p><h4><span>N</span>ormalize</h4><p>Ongoing advice, tech support, and on-demand troubleshooting when something acts up, with the same patience for every small job, whether it's Wi-Fi that doesn't reach a room, a new laptop, or helping a grandparent open their email.</p></template>
         </article>
         <article class="case reveal-on" id="case-community">
           <p class="idx">grade school · community</p>
@@ -539,21 +564,11 @@
           <dl class="neon"><dt>N</dt><dd>A grade school wanted real STEM tools on a small budget.</dd><dt>E</dt><dd>Budgeted and set up a new STEM edtech system, free of charge.</dd><dt>O</dt><dd>Watched how teachers and students used it, and adjusted.</dd><dt>N</dt><dd>Free security sessions for teachers and parents, which became neon1.</dd></dl>
           <p class="stat"><b>free for the school</b> · where it began</p>
           <button class="open" type="button" data-case="community" aria-haspopup="dialog" aria-label="Open case study"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></button>
-          <template class="deep"><h4><span>N</span>eed</h4><p>I'd wanted to put my experience to work in my own community for a long time. A local grade school needed a STEM edtech setup that would actually get used, on a budget that couldn't afford mistakes.</p><h4><span>E</span>xecution</h4><p>I budgeted the new system, compared the realistic options, and set it up for the classrooms, all as volunteer work. Along the way, I invited teachers and parents to free sessions on staying safe online.</p><h4><span>O</span>bservation</h4><p>Seeing teachers use it in class, and parents leave those sessions knowing a little more and worrying a little less, showed me the same help was worth offering more widely.</p><h4><span>N</span>ext</h4><p>That's how neon1 began. Community and nonprofit work is still part of it, so if your school or organization needs a hand, reach out.</p></template>
+          <template class="deep"><h4><span>N</span>eed</h4><p>I'd wanted to put my experience to work in my own community for a long time. A local grade school needed a STEM edtech setup that would actually get used, on a budget that couldn't afford mistakes.</p><h4><span>E</span>xecution</h4><p>I budgeted the new system, compared the realistic options, and set it up for the classrooms, all as volunteer work. Along the way, I invited teachers and parents to free sessions on staying safe online.</p><h4><span>O</span>bservation</h4><p>Seeing teachers use it in class, and parents leave those sessions knowing a little more and worrying a little less, showed me the same help was worth offering more widely.</p><h4><span>N</span>ormalize</h4><p>That's how neon1 began. Community and nonprofit work is still part of it, so if your school or organization needs a hand, reach out.</p></template>
         </article>
 
       </div>
         <div class="rail-nav"><button class="chip" type="button" data-rail="-1" aria-label="Previous">←</button><button class="chip" type="button" data-rail="1" aria-label="Next">→</button></div>
-      </div>
-    </section>
-    <section id="how" class="view split" aria-labelledby="how-h">
-      <h2 id="how-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>how it works</h2>
-      <div class="steps timeline">
-        <div class="reveal-on"><h3>Listen</h3><p>Show me how the work gets done today. One real example is enough.</p></div>
-        <div class="reveal-on"><h3>Propose</h3><p>A few options, from the quickest fix to the fuller build, each with its price, effort, and what it gets you.</p></div>
-        <div class="reveal-on"><h3>Decide</h3><p>You pick. Sometimes that means a new system. Often it's a setting, a cleanup, or leaving it alone.</p></div>
-        <div class="reveal-on"><h3>Build</h3><p>Small changes, tested, and shown to you as they land.</p></div>
-        <div class="reveal-on"><h3>Hand over</h3><p>I show you how it works and write it down, so you can run it without me. Then I check it's doing what we agreed, and keep improving it if you want ongoing care.</p></div>
       </div>
     </section>
 
@@ -578,7 +593,7 @@
         <div class="row reveal-on">
           <h3>1NEON <span class="lock" tabindex="0" role="img" aria-label="currently private"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span></h3>
           <p class="state">pre-release</p>
-          <p><b>1 portal. Needs. Execution. Observation. Next.</b> Project management in layers: what the client needs, the work to deliver it, measuring how it actually performs, and what to improve next. Proposals, decisions, files, and results stay together from the first call to ongoing care. Pronounced "onion".</p>
+          <p><b>1 portal: Needs, Execution, Observation, Normalize.</b> Project management in layers: what the client needs, the work to deliver it, measuring how it actually performs, and making the new way the normal way, with handoff, training, and the old setup retired. Proposals, decisions, files, and results stay together from the first call to ongoing care. Pronounced "onion".</p>
         </div>
       </div>
     </section>
@@ -586,8 +601,8 @@
     <section id="why" class="view" aria-labelledby="why-h">
       <h2 id="why-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>about</h2>
       <div class="story">
-        <p class="reveal-on">neon1 grew out of something I'd wanted for a long time: to put what I know to work for the people and places around me. It started small, at a grade school, and the goal hasn't changed since. Leave people better off with their tech than they were before.</p>
-        <p class="reveal-on">That comes down to a few habits. Listen before building anything. Keep it as simple as the problem allows. Make sure you own your accounts, your data, and the docs to run it. Be clear about what things cost and why. Plan for things to break, and check that the work actually does what it should.</p>
+        <p class="reveal-on">Technology and automation have held my interest for close to 15 years, at home and at work. neon1 is how I put that to work for the people and places around me, with one goal: leave people better off with their tech than they were before.</p>
+        <p class="reveal-on">That comes down to a few habits. Listen before building anything. Leave you knowing your options, even if that's all you need from me. Keep it as simple as the problem allows. Make sure you own your accounts, your data, and the docs to run it. Be clear about what things cost and why. Plan for things to break, and check that the work actually does what it should.</p>
         <p class="reveal-on">The name nods to Neo from <em>The Matrix</em>, who brought peace between man and machine, and the slogan to Robin Williams' Andrew from <em>Bicentennial Man</em>, a machine who spends two centuries being of service while searching for his humanity.</p>
         <p class="sign reveal-on">Neo means new. Neon is unmissable. 1 is glad to be of service.</p>
       </div>
@@ -597,9 +612,10 @@
       <h2 id="faq-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>questions</h2>
       <div class="faq">
         <details class="reveal-on"><summary>Do you come on site?</summary><p>Yes. I also work remotely, or on your own network through a secure connection that I set up for the job and that's removed when it's done.</p></details>
-        <details class="reveal-on"><summary>When do you work?</summary><p>Saturdays and Sundays from 8am to 8pm, and weekday evenings from 6pm (until 9pm Monday to Thursday, 8pm on Friday), Eastern time. That's about 10 to 20 hours a week of project time. The booking calendar shows what's open.</p></details>
+        <details class="reveal-on"><summary>When do you work?</summary><p>Saturdays and Sundays from 8am to 8pm, and weekday evenings from 6pm (until 9pm Monday to Thursday, 8pm on Friday), Eastern time, typically with 10 to 20 hours a week for project work. The booking calendar shows what's open.</p></details>
         <details class="reveal-on"><summary>How long does a project take?</summary><p>Small jobs take a week or two, medium ones two to four weeks, and bigger projects four to six. I take on up to two clients at a time so each one gets proper attention.</p></details>
-        <details class="reveal-on"><summary>How is the price set?</summary><p>After the free call I send a short proposal with options, usually a quick fix, a solid setup, and a fuller build. Each one has a fixed price and says what it covers, how much effort and engineering it takes, and what quality to expect. You pick the one that fits, and that price holds unless you change what you're asking for.</p></details>
+        <details class="reveal-on"><summary>How is the cost worked out?</summary><p>After the first call I send a short proposal with options, usually a quick fix, a solid setup, and a fuller build. Each comes with a cost estimate and says what it covers, how much effort and engineering it takes, and what quality to expect. You pick the one that fits, and if the scope or the work changes along the way, I'll tell you before it changes the cost.</p></details>
+        <details class="reveal-on"><summary>How do you treat our data and accounts?</summary><p>Before any work starts we sign a short agreement on the scope and on how I'll handle your systems and information: only the access the job needs, kept confidential, and handed back or removed when we're done. It works both ways, so you'll know what I need from you and why. If the work touches personal or health data, the right agreement, such as a Business Associate Agreement, comes first.</p></details>
         <details class="reveal-on"><summary>Do you run security training?</summary><p>Yes, for anyone from parents and teachers to engineers and executives. I cover home and business networks, cameras and IoT, accounts and passwords, and the security of physical spaces. I also cover privacy policies and terms, how personal data is handled, security frameworks and administration, and incident prevention, monitoring, and response. And the threats people run into most: phishing, fraud, data brokers, and the dark web.</p></details>
         <details class="reveal-on"><summary>What don't you do?</summary><p>I don't repair electronics, though I can debug software and hardware installs and get them working together. I don't handle personal or health data without the right agreements in place, such as a Business Associate Agreement, but I can help you get them. I'm not a lawyer, but I'll work alongside yours on the technical side.</p></details>
       </div>
@@ -687,7 +703,7 @@
       const veil = document.querySelector(".veil");
       function onScroll() {
         const t = Math.min(1, scrollY / (innerHeight * 0.9));
-        canvas.style.opacity = lens.style.opacity = String(0.8 * (1 - t));
+        canvas.style.opacity = lens.style.opacity = String(0.6 * (1 - t));
         veil.style.opacity = String(1 - t);
         ctl.style.opacity = t > 0.6 ? "0" : "1";
         ctl.style.pointerEvents = t > 0.6 ? "none" : "auto";
@@ -698,6 +714,16 @@
       }
       addEventListener("scroll", onScroll, { passive: true });
       onScroll();
+
+      // ---- 1NEON: the page fades to the rain, then hands over to the portal, which fades itself in ----
+      document.querySelectorAll("a[data-handoff]").forEach((a) => a.addEventListener("click", (e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return; // new tab or window: a plain link
+        e.preventDefault();
+        try { sessionStorage.setItem("neon1.handoff", "1"); } catch { /* storage blocked: the portal just won't fade in */ }
+        if (reduce.matches) { location.href = a.href; return; }
+        document.body.classList.add("leaving");
+        setTimeout(() => (location.href = a.href), 450);
+      }));
 
       // ---- Menu: open/close, Esc, close on link; returns focus to the button ----
       const menu = document.getElementById("menu"), menuBtn = document.getElementById("menuBtn");

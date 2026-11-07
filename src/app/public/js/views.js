@@ -238,17 +238,20 @@
     else if (e.key === "End") { e.preventDefault(); goTo(views.length - 1, { end: true }); }
   });
 
-  // In-page links settle at the top of their view, closing the menu first
+  // In-page links settle at the top of their view, closing the menu first. A link with data-view
+  // (the logo, a real link to neon1.tech) springs to that view instead of reloading
   document.addEventListener("click", (e) => {
-    const a = e.target.closest('a[href^="#"]');
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    const a = e.target.closest('a[href^="#"], a[data-view]');
     if (!a) return;
-    const el = document.getElementById(a.getAttribute("href").slice(1));
+    const id = a.dataset.view || a.getAttribute("href").slice(1);
+    const el = document.getElementById(id);
     const v = el && (el.closest(".view") || el.closest(".hero") || (el.id === "top" ? hero : null));
     const i = views.indexOf(v);
     if (i < 0) return;
     e.preventDefault();
     if (!menu.hidden) document.getElementById("menuBtn").click();
-    history.replaceState(null, "", a.getAttribute("href"));
+    history.replaceState(null, "", a.dataset.view ? "/" : a.getAttribute("href"));
     goTo(i, { link: true });
   });
 
