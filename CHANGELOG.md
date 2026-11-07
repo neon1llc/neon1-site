@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.13.3
+
+- Services read lighter: shorter lines in smaller type, with less space between them.
+
 ## v0.13.2
 
 - Footer column titles are level-three headings, so the page's heading order has no gaps.
