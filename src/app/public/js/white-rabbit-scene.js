@@ -8,11 +8,12 @@
 
 import * as T from "/js/vendor/three-0.187.0.rabbit.min.js";
 import { createSky, createShafts, LIGHT } from "/js/white-rabbit-sky.js";
+import { furnish } from "/js/white-rabbit-room.js";
 
 
-// Room colors, the TV, and where its screen sits (meters; the floor is y 0, the TV faces +z)
-const PAPER = "#F2F4F2", FLOOR = "#E3E8E3", TRIM = "#E8ECE8", BASE = "#C9D3C9";
-const KHAKI = "#A8AC8F", BEZEL = "#9DA185", STAND = "#CFC8B4", VOID = "#0D0208";
+// The white-out, the floor's bounce light, the landing's void, and where the screen sits
+// (meters; the floor is y 0, the TV faces +z; the room itself is built in white-rabbit-room.js)
+const PAPER = "#F2F4F2", FLOOR = "#D9CDB8", VOID = "#0D0208";
 const SW = 0.48, SH = 0.36;                  // screen size
 const SC = new T.Vector3(0, 0.51, -1.775);  // screen center
 const WINDOW = { z: 0.6, y: 1.55, w: 1.2, h: 1.4 };
@@ -127,19 +128,6 @@ const GRADE = {
       gl_FragColor = vec4(mix(c, uPaper, uWhite), t.a);
     }`,
 };
-
-
-// ---- Small canvas textures: soft radial spots for the sun, its patch, and the TV's shadow ----
-function spot(stops, size = 128) {
-  const c = document.createElement("canvas");
-  c.width = c.height = size;
-  const g = c.getContext("2d"), r = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-  stops.forEach(([at, color]) => r.addColorStop(at, color));
-  g.fillStyle = r; g.fillRect(0, 0, size, size);
-  const tex = new T.CanvasTexture(c);
-  tex.colorSpace = T.SRGBColorSpace;
-  return tex;
-}
 
 
 // ---- The landing as a picture ----
@@ -282,70 +270,8 @@ export function createScene({ onLost }) {
   // ---- Sky, sun, and clouds, seen only through the window ----
   const sky = createSky({ scene, win: WINDOW, touch });
 
-  // ---- The room: boxes, with the left wall built around the window opening ----
-  const mats = {
-    wall: new T.MeshLambertMaterial({ color: PAPER }), floor: new T.MeshLambertMaterial({ color: FLOOR }),
-    trim: new T.MeshLambertMaterial({ color: TRIM }), base: new T.MeshLambertMaterial({ color: BASE }),
-    stand: new T.MeshLambertMaterial({ color: STAND }),
-    khaki: new T.MeshStandardMaterial({ color: KHAKI, roughness: 0.55 }),
-    bezel: new T.MeshStandardMaterial({ color: BEZEL, roughness: 0.7 }),
-    knob: new T.MeshStandardMaterial({ color: "#7E826C", roughness: 0.5 }),
-  };
-  const box = (w, h, d, x, y, z, m, parent = scene) => {
-    const mesh = new T.Mesh(new T.BoxGeometry(w, h, d), m);
-    mesh.position.set(x, y, z); parent.add(mesh); return mesh;
-  };
-  const z0 = WINDOW.z - WINDOW.w / 2, z1 = WINDOW.z + WINDOW.w / 2, y0 = WINDOW.y - WINDOW.h / 2, y1 = WINDOW.y + WINDOW.h / 2;
-  box(4, 0.02, 5, 0, -0.01, 0, mats.floor);
-  box(4, 0.02, 5, 0, 2.61, 0, mats.wall);
-  box(4, 2.6, 0.1, 0, 1.3, -2.5, mats.wall);
-  box(0.1, 2.6, 5, 2.0, 1.3, 0, mats.wall);
-  box(4, 2.6, 0.1, 0, 1.3, 2.5, mats.wall);
-  box(0.1, y0, 5, -2.0, y0 / 2, 0, mats.wall);
-  box(0.1, 2.6 - y1, 5, -2.0, (2.6 + y1) / 2, 0, mats.wall);
-  box(0.1, WINDOW.h, z0 + 2.5, -2.0, WINDOW.y, (z0 - 2.5) / 2, mats.wall);
-  box(0.1, WINDOW.h, 2.5 - z1, -2.0, WINDOW.y, (z1 + 2.5) / 2, mats.wall);
-
-  // Window frame, cross mullion, and sill
-  box(0.12, 0.06, WINDOW.w, -2.0, y1 - 0.03, WINDOW.z, mats.trim);
-  box(0.12, 0.06, WINDOW.w, -2.0, y0 + 0.03, WINDOW.z, mats.trim);
-  box(0.12, WINDOW.h, 0.06, -2.0, WINDOW.y, z0 + 0.03, mats.trim);
-  box(0.12, WINDOW.h, 0.06, -2.0, WINDOW.y, z1 - 0.03, mats.trim);
-  box(0.08, WINDOW.h, 0.04, -2.0, WINDOW.y, WINDOW.z, mats.trim);
-  box(0.08, 0.04, WINDOW.w, -2.0, WINDOW.y, WINDOW.z, mats.trim);
-  box(0.18, 0.04, 1.3, -1.89, y0 - 0.02, WINDOW.z, mats.trim);
-
-  // Baseboards along the visible walls
-  box(3.9, 0.08, 0.02, 0, 0.04, -2.44, mats.base);
-  box(0.02, 0.08, 4.9, 1.94, 0.04, 0, mats.base);
-  box(0.02, 0.08, 4.9, -1.94, 0.04, 0, mats.base);
-
-  // A soft shadow under the TV
-  const flat = (w, h, tex, x, y, z, extra) => {
-    const m = new T.Mesh(new T.PlaneGeometry(w, h), new T.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, ...extra }));
-    m.rotation.x = -Math.PI / 2; m.position.set(x, y, z); scene.add(m); return m;
-  };
-  flat(1.5, 1.0, spot([[0, "rgba(40,48,40,.45)"], [1, "rgba(40,48,40,0)"]]), 0, 0.002, -2.0);
-
-  // ---- The TV ----
-  const tv = new T.Group();
-  scene.add(tv);
-  box(0.9, 0.25, 0.5, 0, 0.125, -2.0, mats.stand, tv);
-  const cab = new T.Mesh(new T.RoundedBoxGeometry(0.66, 0.52, 0.42, 3, 0.04), mats.khaki);
-  cab.position.set(0, SC.y, -1.99); tv.add(cab);
-
-  // Bezel frame around the screen, standing a little proud of the cabinet
-  const fz = -1.765, bx = (0.66 - SW) / 2 - 0.005, by = (0.52 - SH) / 2 - 0.005;
-  box(SW + 2 * bx, by, 0.03, 0, SC.y + SH / 2 + by / 2, fz, mats.bezel, tv);
-  box(SW + 2 * bx, by, 0.03, 0, SC.y - SH / 2 - by / 2, fz, mats.bezel, tv);
-  box(bx, SH, 0.03, -SW / 2 - bx / 2, SC.y, fz, mats.bezel, tv);
-  box(bx, SH, 0.03, SW / 2 + bx / 2, SC.y, fz, mats.bezel, tv);
-
-  // Two knobs on the right of the bezel
-  for (const ky of [0.08, -0.04]) {
-    const k = new T.Mesh(new T.CylinderGeometry(0.022, 0.024, 0.02, 24), mats.knob);
-    k.rotation.x = Math.PI / 2; k.position.set(SW / 2 + bx / 2, SC.y + ky, fz + 0.02); tv.add(k);
-  }
+  // ---- The room, the TV around its screen, the table, and the chairs ----
+  furnish(scene, { win: WINDOW, sc: SC, sw: SW, sh: SH });
 
   // Screen and glass, both curved by the same bulge
   const screenU = {
@@ -355,13 +281,13 @@ export function createScene({ onLost }) {
   };
   const screenGeo = new T.PlaneGeometry(SW, SH, 48, 36);
   const screen = new T.Mesh(screenGeo, new T.ShaderMaterial({ uniforms: screenU, vertexShader: SCREEN_VERT, fragmentShader: SCREEN_FRAG }));
-  screen.position.copy(SC); tv.add(screen);
+  screen.position.copy(SC); scene.add(screen);
   const glassU = { uGeoBulge: screenU.uGeoBulge, uStrength: { value: 0 } };
   const glass = new T.Mesh(screenGeo, new T.ShaderMaterial({
     uniforms: glassU, vertexShader: SCREEN_VERT, fragmentShader: GLASS_FRAG,
     transparent: true, blending: T.AdditiveBlending, depthWrite: false,
   }));
-  glass.position.copy(SC).add(new T.Vector3(0, 0, 0.002)); tv.add(glass);
+  glass.position.copy(SC).add(new T.Vector3(0, 0, 0.002)); scene.add(glass);
 
   // ---- Lights, and the colors the room shifts between as the sun comes and goes ----
   const COOL = new T.Color("#D8E2F0"), WARM = new T.Color("#F6EEE2");
@@ -467,11 +393,11 @@ export function createScene({ onLost }) {
 
     // Room light comes up as the room appears; then the sun, as the clouds let it, warms the room
     // and lays the window's panes on the floor, and the room cools again when a cloud covers it
-    const light = ramp(p, [[0.12, 0], [0.28, 0.12], [0.4, 0.3], [0.6, 0.7], [0.82, 1]]);
+    const light = ramp(p, [[0.12, 0], [0.28, 0.14], [0.4, 0.42], [0.6, 0.75], [0.82, 1]]);
     const room = ramp(p, [[0.4, 0], [0.6, 1]]);
     sky.update(dt, ramp(p, [[0.5, 0], [0.7, 1]]), ratio);
     const s = sky.sun;
-    hemi.intensity = light * (0.62 + 0.15 * s) * ramp(p, [[0.55, 2.1], [0.86, 1]]); // the room dims a little as the window takes over
+    hemi.intensity = light * (0.62 + 0.15 * s) * ramp(p, [[0.55, 2.9], [0.86, 1.1]]); // the room dims a little as the window takes over
     hemi.color.copy(COOL).lerp(WARM, s);
     sun.intensity = light * (0.15 + 1.2 * s);
     glow.intensity = ramp(p, [[0, 0], [0.28, 0.6], [0.6, 0.3], [0.82, 0.2]]) * 0.02;
@@ -516,7 +442,10 @@ export function createScene({ onLost }) {
     disposed = true;
     scene.traverse((o) => {
       if (o.geometry) o.geometry.dispose();
-      if (o.material) { if (o.material.map) o.material.map.dispose(); o.material.dispose(); }
+      if (o.material) {
+        for (const k of ["map", "normalMap", "alphaMap"]) if (o.material[k]) o.material[k].dispose();
+        o.material.dispose();
+      }
     });
     if (tex) tex.dispose();
     composer.passes.forEach((pass) => pass.dispose && pass.dispose());
