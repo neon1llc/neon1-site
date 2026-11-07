@@ -303,7 +303,16 @@
   <!-- The white rabbit: the scene's canvas is added in here; the line is only shown at the end -->
   <div class="white-rabbit" id="whiteRabbit" data-state="idle">
     <div class="white-rabbit-end">
-      <div class="white-rabbit-window" aria-hidden="true"><span class="white-rabbit-cloud"></span><span class="white-rabbit-cloud"></span></div>
+      <div class="white-rabbit-card" aria-hidden="true">
+        <canvas class="white-rabbit-sign" width="512" height="131"></canvas>
+        <div class="white-rabbit-casing">
+          <div class="white-rabbit-window">
+            <span class="white-rabbit-cloud"></span><span class="white-rabbit-cloud"></span><span class="white-rabbit-cloud"></span>
+            <span class="white-rabbit-trees"></span><span class="white-rabbit-sash"></span>
+          </div>
+        </div>
+        <div class="white-rabbit-sill"></div>
+      </div>
       <p class="white-rabbit-grass" role="status"></p>
     </div>
   </div>

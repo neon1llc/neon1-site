@@ -59,6 +59,19 @@ export function whiteRabbit({ rain, root }) {
     grass.parentElement.style.opacity = "";
     body.classList.toggle("white-rabbit-cover", on);
     page().forEach((el) => (el.inert = on));
+    if (on && how === "card") paintSign();
+  }
+
+  // The card's carved sign, painted once by the same module the room uses
+  function paintSign() {
+    const sign = root.querySelector(".white-rabbit-sign");
+    if (!sign || sign.dataset.painted) return;
+    sign.dataset.painted = "";
+    import("/js/white-rabbit-sign.js").then(({ paintSign: paint }) => {
+      const c = paint(512);
+      sign.width = c.width; sign.height = c.height;
+      sign.getContext("2d").drawImage(c, 0, 0);
+    }).catch(() => sign.remove());
   }
 
   // Shown once, so the status line announces the end a single time
