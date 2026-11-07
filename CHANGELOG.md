@@ -2,6 +2,14 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.14.0
+
+- The white rabbit is a full room: a rendered sky, clouds, and trees moving in the wind past a double-hung sash window, baked light, and photographed leather, walnut, rug, and plaster.
+- A credited 2019 coupe (CC BY 4.0) waits outside in pearl black, with black rims, red calipers, and smoked side markers that glow white at ignition.
+- Sound starts once the view leaves the TV: a tube hum, static with the snow, and wind, leaves, birds, and a creek through the glass. There is no toggle.
+- Without motion or WebGL, a silent card opens a window out of the dark as you scroll.
+- The copy no longer says New York outside the footer, and About introduces Pradeep by name.
+
 ## v0.13.6
 
 - Email goes to hello@neon1.tech, and security reports to security@neon1.tech.
