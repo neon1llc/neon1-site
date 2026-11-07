@@ -138,13 +138,9 @@
 
     /* Hero text fades up in turn */
     .reveal { opacity: 0; animation: rise .9s ease-out forwards; }
-    .reveal.d1 { animation-delay: .5s; } .reveal.d2 { animation-delay: 1.3s; }
+    .reveal.d1 { animation-delay: .5s; }
     @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
-    /* Scroll cue: a single falling glyph-like bar, the only invitation in the hero */
-    .cue { position: absolute; left: 50%; bottom: 36px; width: 2px; height: 44px; transform: translateX(-50%); overflow: hidden; }
-    .cue span { display: block; width: 2px; height: 14px; background: var(--neon); box-shadow: 0 0 8px var(--neon); animation: drip 1.8s ease-in infinite; }
-    @keyframes drip { from { transform: translateY(-14px); } to { transform: translateY(44px); } }
     .hero { position: relative; }
 
     /* ---- Steps ---- */
@@ -189,11 +185,10 @@
 
     .awake footer { background: #e8ece8; }
 
-    /* Reduced motion: no smooth scrolling, reveals, cue, or card lift */
+    /* Reduced motion: no smooth scrolling, reveals, or card lift */
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
       .reveal { animation: none; opacity: 1; }
-      .cue span { animation: none; transform: translateY(14px); }
       .card, .card:hover { transition: none; transform: none; }
     }
 
@@ -469,7 +464,6 @@
         <h1 class="brand" aria-label="neon1"><span class="ne dec" aria-hidden="true">neon</span><span class="one dec" aria-hidden="true">1</span></h1>
         <p class="tagline reveal d1">1 is glad to be of service.</p>
       </div>
-      <a class="cue reveal d2" href="#services" aria-label="Scroll to services"><span></span></a>
     </section>
   </div>
 
