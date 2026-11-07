@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.12.5
+
+- The rabbit's glitch lets the rain run a little longer before its last stutter.
+
 ## v0.12.4
 
 - The four stages are named as actions on what's needed: Needs, Execute, Observe, and Normalize.

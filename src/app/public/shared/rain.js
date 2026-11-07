@@ -57,8 +57,9 @@ const HALT_MS = 600;    // the step gap the rain picks up from after a halt
 const HOLD = 30;        // steps a word holds once spelled
 
 // The halt, a Matrix glitch: a hard freeze, a lag jump that skips several steps at once
-// with a one-frame flicker, then uneven stutters before the final freeze (about 1.1 s)
-const GLITCH = [["freeze", 260], ["jump", 6], ["freeze", 340], ["run", 2], ["freeze", 170], ["run", 1]];
+// with a one-frame flicker, then uneven stutters (a run of about a third of a second, then one
+// step) before the final freeze (about 1.3 s)
+const GLITCH = [["freeze", 260], ["jump", 6], ["freeze", 340], ["run", 5], ["freeze", 170], ["run", 1]];
 const ZOOM = 1.15, RIM = 5;
 const VOID = "#0D0208";
 const MONO = `"JetBrains Mono", ui-monospace, monospace`;
