@@ -315,7 +315,7 @@ export function createScene({ onLost, onSound = () => {} }) {
 
   // ---- The room, the TV around its screen, the table, and the chairs ----
   const env = environment(renderer);
-  const { glossy } = furnish(scene, { win: WINDOW, sc: SC, sw: SW, sh: SH, env, touch });
+  const { glossy, ready: photos } = furnish(scene, { win: WINDOW, sc: SC, sw: SW, sh: SH, env, touch });
 
   // Baked light: the room's lit meshes take geometry with a second UV map from room.glb and a baked
   // occlusion map on it (made by blender/room.py from this same build); the painted stand-in
@@ -339,7 +339,15 @@ export function createScene({ onLost, onSound = () => {} }) {
     });
     scene.traverse((o) => { if (o.userData.standIn) o.visible = false; });
     renderer.shadowMap.needsUpdate = true;
-    done();
+    // The chairs are too dense to ship twice: their occlusion comes as one byte per vertex, in the
+    // same order as their geometry, and darkens the vertex colors they already carry
+    const dense = [...byName.values()].filter((m) => !m.geometry.attributes.uv1);
+    Promise.all(dense.map((m) => fetch(`/media/white-rabbit/lm/${m.name}.ao`).then((r) => (r.ok ? r.arrayBuffer() : null)).then((buf) => {
+      const ao = buf && new Uint8Array(buf), col = m.geometry.attributes.color, n = m.geometry.attributes.position.count;
+      if (!ao || ao.length !== n || !col) return;
+      for (let i = 0; i < n; i++) col.setXYZ(i, col.getX(i) * ao[i] / 255, col.getY(i) * ao[i] / 255, col.getZ(i) * ao[i] / 255);
+      col.needsUpdate = true;
+    }).catch(() => {}))).then(done);
   }, undefined, () => done()));
 
   // The model car on the sill, nose turned a little toward the room, kept inside the glass
@@ -413,7 +421,7 @@ export function createScene({ onLost, onSound = () => {} }) {
   const pic = document.createElement("canvas");
   let tex = null, fit = { h: SH, d0: 0.5 };
   async function compose() {
-    const [{ cw, ch, rh }] = await Promise.all([picture(pic), sky.ready, car.ready, baked]);
+    const [{ cw, ch, rh }] = await Promise.all([picture(pic), sky.ready, car.ready, baked, photos]);
     if (disposed) return;
     if (!tex || tex.image.width !== cw || tex.image.height !== ch) {
       if (tex) tex.dispose();
