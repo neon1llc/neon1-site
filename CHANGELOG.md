@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.12.2
+
+- Menu links glow in the logo's neon, and the header turns dark with the menu open, even over the light page.
+
 ## v0.12.1
 
 - The white rabbit's window: a blue sky with puffy clouds drifting past a visible sun. When the sun is out, warm light shafts stream into the room, a sunlit patch lands on the floor, and dust glints in the beams; when a cloud covers it, the room cools again.
