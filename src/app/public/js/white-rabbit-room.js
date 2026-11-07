@@ -243,6 +243,71 @@ function rounded(shape, w, h, r) {
 }
 
 
+// The sill's profile as [projection, height] in meters from the opening's bottom, bottom up:
+// a neck clear of the wainscot below, a ring, the echinus flaring out on a convex curve, and the
+// square abacus slab on top, level with the chair rail it stops
+const DORIC = (() => {
+  const pts = [[0, -0.062], [0.066, -0.062], [0.066, -0.048], [0.072, -0.046], [0.077, -0.042], [0.078, -0.038], [0.075, -0.034], [0.07, -0.032]];
+  for (let i = 0; i <= 8; i++) {
+    const t = i / 8, a = (1 - t) * (1 - t), b = 2 * t * (1 - t), c = t * t;
+    pts.push([0.072 * a + 0.125 * b + 0.142 * c, -0.031 * a - 0.027 * b - 0.006 * c]);
+  }
+  return [...pts, [0.16, -0.006], [0.16, 0.028]];
+})();
+const NECK = 0.07, ABACUS = 0.16; // how far past the opening the neck runs, and the slab's projection
+
+// A capital half sunk in a wall that faces +x: the profile is swept around a plan that grows with
+// it, so the front and both ends flare alike. Creases sharper than about 35 degrees stay hard
+function capital(profile, { x, za, zb, y, back = 0 }) {
+  const pos = [], nor = [], uvs = [];
+  const seg = profile.slice(1).map(([r1, h1], i) => {
+    const [r0, h0] = profile[i], l = Math.hypot(r1 - r0, h1 - h0);
+    return [(h1 - h0) / l, -(r1 - r0) / l];
+  });
+  // A vertex's normal in the profile, (out, up): smoothed with its neighbor unless the crease is hard
+  const bend = (s, o) => {
+    const a = seg[s], b = seg[o];
+    if (!b || a[0] * b[0] + a[1] * b[1] < 0.82) return a;
+    const l = Math.hypot(a[0] + b[0], a[1] + b[1]);
+    return [(a[0] + b[0]) / l, (a[1] + b[1]) / l];
+  };
+  // The front and the two ends, each as a point for (projection, 0..1 across) and its plan normal
+  const faces = [
+    [(r, t) => [x + r, za - r + t * (zb - za + 2 * r)], [1, 0]],
+    [(r, t) => [x + t * r, za - r], [0, -1]],
+    [(r, t) => [x + t * r, zb + r], [0, 1]],
+  ];
+  // Adds a triangle, turned to face the way its normals point
+  const tri = (a, b, c) => {
+    const e1 = [b.p[0] - a.p[0], b.p[1] - a.p[1], b.p[2] - a.p[2]], e2 = [c.p[0] - a.p[0], c.p[1] - a.p[1], c.p[2] - a.p[2]];
+    const n = [e1[1] * e2[2] - e1[2] * e2[1], e1[2] * e2[0] - e1[0] * e2[2], e1[0] * e2[1] - e1[1] * e2[0]];
+    const m = a.n.map((v, k) => v + b.n[k] + c.n[k]);
+    for (const v of n[0] * m[0] + n[1] * m[1] + n[2] * m[2] < 0 ? [a, c, b] : [a, b, c]) { pos.push(...v.p); nor.push(...v.n); uvs.push(...v.uv); }
+  };
+  let arc = 0;
+  for (let s = 0; s < seg.length; s++) {
+    const [r0, h0] = profile[s], [r1, h1] = profile[s + 1], n0 = bend(s, s - 1), n1 = bend(s, s + 1);
+    const len = Math.hypot(r1 - r0, h1 - h0);
+    for (const [at, [nx, nz]] of faces) {
+      const v = (r, h, t, [o, u], a) => { const [px, pz] = at(r, t); return { p: [px, y + h, pz], n: [nx * o, u, nz * o], uv: [pz, a] }; };
+      const a = v(r0, h0, 0, n0, arc), b = v(r0, h0, 1, n0, arc), c = v(r1, h1, 1, n1, arc + len), d = v(r1, h1, 0, n1, arc + len);
+      tri(a, b, c); tri(a, c, d);
+    }
+    arc += len;
+  }
+  // The flat top, running back into the opening
+  const [rt, ht] = profile[profile.length - 1], up = [0, 1, 0];
+  const top = (px, pz) => ({ p: [px, y + ht, pz], n: up, uv: [pz, px] });
+  const q = [top(x - back, za - rt), top(x + rt, za - rt), top(x + rt, zb + rt), top(x - back, zb + rt)];
+  tri(q[0], q[1], q[2]); tri(q[0], q[2], q[3]);
+  const geo = new T.BufferGeometry();
+  geo.setAttribute("position", new T.Float32BufferAttribute(pos, 3));
+  geo.setAttribute("normal", new T.Float32BufferAttribute(nor, 3));
+  geo.setAttribute("uv", new T.Float32BufferAttribute(uvs, 2));
+  return geo;
+}
+
+
 /** Builds the room around the window `win` and the TV whose screen (sw by sh) is centered at `sc` */
 export function furnish(scene, { win, sc, sw, sh }) {
   const wood = grain(1), lambert = (o) => new T.MeshLambertMaterial(o), standard = (o) => new T.MeshStandardMaterial(o);
@@ -266,21 +331,17 @@ export function furnish(scene, { win, sc, sw, sh }) {
   add(merged([box(4, 0.02, 5, [0, 2.61, 0])], lambert({ color: CEILING })));
   add(merged([place(new T.PlaneGeometry(4, 5), { r: [-Math.PI / 2, 0, 0], uv: [4 / 2.4, 5 / 0.6] })], lambert({ map: planks() })));
 
-  // ---- The window: an inset double-hung sash, its casing, and a sill shaped like a squat capital ----
+  // ---- The window: an inset double-hung sash, its casing, and a sill shaped like a Doric capital ----
   // Jamb liners line the opening; the casing frames it on the room side with a capped head
   const trim = [
     box(0.1, win.h, 0.012, [-2.0, win.y, z0 + 0.006]), box(0.1, win.h, 0.012, [-2.0, win.y, z1 - 0.006]),
     box(0.1, 0.012, win.w, [-2.0, y1 - 0.006, win.z]),
     box(0.022, win.h + 0.1, 0.09, [-1.94, (y0 + y1 + 0.1) / 2, z0 - 0.045]), box(0.022, win.h + 0.1, 0.09, [-1.94, (y0 + y1 + 0.1) / 2, z1 + 0.045]),
     box(0.026, 0.11, win.w + 0.22, [-1.938, y1 + 0.055, win.z]), box(0.04, 0.025, win.w + 0.27, [-1.93, y1 + 0.122, win.z]),
-    box(0.02, 0.07, win.w + 0.16, [-1.94, y0 - 0.095, win.z]),
   ];
 
-  // The sill: a flat top that rolls over into a curve, then steps down twice toward the wall
-  const sill = new T.Shape();
-  sill.moveTo(-0.1, 0); sill.lineTo(0.07, 0); sill.quadraticCurveTo(0.09, -0.012, 0.045, -0.034);
-  sill.lineTo(0.045, -0.044); sill.lineTo(0.028, -0.044); sill.lineTo(0.028, -0.06); sill.lineTo(-0.1, -0.06); sill.closePath();
-  trim.push(place(new T.ExtrudeGeometry(sill, { depth: win.w + 0.26, bevelEnabled: false, curveSegments: 8 }), { p: [-1.95, y0, z0 - 0.13] }));
+  // The sill: a squat Doric capital half sunk in the wall, its slab running back to the sash
+  trim.push(place(capital(DORIC, { x: -1.95, za: z0 - NECK, zb: z1 + NECK, y: y0, back: 0.1 })));
 
   // Two sashes on their tracks; the lower one is raised a little, so the window is open at the bottom
   const lift = 0.13, mid = y0 + win.h / 2, sw2 = 0.045, sashes = [], panes = [];
@@ -329,9 +390,9 @@ export function furnish(scene, { win, sc, sw, sh }) {
     }
     const strip = (h, d, y, list) => { const [sx, sz] = inward(x, z, t, d / 2); list.push(place(new T.BoxGeometry(len, h, d), { p: [sx, y, sz], r: [0, t, 0] })); };
     strip(BASE, 0.02, BASE / 2, dark); strip(0.014, 0.03, BASE + 0.007, dark);
-    // The chair rail stops at the window casing, so the window sits in front of it
+    // The chair rail stops at the ends of the sill, so the window sits in front of it
     if (t === Math.PI / 2) {
-      for (const [a, b] of [[-ROOM.z, z0 - 0.09], [z1 + 0.09, ROOM.z]]) {
+      for (const [a, b] of [[-ROOM.z, z0 - NECK - ABACUS], [z1 + NECK + ABACUS, ROOM.z]]) {
         const c = (a + b) / 2, L = b - a, rail = (h, d, y) => {
           const [sx, sz] = inward(x, z, t, d / 2);
           light.push(place(new T.BoxGeometry(L, h, d), { p: [sx, y, c + sz - z], r: [0, t, 0] }));
@@ -371,6 +432,8 @@ export function furnish(scene, { win, sc, sw, sh }) {
     const [px, pz] = inward(x, z, t, 0.17);
     ao.push(place(new T.PlaneGeometry(len, 0.34), { p: [px, 0.002, pz], r: [-Math.PI / 2, t, 0], order: "YXZ" }));
   }
+  // The wainscot darkens a little under the sill's overhang
+  ao.push(place(new T.PlaneGeometry(win.w + 2 * NECK + 0.1, 0.09), { p: [-1.893, y0 - 0.106, win.z], r: [0, Math.PI / 2, 0] }));
   add(merged(ao, new T.MeshBasicMaterial({ map: edge(), transparent: true, depthWrite: false })));
   const blobs = [place(new T.PlaneGeometry(1.25, 0.82), { p: [0.06, 0.031, -1.98], r: [-Math.PI / 2, 0, 0] })];
   for (const [x, z, t] of CHAIRS) blobs.push(place(new T.PlaneGeometry(1.05, 1.0), { p: [x, 0.031, z], r: [-Math.PI / 2, t, 0], order: "YXZ" }));
