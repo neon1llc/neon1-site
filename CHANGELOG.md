@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.13.6
+
+- Email goes to hello@neon1.tech, and security reports to security@neon1.tech.
+
 ## v0.13.5
 
 - The contact section and footer list neon1's number: (424) 32-NEON1, or (424) 326-3661.
