@@ -96,6 +96,8 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
   let running = !saved.paused && !reduce.matches;
   // The live rabbit, the step count, and a halt that is not saved as a pause
   const bunny = rabbit && { rate: 0.005, hold: 60, ok: () => true, avoid: () => [], ...rabbit };
+  // The canvas's own size in CSS pixels, set on resize
+  let W = innerWidth, H = innerHeight;
   let rab = null, steps = 0, held = false, ramp = null, gap = STEP_MS, bunnySprite = null, glitch = null;
   const listeners = new Set();
   const emit = () => listeners.forEach((f) => f(api));
@@ -157,15 +159,16 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
 
   // Fits both canvases to the window and pixel ratio, then restarts every column
   function resize() {
+    W = canvas.clientWidth || innerWidth; H = canvas.clientHeight || innerHeight;
     dpr = Math.min(devicePixelRatio || 1, 2);
-    if (lens) { lens.width = innerWidth * dpr; lens.height = innerHeight * dpr; lctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
-    size = innerWidth < 640 ? 17 : 21;
-    canvas.width = innerWidth * dpr; canvas.height = innerHeight * dpr;
+    if (lens) { lens.width = W * dpr; lens.height = H * dpr; lctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
+    size = W < 640 ? 17 : 21;
+    canvas.width = W * dpr; canvas.height = H * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    rows = Math.floor(innerHeight / size);
-    cols = Array.from({ length: Math.ceil(innerWidth / size) }, () => newCol(Math.random() * rows, false));
+    rows = Math.floor(H / size);
+    cols = Array.from({ length: Math.ceil(W / size) }, () => newCol(Math.random() * rows, false));
     ctx.textBaseline = "middle"; ctx.textAlign = "center";
-    ctx.fillStyle = VOID; ctx.fillRect(0, 0, innerWidth, innerHeight);
+    ctx.fillStyle = VOID; ctx.fillRect(0, 0, W, H);
     if (rabbit) bunnySprite = whiteRabbit();
   }
 
@@ -211,7 +214,7 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
     steps++;
     ctx.globalAlpha = 1;
     ctx.fillStyle = `rgba(13, 2, 8, ${FADE})`;
-    ctx.fillRect(0, 0, innerWidth, innerHeight);
+    ctx.fillRect(0, 0, W, H);
     if (Math.random() < WORD_RATE) startWord();
     if (rab && steps > rab.until) rab = null;
     if (bunny && !prefill && !rab && Math.random() < bunny.rate && bunny.ok()) startRabbit();
@@ -264,11 +267,11 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
   // Redraws every visible pane: a rim that bends the rain inward, then a magnified body
   function refract() {
     if (!lens) return;
-    lctx.clearRect(0, 0, innerWidth, innerHeight);
+    lctx.clearRect(0, 0, W, H);
     if (lensOff()) return;
     for (const el of panes()) {
       const r = el.getBoundingClientRect();
-      if (!r.width || r.bottom < 0 || r.top > innerHeight) continue;
+      if (!r.width || r.bottom < 0 || r.top > H) continue;
       lctx.save();
       lctx.fillStyle = VOID;
       lctx.filter = "blur(0.6px)";
@@ -345,7 +348,7 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
     rabbitAt(clientX, clientY, slop = 1.3) {
       if (!rab || held) return false;
       const b = canvas.getBoundingClientRect();
-      const x = ((clientX - b.left) * innerWidth) / b.width, y = ((clientY - b.top) * innerHeight) / b.height;
+      const x = ((clientX - b.left) * W) / b.width, y = ((clientY - b.top) * H) / b.height;
       return Math.abs(x - (rab.col + 0.5) * size) <= size * slop && Math.abs(y - (rab.row + 0.5) * size) <= size * slop;
     },
 
@@ -386,8 +389,9 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
   let lastW = 0, lastH = 0;
   const onResize = () => {
     if (window.visualViewport && visualViewport.scale > 1.01) return;
-    if (innerWidth === lastW && innerHeight === lastH) { refract(); return; }
-    lastW = innerWidth; lastH = innerHeight;
+    const w = canvas.clientWidth || innerWidth, h = canvas.clientHeight || innerHeight;
+    if (w === lastW && h === lastH) { refract(); return; }
+    lastW = w; lastH = h;
     resize(); rab = null;
     for (let i = 0; i < 40; i++) draw(true);
     if (bunny && reduce.matches && !held) stillRabbit();
