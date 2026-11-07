@@ -2,12 +2,13 @@
 // Usage: const sky = createSky({ scene, win, touch }); sky.update(dt, level, ratio); sky.aim(camera, shafts, amount)
 //
 // Imported by white-rabbit-scene.js. The sky is painted on a far wall outside the
-// window: a blue gradient, a sun, and puffy clouds that drift across it on their
-// own clock. The clouds are a few dozen soft circles, so the same shapes can be
-// measured here in JS: sun tells the room how much of the sun is showing. Light shafts are a screen pass
-// that smears only the brightest pixels away from the sun, so they stream from the
-// window, break at the mullions, and fade by themselves when a cloud covers it.
-// Beams from the panes to the floor, and dust glinting in them, follow the sun too.
+// window: a blue gradient, a sun, wispy cirrus, and soft cumulus that drift on their
+// own clock above autumn treetops, as seen from a second story. The cumulus are soft
+// circles, so the same shapes are measured here in JS: sun tells the room how much of
+// the sun is showing. Light shafts are a screen pass that smears only the brightest
+// pixels away from the sun, so they stream from the window, break at the sash rails,
+// and fade by themselves when a cloud covers it. Beams from the panes to the floor,
+// and dust glinting in them, follow the sun too.
 
 import * as T from "/js/vendor/three-0.187.0.rabbit.min.js";
 
@@ -25,10 +26,9 @@ const SPAN = 80, ZMIN = -46;  // the wrap, wider than any view through the windo
 const PUFF = [[0, 1.0, 1.35], [1.5, 0.75, 1.05], [-1.5, 0.65, 1.0], [0.6, 1.85, 1.0], [-0.7, 1.6, 0.9], [2.5, 0.45, 0.6]];
 
 // Each cloud: where it starts, the height of its flat base, and its size
-// The first three cross the sun's height; the rest keep above or below it
-const CLOUDS = [[2, 11.4, 1.0], [30, 10.8, 1.25], [57, 11.9, 0.85], [16, 15.2, 1.1], [-8, 17.5, 1.3],
-  [43, 5.0, 1.3], [-24, 3.4, 1.5], [70, 6.6, 1.1], [10, 1.0, 0.9], [24, 14.4, 0.9], [38, 4.6, 0.8], [64, 16.0, 1.0],
-  [-15, 0.2, 1.1]];
+// The first three cross the sun's height; the rest keep above it, clear of the treetops below
+const CLOUDS = [[2, 11.4, 1.0], [30, 10.8, 1.25], [57, 11.9, 0.85], [16, 15.2, 1.1], [-8, 17.5, 1.4],
+  [43, 7.4, 0.7], [70, 7.8, 0.6], [24, 14.4, 0.8], [64, 16.0, 1.2]];
 const N = CLOUDS.length * PUFF.length;
 
 // Smooth union, so the circles merge into one puffy outline
@@ -46,9 +46,15 @@ const VERT = /* glsl */`
 const FRAG = /* glsl */`
   uniform vec4 uCirc[${N}];
   uniform vec3 uSun;
-  uniform float uDrift;
+  uniform float uDrift, uTime;
   varying vec2 vQ;
   float smin(float a, float b, float k) { float h = max(k - abs(a - b), 0.0) / k; return min(a, b) - h * h * k * 0.25; }
+  float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+  float noise(vec2 p) {
+    vec2 i = floor(p), f = fract(p), u = f * f * (3.0 - 2.0 * f);
+    return mix(mix(hash(i), hash(i + vec2(1, 0)), u.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), u.x), u.y);
+  }
+  float fbm(vec2 p) { float v = 0.0, a = 0.5; for (int i = 0; i < 4; i++) { v += a * noise(p); p *= 2.03; a *= 0.5; } return v; }
   void main() {
     vec2 q = vQ;
     // Deeper blue up high, lighter toward the horizon
@@ -63,9 +69,11 @@ const FRAG = /* glsl */`
       if (d < sd) base = c.w;
       sd = smin(sd, d, 0.9);
     }
+    // Edges eroded by noise that travels with the clouds, so no two look alike
     float zd = q.x + uDrift;
     sd += 0.3 * sin(zd * 0.9 + q.y * 0.4) * sin(q.y * 1.3 - zd * 0.5);
-    float a = smoothstep(0.45, -0.45, sd) * smoothstep(base - 0.3, base + 0.7, q.y);
+    sd += (fbm(vec2(zd, q.y) * 0.55) - 0.5) * 1.4;
+    float a = smoothstep(0.6, -0.6, sd) * smoothstep(base - 0.4, base + 0.9, q.y);
 
     // Sunlit tops, blue-grey bellies, and a silver edge on clouds near the sun
     float ds = length(q - uSun.xy);
@@ -77,8 +85,24 @@ const FRAG = /* glsl */`
     float disc = smoothstep(uSun.z, uSun.z * 0.8, ds);
     float halo = exp(-ds / (uSun.z * 2.2));
     vec3 col = mix(sky, cloud, a);
+
+    // Cirrus: thin streaks high up, drifting slower than the cumulus
+    float ci = fbm(vec2((q.x + uDrift * 0.4) * 0.07, q.y * 0.45)) * fbm(vec2((q.x + uDrift * 0.4) * 0.3, q.y * 1.6));
+    col = mix(col, vec3(1.1, 1.1, 1.12), smoothstep(0.2, 0.42, ci) * smoothstep(9.0, 15.0, q.y) * 0.55 * (1.0 - a));
     col += vec3(1.0, 0.86, 0.62) * halo * 1.4 * exp(-2.5 * a);
     col += vec3(16.0, 13.5, 9.5) * disc * exp(-5.0 * a);
+
+    // Autumn treetops along the bottom, swaying a little more toward their tips
+    float z = q.x + sin(uTime * 0.7 + q.x * 0.35) * 0.12 * clamp(q.y / 4.0, 0.0, 1.0);
+    float top = 2.2 + 0.9 * sin(z * 0.33) + 0.5 * sin(z * 0.81 + 1.3) + 1.1 * fbm(vec2(z * 0.4, 0.0)) + 0.5 * fbm(vec2(z * 2.2, 3.0));
+    float leaf = fbm(vec2(z, q.y) * 3.2), clump = fbm(vec2(z, q.y) * 0.9);
+    if (q.y < top - (1.0 - leaf) * 0.7 && !(q.y > top - 0.9 && leaf < 0.38)) {
+      // Each crown leans to its own color, mixed at the edges, and darker inside and lower down
+      float t = fract(clump * 2.7 + hash(vec2(floor(z / 3.5), 3.0)) * 0.6);
+      vec3 tint = t < 0.3 ? vec3(0.78, 0.26, 0.05) : t < 0.55 ? vec3(0.8, 0.52, 0.08) : t < 0.8 ? vec3(0.52, 0.09, 0.04) : vec3(0.2, 0.33, 0.09);
+      float lit = 0.3 + 0.95 * leaf * leaf + 0.35 * clamp((q.y - top + 1.5) / 1.5, 0.0, 1.0);
+      col = tint * lit * (0.5 + 0.5 * clamp(q.y / 2.5, 0.0, 1.0));
+    }
     gl_FragColor = vec4(col, 1.0);
   }`;
 
@@ -210,7 +234,7 @@ export function createShafts({ touch }) {
 export function createSky({ scene, win, touch }) {
   // The circles, laid out once and moved each frame; w is the cloud's base
   const circ = Array.from({ length: N }, () => new T.Vector4());
-  const uniforms = { uCirc: { value: circ }, uSun: { value: new T.Vector3(SUN.z, SUN.y, SUN.r) }, uDrift: { value: 0 } };
+  const uniforms = { uCirc: { value: circ }, uSun: { value: new T.Vector3(SUN.z, SUN.y, SUN.r) }, uDrift: { value: 0 }, uTime: { value: 0 } };
   const mesh = new T.Mesh(new T.PlaneGeometry(90, 50), new T.ShaderMaterial({ uniforms, vertexShader: VERT, fragmentShader: FRAG }));
   mesh.rotation.y = Math.PI / 2;
   mesh.position.set(FAR, 12, -6);
@@ -237,6 +261,7 @@ export function createSky({ scene, win, touch }) {
     time += Math.min(dt, 0.1);
     const shift = DRIFT * time;
     uniforms.uDrift.value = shift % 1000;
+    uniforms.uTime.value = time;
     let k = 0;
     for (const [z0, base, s] of CLOUDS) {
       const z = ZMIN + ((((z0 - ZMIN - shift) % SPAN) + SPAN) % SPAN);
