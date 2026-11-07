@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.13.5
+
+- The contact section and footer list neon1's number: (424) 32-NEON1, or (424) 326-3661.
+
 ## v0.13.4
 
 - The note under services is down to three short sentences.
