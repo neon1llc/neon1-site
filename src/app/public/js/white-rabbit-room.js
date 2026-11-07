@@ -2,7 +2,7 @@
 // Usage: furnish(scene, { win, sc, sw, sh })
 //
 // Imported by white-rabbit-scene.js. Everything is built in code, with small textures
-// painted on canvases once: wood grain, oak planks, plaster, wainscot panels, a rug,
+// painted on canvases once: wood grain, oak planks, plaster, a rug,
 // tufted leather, a speaker grille, and vents. Parts that share a material are merged
 // into one mesh, so the whole room draws in about twenty calls, phones included.
 
@@ -81,19 +81,6 @@ function plaster() {
       g.fillStyle = `rgba(${r() < 0.5 ? "0,0,0" : "255,255,255"}, ${r() * 0.022})`;
       g.fillRect(r() * w, r() * h, 1 + r() * 2, 1 + r() * 2);
     }
-  });
-}
-
-// One wainscot panel: a frame of stiles and rails around a raised panel, lit from the top left
-function panel() {
-  return painted(256, 256, (g, w, h) => {
-    g.fillStyle = "#fff"; g.fillRect(0, 0, w, h);
-    const m = 34, bev = 10;
-    g.fillStyle = "rgba(0,0,0,.08)"; g.fillRect(m, m, w - 2 * m, h - 2 * m);
-    g.fillStyle = "#fff"; g.fillRect(m + bev, m + bev, w - 2 * (m + bev), h - 2 * (m + bev));
-    g.fillStyle = "rgba(255,255,255,.9)"; g.fillRect(m, m, w - 2 * m, 3); g.fillRect(m, m, 3, h - 2 * m);
-    g.fillStyle = "rgba(0,0,0,.14)"; g.fillRect(m, h - m - 3, w - 2 * m, 3); g.fillRect(w - m - 3, m, 3, h - 2 * m);
-    g.fillStyle = "rgba(0,0,0,.06)"; g.fillRect(0, 0, 2, h);
   });
 }
 
@@ -250,19 +237,27 @@ export function furnish(scene, { win, sc, sw, sh }) {
   ], lambert({ color: WINDOW_TRIM })));
 
   // ---- Wainscot, and the green trim: baseboards, chair rail, and crown moulding ----
-  // Each run is [length, center x, center z, turn]; the panels face into the room
+  // Each run is [length, center x, center z, turn]; the panels face into the room. Every wall
+  // gets a whole number of equal panels, so each starts and ends with a full one, and the
+  // raised fields are real geometry, so each wall shades from the light it actually gets
   const runs = [[3.9, 0, -ROOM.z, 0], [4.9, ROOM.x, 0, -Math.PI / 2], [4.9, -ROOM.x, 0, Math.PI / 2], [3.9, 0, ROOM.z, Math.PI]];
   const inward = (x, z, t, d) => [x + Math.sin(t) * d, z + Math.cos(t) * d];
   const panels = [], dark = [], light = [];
   for (const [len, x, z, t] of runs) {
     const [px, pz] = inward(x, z, t, 0.004);
-    panels.push(place(new T.PlaneGeometry(len, RAIL - BASE), { p: [px, (RAIL + BASE) / 2, pz], r: [0, t, 0], uv: [len / 0.62, 1] }));
+    panels.push(place(new T.PlaneGeometry(len, RAIL - BASE), { p: [px, (RAIL + BASE) / 2, pz], r: [0, t, 0], uv: [len, RAIL - BASE] }));
+    const n = Math.max(1, Math.round(len / 0.62)), pw = len / n, ph = RAIL - BASE - 0.13;
+    for (let i = 0; i < n; i++) {
+      const along = -len / 2 + pw * (i + 0.5), [fx, fz] = inward(x, z, t, 0.013);
+      panels.push(place(new T.RoundedBoxGeometry(pw - 0.13, ph, 0.022, 2, 0.008), {
+        p: [fx + Math.cos(t) * along, (RAIL + BASE) / 2, fz - Math.sin(t) * along], r: [0, t, 0], uv: [pw, ph] }));
+    }
     const strip = (h, d, y, list) => { const [sx, sz] = inward(x, z, t, d / 2); list.push(place(new T.BoxGeometry(len, h, d), { p: [sx, y, sz], r: [0, t, 0] })); };
     strip(BASE, 0.02, BASE / 2, dark); strip(0.014, 0.03, BASE + 0.007, dark);
     strip(0.035, 0.026, RAIL, light); strip(0.012, 0.034, RAIL + 0.02, light);
     strip(0.1, 0.022, ROOM.h - 0.05, light); strip(0.035, 0.05, ROOM.h - 0.0175, light); strip(0.012, 0.03, ROOM.h - 0.106, dark);
   }
-  add(merged(panels, lambert({ color: WALL, map: panel() })));
+  add(merged(panels, standard({ color: WALL, map: plaster(), roughness: 0.75 })));
   add(merged(dark, standard({ color: BRAND, roughness: 0.55 })));
   add(merged(light, standard({ color: MARK, roughness: 0.55 })));
 
