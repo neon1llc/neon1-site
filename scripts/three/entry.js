@@ -8,9 +8,9 @@ export { WebGLRenderer, WebGLRenderTarget, Scene, PerspectiveCamera, CanvasTextu
   DirectionalLight, HemisphereLight, PointLight, CatmullRomCurve3, Vector3, Vector2, Color,
   MathUtils, SRGBColorSpace, LinearFilter, AdditiveBlending, HalfFloatType, Vector4, Points, BufferGeometry,
   Float32BufferAttribute, DoubleSide, BackSide, Shape, ShapeGeometry, ExtrudeGeometry, LatheGeometry, SphereGeometry,
-  RepeatWrapping, PCFSoftShadowMap, MeshPhysicalMaterial, PMREMGenerator, Raycaster } from "three";
+  RepeatWrapping, PCFSoftShadowMap, MeshPhysicalMaterial, PMREMGenerator, Raycaster, TextureLoader } from "three";
 
-// Add-ons: postprocessing, the rounded cabinet, and merging the furniture into a few draws
+// Add-ons: postprocessing, the rounded cabinet, merging the furniture into a few draws, and glTF models
 export { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 export { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 export { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
@@ -18,3 +18,4 @@ export { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js"
 export { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 export { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 export { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
+export { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
