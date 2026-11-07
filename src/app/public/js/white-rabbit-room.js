@@ -17,7 +17,7 @@ const BRASS = "#A8834E", LEATHER = "#5C2C20";
 
 // The room's inside faces, the height of the wainscot, and where the chairs sit (x, z, turn)
 const ROOM = { x: 1.95, z: 2.45, h: 2.6 };
-const RAIL = 0.8, BASE = 0.13;
+const RAIL = 0.66, BASE = 0.13; // low enough that the window and its sill sit clear above the rail
 const CHAIRS = [[-1.12, -1.46, 0.48], [1.29, -1.54, -0.57]]; // set down by hand, not mirrored
 
 // A small seeded random, so the textures look the same on every visit
@@ -254,9 +254,31 @@ function rounded(shape, w, h, r) {
 }
 
 
+// A raised panel field facing +z from the wall at z 0: a w by h rectangle at the wall, a smaller
+// one inset by `bevel` and `depth` out in front, and four trapezoids joining them corner to corner
+function raised(w, h, bevel, depth) {
+  const x = w / 2, y = h / 2, X = x - bevel, Y = y - bevel;
+  const back = [[-x, -y, 0], [x, -y, 0], [x, y, 0], [-x, y, 0]], front = [[-X, -Y, depth], [X, -Y, depth], [X, Y, depth], [-X, Y, depth]];
+  // Flat-shaded triangles from quads given counterclockwise as seen from outside
+  const build = (quads) => {
+    const pos = [], nor = [], uvs = [];
+    for (const q of quads) {
+      const [a, b, c] = q, e1 = b.map((v, k) => v - a[k]), e2 = c.map((v, k) => v - a[k]);
+      const n = [e1[1] * e2[2] - e1[2] * e2[1], e1[2] * e2[0] - e1[0] * e2[2], e1[0] * e2[1] - e1[1] * e2[0]], l = Math.hypot(...n);
+      for (const v of [q[0], q[1], q[2], q[0], q[2], q[3]]) { pos.push(...v); nor.push(...n.map((m) => m / l)); uvs.push(v[0] + x, v[1] + y); }
+    }
+    const geo = new T.BufferGeometry();
+    geo.setAttribute("position", new T.Float32BufferAttribute(pos, 3));
+    geo.setAttribute("normal", new T.Float32BufferAttribute(nor, 3));
+    geo.setAttribute("uv", new T.Float32BufferAttribute(uvs, 2));
+    return geo;
+  };
+  const sides = [0, 1, 2, 3].map((i) => { const j = (i + 1) % 4; return [back[i], back[j], front[j], front[i]]; });
+  return { face: build([front]), sides: build(sides) };
+}
+
 // The sill's profile as [projection, height] in meters from the opening's bottom, bottom up:
-// a neck clear of the wainscot below, a ring, the echinus flaring out on a convex curve, and the
-// square abacus slab on top, level with the chair rail it stops
+// a neck, a ring, the echinus flaring out on a convex curve, and the square abacus slab on top
 const DORIC = (() => {
   const pts = [[0, -0.062], [0.066, -0.062], [0.066, -0.048], [0.072, -0.046], [0.077, -0.042], [0.078, -0.038], [0.075, -0.034], [0.07, -0.032]];
   for (let i = 0; i <= 8; i++) {
@@ -265,7 +287,7 @@ const DORIC = (() => {
   }
   return [...pts, [0.16, -0.006], [0.16, 0.028]];
 })();
-const NECK = 0.07, ABACUS = 0.16; // how far past the opening the neck runs, and the slab's projection
+const NECK = 0.07; // how far past the opening the neck runs at each end
 
 // A capital half sunk in a wall that faces +x: the profile is swept around a plan that grows with
 // it, so the front and both ends flare alike. Creases sharper than about 35 degrees stay hard
@@ -392,25 +414,15 @@ export function furnish(scene, { win, sc, sw, sh }) {
     panels.push(place(new T.PlaneGeometry(len, RAIL - BASE), { p: [px, (RAIL + BASE) / 2, pz], r: [0, t, 0], uv: [len, RAIL - BASE] }));
     const n = Math.max(1, Math.round(len / 0.62)), pw = len / n, ph = RAIL - BASE - 0.13;
     for (let i = 0; i < n; i++) {
-      const along = -len / 2 + pw * (i + 0.5), [fx, fz] = inward(x, z, t, 0.03);
-      // A deep raised field with a dark green edge: a green block behind, a white face in front
-      const [gx, gz] = inward(x, z, t, 0.022);
-      dark.push(place(new T.BoxGeometry(pw - 0.114, ph + 0.016, 0.04), { p: [gx + Math.cos(t) * along, (RAIL + BASE) / 2, gz - Math.sin(t) * along], r: [0, t, 0] }));
-      panels.push(place(new T.RoundedBoxGeometry(pw - 0.13, ph, 0.05, 2, 0.008), {
-        p: [fx + Math.cos(t) * along, (RAIL + BASE) / 2, fz - Math.sin(t) * along], r: [0, t, 0], uv: [pw, ph] }));
+      // A raised field: a white face on four green bevels that slope back to the wall
+      const along = -len / 2 + pw * (i + 0.5), [fx, fz] = inward(x, z, t, 0.004);
+      const at = { p: [fx + Math.cos(t) * along, (RAIL + BASE) / 2, fz - Math.sin(t) * along], r: [0, t, 0] };
+      const { face, sides } = raised(pw - 0.08, ph + 0.02, 0.04, 0.026);
+      panels.push(place(face, at)); dark.push(place(sides, at));
     }
     const strip = (h, d, y, list) => { const [sx, sz] = inward(x, z, t, d / 2); list.push(place(new T.BoxGeometry(len, h, d), { p: [sx, y, sz], r: [0, t, 0] })); };
     strip(BASE, 0.02, BASE / 2, dark); strip(0.014, 0.03, BASE + 0.007, dark);
-    // The chair rail stops at the ends of the sill, so the window sits in front of it
-    if (t === Math.PI / 2) {
-      for (const [a, b] of [[-ROOM.z, z0 - NECK - ABACUS], [z1 + NECK + ABACUS, ROOM.z]]) {
-        const c = (a + b) / 2, L = b - a, rail = (h, d, y) => {
-          const [sx, sz] = inward(x, z, t, d / 2);
-          light.push(place(new T.BoxGeometry(L, h, d), { p: [sx, y, c + sz - z], r: [0, t, 0] }));
-        };
-        rail(0.035, 0.026, RAIL); rail(0.012, 0.034, RAIL + 0.02);
-      }
-    } else { strip(0.035, 0.026, RAIL, light); strip(0.012, 0.034, RAIL + 0.02, light); }
+    strip(0.035, 0.026, RAIL, light); strip(0.012, 0.034, RAIL + 0.02, light);
     strip(0.1, 0.022, ROOM.h - 0.05, light); strip(0.035, 0.05, ROOM.h - 0.0175, light); strip(0.012, 0.03, ROOM.h - 0.106, dark);
   }
   add(merged(panels, standard({ color: WALL, map: plaster(), roughness: 0.75 })));
@@ -481,8 +493,8 @@ export function furnish(scene, { win, sc, sw, sh }) {
     const [px, pz] = inward(x, z, t, 0.17);
     ao.push(place(new T.PlaneGeometry(len, 0.34), { p: [px, 0.002, pz], r: [-Math.PI / 2, t, 0], order: "YXZ" }));
   }
-  // The wainscot darkens a little under the sill's overhang
-  ao.push(place(new T.PlaneGeometry(win.w + 2 * NECK + 0.1, 0.09), { p: [-1.893, y0 - 0.106, win.z], r: [0, Math.PI / 2, 0] }));
+  // The wall darkens a little under the sill's neck
+  ao.push(place(new T.PlaneGeometry(win.w + 2 * NECK + 0.06, 0.06), { p: [-1.948, y0 - 0.092, win.z], r: [0, Math.PI / 2, 0] }));
   add(merged(ao, new T.MeshBasicMaterial({ map: edge(), transparent: true, depthWrite: false })));
   const blobs = [place(new T.PlaneGeometry(1.25, 0.82), { p: [0.06, 0.043, -1.98], r: [-Math.PI / 2, 0, 0] })];
   for (const [x, z, t] of CHAIRS) blobs.push(place(new T.PlaneGeometry(1.05, 1.0), { p: [x, 0.043, z], r: [-Math.PI / 2, t, 0], order: "YXZ" }));
