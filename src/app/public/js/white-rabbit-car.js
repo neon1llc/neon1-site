@@ -2,8 +2,9 @@
 // Usage: const car = createCar({ scene, env, at, onSound }); car.pick(raycaster); car.update(time, light)
 //
 // Imported by white-rabbit-scene.js. A generic long-hood, short-deck coupe at about
-// 1:13, lofted from cross-sections: wide haunches, a low roof, slim headlights, and
-// no badges or names. Clicking it flashes the headlights twice, pauses, cranks the
+// 1:15, lofted from cross-sections: wide haunches, a low roof with slit windows, a
+// vented hood bulge, slim clear headlights, a front splitter, a decklid wing, and black
+// wheels in black arches, all in one pearl black with no badges or names. Clicking it flashes the headlights twice, pauses, cranks the
 // starter, and the engine catches: the lights stay on and the body rumbles at idle.
 // Clicking again shuts it off. onSound(kind) hears "click", "crank", "fire", and "stop".
 
@@ -32,17 +33,13 @@ function through(pts, z) {
 // The body's side and plan: rocker and arch line underneath, hood and deck line on top, half width
 const BOTTOM_BASE = [[-0.1325, 0.021], [-0.118, 0.017], [0.11, 0.016], [0.1325, 0.021]];
 const TOP = [[-0.1325, 0.047], [-0.118, 0.055], [-0.078, 0.058], [0.02, 0.057], [0.09, 0.0525], [0.118, 0.049], [0.1325, 0.038]];
-const HALF = [[-0.1325, 0.044], [-0.112, 0.05], [-0.078, 0.0535], [-0.035, 0.0505], [0.035, 0.0505], [0.083, 0.0515], [0.118, 0.048], [0.1325, 0.041]];
+const HALF = [[-0.1325, 0.045], [-0.112, 0.051], [-0.079, 0.0545], [-0.045, 0.0505], [0.04, 0.0502], [0.083, 0.0525], [0.115, 0.049], [0.1325, 0.043]];
 // The greenhouse: from the rear window's base to the windshield's, roof height and half width
 const ROOF = [[-0.082, 0.057], [-0.035, 0.0735], [-0.006, 0.0745], [0.034, 0.056]];
 const ROOF_HALF = [[-0.082, 0.042], [-0.035, 0.036], [-0.006, 0.036], [0.034, 0.043]];
 
-// The underside rises into a round arch over each wheel
-function bottom(z) {
-  let y = through(BOTTOM_BASE, z);
-  for (const a of AXLES) { const d = z - a, r = WHEEL + 0.0045; if (Math.abs(d) < r) y = Math.max(y, WHEEL + Math.sqrt(r * r - d * d)); }
-  return y;
-}
+// The underside, flat between the bumpers; the wheel openings are dark liners on the sides
+const bottom = (z) => through(BOTTOM_BASE, z);
 
 // A lofted shell through cross-sections along z: section(z, a) gives [x, y] for the angle a around it
 function loft(z0, z1, rows, cols, section) {
@@ -137,16 +134,17 @@ export function createCar({ scene, env, at, onSound = () => {} }) {
 
   // Pearl black: glossy black over fine metal flakes that glint only where light catches them
   const paint = new T.MeshPhysicalMaterial({
-    color: "#060607", metalness: 0.7, roughness: 0.3, normalMap: flakes(), normalScale: new T.Vector2(0.9, 0.9),
-    clearcoat: 1, clearcoatRoughness: 0.03, envMap: env, envMapIntensity: 0,
+    color: "#050506", metalness: 0.4, roughness: 0.3, normalMap: flakes(), normalScale: new T.Vector2(0.9, 0.9),
+    clearcoat: 0.8, clearcoatRoughness: 0.04, envMap: env, envMapIntensity: 0,
   });
-  const glass = new T.MeshStandardMaterial({ color: "#07080A", metalness: 0.2, roughness: 0.06, envMap: env, envMapIntensity: 0 });
-  const trim = new T.MeshStandardMaterial({ color: "#111214", roughness: 0.5 });
-  const rubber = new T.MeshStandardMaterial({ color: "#0B0B0B", roughness: 0.85 });
-  const rims = new T.MeshStandardMaterial({ color: "#2A2C30", metalness: 0.8, roughness: 0.3, envMap: env, envMapIntensity: 0 });
-  const lamps = new T.MeshStandardMaterial({ color: "#20242A", emissive: "#FFF4E2", emissiveIntensity: 0, roughness: 0.2 });
-  const tails = new T.MeshStandardMaterial({ color: "#3A0806", emissive: "#FF2010", emissiveIntensity: 0, roughness: 0.3 });
-  const glossy = [[paint, 0.3], [glass, 0.45], [rims, 0.8]];
+  // Black glass and trim, black tires and wheels, clear headlights, and red taillights
+  const glass = new T.MeshStandardMaterial({ color: "#050608", metalness: 0.2, roughness: 0.06, envMap: env, envMapIntensity: 0 });
+  const trim = new T.MeshStandardMaterial({ color: "#060607", roughness: 0.55 });
+  const rubber = new T.MeshStandardMaterial({ color: "#070707", roughness: 0.9 });
+  const rims = new T.MeshStandardMaterial({ color: "#0E0F11", metalness: 0.6, roughness: 0.35, envMap: env, envMapIntensity: 0 });
+  const lamps = new T.MeshStandardMaterial({ color: "#B8C0C8", metalness: 0.4, roughness: 0.12, emissive: "#FFF4E2", emissiveIntensity: 0, envMap: env, envMapIntensity: 0 });
+  const tails = new T.MeshStandardMaterial({ color: "#7A0A06", emissive: "#FF1A0A", emissiveIntensity: 0.25, roughness: 0.25 });
+  const glossy = [[paint, 0.16], [glass, 0.35], [rims, 0.2], [lamps, 0.8]];
 
   // Body and greenhouse
   shell.add(lit(new T.Mesh(loft(-L / 2, L / 2, 44, 28, body), paint)));
@@ -164,10 +162,24 @@ export function createCar({ scene, env, at, onSound = () => {} }) {
     shell.add(lit(m));
     return m;
   };
-  parts([[0.052, 0.011, 0.004, [0, 0.033, 0.1328]], [0.07, 0.008, 0.004, [0, 0.021, 0.1312]],
-    [0.008, 0.006, 0.012, [-0.047, 0.061, 0.03]], [0.008, 0.006, 0.012, [0.047, 0.061, 0.03]]], trim);
+  // Black trim: slim upper grille, wide lower grille, splitter, hood vent, mirrors, arch liners, and the wing
+  const black = [[0.05, 0.006, 0.004, [0, 0.039, 0.1328]], [0.074, 0.013, 0.004, [0, 0.026, 0.1328]],
+    [0.106, 0.0022, 0.012, [0, 0.0135, 0.127]], [0.096, 0.002, 0.004, [0, 0.013, 0.1335], [0.25, 0, 0]],
+    [0.026, 0.0025, 0.016, [0, 0.0565, 0.066], [-0.09, 0, 0]],
+    [0.005, 0.004, 0.008, [-0.046, 0.06, 0.024]], [0.005, 0.004, 0.008, [0.046, 0.06, 0.024]],
+    [0.088, 0.002, 0.012, [0, 0.0615, -0.122], [0.12, 0, 0]],
+    [0.003, 0.005, 0.006, [-0.03, 0.059, -0.121]], [0.003, 0.005, 0.006, [0.03, 0.059, -0.121]]];
+  parts(black, trim);
+  // Liners that read as the wheel openings, just proud of the sides above each tire
+  const liner = [];
+  for (const z of AXLES) for (const k of [-1, 1]) {
+    const g = new T.CylinderGeometry(WHEEL + 0.0045, WHEEL + 0.0045, 0.002, 24, 1, false, 0, Math.PI).toNonIndexed();
+    g.rotateZ(Math.PI / 2); g.translate(k * (through(HALF, z) + 0.0004), WHEEL, z); liner.push(g);
+  }
+  shell.add(new T.Mesh(T.mergeGeometries(liner), trim));
+  liner.forEach((g) => g.dispose());
   parts([[0.021, 0.0045, 0.004, [-0.03, 0.0425, 0.1305], [0, -0.35, -0.06]], [0.021, 0.0045, 0.004, [0.03, 0.0425, 0.1305], [0, 0.35, 0.06]]], lamps);
-  parts([[0.026, 0.006, 0.003, [-0.027, 0.0455, -0.1325]], [0.026, 0.006, 0.003, [0.027, 0.0455, -0.1325]]], tails);
+  parts([[0.028, 0.0065, 0.003, [-0.026, 0.0455, -0.1328]], [0.028, 0.0065, 0.003, [0.026, 0.0455, -0.1328]]], tails);
 
   // Wheels stay put while the body rumbles above them
   const tire = [], rim = [];
@@ -220,7 +232,7 @@ export function createCar({ scene, env, at, onSound = () => {} }) {
         on = 1; shake = 0.35 + 1.4 * Math.exp(-(t - FIRE) * 3.5);
       }
     } else cranked = fired = false;
-    lamps.emissiveIntensity = on * 3.2; tails.emissiveIntensity = running ? 1.4 : 0;
+    lamps.emissiveIntensity = on * 3.2; tails.emissiveIntensity = running ? 1.4 : 0.25;
     glowU.uOn.value = on * 0.9; beam.intensity = on * 0.05;
     // Idle: uneven firing pulses rock the body a fraction of a millimeter
     const pulse = Math.sin(time * 2 * Math.PI * 9.5) * 0.6 + Math.sin(time * 2 * Math.PI * 4.75 + 1.3) * 0.4;
