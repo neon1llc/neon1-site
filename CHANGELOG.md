@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.12.7
+
+- Glass panes share one roomier padding, used by the landing's wordmark pane and the not-found page, whose pane now magnifies the rain like the landing's.
+- Pinch-zooming no longer scrambles the rain or the hero; they wait until the page is back at normal scale.
+
 ## v0.12.6
 
 - Unknown paths get a real not-found page, with a 404 status: the rain behind a glitching 404 and a way home. The glitch is shared with 1NEON.

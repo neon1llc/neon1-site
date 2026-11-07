@@ -381,7 +381,13 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
 
   // Start: pre-fill so rain is already falling on first paint, which is also the
   // still frame that reduced motion keeps
+  // A pinch zoom also fires resize; the rain keeps its grid until the page is back at normal scale,
+  // and only restarts when the window really changed size
+  let lastW = 0, lastH = 0;
   const onResize = () => {
+    if (window.visualViewport && visualViewport.scale > 1.01) return;
+    if (innerWidth === lastW && innerHeight === lastH) { refract(); return; }
+    lastW = innerWidth; lastH = innerHeight;
     resize(); rab = null;
     for (let i = 0; i < 40; i++) draw(true);
     if (bunny && reduce.matches && !held) stillRabbit();

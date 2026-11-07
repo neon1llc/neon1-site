@@ -28,6 +28,8 @@
 
 /* Clear glass over the rain: no tint, so the black stays black; the lens draws what shows through */
 .glass { border-radius: var(--glass-r); background: transparent; box-shadow: none; }
+/* A glass pane holding a few lines: room inside it about one and a half times the gap between them */
+.glass-pane { padding: 28px 36px; }
 
 /* neon1 wordmark: "neon" is set 1.3x so its letters match the height of "1"
    (x-height 0.56em vs digit 0.73em), at weight 450 so its strokes match the 700 "1" */

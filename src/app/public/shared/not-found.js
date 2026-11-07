@@ -3,5 +3,5 @@
 
 import { rain } from "/shared/rain.js";
 
-// The rain alone; the pane is plain tinted glass, so it needs no lens
-rain({ canvas: document.getElementById("rain") });
+// The rain, with the lens magnifying it behind the glass pane and the button, as on the landing
+rain({ canvas: document.getElementById("rain"), lens: document.getElementById("lens"), panes: () => document.querySelectorAll(".nf, .nf a") });

@@ -4,8 +4,8 @@
 /* Dark page, the rain behind, the message centered in a glass pane */
 html, body { height: 100%; margin: 0; }
 body { background: var(--void); color: #d6f5dc; font: 16px/1.6 var(--sans); display: grid; place-items: center; }
-.nf { position: relative; z-index: 2; text-align: center; padding: 28px 32px; border-radius: var(--glass-r); background: rgba(13, 2, 8, .6);
-  border: 1px solid rgba(0, 255, 65, .16); margin: 16px; }
+/* Clear glass over the rain, like the landing's panes; the lens behind it does the work */
+.nf { position: relative; z-index: 2; text-align: center; margin: 16px; }
 .nf h1 { margin: 0; font: 700 clamp(56px, 14vw, 96px)/1 var(--mono); color: var(--neon); text-shadow: 0 0 8px rgba(108, 255, 168, .65), 0 0 20px rgba(0, 230, 118, .35); }
 .nf p { margin: 14px 0 22px; font: 14px var(--mono); color: #84a98c; }
 .nf a { display: inline-block; font: 500 13px var(--mono); color: var(--neon); border: 1px solid var(--neon); border-radius: 8px; padding: 10px 16px; text-decoration: none; }
