@@ -298,8 +298,8 @@ export function createScene({ onLost, onSound = () => {} }) {
   const env = environment(renderer);
   const { glossy } = furnish(scene, { win: WINDOW, sc: SC, sw: SW, sh: SH, env, touch });
 
-  // The model car on the sill, nose turned a little toward the room
-  const car = createCar({ scene, env, at: { p: [-1.9, WINDOW.y - WINDOW.h / 2 + 0.028, 0.9], turn: 0.2, scale: 1.4 }, onSound });
+  // The model car on the sill, nose turned a little toward the room, kept inside the glass
+  const car = createCar({ scene, env, at: { p: [-1.872, WINDOW.y - WINDOW.h / 2 + 0.028, 0.9], turn: 0.1, scale: 1.25 }, onSound });
   sky.block(...car.box);
 
   // Screen and glass, both curved by the same bulge
