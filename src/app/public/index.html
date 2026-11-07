@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.12.6" />
+  <meta name="version" content="0.12.7" />
   <title>neon1</title>
   <meta name="description" content="neon1 is a one-person technology practice in New York: cloud and AI engineering, business automation, networks, and cameras." />
   <meta name="theme-color" content="#0D0208" />
@@ -19,7 +19,8 @@
   <link rel="modulepreload" href="/js/white-rabbit.js" />
   <script>
     // The visible height, which some mobile browsers report differently from CSS vh units
-    (() => { const set = () => document.documentElement.style.setProperty("--vh", (window.visualViewport ? visualViewport.height : innerHeight) + "px"); set(); addEventListener("resize", set); if (window.visualViewport) visualViewport.addEventListener("resize", set); })();
+    // Ignored while pinch-zoomed, when the visible height shrinks only because the page is magnified
+    (() => { const set = () => { if (window.visualViewport && visualViewport.scale > 1.01) return; document.documentElement.style.setProperty("--vh", (window.visualViewport ? visualViewport.height : innerHeight) + "px"); }; set(); addEventListener("resize", set); if (window.visualViewport) visualViewport.addEventListener("resize", set); })();
   </script>
   <style>
     /* ---- Page tokens; fonts and brand tokens come from /shared/neon1.css ---- */
@@ -348,8 +349,7 @@
     .links .portal svg { width: 14px; height: 14px; }
     header.light .links .portal { color: var(--brand); border-color: rgba(3,87,4,.25); }
     header.light .links .portal:hover { border-color: var(--brand); }
-    /* Room around the wordmark and slogan, about the size of the gap between them */
-    .hero-pane { padding: 20px 30px; }
+    /* Room around the wordmark and slogan comes from the shared .glass-pane */
     /* The 1.3x "neon" adds .3em of empty line space above the letters; pull it back so the pane looks balanced */
     .hero-pane .brand { margin-top: -.3em; }
     body { transition: background-color .4s; } body.woke { background-color: var(--paper); }
@@ -501,7 +501,7 @@
 
   <div id="top" class="top">
     <section class="hero">
-      <div class="glass hero-pane">
+      <div class="glass glass-pane hero-pane">
         <h1 class="brand" aria-label="neon1"><span class="ne dec" aria-hidden="true">neon</span><span class="one dec" aria-hidden="true">1</span></h1>
         <p class="tagline reveal d1">1 is glad to be of service.</p>
       </div>
@@ -682,7 +682,7 @@
     </div>
     <div class="legal">
       <span>© <span id="yr"></span> NEON1 LLC, New York</span>
-      <span>No tracking or cookies. v0.12.6</span>
+      <span>No tracking or cookies. v0.12.7</span>
     </div>
   </footer>
   </div>
