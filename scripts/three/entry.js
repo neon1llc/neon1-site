@@ -5,12 +5,11 @@
 // Core: renderer, scene graph, geometry, materials, lights, and math
 export { WebGLRenderer, WebGLRenderTarget, Scene, PerspectiveCamera, CanvasTexture, Mesh, Group, BoxGeometry,
   PlaneGeometry, CylinderGeometry, ShaderMaterial, MeshStandardMaterial, MeshLambertMaterial, MeshBasicMaterial,
-  Sprite, SpriteMaterial, DirectionalLight, HemisphereLight, PointLight, CatmullRomCurve3, Vector3, Vector2, Color,
+  DirectionalLight, HemisphereLight, PointLight, CatmullRomCurve3, Vector3, Vector2, Color,
   MathUtils, SRGBColorSpace, LinearFilter, AdditiveBlending, HalfFloatType, Vector4, Points, BufferGeometry,
-  Float32BufferAttribute } from "three";
+  Float32BufferAttribute, DoubleSide } from "three";
 
-// Add-ons: the sky with its clouds, postprocessing, and the rounded cabinet
-export { Sky } from "three/addons/objects/Sky.js";
+// Add-ons: postprocessing and the rounded cabinet
 export { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 export { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 export { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
