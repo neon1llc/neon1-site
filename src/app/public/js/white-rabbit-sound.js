@@ -2,8 +2,10 @@
 // Usage: const sound = createSound(new AudioContext()); sound.start("scene"); sound.update(p, tv); sound.close()
 //
 // Imported by white-rabbit.js after a catch, with an AudioContext made in that same click
-// or tap. The CRT's hum and whine, the static on the screen, the room's quiet air, and
-// the glitch as the rain stops are built from oscillators, noise, and filters. The car's
+// or tap, and silent until the scroll out of the TV begins. The tube's low mains hum and
+// faint whine, static while the screen shows snow, the room's quiet air, the
+// outdoors (a breeze, leaves rustling in gusts, birds now and then, a faint creek), and the
+// glitch as the rain stops are built from oscillators, noise, and filters. The car's
 // ignition is a real V8 recording, fetched only after the car is first clicked, played
 // slower and deeper, then held on a looped stretch of its idle; until it loads, or if it
 // can't, the starter and idle are synthesized too. Everything is kept quiet.
@@ -26,7 +28,7 @@ function ramp(p, pts) {
 }
 
 
-/** Builds the sound graph on ctx; start(mode) brings in the beds for "scene" or "card" */
+/** Builds the sound graph on ctx; start("scene") readies the beds, which update(p, tv) then brings in */
 export function createSound(ctx) {
   const now = () => ctx.currentTime;
   const out = ctx.createDynamicsCompressor();
@@ -52,41 +54,138 @@ export function createSound(ctx) {
   const hum = gain();
   const humTone = filter("lowpass", 380, 0.7, hum);
   sources.push(tone("sawtooth", 60, gain(0.5, humTone)), tone("sine", 120, gain(0.6, humTone)), tone("sine", 180, gain(0.15, humTone)));
-  sources.push(tone("sine", 15734, gain(0.012, hum)));
+  sources.push(tone("sine", 15734, gain(0.004, hum)));
+  // An electrical buzz on top: noise chopped at twice the mains rate, kept thin and quiet
+  const buzz = gain(0, hum);
+  const buzzTone = filter("bandpass", 1800, 1.5, buzz);
+  sources.push(hiss(buzzTone));
+  const chop = gain(0.006, buzz.gain);
+  sources.push(tone("square", 120, chop));
 
   // Static on the screen: band-limited noise, muffled by a lowpass once the glass is between us
   const fizz = gain();
   const muffle = filter("lowpass", 6000, 0.5, fizz);
   sources.push(hiss(filter("bandpass", 2600, 0.6, muffle)));
 
-  // The room: low, still air, and a breath of wind and leaves near the open window
+  // The room: low, still air
   const air = gain();
   sources.push(hiss(filter("lowpass", 240, 0.4, air)));
-  const breeze = gain();
-  const leaves = filter("bandpass", 1100, 0.4, breeze);
-  sources.push(hiss(leaves));
 
-  let mode = null, muted = false;
+  // ---- Outside, through the window: a soft breeze, leaves in gusts, birds, and a faint creek ----
+  // Everything outside runs through one level and one lowpass, so it is muffled while the window is
+  // behind the camera and opens up as the camera turns to it
+  const outside = gain();
+  const through = filter("lowpass", 900, 0.5, outside);
+  // A small, soft room for the birds: two damped echoes that feed back a little
+  const echo = ctx.createDelay(1); echo.delayTime.value = 0.13;
+  const echo2 = ctx.createDelay(1); echo2.delayTime.value = 0.21;
+  const damp = filter("lowpass", 2400, 0.5, through);
+  const feed = gain(0.28, echo);
+  echo.connect(damp); echo2.connect(damp); damp.connect(feed); feed.connect(echo2);
+  const birdsSend = gain(0.22, echo);
+  // The breeze bed: a low, slow-moving whisper that never quite stops
+  const bed = gain(0.012, through);
+  const bedTone = filter("lowpass", 420, 0.4, bed);
+  sources.push(hiss(bedTone));
+  // A faint creek far off: babbling noise whose band wanders
+  const creek = gain(0.0035, through);
+  const creekTone = filter("bandpass", 900, 0.8, creek);
+  sources.push(hiss(creekTone));
+
+  // A one-shot noise grain: a leaf ticking against others, short, bright, and placed left or right
+  function grain(level) {
+    const t = now(), len = 0.012 + Math.random() * 0.045;
+    const src = ctx.createBufferSource(); src.buffer = noise;
+    const band = ctx.createBiquadFilter(); band.type = "bandpass"; band.frequency.value = 2000 + Math.random() * 4000; band.Q.value = 1.2 + Math.random() * 2;
+    const pan = ctx.createStereoPanner(); pan.pan.value = Math.random() * 1.8 - 0.9;
+    const g = ctx.createGain(); g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(level, t + 0.002); g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+    src.connect(band).connect(g).connect(pan).connect(through);
+    src.start(t, Math.random() * 1.8, len + 0.01);
+    src.onended = () => pan.disconnect();
+  }
+
+  // A bird: a pure tone through a gain envelope, gliding between pitches; notes are [start, length,
+  // from Hz, to Hz, level]; far birds are quieter and duller, and every bird sits left or right
+  function bird(notes, far) {
+    const t = now() + 0.02, pan = ctx.createStereoPanner(), dull = ctx.createBiquadFilter();
+    pan.pan.value = Math.random() * 1.6 - 0.8;
+    dull.type = "lowpass"; dull.frequency.value = 9000 - far * 6500;
+    const out = ctx.createGain(); out.gain.value = 0.05 * (1 - far * 0.7);
+    out.connect(dull).connect(pan); pan.connect(through); pan.connect(birdsSend);
+    let end = 0;
+    for (const [at, len, f0, f1, level] of notes) {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.frequency.setValueAtTime(f0, t + at); o.frequency.exponentialRampToValueAtTime(f1, t + at + len);
+      g.gain.setValueAtTime(0, t + at); g.gain.linearRampToValueAtTime(level, t + at + Math.min(0.012, len / 3));
+      g.gain.setTargetAtTime(0, t + at + len * 0.7, len * 0.12);
+      o.connect(g).connect(out); o.start(t + at); o.stop(t + at + len + 0.1);
+      end = Math.max(end, at + len + 0.2);
+    }
+    setTimeout(() => pan.disconnect(), (end + 0.5) * 1000);
+  }
+
+  // Four kinds of bird, each a little different every time
+  const songs = [
+    // A quick chirping trill
+    () => { const n = 3 + (Math.random() * 4 | 0), f = 2600 + Math.random() * 1400; return Array.from({ length: n }, (_, i) => [i * 0.075, 0.045, f, f * 1.8, 1]); },
+    // A two-note "fee-bee" whistle
+    () => { const f = 3300 + Math.random() * 500; return [[0, 0.32, f, f * 0.98, 0.9], [0.4, 0.38, f * 0.83, f * 0.8, 0.8]]; },
+    // A warbling phrase
+    () => { let at = 0; return Array.from({ length: 7 + (Math.random() * 6 | 0) }, () => { const f = 2200 + Math.random() * 2600, len = 0.05 + Math.random() * 0.05, n = [at, len, f, f * (0.8 + Math.random() * 0.5), 0.7 + Math.random() * 0.3]; at += len + 0.02; return n; }); },
+    // A dove cooing far off: low and soft, "hoo-HOO-hoo-hoo"
+    () => { const f = 470 + Math.random() * 60; return [[0, 0.32, f * 0.95, f, 0.6], [0.45, 0.5, f * 1.08, f, 1], [1.05, 0.3, f, f * 0.94, 0.6], [1.45, 0.3, f, f * 0.94, 0.55]]; },
+  ];
+
+  // The clock outside: when the next gust and bird come, and how the current gust is shaped
+  let gust = { start: 4 + Math.random() * 6, rise: 2, hold: 1, fall: 2.5 }, nextBird = 2 + Math.random() * 5;
+  const gustLevel = (t) => {
+    const g = gust, x = t - g.start;
+    if (x < 0) return 0;
+    if (x < g.rise) return Math.sin((x / g.rise) * Math.PI / 2) ** 2;
+    if (x < g.rise + g.hold) return 1;
+    return Math.max(0, 1 - (x - g.rise - g.hold) / g.fall) ** 2;
+  };
+
+  // Outside, each frame: gusts come and go with grains of rustle thickest at their peak, birds sing now
+  // and then, and the window's openness sets how much of it reaches the room
+  let last = 0;
+  function outdoors(level, openness) {
+    const t = now(), dt = last ? Math.min(0.1, t - last) : 0;
+    last = t;
+    glide(outside.gain, level, 0.4);
+    glide(through.frequency, 700 + 8000 * openness * openness, 0.3);
+    if (level < 0.01) return;
+    const g = gustLevel(t);
+    if (t > gust.start + gust.rise + gust.hold + gust.fall) gust = { start: t + 6 + Math.random() * 14, rise: 1 + Math.random() * 2, hold: Math.random() * 1.5, fall: 1.5 + Math.random() * 2 };
+    glide(bed.gain, 0.01 + 0.012 * g, 0.5);
+    glide(bedTone.frequency, 380 + 260 * g, 0.5);
+    for (let n = dt * (6 + 140 * g); n > 0; n--) if (Math.random() < n) grain(0.02 + 0.05 * g * Math.random());
+    if (t > nextBird) { bird(songs[Math.random() * songs.length | 0](), Math.random()); nextBird = t + 4 + Math.random() * 11; }
+    glide(creekTone.frequency, 800 + 250 * Math.sin(t * 0.7) + 120 * Math.sin(t * 2.3), 0.1);
+  }
+
+  let mode = null, heard = false;
 
   // Sets a level smoothly
   const glide = (param, v, t = GLIDE) => param.setTargetAtTime(v, now(), t);
 
-  // Brings the beds in: the scene gets everything, the card only the room's air
-  function start(m) {
-    mode = m;
-    glide(master.gain, muted ? 0 : LEVEL, 0.4);
-    if (m === "card") { glide(hum.gain, 0); glide(fizz.gain, 0); glide(air.gain, 0.05, 0.5); glide(breeze.gain, 0.012, 0.5); }
-  }
+  // Readies the beds; nothing is heard until the scroll out of the TV begins (see update)
+  function start(m) { mode = m; }
 
-  // Follows the scene: the hum fades as the camera turns from the set, static sits under the screen beats
+  // Follows the scene: the tube's low hum fades as the camera turns from the set, static comes with the
+  // snow on the screen, and the outdoors comes in with the room and opens up toward the window
   function update(p, tv) {
     if (mode !== "scene") return;
-    glide(hum.gain, 0.04 * (0.06 + 0.94 * tv));
-    glide(fizz.gain, ramp(p, [[0, 0.004], [0.06, 0.02], [0.3, 0.035], [0.38, 0.06], [0.46, 0.025], [0.6, 0.008], [0.8, 0.002]]) * (0.3 + 0.7 * tv));
+    // Silent at the landing; the sound fades in as the scroll out of the TV begins, and out on the way back
+    heard = p >= 0.002;
+    glide(master.gain, heard ? LEVEL : 0, heard ? 0.35 : 0.15);
+    glide(hum.gain, 0.045 * (0.06 + 0.94 * tv));
+    // Static only while the screen itself shows snow, following it in and out
+    glide(fizz.gain, 0.06 * ramp(p, [[0.36, 0], [0.4, 1], [0.46, 0]]));
     glide(muffle.frequency, ramp(p, [[0, 7000], [0.28, 4000], [0.45, 1400], [0.7, 900]]));
     glide(air.gain, ramp(p, [[0.3, 0.01], [0.5, 0.04], [0.9, 0.05]]));
-    glide(breeze.gain, ramp(p, [[0.6, 0], [0.85, 0.014], [1, 0.02]]));
-    glide(leaves.frequency, 900 + 300 * Math.sin(now() * 0.3));
+    outdoors(ramp(p, [[0.38, 0], [0.55, 0.45], [0.85, 1]]), ramp(p, [[0.6, 0], [0.88, 1]]));
   }
 
   // ---- The glitch as the rain stops ----
@@ -209,14 +308,7 @@ export function createSound(ctx) {
     starter = null;
   }
 
-  // ---- Mute and close ----
-  // Muting fades out and suspends the context, so it costs nothing while silent
-  function setMuted(m) {
-    muted = m;
-    if (m) { glide(master.gain, 0, 0.05); setTimeout(() => muted && ctx.state === "running" && ctx.suspend(), 250); }
-    else { ctx.resume(); glide(master.gain, LEVEL, 0.2); }
-  }
-
+  // ---- Close ----
   // Fades everything out and closes the context, freeing the audio device and the recording
   function close() {
     glide(master.gain, 0, 0.08);
@@ -224,5 +316,5 @@ export function createSound(ctx) {
     setTimeout(() => { sources.forEach((s) => { try { s.stop(); } catch { /* already stopped */ } }); ctx.close().catch(() => {}); }, 300);
   }
 
-  return { start, update, glitch, car, setMuted, close };
+  return { start, update, glitch, car, close };
 }

@@ -6,9 +6,9 @@
 // the picture on an old TV, and the camera pulls back into a light room and up to
 // a window, ending on "go touch grass". Scrolling up plays it back into the screen
 // and the rain picks up again. Reduced motion, no WebGL, or a failed import get a
-// still card instead. Sound, synthesized in white-rabbit-sound.js, starts with the
-// catch, quietly; a toggle mutes it and is remembered. The card stays silent unless
-// sound was turned on.
+// still card instead. Sound, synthesized in white-rabbit-sound.js, is readied by the
+// catch and heard once the scroll out of the TV begins, quietly, and it stops when the
+// scroll returns to the landing. The card is always silent.
 //
 // States, kept on root as data-state: idle, caught, playing, reversing, done, exiting.
 // Testing: ?rabbit=now keeps a rabbit on the landing and notes its cell center on root
@@ -25,11 +25,9 @@ const IDLE = 160;          // ms without input that ends a gesture
 const FADE = 400;          // ms for the card crossfade
 const DOWN = ["ArrowDown", "PageDown", "End"], UP = ["ArrowUp", "PageUp", "Home"];
 const SCENE = "/js/white-rabbit-scene.js", SOUND = "/js/white-rabbit-sound.js";
-const KEY = "neon1.rabbit.sound"; // "on" or "off" once chosen
 
-// The visitor's sound choice, if any; storage can be blocked, so it may only last the page
-function choice() { try { return localStorage.getItem(KEY); } catch { return null; } }
-function choose(v) { try { localStorage.setItem(KEY, v); } catch { /* kept for this page only */ } }
+// An earlier version saved a sound choice; there is no choice now, so the old key goes
+try { localStorage.removeItem("neon1.rabbit.sound"); } catch { /* storage blocked: nothing to clear */ }
 
 const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
 const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
@@ -42,7 +40,6 @@ export function whiteRabbit({ rain, root }) {
   const grass = root.querySelector(".white-rabbit-grass");
   const menu = document.getElementById("menu");
   const pauseBtn = document.querySelector('[data-rain="pause"]');
-  const toggle = root.querySelector(".white-rabbit-sound");
   const page = () => document.querySelectorAll("header, .top, .awake, .rainctl");
 
   // Progress: wanted and rendered, with the spring's velocity
@@ -90,15 +87,8 @@ export function whiteRabbit({ rain, root }) {
   }
 
   // ---- Sound ----
-  // On by default in the scene, off in the card, unless the visitor chose
-  const wanted = (m = mode) => { const c = choice(); return c ? c === "on" : m === "scene"; };
-
-  // The toggle shows whether sound is on for the current mode
-  function showToggle() {
-    const on = wanted();
-    toggle.textContent = on ? "sound on" : "sound off";
-    toggle.setAttribute("aria-pressed", String(on));
-  }
+  // Sound belongs to the scene; the card is always silent
+  const wanted = () => mode === "scene";
 
   // Opens the audio device inside a click or tap, then builds the sounds once their module loads
   function openAudio() {
@@ -120,18 +110,10 @@ export function whiteRabbit({ rain, root }) {
     audio = sound = null;
   }
 
-  // The toggle saves the choice, then opens, mutes, or unmutes the sound
-  toggle.addEventListener("click", () => {
-    choose(wanted() ? "off" : "on");
-    showToggle();
-    if (!wanted()) { if (sound) sound.setMuted(true); return; }
-    if (!audio) { if (state !== "idle") openAudio(); } else if (sound) sound.setMuted(false);
-  });
-
   // A hidden tab goes quiet
   document.addEventListener("visibilitychange", () => {
     if (!audio) return;
-    if (document.hidden) audio.suspend(); else if (wanted()) audio.resume();
+    if (document.hidden) audio.suspend(); else audio.resume();
   });
 
   // ---- Catching ----
@@ -145,7 +127,8 @@ export function whiteRabbit({ rain, root }) {
     body.classList.remove("white-rabbit-hover");
     target = p = v = 0; halted = prepared = handed = false; escape = null;
     mode = reduce.matches ? "card" : "scene";
-    showToggle(); openAudio();
+    root.dataset.mode = mode;
+    openAudio();
     rain.halt((kind, ms) => sound && sound.glitch(kind, ms)).then(() => { halted = true; prepare(); });
     if (mode === "scene") load();
   }
@@ -171,7 +154,7 @@ export function whiteRabbit({ rain, root }) {
   function fallback() {
     if (state === "idle" || mode === "card") return;
     mode = "card";
-    if (sound) sound.start("card");
+    closeAudio();
     drop();
     if (state === "caught") return;
     handed = false;
@@ -304,7 +287,6 @@ export function whiteRabbit({ rain, root }) {
       catchIt();
       return;
     }
-    if (toggle.contains(e.target)) return;
     if (state !== "caught") {
       if (scene && handed && mode === "scene" && state !== "exiting" && scene.pick(e.clientX, e.clientY)) { e.preventDefault(); e.stopPropagation(); }
       return;
