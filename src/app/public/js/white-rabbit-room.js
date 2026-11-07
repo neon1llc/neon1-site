@@ -432,7 +432,7 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
   add(merged([box(4, 0.02, 5, [0, 2.61, 0])], lambert({ color: CEILING })));
   add(merged([place(new T.PlaneGeometry(4, 5), { r: [-Math.PI / 2, 0, 0], uv: [4 / 2.4, 5 / 0.6] })], lambert({ map: photo("floor-color", [1.2, 0.3], true), normalMap: photo("floor-normal", [1.2, 0.3]) })));
 
-  // ---- The window: an inset double-hung sash, its casing, and a sill shaped like a Doric capital ----
+  // ---- The window: an inset double-hung sash window, its casing, and a sill shaped like a Doric capital ----
   // Jamb liners line the opening; the casing frames it on the room side with a capped head
   const trim = [
     box(0.1, win.h, 0.012, [-2.0, win.y, z0 + 0.006]), box(0.1, win.h, 0.012, [-2.0, win.y, z1 - 0.006]),
@@ -444,20 +444,35 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
   // The sill: a squat Doric capital half sunk in the wall, its slab running back to the sash
   trim.push(place(capital(DORIC, { x: -1.95, za: z0 - NECK, zb: z1 + NECK, y: y0, back: 0.1 })));
 
-  // Two sashes on their tracks; the lower one is raised a little, so the window is open at the bottom
-  const lift = 0.13, mid = y0 + win.h / 2, sw2 = 0.045, sashes = [], panes = [];
-  const sash = (x, bottom, top, meet) => {
+  // A double-hung window, closed. The upper sash sits in the outer track; the lower sash sits in the
+  // inner track, a sash's depth nearer the room, and is the one that slides. Its top rail is the
+  // meeting rail, overlapping the upper sash's bottom rail, with the lock on it; its bottom rail is
+  // deeper, with a lift, and seats on the sill. A parting bead runs between the tracks, and stops
+  // hold the lower sash in from the room side
+  const mid = y0 + win.h / 2, sw2 = 0.045, deep = 0.034, sashes = [], panes = [];
+  const outerX = -2.03, innerX = -1.99;
+  const sash = (x, bottom, top, topRail, bottomRail) => {
     const h = top - bottom, cy = (bottom + top) / 2;
-    sashes.push(box(0.03, sw2, win.w - 0.02, [x, top - sw2 / 2, win.z]), box(0.03, meet ? 0.05 : sw2, win.w - 0.02, [x, bottom + (meet ? 0.025 : sw2 / 2), win.z]),
-      box(0.03, h, sw2, [x, cy, z0 + 0.01 + sw2 / 2]), box(0.03, h, sw2, [x, cy, z1 - 0.01 - sw2 / 2]));
-    panes.push(place(new T.PlaneGeometry(win.w - 0.02 - 2 * sw2, h - 2 * sw2), { p: [x, cy, win.z], r: [0, Math.PI / 2, 0] }));
+    sashes.push(box(deep, topRail, win.w - 0.02, [x, top - topRail / 2, win.z]), box(deep, bottomRail, win.w - 0.02, [x, bottom + bottomRail / 2, win.z]),
+      box(deep, h, sw2, [x, cy, z0 + 0.01 + sw2 / 2]), box(deep, h, sw2, [x, cy, z1 - 0.01 - sw2 / 2]));
+    const ph = h - topRail - bottomRail;
+    panes.push(place(new T.PlaneGeometry(win.w - 0.02 - 2 * sw2, ph), { p: [x, bottom + bottomRail + ph / 2, win.z], r: [0, Math.PI / 2, 0] }));
   };
-  sash(-2.028, mid - 0.025, y1, true);
-  sash(-1.992, y0 + lift, mid + 0.025 + lift, false);
+  sash(outerX, mid - 0.012, y1, sw2, 0.03);                     // upper sash: its bottom rail tucks behind the meeting rail
+  sash(innerX, y0 + 0.028, mid + 0.026, 0.05, 0.075);          // lower sash: meeting rail on top, deep bottom rail on the sill
+  // Parting beads between the tracks and stops on the room side, up both jambs and across the head
+  for (const z of [z0 + 0.006, z1 - 0.006]) {
+    sashes.push(box(0.008, win.h, 0.012, [-2.01, win.y, z]), box(0.014, win.h, 0.014, [-1.966, win.y, z + (z < win.z ? 0.001 : -0.001)]));
+  }
+  sashes.push(box(0.008, 0.012, win.w, [-2.01, y1 - 0.006, win.z]), box(0.014, 0.014, win.w, [-1.966, y1 - 0.007, win.z]));
+  // A lift lip along the bottom rail's face, so the lower sash can be raised
+  sashes.push(box(0.012, 0.01, win.w * 0.5, [innerX + deep / 2 + 0.006, y0 + 0.028 + 0.05, win.z]));
   add(merged([...trim, ...sashes], shiny(0.35, { color: WINDOW_TRIM, roughness: 0.5 })));
   add(merged(panes, standard({ color: "#DCEBF2", roughness: 0.05, transparent: true, opacity: 0.08, depthWrite: false })));
-  add(merged([box(0.012, 0.012, 0.05, [-1.975, mid + lift + 0.03, win.z]), box(0.014, 0.01, 0.06, [-1.973, y0 + lift + 0.02, win.z - 0.3]),
-    box(0.014, 0.01, 0.06, [-1.973, y0 + lift + 0.02, win.z + 0.3])], shiny(1, { color: BRASS, metalness: 0.7, roughness: 0.3 })));
+  // Brass: the sash lock on the meeting rail, and two lifts on the bottom rail
+  add(merged([box(0.016, 0.01, 0.06, [innerX + deep / 2 - 0.004, mid + 0.031, win.z]), box(0.012, 0.012, 0.022, [innerX - deep / 2 - 0.004, mid + 0.031, win.z + 0.03]),
+    box(0.014, 0.02, 0.012, [innerX + deep / 2 + 0.007, y0 + 0.07, win.z - 0.3]), box(0.014, 0.02, 0.012, [innerX + deep / 2 + 0.007, y0 + 0.07, win.z + 0.3])],
+    shiny(1, { color: BRASS, metalness: 0.7, roughness: 0.3 })));
 
   // ---- The carved sign above the window, hung a hair off level ----
   const sw3 = 0.78, sh3 = 0.2, plaque = new T.Shape();
