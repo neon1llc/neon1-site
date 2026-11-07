@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.12.8
+
+- The rain sizes itself to its own box rather than the window, so an on-screen keyboard or a zoom no longer leaves a dense band of stuck rain.
+
 ## v0.12.7
 
 - Glass panes share one roomier padding, used by the landing's wordmark pane and the not-found page, whose pane now magnifies the rain like the landing's.
