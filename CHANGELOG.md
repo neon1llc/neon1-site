@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.13.4
+
+- The note under services is down to three short sentences.
+
 ## v0.13.3
 
 - Services read lighter: shorter lines in smaller type, with less space between them.
