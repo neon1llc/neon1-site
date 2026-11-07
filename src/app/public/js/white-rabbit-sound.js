@@ -2,13 +2,19 @@
 // Usage: const sound = createSound(new AudioContext()); sound.start("scene"); sound.update(p, tv); sound.close()
 //
 // Imported by white-rabbit.js after a catch, with an AudioContext made in that same click
-// or tap. Nothing is downloaded: the CRT's hum and whine, the static on the screen, the
-// room's quiet air, the glitch as the rain stops, and the model car's starter and V8
-// idle are all built from oscillators, noise, and filters. Everything is kept quiet.
+// or tap. The CRT's hum and whine, the static on the screen, the room's quiet air, and
+// the glitch as the rain stops are built from oscillators, noise, and filters. The car's
+// ignition is a real V8 recording, fetched only after the car is first clicked, played
+// slower and deeper, then held on a looped stretch of its idle; until it loads, or if it
+// can't, the starter and idle are synthesized too. Everything is kept quiet.
 
 
 // Overall level, and the time constant for smooth level changes (seconds)
 const LEVEL = 0.55, GLIDE = 0.08;
+
+// The V8 recording: played slower (which also lowers it), the crank, catch, and first revs up
+// to CUT seconds into it, then a clean idle stretch looped (seconds into the recording)
+export const V8 = { url: "/media/white-rabbit-v8.m4a", rate: 0.85, cut: 10, idle: [12.5, 14.5], caught: 2.25 };
 
 // Piecewise linear through [progress, value] pairs, flat outside them
 function ramp(p, pts) {
@@ -134,11 +140,40 @@ export function createSound(ctx) {
     for (let i = 0; i < n; i++) d[i] /= peak;
     return buf;
   }
-  let engine = null, starter = null;
+  let engine = null, starter = null, v8 = null, v8Load = null;
+
+  // Fetches and decodes the recording once; a failure leaves the synthesized engine in its place
+  function loadV8() {
+    v8Load = v8Load || fetch(V8.url).then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(r.status))))
+      .then((b) => ctx.decodeAudioData(b)).then((buf) => { v8 = buf; }).catch(() => {});
+  }
+
+  // The recording through a low shelf for weight, into its own gain
+  function recorded(offset, len, loop) {
+    const g = gain(0), shelf = filter("lowshelf", 160, 0.7, g), src = ctx.createBufferSource();
+    shelf.gain.value = 5;
+    src.buffer = v8; src.playbackRate.value = V8.rate; src.connect(shelf);
+    if (loop) { src.loop = true; src.loopStart = V8.idle[0]; src.loopEnd = V8.idle[1]; }
+    return { g, src, go: (at) => (loop ? src.start(at, offset) : src.start(at, offset, len)) };
+  }
+
+  // The ignition from the recording: crank, catch, and revs, then a crossfade into the looping idle
+  function ignition() {
+    const t = now(), end = t + V8.cut / V8.rate, fade = 0.7;
+    const rec = recorded(0, V8.cut + 0.2, false), idle = recorded(V8.idle[0], 0, true);
+    rec.g.gain.setValueAtTime(0, t); rec.g.gain.linearRampToValueAtTime(0.5, t + 0.08);
+    rec.g.gain.setValueAtTime(0.5, end - fade); rec.g.gain.linearRampToValueAtTime(0, end);
+    idle.g.gain.setValueAtTime(0, end - fade); idle.g.gain.linearRampToValueAtTime(0.42, end);
+    rec.go(t); idle.go(end - fade);
+    engine = { parts: [rec, idle] };
+  }
 
   // The starter: a geared whine that labors at each compression; the engine: a blip, then idle
   function car(kind) {
     const t = now();
+    if (kind === "click") { loadV8(); return; }
+    if (kind === "crank" && v8) { ignition(); return; }
+    if (kind === "fire" && engine) return; // the recording already caught
     if (kind === "crank") {
       const g = gain(0), body = filter("lowpass", 900, 1, g), wob = ctx.createGain();
       wob.gain.value = 0.5; wob.connect(body);
@@ -154,13 +189,14 @@ export function createSound(ctx) {
       src.connect(filter("lowpass", 520, 0.8, g)); src.start();
       src.playbackRate.setValueAtTime(1, t); src.playbackRate.linearRampToValueAtTime(2.1, t + 0.25); src.playbackRate.setTargetAtTime(1, t + 0.3, 0.35);
       g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.32, t + 0.06); g.gain.setTargetAtTime(0.16, t + 0.4, 0.4);
-      engine = { g, src };
+      engine = { parts: [{ g, src }] };
     } else if (kind === "stop") {
       stopStarter();
       if (engine) {
-        const { g, src } = engine;
-        src.playbackRate.setTargetAtTime(0.6, t, 0.25); g.gain.setTargetAtTime(0, t, 0.18);
-        src.stop(t + 1); setTimeout(() => g.disconnect(), 1200);
+        for (const { g, src } of engine.parts) {
+          src.playbackRate.setTargetAtTime(0.6, t, 0.25); g.gain.cancelScheduledValues(t); g.gain.setTargetAtTime(0, t, 0.18);
+          src.stop(t + 1); setTimeout(() => g.disconnect(), 1200);
+        }
         engine = null;
       }
     }
@@ -181,9 +217,10 @@ export function createSound(ctx) {
     else { ctx.resume(); glide(master.gain, LEVEL, 0.2); }
   }
 
-  // Fades everything out and closes the context, freeing the audio device
+  // Fades everything out and closes the context, freeing the audio device and the recording
   function close() {
     glide(master.gain, 0, 0.08);
+    v8 = null; engine = null;
     setTimeout(() => { sources.forEach((s) => { try { s.stop(); } catch { /* already stopped */ } }); ctx.close().catch(() => {}); }, 300);
   }
 

@@ -5,7 +5,7 @@
 // 1:13, lofted from cross-sections: wide haunches, a low roof, slim headlights, and
 // no badges or names. Clicking it flashes the headlights twice, pauses, cranks the
 // starter, and the engine catches: the lights stay on and the body rumbles at idle.
-// Clicking again shuts it off. onSound(kind) hears "crank", "fire", and "stop".
+// Clicking again shuts it off. onSound(kind) hears "click", "crank", "fire", and "stop".
 
 import * as T from "/js/vendor/three-0.187.0.rabbit.min.js";
 
@@ -14,7 +14,8 @@ import * as T from "/js/vendor/three-0.187.0.rabbit.min.js";
 const L = 0.265, WHEEL = 0.02, AXLES = [0.083, -0.079], TRACK = 0.046;
 
 // The timeline after a click, in seconds: two flashes, a pause, the starter, then the engine catches
-const FLASHES = [[0, 0.14], [0.3, 0.44]], CRANK = 0.95, FIRE = 1.75;
+// when the slowed recording does (2.25 s into it, played at 0.85)
+const FLASHES = [[0, 0.14], [0.3, 0.44]], CRANK = 0.95, FIRE = CRANK + 2.25 / 0.85;
 
 // Smooth step between edges a and b
 const step = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
@@ -198,7 +199,7 @@ export function createCar({ scene, env, at, onSound = () => {} }) {
     car.updateMatrixWorld();
     if (!ray.intersectObject(hit, false).length) return false;
     if (look) return true;
-    if (started < 0) started = performance.now() / 1000;
+    if (started < 0) { started = performance.now() / 1000; onSound("click"); }
     else { started = -1; running = false; onSound("stop"); }
     return true;
   }

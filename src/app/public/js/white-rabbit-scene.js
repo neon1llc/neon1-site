@@ -270,7 +270,7 @@ function environment(renderer) {
 
 /**
  * Builds the scene on a new canvas in #whiteRabbit; throws without WebGL. onLost() runs if the
- * context goes; onSound(kind) hears the car on the sill ("crank", "fire", "stop")
+ * context goes; onSound(kind) hears the car on the sill ("click", "crank", "fire", "stop")
  */
 export function createScene({ onLost, onSound = () => {} }) {
   const root = document.getElementById("whiteRabbit");
