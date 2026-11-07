@@ -299,7 +299,7 @@ export function createScene({ onLost, onSound = () => {} }) {
   const { glossy } = furnish(scene, { win: WINDOW, sc: SC, sw: SW, sh: SH, env, touch });
 
   // The model car on the sill, nose turned a little toward the room, kept inside the glass
-  const car = createCar({ scene, env, at: { p: [-1.872, WINDOW.y - WINDOW.h / 2 + 0.028, 0.9], turn: 0.1, scale: 1.25, detail: !touch }, onSound });
+  const car = createCar({ scene, env, at: { p: [-1.872, WINDOW.y - WINDOW.h / 2 + 0.028, 0.9], turn: 0.1, scale: 1.25 }, onSound });
   sky.block(...car.box);
 
   // Screen and glass, both curved by the same bulge
@@ -368,7 +368,7 @@ export function createScene({ onLost, onSound = () => {} }) {
   const pic = document.createElement("canvas");
   let tex = null, fit = { h: SH, d0: 0.5 };
   async function compose() {
-    const [{ cw, ch, rh }] = await Promise.all([picture(pic), sky.ready]);
+    const [{ cw, ch, rh }] = await Promise.all([picture(pic), sky.ready, car.ready]);
     if (disposed) return;
     if (!tex || tex.image.width !== cw || tex.image.height !== ch) {
       if (tex) tex.dispose();
@@ -517,7 +517,7 @@ export function createScene({ onLost, onSound = () => {} }) {
       }
     });
     if (tex) tex.dispose();
-    env.dispose(); sky.dispose();
+    env.dispose(); sky.dispose(); car.dispose();
     composer.passes.forEach((pass) => pass.dispose && pass.dispose());
     composer.dispose();
     renderer.dispose();

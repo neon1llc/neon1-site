@@ -252,6 +252,8 @@ export function createSky({ scene, win, touch }) {
     }, undefined, () => done()));
   });
   const ready = Promise.all(loads);
+  // Past the layers' edges, at the steepest views up through the glass, the sky stays blue
+  scene.background = new T.Color(0.2, 0.36, 0.72);
   const beam = beams(win), motes = dust(win, touch ? 140 : 280);
   scene.add(beam, motes);
 
