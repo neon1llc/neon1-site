@@ -404,7 +404,7 @@ export function createScene({ onLost, onSound = () => {} }) {
 
   // ---- One frame ----
   const P = new T.Vector3(), L = new T.Vector3(), D = new T.Vector3();
-  let frames = 0, spent = 0, lastFrame = 0, prev = 0;
+  let frames = 0, spent = 0, lastFrame = 0, prev = 0, facing = 1;
   function render(p, { speed = 0, still = false } = {}) {
     if (disposed || !posCurve) return;
     const now = performance.now(), time = now / 1000, dt = prev ? (now - prev) / 1000 : 0;
@@ -427,6 +427,10 @@ export function createScene({ onLost, onSound = () => {} }) {
     P.set(T.MathUtils.clamp(P.x, -1.85, 1.85), T.MathUtils.clamp(P.y, 0.2, 2.4), T.MathUtils.clamp(P.z, -2.35, 2.35));
     camera.position.copy(P); camera.lookAt(L);
     camera.fov = fov; camera.aspect = aspect; camera.updateProjectionMatrix();
+    // How squarely and closely the camera faces the set, for the sound of its hum
+    camera.getWorldDirection(D);
+    const toSet = L.copy(SC).sub(camera.position), far = toSet.length();
+    facing = Math.max(0, D.dot(toSet.divideScalar(far))) ** 2 * Math.min(1, 1.1 / (0.3 + far));
 
     // Screen: still at 0, then ripples, bulge and scanlines, the tube, and a little snow as the room appears
     screenU.uTime.value = time; screenU.uRippleT.value = time;
@@ -520,5 +524,5 @@ export function createScene({ onLost, onSound = () => {} }) {
     canvas.remove();
   }
 
-  return { compose, render, resize, dispose, pick, over: (x, y) => pick(x, y, true) };
+  return { compose, render, resize, dispose, pick, over: (x, y) => pick(x, y, true), get facing() { return facing; } };
 }

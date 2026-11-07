@@ -220,7 +220,7 @@ export function createCar({ scene, env, at, onSound = () => {} }) {
       }
     } else cranked = fired = false;
     lamps.emissiveIntensity = on * 3.2; tails.emissiveIntensity = running ? 1.4 : 0;
-    glowU.uOn.value = on * 0.9; beam.intensity = on * 0.12;
+    glowU.uOn.value = on * 0.9; beam.intensity = on * 0.05;
     // Idle: uneven firing pulses rock the body a fraction of a millimeter
     const pulse = Math.sin(time * 2 * Math.PI * 9.5) * 0.6 + Math.sin(time * 2 * Math.PI * 4.75 + 1.3) * 0.4;
     shell.position.set(Math.sin(time * 83) * 0.00012 * shake, 0.00035 * shake * (0.5 + 0.5 * pulse), 0);
