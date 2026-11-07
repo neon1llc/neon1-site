@@ -1,16 +1,16 @@
 // src/app/public/js/white-rabbit-sky.js - The sky behind the white rabbit's window: clouds, the sun, and its light.
 // Usage: const sky = createSky({ scene, win, touch }); await sky.ready; sky.update(dt, level, ratio); sky.aim(camera, shafts, amount)
 //
-// Imported by white-rabbit-scene.js. Outside is three images rendered in Blender (see
-// the planning folder's blender/outside.py) from one viewpoint in the room: a sky, a
-// layer of volumetric cumulus, and autumn treetops seen from a second story. Each sits
-// on a plane at its own depth, so the view shifts a little as the camera moves; the
-// clouds drift and wrap, and the leaves sway. The sun disc is drawn here, brighter than
-// an image can hold, and the cloud layer's alpha at the sun is read on the CPU, so sun
-// tells the room how much of it is showing. Light shafts are a screen pass that smears
-// only the brightest pixels away from the sun, so they stream from the window, break at
-// the sash rails, and fade by themselves when a cloud covers it. Beams from the panes to
-// the floor, and dust glinting in them, follow the sun too.
+// Imported by white-rabbit-scene.js. Outside is four images rendered in Blender (see the
+// planning folder's blender/outside.py) from one viewpoint in the room: a sky, a layer of
+// volumetric cumulus, and two rows of real autumn trees (Poly Haven models, recolored) seen
+// from a second story. Each sits on a plane at its own depth, so the view shifts a little as
+// the camera moves; the clouds drift and wrap, and the trees sway in slow gusts. The sun disc
+// is drawn here, brighter than an image can hold, and the cloud layer's alpha at the sun is
+// read on the CPU, so sun tells the room how much of it is showing. Light shafts are a screen
+// pass that smears only the brightest pixels away from the sun, so they stream from the
+// window, break at the sash rails, and fade by themselves when a cloud covers it. Beams from
+// the panes to the floor, and dust glinting in them, follow the sun too.
 
 import * as T from "/js/vendor/three-0.187.0.rabbit.min.js";
 
@@ -25,7 +25,8 @@ const FAR = REF;
 const LAYERS = {
   sky: ["/media/white-rabbit/sky.webp", [-25, 15, -3, 37], -60],
   clouds: ["/media/white-rabbit/clouds.webp", [-25, 15, 4, 24], -45],
-  trees: ["/media/white-rabbit/trees.webp", [-25, 15, -3, 7], -16],
+  treesFar: ["/media/white-rabbit/trees-far.webp", [-25, 15, -3, 7], -30],
+  treesNear: ["/media/white-rabbit/trees-near.webp", [-25, 15, -3, 7], -16],
 };
 
 // Sunlight comes in steeper than the painted sun sits, so its patch lands on the floor
@@ -69,14 +70,19 @@ const CLOUD_FRAG = /* glsl */`
     vec4 c = texture2D(uMap, vec2(vUv.x + uDrift, vUv.y));
     gl_FragColor = vec4(mix(c.rgb, vec3(1.0, 0.99, 0.97), 0.25) * 1.18, c.a);  // fair-weather white, not storm grey
   }`;
-// The treetops, swaying a little more toward the top of the layer
+// The treetops in the wind: slow gusts roll across the row, crowns lean and breathe more toward their
+// tops, and leaves flutter faster in small patches; uDrift sets each row's phase and strength
 const TREE_FRAG = /* glsl */`
   uniform sampler2D uMap;
-  uniform float uTime;
+  uniform float uTime, uDrift;
   varying vec2 vUv, vQ;
   void main() {
     vec2 uv = vUv;
-    uv.x += sin(uTime * 0.8 + uv.x * 38.0 + uv.y * 5.0) * 0.0011 * uv.y + sin(uTime * 1.9 + uv.x * 140.0) * 0.00025 * uv.y;
+    float gust = 0.55 + 0.45 * sin(uTime * 0.21 - uv.x * 3.0 + uDrift * 7.0) * sin(uTime * 0.13 + uv.x * 1.7);
+    float top = smoothstep(0.1, 0.95, uv.y);
+    uv.x += (sin(uTime * 0.7 + uv.x * 9.0 + uDrift * 3.0) * 0.0022 + sin(uTime * 1.6 + uv.x * 31.0 + uv.y * 7.0) * 0.0007) * gust * top * uDrift;
+    uv.y += sin(uTime * 0.9 + uv.x * 13.0 + uDrift) * 0.0012 * gust * top * uDrift;
+    uv += vec2(sin(uTime * 4.1 + uv.y * 220.0), cos(uTime * 3.7 + uv.x * 260.0)) * 0.00018 * gust * top;
     vec4 c = texture2D(uMap, uv);
     if (c.a < 0.35) discard;
     gl_FragColor = vec4(c.rgb, 1.0);
@@ -229,6 +235,8 @@ export function createSky({ scene, win, touch }) {
     const [za, ya] = along(x, z0, y0), [zb, yb] = along(x, z1, y1);
     const u = { uMap: { value: null }, uSun: { value: new T.Vector3() }, uDrift: { value: 0 }, uTime: { value: 0 } };
     uniforms[name] = u;
+    if (name === "treesFar") u.uDrift.value = 0.6;
+    if (name === "treesNear") u.uDrift.value = 1;
     if (name === "sky") { const [sz, sy] = along(x, SUN.z, SUN.y), [rz] = along(x, SUN.z + SUN.r, SUN.y); u.uSun.value.set(sz, sy, rz - sz); }
     const mesh = new T.Mesh(new T.PlaneGeometry(zb - za, yb - ya), new T.ShaderMaterial({
       uniforms: u, vertexShader: LAYER_VERT, fragmentShader: name === "sky" ? SKY_FRAG : name === "clouds" ? CLOUD_FRAG : TREE_FRAG,
@@ -272,7 +280,7 @@ export function createSky({ scene, win, touch }) {
   function update(dt, level = 0, ratio = 1) {
     time += Math.min(dt, 0.1);
     uniforms.clouds.uDrift.value = (time * DRIFT) % 1;
-    uniforms.trees.uTime.value = time;
+    uniforms.treesFar.uTime.value = uniforms.treesNear.uTime.value = time;
     let seen = 0;
     for (const [oz, oy] of [[0, 0], [0.6, 0], [-0.6, 0], [0, 0.6], [0, -0.6]]) seen += 1 - 0.9 * cloudAt(SUN.z + oz * SUN.r, SUN.y + oy * SUN.r);
     sun = seen / 5;

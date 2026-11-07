@@ -331,9 +331,11 @@ export function createScene({ onLost, onSound = () => {} }) {
       if (!target) return;
       const g = unpacked(o.geometry).applyMatrix4(o.matrixWorld);
       o.geometry.dispose(); target.geometry.dispose(); target.geometry = g;
+      // The carved sign's face keeps its full light, so the letters stay legible on the window wall
+      if (target.material.alphaTest > 0) return;
       const t = loader.load(`/media/white-rabbit/lm/${o.name}.webp`);
       t.channel = 1; t.flipY = false; bakedTextures.push(t);
-      target.material.aoMap = t; target.material.aoMapIntensity = 1; target.material.needsUpdate = true;
+      target.material.aoMap = t; target.material.aoMapIntensity = 0.8; target.material.needsUpdate = true;
     });
     scene.traverse((o) => { if (o.userData.standIn) o.visible = false; });
     renderer.shadowMap.needsUpdate = true;
