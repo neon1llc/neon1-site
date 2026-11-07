@@ -93,6 +93,19 @@ const GLOW_FRAG = /* glsl */`
   }`;
 
 
+// A geometry's attributes as plain floats, so a quantized model can be moved into place
+export function unpacked(geo) {
+  const out = new T.BufferGeometry();
+  for (const [name, a] of Object.entries(geo.attributes)) {
+    const arr = new Float32Array(a.count * a.itemSize), get = ["getX", "getY", "getZ", "getW"];
+    for (let i = 0; i < a.count; i++) for (let c = 0; c < a.itemSize; c++) arr[i * a.itemSize + c] = a[get[c]](i);
+    out.setAttribute(name, new T.Float32BufferAttribute(arr, a.itemSize));
+  }
+  if (geo.index) out.setIndex(geo.index.clone());
+  return out;
+}
+
+
 /** Builds the car at `at` ({ p, turn, scale, detail }) on the sill; env gives the paint its reflections */
 export function createCar({ scene, env, at, onSound = () => {} }) {
   const car = new T.Group(), shell = new T.Group();
@@ -151,10 +164,11 @@ export function createCar({ scene, env, at, onSound = () => {} }) {
       for (const z of axles) for (const k of [-1, 1]) {
         at.position.set(k * TRACK, WHEEL, z); at.scale.set(k, 1, 1); at.updateMatrix();
         const list = byMaterial.get(part.material) || [];
-        list.push(part.geometry.clone().applyMatrix4(at.matrix));
+        list.push(unpacked(part.geometry).applyMatrix4(at.matrix.clone().multiply(part.matrixWorld)));
         byMaterial.set(part.material, list);
       }
     };
+    gltf.scene.updateMatrixWorld(true);
     for (const o of extras) o.traverse((part) => {
       if (!part.isMesh) return;
       corners(part, o.name === "wheel" ? AXLES : o.name === "caliper-front" ? [AXLES[0]] : [AXLES[1]]);
