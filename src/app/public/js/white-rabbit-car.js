@@ -24,21 +24,36 @@ const FLASHES = [[0, 0.14], [0.3, 0.44]], CRANK = 0.95, FIRE = CRANK + 2.25 / 0.
 // The model and its baked ambient occlusion, made by the planning folder's blender/car.py
 const MODEL = "/media/white-rabbit/car.glb", AO = "/media/white-rabbit/car-ao.webp", WHEEL_AO = "/media/white-rabbit/wheel-ao.webp";
 
-// The honeycomb mesh in the lower intake, painted once
+// The honeycomb mesh in the lower intake, painted once as a color map and a normal map, so the
+// cells catch light without any geometry
 function honeycomb() {
-  const c = document.createElement("canvas");
-  c.width = 128; c.height = 32;
-  const g = c.getContext("2d");
-  g.fillStyle = "#020202"; g.fillRect(0, 0, 128, 32);
-  g.strokeStyle = "#1c1d20"; g.lineWidth = 1.2;
-  for (let y = 0, row = 0; y < 36; y += 5.2, row++) for (let x = row % 2 ? 4.5 : 0; x < 132; x += 9) {
-    g.beginPath();
-    for (let k = 0; k < 6; k++) { const a = Math.PI / 6 + (k * Math.PI) / 3; g.lineTo(x + Math.cos(a) * 3.4, y + Math.sin(a) * 3.4); }
-    g.closePath(); g.stroke();
+  const w = 256, h = 64, cells = [];
+  for (let y = 0, row = 0; y < h + 6; y += 5.2, row++) for (let x = row % 2 ? 4.5 : 0; x < w + 9; x += 9) cells.push([x, y]);
+  const paint = (fill, stroke, width) => {
+    const c = document.createElement("canvas"); c.width = w; c.height = h;
+    const g = c.getContext("2d");
+    g.fillStyle = fill; g.fillRect(0, 0, w, h);
+    for (const [x, y] of cells) {
+      g.beginPath();
+      for (let k = 0; k < 6; k++) { const a = Math.PI / 6 + (k * Math.PI) / 3; g.lineTo(x + Math.cos(a) * 3.6, y + Math.sin(a) * 3.6); }
+      g.closePath();
+      if (stroke) { g.strokeStyle = stroke; g.lineWidth = width; g.stroke(); } else { g.fillStyle = "#000"; g.fill(); }
+    }
+    return c;
+  };
+  const color = new T.CanvasTexture(paint("#010101", "#1d1e22", 1.4));
+  color.colorSpace = T.SRGBColorSpace;
+  // The normal map: the web between cells bulges toward the viewer, its sides lit from the edges
+  const c = paint("#8080ff", null), g = c.getContext("2d");
+  for (const [x, y] of cells) {
+    for (let k = 0; k < 6; k++) {
+      const a = Math.PI / 6 + (k * Math.PI) / 3, nx = Math.cos(a + Math.PI / 6), ny = Math.sin(a + Math.PI / 6);
+      g.strokeStyle = `rgb(${Math.round(128 + nx * 90)}, ${Math.round(128 - ny * 90)}, 200)`; g.lineWidth = 1.2;
+      g.beginPath(); g.moveTo(x + Math.cos(a) * 3.6, y + Math.sin(a) * 3.6);
+      const a2 = a + Math.PI / 3; g.lineTo(x + Math.cos(a2) * 3.6, y + Math.sin(a2) * 3.6); g.stroke();
+    }
   }
-  const tex = new T.CanvasTexture(c);
-  tex.colorSpace = T.SRGBColorSpace;
-  return tex;
+  return { color, normal: new T.CanvasTexture(c) };
 }
 
 
@@ -85,36 +100,38 @@ export function createCar({ scene, env, at, onSound = () => {} }) {
   car.add(shell); scene.add(car);
   const lit = (m) => { m.castShadow = m.receiveShadow = true; return m; };
 
-  // Pearl black: a near-black base with fine flakes under a hard, glassy clear coat. The base is
-  // rough and barely metallic, so grazing light doesn't haze it grey; the coat gives the reflections
+  // Pearl black: a deep black base with fine flakes under a hard, glassy clear coat that mirrors the
+  // outdoor light (env is a bright sky over dark ground, so the shoulder line catches a highlight)
   const paint = new T.MeshPhysicalMaterial({
-    color: "#030304", metalness: 0.25, roughness: 0.55, normalMap: flakes(), normalScale: new T.Vector2(0.4, 0.4),
-    clearcoat: 1, clearcoatRoughness: 0.025, envMap: env, envMapIntensity: 0,
+    color: "#0A0A0C", metalness: 0.05, roughness: 0.25, normalMap: flakes(), normalScale: new T.Vector2(0.35, 0.35),
+    clearcoat: 1, clearcoatRoughness: 0.03, envMap: env, envMapIntensity: 0,
   });
   // Tinted glass, black trim and wheels, clear lamps that light up, red taillights and calipers
-  const glass = new T.MeshPhysicalMaterial({ color: "#020304", metalness: 0, roughness: 0.04, clearcoat: 1, clearcoatRoughness: 0.02, envMap: env, envMapIntensity: 0 });
+  const glass = new T.MeshPhysicalMaterial({ color: "#04060A", metalness: 0, roughness: 0.03, clearcoat: 1, clearcoatRoughness: 0.02, envMap: env, envMapIntensity: 0 });
   const trim = new T.MeshStandardMaterial({ color: "#050506", roughness: 0.6 });
   const rubber = new T.MeshStandardMaterial({ color: "#080808", roughness: 0.9, side: T.DoubleSide });
-  const rims = new T.MeshStandardMaterial({ color: "#1B1C20", metalness: 0.75, roughness: 0.22, envMap: env, envMapIntensity: 0, side: T.DoubleSide });
+  const rims = new T.MeshStandardMaterial({ color: "#0B0B0D", metalness: 0.6, roughness: 0.12, envMap: env, envMapIntensity: 0, side: T.DoubleSide });
   const inner = new T.MeshStandardMaterial({ color: "#030303", roughness: 0.8, side: T.DoubleSide });
+  const lip = new T.MeshStandardMaterial({ color: "#8E9094", metalness: 1, roughness: 0.28, envMap: env, envMapIntensity: 0 }); // machined rim edge
   const rotor = new T.MeshStandardMaterial({ color: "#3A3B3E", metalness: 0.85, roughness: 0.3, side: T.DoubleSide });
   const caliper = new T.MeshStandardMaterial({ color: "#D0170D", roughness: 0.38, emissive: "#3A0300", side: T.DoubleSide });
   const lamps = new T.MeshStandardMaterial({ color: "#3C424A", metalness: 0.6, roughness: 0.08, emissive: "#FFF4E2", emissiveIntensity: 0, envMap: env, envMapIntensity: 0 });
   const tails = new T.MeshStandardMaterial({ color: "#7A0A06", emissive: "#FF1A0A", emissiveIntensity: 0.25, roughness: 0.25 });
-  const glossy = [[paint, 0.22], [glass, 0.5], [rims, 0.6], [lamps, 0.8]];
+  const glossy = [[paint, 0.7], [glass, 1.5], [rims, 0.7], [lip, 0.9], [lamps, 0.8]];
 
   // ---- The model: shell pieces ride the rumble, the four wheels stay put ----
   // Each piece takes its material by the name it was given in Blender
   const tex = new T.TextureLoader(), textures = [];
   const ao = (url) => { const t = tex.load(url); t.flipY = false; textures.push(t); return t; };
-  const intake = new T.MeshStandardMaterial({ map: honeycomb(), roughness: 0.6 });
+  const comb = honeycomb();
+  const intake = new T.MeshStandardMaterial({ map: comb.color, normalMap: comb.normal, roughness: 0.55, metalness: 0.2 });
   const trimPaint = paint.clone();
   const ready = new Promise((done) => new T.GLTFLoader().load(MODEL, (gltf) => {
-    paint.aoMap = ao(AO); paint.aoMapIntensity = 1;
+    paint.aoMap = ao(AO); paint.aoMapIntensity = 0.6; // AO only darkens the ambient and reflections, gently
     paint.normalMap.repeat.set(36, 36); // fine flakes over the model's UV islands
     const wheelAO = ao(WHEEL_AO);
-    for (const m of [rubber, rims, inner, rotor]) { m.aoMap = wheelAO; m.aoMapIntensity = 0.9; }
-    const pick = { paint, glass, trim, intake, lamp: lamps, tail: tails, tire: rubber, rim: rims, inner, rotor, caliper };
+    for (const m of [rubber, rims, inner, lip, rotor]) { m.aoMap = wheelAO; m.aoMapIntensity = 0.9; }
+    const pick = { paint, glass, trim, intake, lamp: lamps, tail: tails, tire: rubber, rim: rims, inner, lip, rotor, caliper };
     const extras = [];
     gltf.scene.traverse((o) => {
       if (!o.isMesh) return;
@@ -208,7 +225,7 @@ export function createCar({ scene, env, at, onSound = () => {} }) {
   }
 
   // Frees the baked textures; the meshes and materials go with the scene
-  function dispose() { textures.forEach((t) => t.dispose()); intake.map.dispose(); }
+  function dispose() { textures.forEach((t) => t.dispose()); comb.color.dispose(); comb.normal.dispose(); }
 
   return { pick, update, box, ready, dispose, get running() { return running; } };
 }
