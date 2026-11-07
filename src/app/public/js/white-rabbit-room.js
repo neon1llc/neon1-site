@@ -114,6 +114,22 @@ function rug() {
   });
 }
 
+// Carpet fibres as a normal map: thousands of short curled strands, each a little ridge with a lit
+// and a shaded side, so the pile catches light and shadow as the camera moves
+function fibres() {
+  const r = seeded(31);
+  return painted(512, 512, (g, w, h) => {
+    g.fillStyle = "rgb(128, 128, 255)"; g.fillRect(0, 0, w, h);
+    g.lineCap = "round";
+    for (let i = 0; i < 26000; i++) {
+      const x = r() * w, y = r() * h, a = r() * Math.PI * 2, l = 2 + r() * 4, nx = Math.cos(a + Math.PI / 2), ny = Math.sin(a + Math.PI / 2);
+      g.strokeStyle = `rgba(${Math.round(128 + nx * 70)}, ${Math.round(128 - ny * 70)}, 225, ${0.35 + r() * 0.4})`;
+      g.lineWidth = 0.8 + r() * 0.9;
+      g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + Math.cos(a + 0.7) * l * 0.6, y + Math.sin(a + 0.7) * l * 0.6, x + Math.cos(a) * l, y + Math.sin(a) * l); g.stroke();
+    }
+  }, false);
+}
+
 // The speaker cloth behind the brass slats: a dark, fine weave
 function grille() {
   const r = seeded(9);
@@ -525,63 +541,19 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
   add(merged(light, standard({ color: MARK, roughness: 0.55 })));
 
   // ---- The rug, and soft shadows where things meet ----
-  // The rug: a thick slab, then a pile in three thinning layers. Around each chair and table foot
-  // the layers are cut away and replaced by a small dish: fibres pressed down under the foot and
-  // pushed up into a soft ring around it
-  const RUG = { x: 0.06, z: -1.35, w: 3.0, d: 1.9 }, SLAB = 0.024, rugMap = rug(), feet = [];
+  // The rug: one thick slab whose top carries a fibre normal map over the heathered wool, so the
+  // pile reads as soft carpet without layers of geometry; each foot leaves a soft contact shadow
+  const RUG = { x: 0.06, z: -1.35, w: 3.0, d: 1.9 }, SLAB = 0.024, feet = [];
   for (const [lx, lz] of [[-0.43, -0.22], [0.43, -0.22], [-0.43, 0.22], [0.43, 0.22]]) feet.push([sc.x + 0.06 + lx, -1.98 + lz, 0.016]);
   for (const [x, z, t] of CHAIRS) for (const [lx, lz] of CHAIR_LEGS) {
     feet.push([x + lx * Math.cos(t) + lz * Math.sin(t), z - lx * Math.sin(t) + lz * Math.cos(t), 0.022]);
   }
-  const DENT = 0.05, SIDES = 16, pw = RUG.w - 0.02, pd = RUG.d - 0.02;
-  const onRug = feet.filter(([fx, fz, f]) => Math.abs(fx - RUG.x) < pw / 2 - f - DENT && Math.abs(fz - RUG.z) < pd / 2 - f - DENT);
-  const rugUV = (x, z) => [(x - RUG.x + RUG.w / 2) / RUG.w, (RUG.z - z + RUG.d / 2) / RUG.d];
-  add(merged([place(new T.RoundedBoxGeometry(RUG.w, SLAB, RUG.d, 2, 0.01), { p: [RUG.x, SLAB / 2, RUG.z] })], lambert({ map: rugMap })));
-  [[0.62, 0.005], [0.42, 0.011], [0.24, 0.017]].forEach(([density, lift], k) => {
-    const r = seeded(21 + k), fibres = painted(512, 320, (g, w, h) => {
-      g.fillStyle = "#000"; g.fillRect(0, 0, w, h); g.fillStyle = "#fff";
-      for (let i = 0; i < w * h * density * 0.45; i++) g.fillRect(r() * w, r() * h, 1 + r(), 1 + r());
-    }, false);
-    // The flat layer, with a round hole at each foot (shape y runs toward -z once laid flat)
-    const sheet = rounded(new T.Shape(), pw, pd, 0.01);
-    for (const [fx, fz, f] of onRug) {
-      const hole = new T.Shape();
-      for (let i = 0; i < SIDES; i++) {
-        const a = (i / SIDES) * Math.PI * 2;
-        hole[i ? "lineTo" : "moveTo"](fx - RUG.x + Math.cos(a) * (f + DENT), RUG.z - fz - Math.sin(a) * (f + DENT));
-      }
-      sheet.holes.push(hole);
-    }
-    const flat = new T.ShapeGeometry(sheet), uv = flat.attributes.uv;
-    for (let i = 0; i < uv.count; i++) uv.setXY(i, (uv.getX(i) + RUG.w / 2) / RUG.w, (uv.getY(i) + RUG.d / 2) / RUG.d);
-    const parts = [place(flat, { p: [RUG.x, SLAB + lift, RUG.z], r: [-Math.PI / 2, 0, 0] })];
-    // The dish: rings from the foot out to the hole's edge, matching its corners exactly
-    for (const [fx, fz, f] of onRug) {
-      const rings = [0, f * 0.7, f, f + DENT * 0.2, f + DENT * 0.45, f + DENT * 0.7, f + DENT];
-      const height = (rho) => {
-        const t = Math.max(0, (rho - f) / DENT), rise = t * t * (3 - 2 * t);
-        const ring = Math.sin(Math.PI * Math.min(1, Math.max(0, (t - 0.15) / 0.75))) * 0.0035 * (1 + k * 0.4);
-        return SLAB + 0.0015 + k * 0.0008 + (lift - 0.0015 - k * 0.0008) * rise + ring;
-      };
-      const pos = [], uvs = [], nor = [];
-      const vert = (j, i) => {
-        const a = (i / SIDES) * Math.PI * 2, rho = rings[j], x = fx + Math.cos(a) * rho, z = fz + Math.sin(a) * rho;
-        const slope = (height(rho + 0.002) - height(rho - 0.002)) / 0.004, l = Math.hypot(slope, 1);
-        pos.push(x, height(rho), z); uvs.push(...rugUV(x, z)); nor.push(-Math.cos(a) * slope / l, 1 / l, -Math.sin(a) * slope / l);
-      };
-      for (let j = 0; j < rings.length - 1; j++) for (let i = 0; i < SIDES; i++) {
-        for (const [jj, ii] of [[j, i], [j + 1, i + 1], [j + 1, i], [j, i], [j, i + 1], [j + 1, i + 1]]) vert(jj, ii);
-      }
-      const dish = new T.BufferGeometry();
-      dish.setAttribute("position", new T.Float32BufferAttribute(pos, 3));
-      dish.setAttribute("normal", new T.Float32BufferAttribute(nor, 3));
-      dish.setAttribute("uv", new T.Float32BufferAttribute(uvs, 2));
-      parts.push(dish);
-    }
-    add(merged(parts, lambert({ map: rugMap, alphaMap: fibres, alphaTest: 0.5, color: new T.Color(1, 1, 1).multiplyScalar(0.92 + k * 0.05) })));
-  });
-  // Each foot darkens the pressed pile around it, under the ring of fibres it pushed up
-  add(merged(onRug.map(([fx, fz, f]) => place(new T.PlaneGeometry(2 * (f + DENT), 2 * (f + DENT)), { p: [fx, SLAB + 0.003, fz], r: [-Math.PI / 2, 0, 0] })),
+  const onRug = feet.filter(([fx, fz]) => Math.abs(fx - RUG.x) < RUG.w / 2 - 0.05 && Math.abs(fz - RUG.z) < RUG.d / 2 - 0.05);
+  const pile = fibres();
+  pile.repeat.set(6, 4);
+  add(merged([place(new T.RoundedBoxGeometry(RUG.w, SLAB, RUG.d, 2, 0.01), { p: [RUG.x, SLAB / 2, RUG.z] })],
+    standard({ map: rug(), normalMap: pile, normalScale: new T.Vector2(0.9, 0.9), roughness: 0.95 })));
+  add(merged(onRug.map(([fx, fz, f]) => place(new T.PlaneGeometry(f * 4.5, f * 4.5), { p: [fx, SLAB + 0.002, fz], r: [-Math.PI / 2, 0, 0] })),
     new T.MeshBasicMaterial({ map: shadow(), transparent: true, depthWrite: false })));
   const ao = [];
   for (const [len, x, z, t] of runs) {
@@ -591,8 +563,8 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
   // The wall darkens a little under the sill's neck
   ao.push(place(new T.PlaneGeometry(win.w + 2 * NECK + 0.06, 0.06), { p: [-1.948, y0 - 0.092, win.z], r: [0, Math.PI / 2, 0] }));
   add(merged(ao, new T.MeshBasicMaterial({ map: edge(), transparent: true, depthWrite: false })));
-  const blobs = [place(new T.PlaneGeometry(1.25, 0.82), { p: [0.06, 0.043, -1.98], r: [-Math.PI / 2, 0, 0] })];
-  for (const [x, z, t] of CHAIRS) blobs.push(place(new T.PlaneGeometry(1.05, 1.0), { p: [x, 0.043, z], r: [-Math.PI / 2, t, 0], order: "YXZ" }));
+  const blobs = [place(new T.PlaneGeometry(1.25, 0.82), { p: [0.06, 0.026, -1.98], r: [-Math.PI / 2, 0, 0] })];
+  for (const [x, z, t] of CHAIRS) blobs.push(place(new T.PlaneGeometry(1.05, 1.0), { p: [x, 0.026, z], r: [-Math.PI / 2, t, 0], order: "YXZ" }));
   add(merged(blobs, new T.MeshBasicMaterial({ map: shadow(true), transparent: true, depthWrite: false })));
 
   // ---- The table: a low walnut side table with turned legs ----
