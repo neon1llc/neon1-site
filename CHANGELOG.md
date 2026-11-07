@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.12.1
+
+- The white rabbit's window: a blue sky with puffy clouds drifting past a visible sun. When the sun is out, warm light shafts stream into the room, a sunlit patch lands on the floor, and dust glints in the beams; when a cloud covers it, the room cools again.
+- The "currently private" note sits to the right of the lock.
+
 ## v0.12.0
 
 - The white rabbit: now and then a 🐇 falls in the rain. Catch it, and scrolling pulls you back out of an old TV into a sunlit room, ending on "go touch grass". Scrolling up plays it back into the screen. three.js loads only after a catch, and reduced motion gets a short crossfade instead.
