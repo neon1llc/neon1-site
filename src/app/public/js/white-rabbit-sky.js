@@ -83,6 +83,12 @@ const TREE_FRAG = /* glsl */`
     uv.x += (sin(uTime * 0.7 + uv.x * 9.0 + uDrift * 3.0) * 0.0022 + sin(uTime * 1.6 + uv.x * 31.0 + uv.y * 7.0) * 0.0007) * gust * top * uDrift;
     uv.y += sin(uTime * 0.9 + uv.x * 13.0 + uDrift) * 0.0012 * gust * top * uDrift;
     uv += vec2(sin(uTime * 4.1 + uv.y * 220.0), cos(uTime * 3.7 + uv.x * 260.0)) * 0.00018 * gust * top;
+    // Below the picture (only the near row reaches there), the lower foliage again, mirrored and in deeper shade
+    if (uv.y < 0.03) {
+      vec4 m = texture2D(uMap, vec2(uv.x, 0.06 + mod(0.03 - uv.y, 0.4)));
+      gl_FragColor = vec4(mix(vec3(0.16, 0.1, 0.05), m.rgb, m.a) * 0.7, 1.0);
+      return;
+    }
     vec4 c = texture2D(uMap, uv);
     if (c.a < 0.35) discard;
     gl_FragColor = vec4(c.rgb, 1.0);
@@ -244,6 +250,13 @@ export function createSky({ scene, win, touch }) {
     }));
     mesh.rotation.y = Math.PI / 2;
     mesh.position.set(x, (ya + yb) / 2, (za + zb) / 2);
+    // The near row reaches further down, its bottom edge of foliage stretched, so no steep look down
+    // through the lower sash finds the edge of the picture
+    if (name === "treesNear") {
+      const pos = mesh.geometry.attributes.position, uv = mesh.geometry.attributes.uv, k = 2.2, h = yb - ya;
+      for (let i = 0; i < pos.count; i++) if (pos.getY(i) < 0) { pos.setY(i, h / 2 - h * k); uv.setY(i, 1 - k); }
+      mesh.geometry.computeBoundingSphere();
+    }
     mesh.renderOrder = order - 10;
     scene.add(mesh);
     return new Promise((done) => loader.load(url, (tex) => {
