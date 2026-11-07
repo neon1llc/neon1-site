@@ -12,13 +12,14 @@ import { paintSign, signOutline } from "/js/white-rabbit-sign.js";
 
 // Palette: pale walls with the brand greens as trim, walnut and bakelite for the set, oxblood leather
 const WALL = "#F7F8F5", CEILING = "#F5F6F3", WINDOW_TRIM = "#E8ECE8", BRAND = "#035704", MARK = "#327641";
-const WALNUT = "#8A5A34", DARK_WOOD = "#6A4426", LEG_WOOD = "#3A2416", BAKELITE = "#3E2B1E", IVORY = "#D9CCAA";
-const BRASS = "#A8834E", LEATHER = "#5C2C20";
+const WALNUT = "#8A5A34", DARK_WOOD = "#6A4426", LEG_WOOD = "#4A2D1A", BAKELITE = "#3E2B1E", IVORY = "#D9CCAA";
+const BRASS = "#A8834E", LEATHER = "#62291D";
 
 // The room's inside faces, the height of the wainscot, and where the chairs sit (x, z, turn)
 const ROOM = { x: 1.95, z: 2.45, h: 2.6 };
 const RAIL = 0.66, BASE = 0.13; // low enough that the window and its sill sit clear above the rail
 const CHAIRS = [[-1.12, -1.46, 0.48], [1.29, -1.54, -0.57]]; // set down by hand, not mirrored
+const CHAIR_LEGS = [[-0.37, 0.36], [0.37, 0.36], [-0.34, -0.33], [0.34, -0.33]]; // the front pair under the carved posts
 
 // A small seeded random, so the textures look the same on every visit
 function seeded(n) { return () => ((n = (n * 16807) % 2147483647) - 1) / 2147483646; }
@@ -113,11 +114,12 @@ function rug() {
   });
 }
 
-// The speaker grille: dark cloth behind thin brass slats
+// The speaker cloth behind the brass slats: a dark, fine weave
 function grille() {
+  const r = seeded(9);
   return painted(128, 128, (g, w, h) => {
-    g.fillStyle = "#2A2018"; g.fillRect(0, 0, w, h);
-    for (let y = 6; y < h; y += 12) { g.fillStyle = "#B8935A"; g.fillRect(0, y, w, 4); g.fillStyle = "rgba(0,0,0,.4)"; g.fillRect(0, y + 4, w, 2); }
+    g.fillStyle = "#241A13"; g.fillRect(0, 0, w, h);
+    for (let y = 0; y < h; y += 2) for (let x = (y / 2) % 2; x < w; x += 2) { g.fillStyle = `rgba(90, 70, 45, ${0.15 + r() * 0.2})`; g.fillRect(x, y, 1, 1); }
   });
 }
 
@@ -243,6 +245,17 @@ function moved(parts, opts) { return parts.map((g) => place(g, opts)); }
 // A turned profile spun around its axis: [radius, height] pairs from the bottom up
 const turned = (pts, seg = 14) => new T.LatheGeometry(pts.map(([x, y]) => new T.Vector2(x, y)), seg);
 
+// A knob body along +y: fluted sides and a domed face
+function knob() {
+  const geo = turned([[0, 0], [0.023, 0], [0.024, 0.004], [0.024, 0.022], [0.022, 0.027], [0.016, 0.031], [0, 0.0325]], 32), pos = geo.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i), z = pos.getZ(i), r = Math.hypot(x, z);
+    if (r > 0.02 && pos.getY(i) > 0.002 && pos.getY(i) < 0.024) { const k = 1 + 0.05 * Math.cos(Math.atan2(z, x) * 16); pos.setXYZ(i, x * k, pos.getY(i), z * k); }
+  }
+  geo.computeVertexNormals();
+  return geo;
+}
+
 // A rounded rectangle path, centered
 function rounded(shape, w, h, r) {
   const x = -w / 2, y = -h / 2;
@@ -253,6 +266,26 @@ function rounded(shape, w, h, r) {
   return shape;
 }
 
+
+// A big cat's head carved in wood, facing +z, about 9 cm across: a round boss behind, the skull,
+// cheekbones, a muzzle with whisker pads, a nose and chin, a heavy brow over almond eyes, and ears
+function panther() {
+  const ball = (s, p, rz = 0) => place(new T.SphereGeometry(1, 8, 6), { p, s, r: [0, 0, rz] });
+  const parts = [
+    place(new T.CylinderGeometry(0.04, 0.046, 0.026, 16), { p: [0, -0.004, -0.016], r: [Math.PI / 2, 0, 0] }),
+    ball([0.04, 0.036, 0.032], [0, 0.008, 0.004]),
+    ball([0.016, 0.014, 0.016], [-0.027, -0.006, 0.014]), ball([0.016, 0.014, 0.016], [0.027, -0.006, 0.014]),
+    ball([0.021, 0.016, 0.022], [0, -0.012, 0.034]),
+    ball([0.013, 0.011, 0.012], [-0.011, -0.018, 0.046]), ball([0.013, 0.011, 0.012], [0.011, -0.018, 0.046]),
+    ball([0.011, 0.007, 0.008], [0, -0.004, 0.055]), ball([0.011, 0.008, 0.011], [0, -0.031, 0.035]),
+    ball([0.015, 0.006, 0.01], [-0.015, 0.015, 0.031], -0.3), ball([0.015, 0.006, 0.01], [0.015, 0.015, 0.031], 0.3),
+    ball([0.0065, 0.004, 0.004], [-0.016, 0.006, 0.035], 0.25), ball([0.0065, 0.004, 0.004], [0.016, 0.006, 0.035], -0.25),
+  ];
+  for (const k of [-1, 1]) {
+    parts.push(place(new T.CylinderGeometry(0, 0.013, 0.022, 6), { p: [k * 0.027, 0.04, -0.002], r: [0, 0, -k * 0.55], s: [1, 1, 0.55] }));
+  }
+  return parts;
+}
 
 // A raised panel field facing +z from the wall at z 0: a w by h rectangle at the wall, a smaller
 // one inset by `bevel` and `depth` out in front, and four trapezoids joining them corner to corner
@@ -341,9 +374,16 @@ function capital(profile, { x, za, zb, y, back = 0 }) {
 }
 
 
-/** Builds the room around the window `win` and the TV whose screen (sw by sh) is centered at `sc` */
-export function furnish(scene, { win, sc, sw, sh }) {
+/**
+ * Builds the room around the window `win` and the TV whose screen (sw by sh) is centered at `sc`.
+ * env is a small environment map for the furniture's reflections; returns { glossy }, the
+ * materials that reflect it as [material, full strength], so the scene can dim them with the room
+ */
+export function furnish(scene, { win, sc, sw, sh, env }) {
   const wood = grain(1), lambert = (o) => new T.MeshLambertMaterial(o), standard = (o) => new T.MeshStandardMaterial(o);
+  // Varnish, plastic, brass, and leather reflect the room, so highlights slide as the camera moves
+  const glossy = [];
+  const shiny = (k, o, Kind = T.MeshStandardMaterial) => { const m = new Kind({ ...o, envMap: env, envMapIntensity: 0 }); glossy.push([m, k]); return m; };
   // Lit meshes cast and take the window light's shadows; glass and the painted shadows don't
   const add = (mesh) => {
     const lit = !mesh.material.isMeshBasicMaterial && !mesh.material.transparent;
@@ -386,10 +426,10 @@ export function furnish(scene, { win, sc, sw, sh }) {
   };
   sash(-2.028, mid - 0.025, y1, true);
   sash(-1.992, y0 + lift, mid + 0.025 + lift, false);
-  add(merged([...trim, ...sashes], standard({ color: WINDOW_TRIM, roughness: 0.5 })));
+  add(merged([...trim, ...sashes], shiny(0.35, { color: WINDOW_TRIM, roughness: 0.5 })));
   add(merged(panes, standard({ color: "#DCEBF2", roughness: 0.05, transparent: true, opacity: 0.08, depthWrite: false })));
   add(merged([box(0.012, 0.012, 0.05, [-1.975, mid + lift + 0.03, win.z]), box(0.014, 0.01, 0.06, [-1.973, y0 + lift + 0.02, win.z - 0.3]),
-    box(0.014, 0.01, 0.06, [-1.973, y0 + lift + 0.02, win.z + 0.3])], standard({ color: BRASS, metalness: 0.7, roughness: 0.3 })));
+    box(0.014, 0.01, 0.06, [-1.973, y0 + lift + 0.02, win.z + 0.3])], shiny(1, { color: BRASS, metalness: 0.7, roughness: 0.3 })));
 
   // ---- The carved sign above the window, hung a hair off level ----
   const sw3 = 0.78, sh3 = 0.2, plaque = new T.Shape();
@@ -435,7 +475,7 @@ export function furnish(scene, { win, sc, sw, sh }) {
   // pushed up into a soft ring around it
   const RUG = { x: 0.06, z: -1.35, w: 3.0, d: 1.9 }, SLAB = 0.024, rugMap = rug(), feet = [];
   for (const [lx, lz] of [[-0.43, -0.22], [0.43, -0.22], [-0.43, 0.22], [0.43, 0.22]]) feet.push([sc.x + 0.06 + lx, -1.98 + lz, 0.016]);
-  for (const [x, z, t] of CHAIRS) for (const [lx, lz] of [[-0.34, 0.31], [0.34, 0.31], [-0.34, -0.33], [0.34, -0.33]]) {
+  for (const [x, z, t] of CHAIRS) for (const [lx, lz] of CHAIR_LEGS) {
     feet.push([x + lx * Math.cos(t) + lz * Math.sin(t), z - lx * Math.sin(t) + lz * Math.cos(t), 0.022]);
   }
   const DENT = 0.05, SIDES = 16, pw = RUG.w - 0.02, pd = RUG.d - 0.02;
@@ -508,7 +548,7 @@ export function furnish(scene, { win, sc, sw, sh }) {
   }
   table.push(box(0.84, 0.05, 0.02, [tx, top - 0.06, tz - 0.22]), box(0.84, 0.05, 0.02, [tx, top - 0.06, tz + 0.22]),
     box(0.02, 0.05, 0.42, [tx - 0.43, top - 0.06, tz]), box(0.02, 0.05, 0.42, [tx + 0.43, top - 0.06, tz]));
-  add(merged(table, standard({ color: DARK_WOOD, map: wood, roughness: 0.45 })));
+  add(merged(table, shiny(0.6, { color: DARK_WOOD, map: wood, roughness: 0.4 })));
   add(merged([place(new T.PlaneGeometry(0.92, 0.42), { p: [tx, top + 0.001, tz - 0.02], r: [-Math.PI / 2, 0, 0] })],
     new T.MeshBasicMaterial({ map: shadow(true), transparent: true, depthWrite: false })));
 
@@ -516,12 +556,12 @@ export function furnish(scene, { win, sc, sw, sh }) {
   // The screen itself belongs to the scene; this builds everything around it
   const front = sc.z - 0.01, cx = sc.x + 0.06, cy = sc.y - 0.005, cw = 0.8, ch = 0.52, cd = 0.3;
   add(merged([place(new T.RoundedBoxGeometry(cw, ch, cd, 4, 0.05), { p: [cx, cy, front - cd / 2] })],
-    standard({ color: WALNUT, map: wood, roughness: 0.38 })));
+    shiny(0.9, { color: WALNUT, map: wood, roughness: 0.42, clearcoat: 0.7, clearcoatRoughness: 0.22 }, T.MeshPhysicalMaterial)));
 
   // The tube's housing narrows toward the back: a four-sided frustum, wide side forward
   const back = new T.CylinderGeometry(0.57 / Math.SQRT2, 1 / Math.SQRT2, 0.22, 4, 1);
   back.rotateY(Math.PI / 4); back.rotateX(-Math.PI / 2);
-  add(merged([place(back, { p: [cx, cy, front - cd - 0.11], s: [0.72, 0.44, 1] })], standard({ color: BAKELITE, roughness: 0.55 })));
+  const bakelite = [place(back, { p: [cx, cy, front - cd - 0.11], s: [0.72, 0.44, 1] })];
   add(merged([place(new T.PlaneGeometry(0.32, 0.16), { p: [cx, cy, front - cd - 0.221], r: [0, Math.PI, 0] })], standard({ map: vents(), roughness: 0.6 })));
 
   // Bezel with a rounded opening a touch larger than the screen, since its bevel leans inward
@@ -529,23 +569,30 @@ export function furnish(scene, { win, sc, sw, sh }) {
   outline.holes.push(rounded(new T.Shape(), sw + 2 * bev, sh + 2 * bev, 0.035 + bev));
   const bezel = new T.ExtrudeGeometry(outline, { depth: 0.01, bevelEnabled: true, bevelThickness: bev, bevelSize: bev, bevelSegments: 2, curveSegments: 10 });
   const ivory = [place(bezel, { p: [sc.x, sc.y, front + bev] })];
-  for (const ky of [0.125, 0.025]) {
-    ivory.push(place(turned([[0, 0], [0.027, 0], [0.029, 0.006], [0.027, 0.018], [0.019, 0.027], [0, 0.029]], 18), { p: [cx + 0.3, cy + ky, front], r: [Math.PI / 2, 0, 0] }));
+  // Two deep knobs: a dark skirt, a fluted ivory body with a rounded face and a pointer ridge, and a brass cap
+  const brass = [];
+  for (const [ky, turn] of [[0.125, 0.6], [0.025, -0.9]]) {
+    const at = { p: [cx + 0.3, cy + ky, front], r: [Math.PI / 2, turn, 0] };
+    bakelite.push(place(turned([[0, 0], [0.034, 0], [0.034, 0.004], [0.03, 0.007], [0, 0.007]], 24), at));
+    ivory.push(place(knob(), at), place(new T.BoxGeometry(0.004, 0.012, 0.004), { p: [cx + 0.3 + Math.sin(turn) * 0.013, cy + ky + Math.cos(turn) * 0.013, front + 0.0295], r: [0, 0, -turn] }));
+    brass.push(place(turned([[0, 0], [0.009, 0], [0.009, 0.002], [0.006, 0.004], [0, 0.0045]], 16), { ...at, p: [cx + 0.3, cy + ky, front + 0.031] }));
   }
-  add(merged(ivory, standard({ color: IVORY, roughness: 0.32 })));
+  add(merged(ivory, shiny(0.8, { color: IVORY, roughness: 0.26 })));
+  add(merged(bakelite, shiny(0.6, { color: BAKELITE, roughness: 0.4 })));
 
   // A dark gap behind the screen's edge, seen at a slant
   add(merged([place(new T.PlaneGeometry(sw + 0.02, sh + 0.02), { p: [sc.x, sc.y, sc.z - 0.004] })], new T.MeshBasicMaterial({ color: "#050403" })));
 
   // Speaker grille, brass trim, and bun feet
   add(merged([place(new T.PlaneGeometry(0.15, 0.13), { p: [cx + 0.3, cy - 0.12, front + 0.001] })], standard({ map: grille(), roughness: 0.6 })));
-  const brass = [box(0.162, 0.006, 0.006, [cx + 0.3, cy - 0.052, front + 0.002]), box(0.162, 0.006, 0.006, [cx + 0.3, cy - 0.188, front + 0.002]),
+  for (let k = 0; k < 9; k++) brass.push(place(new T.CylinderGeometry(0.0025, 0.0025, 0.15, 6), { p: [cx + 0.3, cy - 0.064 - k * 0.0139, front + 0.004], r: [0, 0, Math.PI / 2] }));
+  brass.push(box(0.162, 0.006, 0.006, [cx + 0.3, cy - 0.052, front + 0.002]), box(0.162, 0.006, 0.006, [cx + 0.3, cy - 0.188, front + 0.002]),
     box(0.006, 0.142, 0.006, [cx + 0.219, cy - 0.12, front + 0.002]), box(0.006, 0.142, 0.006, [cx + 0.381, cy - 0.12, front + 0.002]),
-    box(0.62, 0.005, 0.004, [cx - 0.06, cy - ch / 2 + 0.03, front + 0.001])];
+    box(0.62, 0.005, 0.004, [cx - 0.06, cy - ch / 2 + 0.03, front + 0.001]));
   for (const [fx, fz] of [[-0.34, -0.04], [0.34, -0.04], [-0.34, -0.26], [0.34, -0.26]]) {
     brass.push(place(turned([[0.016, 0], [0.02, 0.01], [0.016, cy - ch / 2 - top], [0, cy - ch / 2 - top]]), { p: [cx + fx, top, front + fz] }));
   }
-  add(merged(brass, standard({ color: BRASS, metalness: 0.6, roughness: 0.35 })));
+  add(merged(brass, shiny(1, { color: BRASS, metalness: 0.75, roughness: 0.3 })));
 
   // A seat cushion that has been sat in: its top dips toward the middle
   const sag = (geo) => {
@@ -559,6 +606,8 @@ export function furnish(scene, { win, sc, sw, sh }) {
   };
 
   // ---- Two wingback armchairs, built facing +z, then turned toward the space in front of the set ----
+  // Inside, the seat, a deck under it, and a block behind it close every gap, so each chair is one
+  // upholstered piece; carved posts under the arms run down into the front legs
   const tuft = tufting(), rb = (w, h, d, seg, rad, o) => place(new T.RoundedBoxGeometry(w, h, d, seg, rad), o);
   const chair = { tufted: [], plain: [], wood: [] };
   chair.tufted.push(
@@ -567,20 +616,41 @@ export function furnish(scene, { win, sc, sw, sh }) {
     rb(0.15, 0.48, 0.36, 3, 0.06, { p: [0.37, 0.9, -0.17], r: [0, -0.22, 0], uv: [0.5, 0.7] }));
   chair.plain.push(
     rb(0.84, 0.22, 0.78, 2, 0.04, { p: [0, 0.28, 0] }),
-    sag(rb(0.56, 0.12, 0.6, 3, 0.05, { p: [0, 0.45, 0.07] })),
+    rb(0.64, 0.1, 0.72, 2, 0.03, { p: [0, 0.4, 0.0] }),
+    rb(0.64, 0.14, 0.16, 2, 0.04, { p: [0, 0.44, -0.27] }),
+    sag(rb(0.6, 0.12, 0.6, 3, 0.05, { p: [0, 0.45, 0.07] })),
     rb(0.13, 0.2, 0.72, 3, 0.05, { p: [-0.36, 0.48, 0.02] }), rb(0.13, 0.2, 0.72, 3, 0.05, { p: [0.36, 0.48, 0.02] }),
     place(new T.CylinderGeometry(0.075, 0.075, 0.7, 14), { p: [-0.37, 0.6, 0.02], r: [Math.PI / 2, 0, 0] }),
     place(new T.CylinderGeometry(0.075, 0.075, 0.7, 14), { p: [0.37, 0.6, 0.02], r: [Math.PI / 2, 0, 0] }));
   const leg = [[0.02, 0], [0.024, 0.015], [0.018, 0.04], [0.03, 0.08], [0.026, 0.12], [0.032, 0.15], [0.032, 0.17], [0, 0.17]];
-  for (const [lx, lz] of [[-0.34, 0.31], [0.34, 0.31], [-0.34, -0.33], [0.34, -0.33]]) chair.wood.push(place(turned(leg, 12), { p: [lx, 0, lz] }));
+  for (const [lx, lz] of CHAIR_LEGS) chair.wood.push(place(turned(leg, 12), { p: [lx, 0, lz] }));
   for (const ax of [-0.37, 0.37]) {
-    chair.wood.push(rb(0.1, 0.2, 0.03, 2, 0.012, { p: [ax, 0.47, 0.385] }));
-    chair.wood.push(place(turned([[0, 0], [0.05, 0], [0.06, 0.02], [0.05, 0.045], [0, 0.055]], 14), { p: [ax, 0.6, 0.39], r: [Math.PI / 2, 0, 0] }));
+    // The post: a square shaft with collars and a raised front panel, from the leg up under the arm
+    chair.wood.push(rb(0.07, 0.4, 0.06, 2, 0.008, { p: [ax, 0.36, 0.375] }),
+      rb(0.084, 0.03, 0.072, 1, 0.006, { p: [ax, 0.185, 0.375] }), rb(0.084, 0.026, 0.072, 1, 0.006, { p: [ax, 0.5, 0.375] }),
+      rb(0.044, 0.22, 0.012, 1, 0.004, { p: [ax, 0.34, 0.408] }));
+    // The panther's head on the front of the arm, set on a round boss
+    chair.wood.push(...panther().map((g) => place(g, { p: [ax, 0.6, 0.392], s: [1.55, 1.55, 1.55] })));
   }
-  const both = (parts) => CHAIRS.flatMap(([x, z, t]) => moved(parts.map((g) => g.clone()), { p: [x, 0, z], r: [0, t, 0] }));
-  const leather = { color: LEATHER, map: tuft.color, roughness: 0.48 };
-  add(merged(both(chair.tufted), standard({ ...leather, normalMap: tuft.normal, normalScale: new T.Vector2(0.9, 0.9) })));
-  add(merged(both(chair.plain), standard({ color: LEATHER, map: worn(), roughness: 0.46 })));
-  add(merged(both(chair.wood), standard({ color: LEG_WOOD, map: wood, roughness: 0.4 })));
+  // Each chair takes its own leather: the left one redder, the right darker and duller toward the top,
+  // both mottled where years of hands and sun have worked at them
+  const tone = (geo, k) => {
+    const pos = geo.attributes.position, col = [];
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i);
+      const mottle = 0.86 + 0.14 * Math.sin(x * 23 + z * 7) * Math.sin(y * 19 - x * 11) + 0.08 * Math.sin(z * 41 + y * 29);
+      const age = k ? 1 - 0.42 * Math.min(1, Math.max(0, (y - 0.45) / 0.65)) : 1;
+      const [r, g, b] = k ? [0.86, 0.8, 0.76] : [1.22, 0.86, 0.8];
+      col.push(r * mottle * age, g * mottle * age * (k ? 0.96 + 0.04 * age : 1), b * mottle * age);
+    }
+    geo.setAttribute("color", new T.Float32BufferAttribute(col, 3));
+    return geo;
+  };
+  const both = (parts, tinted = false) => CHAIRS.flatMap(([x, z, t], k) => moved(parts.map((g) => (tinted ? tone(g.clone(), k) : g.clone())), { p: [x, 0, z], r: [0, t, 0] }));
+  const leather = { color: LEATHER, vertexColors: true, roughness: 0.62 };
+  add(merged(both(chair.tufted, true), shiny(0.3, { ...leather, map: tuft.color, normalMap: tuft.normal, normalScale: new T.Vector2(0.9, 0.9) })));
+  add(merged(both(chair.plain, true), shiny(0.3, { ...leather, map: worn() })));
+  add(merged(both(chair.wood), shiny(0.7, { color: LEG_WOOD, map: wood, roughness: 0.38 })));
   Object.values(chair).flat().forEach((g) => g.dispose());
+  return { glossy };
 }
