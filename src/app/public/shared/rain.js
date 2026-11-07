@@ -3,10 +3,11 @@
 //
 // Columns of glyphs with long fading trails. Now and then a column spells a word
 // where it is and holds it long enough to read. Glass panes act as a lens: each
-// shows the rain behind it slightly magnified, like thick convex glass.
+// shows the rain behind it slightly magnified, like thick convex glass. With the
+// rabbit option, a white rabbit now and then drops in as a one-glyph word.
 
 
-// Character sets the charset control cycles through; the white rabbit is kept out of them on purpose
+// Character sets the charset control cycles through; the white rabbit only comes as its own word
 const EMOJI = ["💻", "🔒", "📡", "🛰️", "🔌", "⚙️", "🧅", "💊", "🕶️", "☁️", "🔑", "📷", "🛡️", "🤖", "💾", "📶", "🧠"];
 const FACES = ["😀", "😃", "😄", "😁", "😆", "😅", "😂", "🙂", "😉", "😊", "😇", "🥰", "😍", "🤩", "😎", "🤓", "🧐", "🤔", "😴", "🤯", "🥳", "😏", "😌", "🙃"];
 
@@ -45,10 +46,15 @@ export const WORDS = [
   { weight: 2, color: NEON, alpha: 1, glow: 6, words: ["neon1", "1withtechnology", "1isgladtobeofservice", "1NEON", "onion"] },
 ];
 
+// The rabbit: one glyph, white, with a soft glow
+const RABBIT = { color: "#ffffff", alpha: 1, glow: 10, words: ["🐇"] };
+
 // Rain timing and look
 const WORD_RATE = 0.06; // chance per step that some column starts a word
 const FADE = 0.07;      // lower means longer trails
 const STEP_MS = 66;     // about 15 steps a second
+const HALT_MS = 600;    // the step gap the rain slows to before it stops
+const HOLD = 30;        // steps a word holds once spelled
 const ZOOM = 1.15, RIM = 5;
 const VOID = "#0D0208";
 const MONO = `"JetBrains Mono", ui-monospace, monospace`;
@@ -67,8 +73,11 @@ function save(s) {
  * Starts the rain on `canvas`, and the lens on `lens` when given.
  * panes() lists the glass elements to magnify; lensOff() pauses the lens while it returns true.
  * words replaces the word groups. Returns the controls and a stop() for cleanup.
+ * rabbit, when given, lets a rabbit drop in: { rate, hold, ok, avoid }. rate is the chance per
+ * step, hold its steps on screen, ok() allows one, and avoid() lists elements it must not sit under.
+ * Without it there are no rabbits and the rain is unchanged.
  */
-export function rain({ canvas, lens = null, panes = () => [], lensOff = () => false, words = WORDS }) {
+export function rain({ canvas, lens = null, panes = () => [], lensOff = () => false, words = WORDS, rabbit = null }) {
   const ctx = canvas.getContext("2d");
   const lctx = lens && lens.getContext("2d");
   const reduce = matchMedia("(prefers-reduced-motion: reduce)");
@@ -80,6 +89,9 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
   let grid = saved.grid !== false;
   let set = Math.max(0, SETS.findIndex((s) => s.name === saved.set));
   let running = !saved.paused && !reduce.matches;
+  // The live rabbit, the step count, and a halt that is not saved as a pause
+  const bunny = rabbit && { rate: 0.005, hold: 60, ok: () => true, avoid: () => [], ...rabbit };
+  let rab = null, steps = 0, held = false, ramp = null, gap = STEP_MS;
   const listeners = new Set();
   const emit = () => listeners.forEach((f) => f(api));
 
@@ -88,17 +100,54 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
   const newCol = (y, top = true) => ({ y, top, v: speed(), word: null, wi: 0, g: null, wy: 0, hold: 0 });
 
   // Starts a word from a weighted group in a column that has room for it
-  function startWord() {
-    if (!cols.length) return; // a window with no width yet has no columns
-    let r = Math.random() * total, g = words[0];
-    for (const w of words) { if ((r -= w.weight) <= 0) { g = w; break; } }
-    const word = g.words[(Math.random() * g.words.length) | 0];
+  // Words are arrays of code points, so an emoji counts as one cell
+  function startWord(g = null, hold = HOLD, fits = () => true) {
+    if (!cols.length) return -1; // a window with no width yet has no columns
+    if (!g) {
+      let r = Math.random() * total; g = words[0];
+      for (const w of words) { if ((r -= w.weight) <= 0) { g = w; break; } }
+    }
+    const word = [...g.words[(Math.random() * g.words.length) | 0]];
     for (let tries = 0; tries < 8; tries++) {
-      const c = cols[(Math.random() * cols.length) | 0];
+      const i = (Math.random() * cols.length) | 0, c = cols[i];
       const wy = Math.floor(c.y);
       // Only a drop that has fallen from the top, with a trail above it, turns into a word
-      if (c.word || !c.top || wy < 3 || wy + word.length >= rows) continue;
-      Object.assign(c, { word, wi: 0, g, wy, hold: 30 });
+      if (c.word || !c.top || wy < 3 || wy + word.length >= rows || !fits(i, wy)) continue;
+      Object.assign(c, { word, wi: 0, g, wy, hold });
+      return i;
+    }
+    return -1;
+  }
+
+  // Cells under the elements the rabbit avoids, padded by a cell, are off limits
+  function clear() {
+    const rects = [...bunny.avoid()].map((el) => el.getBoundingClientRect()).filter((r) => r.width);
+    return (i, row) => {
+      const x = (i + 0.5) * size, y = (row + 0.5) * size;
+      return !rects.some((r) => x > r.left - size && x < r.right + size && y > r.top - size && y < r.bottom + size);
+    };
+  }
+
+  // Drops the rabbit in as a word; it stays catchable a little while after it starts to fade
+  function startRabbit() {
+    const i = startWord(RABBIT, bunny.hold, clear());
+    if (i < 0) return false;
+    rab = { col: i, row: cols[i].wy, until: steps + 1 + bunny.hold + 12 };
+    return true;
+  }
+
+  // Reduced motion: one rabbit sits still in the middle third of the frame
+  function stillRabbit() {
+    const fits = clear(), third = Math.ceil(cols.length / 3);
+    for (let tries = 0; tries < 40; tries++) {
+      const i = third + ((Math.random() * third) | 0), row = 3 + ((Math.random() * Math.max(1, rows - 5)) | 0);
+      if (!cols[i] || !fits(i, row)) continue;
+      ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+      ctx.fillStyle = VOID; ctx.fillRect(i * size, row * size, size, size);
+      ctx.shadowColor = RABBIT.color; ctx.shadowBlur = RABBIT.glow; ctx.fillStyle = RABBIT.color;
+      glyph(RABBIT.words[0], i * size, row * size);
+      ctx.shadowBlur = 0;
+      rab = { col: i, row, until: Infinity };
       return;
     }
   }
@@ -123,12 +172,16 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
     ctx.fillText(ch, x + size / 2, y + size / 2);
   }
 
-  // One step: fade the trails, maybe start a word, then advance every column
-  function draw() {
+  // One step: fade the trails, maybe start a word or a rabbit, then advance every column
+  // The prefill passes no rabbits, since the page isn't ready to ask yet
+  function draw(prefill = false) {
+    steps++;
     ctx.globalAlpha = 1;
     ctx.fillStyle = `rgba(13, 2, 8, ${FADE})`;
     ctx.fillRect(0, 0, innerWidth, innerHeight);
     if (Math.random() < WORD_RATE) startWord();
+    if (rab && steps > rab.until) rab = null;
+    if (bunny && !prefill && !rab && Math.random() < bunny.rate && bunny.ok()) startRabbit();
     const chars = SETS[set].chars;
     cols.forEach((c, i) => {
       const x = i * size;
@@ -156,7 +209,10 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
       ctx.fillStyle = r > 0.96 ? "#e9ffee" : r > 0.45 ? "#22ff7a" : "#00b84f";
       glyph(chars[(Math.random() * chars.length) | 0], x, y);
       c.y += c.v;
-      if (c.y > rows && !c.word && Math.random() > 0.97) Object.assign(c, newCol(0));
+      if (c.y > rows && !c.word && Math.random() > 0.97) {
+        Object.assign(c, newCol(0));
+        if (rab && rab.col === i) rab = null;
+      }
     });
   }
 
@@ -188,11 +244,27 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
     }
   }
 
-  // Steps the rain at STEP_MS, and not while paused or the tab is hidden
+  // The gap between steps: STEP_MS, or eased along a halt or resume ramp
+  function stepGap(now) {
+    if (!ramp) return gap;
+    const t = Math.min(1, (now - ramp.t0) / ramp.ms), e = 1 - (1 - t) ** 3;
+    gap = ramp.from + (ramp.to - ramp.from) * e;
+    if (t >= 1) { const end = ramp.end; ramp = null; if (end) end(); }
+    return gap;
+  }
+
+  // Steps the rain at the current gap, and not while paused, held, or the tab is hidden
   function loop() {
     const now = performance.now();
-    if (running && !document.hidden && now - last >= STEP_MS) { last = now; draw(); refract(); }
+    const g = stepGap(now);
+    if (running && !held && !document.hidden && now - last >= g) { last = now; draw(); refract(); }
     raf = requestAnimationFrame(loop);
+  }
+
+  // Keeps the live rabbit drawn at full strength while the rain stops around it
+  function pin() {
+    if (!rab || !running) return;
+    Object.assign(cols[rab.col], { word: [...RABBIT.words[0]], wi: 1, g: RABBIT, wy: rab.row, hold: Infinity });
   }
 
   // The controls: each change is saved and reported to subscribers
@@ -210,12 +282,52 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
     nextCharset() { set = (set + 1) % SETS.length; persist(); emit(); },
     subscribe(f) { listeners.add(f); f(api); return () => listeners.delete(f); },
     refract,
+    get held() { return held; },
+
+    // True when the point (client px) is on the live rabbit, within slop cells
+    // The canvas can be taller than the layout viewport (100vh on iOS), so scale first
+    rabbitAt(clientX, clientY, slop = 1.3) {
+      if (!rab || held) return false;
+      const b = canvas.getBoundingClientRect();
+      const x = ((clientX - b.left) * innerWidth) / b.width, y = ((clientY - b.top) * innerHeight) / b.height;
+      return Math.abs(x - (rab.col + 0.5) * size) <= size * slop && Math.abs(y - (rab.row + 0.5) * size) <= size * slop;
+    },
+
+    // Where the live rabbit's cell is centered, in layout px, or null
+    get rabbit() { return rab && { x: (rab.col + 0.5) * size, y: (rab.row + 0.5) * size }; },
+
+    // Drops a rabbit in now if there is room; for testing
+    spawnRabbit() { return !!bunny && !rab && running && !held && startRabbit(); },
+
+    // Slows the rain to a stop over ms without saving a pause; resolves once it is still
+    halt(ms = 1100) {
+      pin();
+      return new Promise((done) => {
+        if (!running) { held = true; done(); return; }
+        ramp = { from: gap, to: HALT_MS, t0: performance.now(), ms, end: () => { held = true; done(); } };
+      });
+    },
+
+    // Picks the rain back up over ms; the caught rabbit fades with the trails
+    // A still rain (reduced motion) draws a fresh frame with a new rabbit instead
+    resume(ms = 800) {
+      if (rab) { const c = cols[rab.col]; if (c && c.g === RABBIT) c.hold = 0; }
+      rab = null;
+      if (held && reduce.matches) { held = false; onResize(); return; }
+      held = false;
+      ramp = { from: Math.max(gap, STEP_MS), to: STEP_MS, t0: performance.now(), ms };
+    },
     stop() { cancelAnimationFrame(raf); removeEventListener("resize", onResize); },
   };
 
   // Start: pre-fill so rain is already falling on first paint, which is also the
   // still frame that reduced motion keeps
-  const onResize = () => { resize(); for (let i = 0; i < 40; i++) draw(); refract(); };
+  const onResize = () => {
+    resize(); rab = null;
+    for (let i = 0; i < 40; i++) draw(true);
+    if (bunny && reduce.matches && !held) stillRabbit();
+    refract();
+  };
   addEventListener("resize", onResize);
   onResize();
   loop();
