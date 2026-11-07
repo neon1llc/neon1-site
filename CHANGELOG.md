@@ -2,6 +2,20 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.12.0
+
+- The white rabbit: now and then a 🐇 falls in the rain. Catch it, and scrolling pulls you back out of an old TV into a sunlit room, ending on "go touch grass". Scrolling up plays it back into the screen. three.js loads only after a catch, and reduced motion gets a short crossfade instead.
+- Services lead with business workflows and technology for small to medium businesses, then cloud and AI engineering, networks, devices, and spaces, and security awareness and readiness.
+- How it works is now process and comes before case studies. About is in the nav.
+- The fourth stage is Normalize: handoff, training, retiring the old setup, and cleanup.
+- Proposals come with estimates rather than fixed prices, and a new question covers how data and accounts are treated.
+- About speaks to close to 15 years of interest in technology and automation, and to leaving people knowing their options.
+- Xenoss links to its site from the case studies.
+- The logo is a real link to neon1.tech, for bookmarking, and still springs back to the top.
+- The 1NEON button fades the page out and hands over to the portal, which fades itself in.
+- The hero pane has more room, and the rain is lighter so the content reads first.
+- The rabbit favicon, the typed easter eggs, and the scroll cue are gone.
+
 ## v0.11.1
 
 - Open source shows formal names: AWS CLIP, DeployOps, neon1 Ready, and 1NEON. A public project shows the case-study arrow on hover and opens in a new tab; a private one shows a lock that says "currently private" on hover or tap.
