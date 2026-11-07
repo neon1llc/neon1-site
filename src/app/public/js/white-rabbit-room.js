@@ -19,7 +19,7 @@ const BRASS = "#A8834E", LEATHER = "#62291D";
 const ROOM = { x: 1.95, z: 2.45, h: 2.6 };
 const RAIL = 0.66, BASE = 0.13; // low enough that the window and its sill sit clear above the rail
 const CHAIRS = [[-1.12, -1.46, 0.48], [1.29, -1.54, -0.57]]; // set down by hand, not mirrored
-const CHAIR_LEGS = [[-0.37, 0.36], [0.37, 0.36], [-0.34, -0.33], [0.34, -0.33]]; // the front pair under the carved posts
+const CHAIR_LEGS = [[-0.39, 0.38], [0.39, 0.38], [-0.405, -0.385], [0.405, -0.385]]; // front pair under the carved posts
 
 // A small seeded random, so the textures look the same on every visit
 function seeded(n) { return () => ((n = (n * 16807) % 2147483647) - 1) / 2147483646; }
@@ -267,24 +267,79 @@ function rounded(shape, w, h, r) {
 }
 
 
-// A big cat's head carved in wood, facing +z, about 9 cm across: a round boss behind, the skull,
-// cheekbones, a muzzle with whisker pads, a nose and chin, a heavy brow over almond eyes, and ears
-function panther() {
-  const ball = (s, p, rz = 0) => place(new T.SphereGeometry(1, 8, 6), { p, s, r: [0, 0, rz] });
-  const parts = [
-    place(new T.CylinderGeometry(0.04, 0.046, 0.026, 16), { p: [0, -0.004, -0.016], r: [Math.PI / 2, 0, 0] }),
-    ball([0.04, 0.036, 0.032], [0, 0.008, 0.004]),
-    ball([0.016, 0.014, 0.016], [-0.027, -0.006, 0.014]), ball([0.016, 0.014, 0.016], [0.027, -0.006, 0.014]),
-    ball([0.021, 0.016, 0.022], [0, -0.012, 0.034]),
-    ball([0.013, 0.011, 0.012], [-0.011, -0.018, 0.046]), ball([0.013, 0.011, 0.012], [0.011, -0.018, 0.046]),
-    ball([0.011, 0.007, 0.008], [0, -0.004, 0.055]), ball([0.011, 0.008, 0.011], [0, -0.031, 0.035]),
-    ball([0.015, 0.006, 0.01], [-0.015, 0.015, 0.031], -0.3), ball([0.015, 0.006, 0.01], [0.015, 0.015, 0.031], 0.3),
-    ball([0.0065, 0.004, 0.004], [-0.016, 0.006, 0.035], 0.25), ball([0.0065, 0.004, 0.004], [0.016, 0.006, 0.035], -0.25),
-  ];
-  for (const k of [-1, 1]) {
-    parts.push(place(new T.CylinderGeometry(0, 0.013, 0.022, 6), { p: [k * 0.027, 0.04, -0.002], r: [0, 0, -k * 0.55], s: [1, 1, 0.55] }));
+// A big cat's head carved from one piece of wood, facing +z, about 11 cm across: a sphere pushed
+// and pulled by smooth bumps and hollows into a broad skull, heavy brow over eyes set in sockets,
+// cheeks, a muzzle with whisker pads, a nose, a mouth line, a chin, and pointed ears; the back
+// flattens into the arm it grows from, and faint chisel facets keep it from looking cast
+function panther(seg = 44) {
+  const geo = new T.SphereGeometry(1, seg, Math.round(seg * 0.75));
+  geo.rotateY(-Math.PI / 2); // the seam goes to the back
+  const pos = geo.attributes.position;
+  // A smooth bump around direction c, wx wide and wy tall, of height amp
+  const bump = (x, y, z, cx, cy, cz, wx, wy, amp) => {
+    const d = ((x - cx) / wx) ** 2 + ((y - cy) / wy) ** 2 + ((z - cz) / ((wx + wy) / 2)) ** 2;
+    return amp * Math.exp(-d);
+  };
+  // Carved hollows stay darker, as oil and dust settle in them over the years
+  const shade = [];
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i), ax = Math.abs(x);
+    let up = 0, down = 0;
+    up += bump(x, y, z, 0, -0.32, 0.95, 0.4, 0.33, 0.5);                 // muzzle
+    up += bump(x, y, z, 0, -0.06, 1, 0.13, 0.2, 0.14);                   // bridge of the nose
+    up += bump(x, y, z, 0, -0.21, 1, 0.12, 0.06, 0.22);                  // nose pad
+    up += bump(ax, y, z, 0.19, -0.44, 0.88, 0.14, 0.12, 0.22);           // whisker pads
+    down += bump(ax, y, z, 0.13, -0.62, 0.78, 0.24, 0.03, 0.2);         // mouth line
+    down += bump(x, y, z, 0, -0.43, 0.92, 0.025, 0.12, 0.12);             // groove below the nose
+    up += bump(x, y, z, 0, -0.78, 0.62, 0.18, 0.11, 0.1);                // chin
+    down += bump(ax, y, z, 0.31, 0.16, 0.94, 0.12, 0.085, 0.3);          // eye sockets
+    up += bump(ax, y, z, 0.31, 0.14, 0.94, 0.08, 0.038, 0.14);           // almond eyes in them
+    up += bump(ax, y + 0.1 * ax, z, 0.3, 0.33, 0.9, 0.2, 0.055, 0.22);    // brow, drawn down toward the middle
+    down += bump(x, y, z, 0, 0.38, 0.93, 0.04, 0.14, 0.07);              // frown line
+    up += bump(ax, y, z, 0.62, -0.22, 0.72, 0.28, 0.26, 0.2);            // cheeks
+    down += bump(ax, y, z, 0.48, -0.05, 0.86, 0.1, 0.25, 0.05);          // between cheek and muzzle
+    const ear = Math.max(0, 1 - Math.hypot((ax - 0.52) / 0.22, (y - 0.8) / 0.28, (z - 0.25) / 0.3));
+    up += 0.65 * ear * ear;                                              // pointed ears
+    down += 0.2 * Math.max(0, 1 - Math.hypot((ax - 0.52) / 0.12, (y - 0.85) / 0.18, (z - 0.42) / 0.12)); // their hollows
+    const r = 1 + up - down + 0.012 * Math.sin(x * 23 + y * 7) * Math.sin(y * 19 - z * 11); // chisel facets
+    const back = z < 0 ? 1 + z * 0.45 : 1;                               // flat behind, into the arm
+    pos.setXYZ(i, x * r, y * r * 0.92, z * r * 0.9 * back);
+    const v = Math.max(0.3, 1 - 3.6 * down);
+    shade.push(v, v, v);
   }
-  return parts;
+  geo.setAttribute("color", new T.Float32BufferAttribute(shade, 3));
+  const uv = geo.attributes.uv;
+  for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * 3, uv.getY(i) * 2); // finer grain
+  geo.computeVertexNormals();
+  geo.scale(0.05, 0.05, 0.05);
+  return geo;
+}
+
+// A squared shaft swept along a curve through pts, w wide (x) and d deep at its start, tapering
+// to w1 by d1 at its end, with softly rounded corners
+function swept(pts, [w, d], [w1, d1], rows = 14, cols = 20) {
+  const curve = new T.CatmullRomCurve3(pts.map((p) => new T.Vector3(...p)));
+  const pos = [], uvs = [], idx = [], p = new T.Vector3(), t = new T.Vector3();
+  for (let i = 0; i <= rows; i++) {
+    const k = i / rows, a = (w + (w1 - w) * k) / 2, b = (d + (d1 - d) * k) / 2;
+    curve.getPoint(k, p); curve.getTangent(k, t);
+    const ny = t.z, nz = -t.y; // across the shaft's depth, toward the front
+    for (let j = 0; j <= cols; j++) {
+      const ang = (j / cols) * Math.PI * 2, c = Math.cos(ang), s = Math.sin(ang);
+      const sx = a * Math.sign(c) * Math.abs(c) ** 0.3, sn = b * Math.sign(s) * Math.abs(s) ** 0.3;
+      pos.push(p.x + sx, p.y + ny * sn, p.z + nz * sn); uvs.push(j / cols, k * 2);
+    }
+  }
+  for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) {
+    const q = i * (cols + 1) + j, r = q + cols + 1;
+    idx.push(q, q + 1, r, q + 1, r + 1, r);
+  }
+  const geo = new T.BufferGeometry();
+  geo.setIndex(idx);
+  geo.setAttribute("position", new T.Float32BufferAttribute(pos, 3));
+  geo.setAttribute("uv", new T.Float32BufferAttribute(uvs, 2));
+  geo.computeVertexNormals();
+  return geo;
 }
 
 // A raised panel field facing +z from the wall at z 0: a w by h rectangle at the wall, a smaller
@@ -379,7 +434,7 @@ function capital(profile, { x, za, zb, y, back = 0 }) {
  * env is a small environment map for the furniture's reflections; returns { glossy }, the
  * materials that reflect it as [material, full strength], so the scene can dim them with the room
  */
-export function furnish(scene, { win, sc, sw, sh, env }) {
+export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
   const wood = grain(1), lambert = (o) => new T.MeshLambertMaterial(o), standard = (o) => new T.MeshStandardMaterial(o);
   // Varnish, plastic, brass, and leather reflect the room, so highlights slide as the camera moves
   const glossy = [];
@@ -619,18 +674,24 @@ export function furnish(scene, { win, sc, sw, sh, env }) {
     rb(0.64, 0.1, 0.72, 2, 0.03, { p: [0, 0.4, 0.0] }),
     rb(0.64, 0.14, 0.16, 2, 0.04, { p: [0, 0.44, -0.27] }),
     sag(rb(0.6, 0.12, 0.6, 3, 0.05, { p: [0, 0.45, 0.07] })),
-    rb(0.13, 0.2, 0.72, 3, 0.05, { p: [-0.36, 0.48, 0.02] }), rb(0.13, 0.2, 0.72, 3, 0.05, { p: [0.36, 0.48, 0.02] }),
-    place(new T.CylinderGeometry(0.075, 0.075, 0.7, 14), { p: [-0.37, 0.6, 0.02], r: [Math.PI / 2, 0, 0] }),
-    place(new T.CylinderGeometry(0.075, 0.075, 0.7, 14), { p: [0.37, 0.6, 0.02], r: [Math.PI / 2, 0, 0] }));
-  const leg = [[0.02, 0], [0.024, 0.015], [0.018, 0.04], [0.03, 0.08], [0.026, 0.12], [0.032, 0.15], [0.032, 0.17], [0, 0.17]];
-  for (const [lx, lz] of CHAIR_LEGS) chair.wood.push(place(turned(leg, 12), { p: [lx, 0, lz] }));
-  for (const ax of [-0.37, 0.37]) {
-    // The post: a square shaft with collars and a raised front panel, from the leg up under the arm
-    chair.wood.push(rb(0.07, 0.4, 0.06, 2, 0.008, { p: [ax, 0.36, 0.375] }),
-      rb(0.084, 0.03, 0.072, 1, 0.006, { p: [ax, 0.185, 0.375] }), rb(0.084, 0.026, 0.072, 1, 0.006, { p: [ax, 0.5, 0.375] }),
-      rb(0.044, 0.22, 0.012, 1, 0.004, { p: [ax, 0.34, 0.408] }));
-    // The panther's head on the front of the arm, set on a round boss
-    chair.wood.push(...panther().map((g) => place(g, { p: [ax, 0.6, 0.392], s: [1.55, 1.55, 1.55] })));
+    rb(0.13, 0.2, 0.66, 3, 0.05, { p: [-0.36, 0.48, -0.01] }), rb(0.13, 0.2, 0.66, 3, 0.05, { p: [0.36, 0.48, -0.01] }),
+    place(new T.CylinderGeometry(0.075, 0.075, 0.64, 14), { p: [-0.37, 0.6, -0.01], r: [Math.PI / 2, 0, 0] }),
+    place(new T.CylinderGeometry(0.075, 0.075, 0.64, 14), { p: [0.37, 0.6, -0.01], r: [Math.PI / 2, 0, 0] }));
+  // Wood below each arm, as on the real chair: the panther's head at the front of the armrest,
+  // its neck curving down and out into the front post and on into a bulbous turned leg, a carved
+  // side panel, and a squared back leg that kicks back a little
+  const leg = [[0.022, 0], [0.026, 0.014], [0.02, 0.034], [0.037, 0.074], [0.031, 0.11], [0.037, 0.14], [0.034, 0.17], [0, 0.17]];
+  for (const k of [-1, 1]) {
+    const [fx, fz] = CHAIR_LEGS[k < 0 ? 0 : 1], [bx, bz] = CHAIR_LEGS[k < 0 ? 2 : 3];
+    chair.wood.push(place(turned(leg, 14), { p: [fx, 0, fz] }),
+      swept([[bx, 0.17, bz + 0.035], [bx, 0.09, bz + 0.012], [bx, 0, bz]], [0.044, 0.044], [0.032, 0.032], 8, 16),
+      swept([[k * 0.372, 0.58, 0.38], [k * 0.384, 0.53, 0.405], [k * 0.39, 0.42, 0.412], [k * 0.39, 0.28, 0.4], [fx, 0.165, fz]], [0.074, 0.07], [0.068, 0.062]),
+      rb(0.082, 0.03, 0.078, 1, 0.006, { p: [fx, 0.185, fz] }),
+      rb(0.024, 0.39, 0.74, 1, 0.006, { p: [k * 0.432, 0.34, -0.01] }),
+      place(turned([[0, 0], [0.074, 0], [0.078, 0.02], [0.074, 0.05], [0.062, 0.07], [0, 0.072]], 20), { p: [k * 0.37, 0.6, 0.3], r: [Math.PI / 2, 0, 0] }),
+      place(panther(touch ? 36 : 56), { p: [k * 0.37, 0.6, 0.4] }));
+    const { face, sides } = raised(0.58, 0.24, 0.022, 0.01);
+    for (const g of [face, sides]) chair.wood.push(place(g, { p: [k * 0.444, 0.34, -0.01], r: [0, k * Math.PI / 2, 0] }));
   }
   // Each chair takes its own leather: the left one redder, the right darker and duller toward the top,
   // both mottled where years of hands and sun have worked at them
@@ -650,7 +711,8 @@ export function furnish(scene, { win, sc, sw, sh, env }) {
   const leather = { color: LEATHER, vertexColors: true, roughness: 0.62 };
   add(merged(both(chair.tufted, true), shiny(0.3, { ...leather, map: tuft.color, normalMap: tuft.normal, normalScale: new T.Vector2(0.9, 0.9) })));
   add(merged(both(chair.plain, true), shiny(0.3, { ...leather, map: worn() })));
-  add(merged(both(chair.wood), shiny(0.7, { color: LEG_WOOD, map: wood, roughness: 0.38 })));
+  chair.wood.forEach((g) => { if (!g.attributes.color) g.setAttribute("color", new T.Float32BufferAttribute(new Float32Array(g.attributes.position.count * 3).fill(1), 3)); });
+  add(merged(both(chair.wood), shiny(0.7, { color: LEG_WOOD, map: wood, roughness: 0.38, vertexColors: true })));
   Object.values(chair).flat().forEach((g) => g.dispose());
   return { glossy };
 }
