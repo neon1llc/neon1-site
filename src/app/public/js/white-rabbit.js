@@ -22,7 +22,6 @@ const STIFF = 90;          // spring stiffness, per second squared
 const DAMP = 2 * Math.sqrt(STIFF);
 const BAND = 0.02;         // the most input can pull past the end
 const IDLE = 160;          // ms without input that ends a gesture
-const FADE = 400;          // ms for the card crossfade
 const DOWN = ["ArrowDown", "PageDown", "End"], UP = ["ArrowUp", "PageUp", "Home"];
 const SCENE = "/js/white-rabbit-scene.js", SOUND = "/js/white-rabbit-sound.js";
 
@@ -125,7 +124,7 @@ export function whiteRabbit({ rain, root }) {
     clearTimeout(disposeTimer);
     set("caught"); lock(true);
     body.classList.remove("white-rabbit-hover");
-    target = p = v = 0; halted = prepared = handed = false; escape = null;
+    target = p = v = 0; halted = prepared = handed = false; escape = null; cardP = 0;
     mode = reduce.matches ? "card" : "scene";
     root.dataset.mode = mode;
     openAudio();
@@ -158,7 +157,7 @@ export function whiteRabbit({ rain, root }) {
     drop();
     if (state === "caught") return;
     handed = false;
-    cover(true, "card"); set("done"); announce(true);
+    cover(true, "card"); card(Math.max(0.001, p) - cardP);
   }
 
   // Frees the scene's GPU memory; the imported modules stay cached for the next catch
@@ -203,10 +202,10 @@ export function whiteRabbit({ rain, root }) {
     if (state === "caught") {
       if (d < 0) return;
       set("playing");
-      if (mode === "card") { card(true); return; }
-      start();
+      if (mode === "card") cover(true, "card");
+      else start();
     }
-    if (mode === "card") { if (d < 0 && state === "done") card(false); return; }
+    if (mode === "card") { card(d); return; }
     if (state === "done" && d > 0) { target = Math.min(1 + BAND, target + d * 0.3); band(); return; }
     set(d > 0 ? "playing" : "reversing");
     target = target + d > 1 ? Math.min(1 + BAND, 1 + (target + d - 1) * 0.3) : Math.max(0, target + d);
@@ -274,7 +273,7 @@ export function whiteRabbit({ rain, root }) {
   function bail() {
     if (state === "caught") { leave(); return; }
     if (state === "exiting") return;
-    if (mode === "card") { card(false); return; }
+    if (mode === "card") { card(-cardP); return; }
     set("reversing");
     escape = { from: Math.min(target, 1), t0: performance.now() };
   }
@@ -312,21 +311,21 @@ export function whiteRabbit({ rain, root }) {
   });
 
   // ---- The card (reduced motion and fallbacks) ----
-  // Crossfades, opacity only; back at the landing, the egg is disarmed
-  function card(show) {
-    if (show) {
-      cover(true, "card");
-      setTimeout(() => { if (state === "playing") { set("done"); announce(true); } }, FADE);
-      return;
-    }
-    set("reversing");
-    root.dataset.leaving = "";
-    setTimeout(() => {
-      delete root.dataset.leaving;
-      if (state !== "reversing") return;
-      cover(false); announce(false);
-      set("exiting"); rain.resume(); closeAudio(); settle();
-    }, FADE);
+  // Scroll-linked and reversible, with nothing moving on its own: the page goes dark, the window and
+  // its view come up out of the dark, then "go touch grass" rises from behind the trees. Scrolling
+  // back reverses it, and back at the start the egg is disarmed
+  let cardP = 0;
+  function card(d) {
+    cardP = clamp(cardP + d, 0, 1);
+    root.style.setProperty("--card-dark", smooth(0, 0.15, cardP).toFixed(3));
+    root.style.setProperty("--card-window", smooth(0.12, 0.55, cardP).toFixed(3));
+    root.style.setProperty("--card-rise", smooth(0.55, 1, cardP).toFixed(3));
+    if (cardP >= 1) { if (state !== "done") { set("done"); announce(true); } return; }
+    set(d < 0 ? "reversing" : "playing");
+    if (cardP > 0) return;
+    cover(false); announce(false);
+    ["--card-dark", "--card-window", "--card-rise"].forEach((k) => root.style.removeProperty(k));
+    set("exiting"); rain.resume(); closeAudio(); settle();
   }
 
   // ---- The scene loop ----
