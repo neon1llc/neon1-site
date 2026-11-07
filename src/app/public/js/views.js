@@ -27,14 +27,14 @@
   const enterEase = [0.19, 1, 0.22, 1];
 
   // The hero counts as seen, so it never plays an entrance
-  // Input pauses while the menu or a case study is open
+  // Input pauses while the menu, a case study, or the white rabbit is open
   const root = document.documentElement;
   root.classList.add("motion-ready", "glide");
   const hero = document.querySelector(".hero");
   const views = [hero, ...document.querySelectorAll(".view")];
   const visited = new Set([hero]);
   const menu = document.getElementById("menu");
-  const paused = () => !menu.hidden || document.body.classList.contains("case-open");
+  const paused = () => !menu.hidden || document.body.classList.contains("case-open") || document.body.classList.contains("white-rabbit-on");
 
   // ---- Layout: where each view starts and how far it scrolls inside ----
   const vh = () => (window.visualViewport ? visualViewport.height : innerHeight);
