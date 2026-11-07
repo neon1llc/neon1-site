@@ -9,6 +9,7 @@
 import * as T from "/js/vendor/three-0.187.0.rabbit.min.js";
 import { createSky, createShafts, LIGHT } from "/js/white-rabbit-sky.js";
 import { furnish } from "/js/white-rabbit-room.js";
+import { createCar } from "/js/white-rabbit-car.js";
 
 
 // The white-out, the floor's bounce light, the landing's void, and where the screen sits
@@ -267,8 +268,11 @@ function environment(renderer) {
 }
 
 
-/** Builds the scene on a new canvas in #whiteRabbit; throws without WebGL. onLost() runs if the context goes */
-export function createScene({ onLost }) {
+/**
+ * Builds the scene on a new canvas in #whiteRabbit; throws without WebGL. onLost() runs if the
+ * context goes; onSound(kind) hears the car on the sill ("crank", "fire", "stop")
+ */
+export function createScene({ onLost, onSound = () => {} }) {
   const root = document.getElementById("whiteRabbit");
   const touch = matchMedia("(pointer: coarse)").matches;
   let ratio = Math.min(devicePixelRatio || 1, touch ? 1.5 : 2);
@@ -293,6 +297,9 @@ export function createScene({ onLost }) {
   // ---- The room, the TV around its screen, the table, and the chairs ----
   const env = environment(renderer);
   const { glossy } = furnish(scene, { win: WINDOW, sc: SC, sw: SW, sh: SH, env });
+
+  // The model car on the sill, nose turned a little toward the room
+  const car = createCar({ scene, env, at: { p: [-1.9, WINDOW.y - WINDOW.h / 2 + 0.028, 0.9], turn: 0.2, scale: 1.4 }, onSound });
 
   // Screen and glass, both curved by the same bulge
   const screenU = {
@@ -446,6 +453,7 @@ export function createScene({ onLost }) {
     sun.intensity = light * (0.15 + 1.2 * s);
     fill.intensity = light * (0.55 + 0.35 * s);
     for (const [m, k] of glossy) m.envMapIntensity = k * light;
+    car.update(time, light);
     glow.intensity = ramp(p, [[0, 0], [0.28, 0.6], [0.6, 0.3], [0.82, 0.2]]) * 0.02;
     grade.uniforms.uTint.value.copy(WHITE).lerp(TINT_COOL.clone().lerp(TINT_WARM, s), room);
 
@@ -475,6 +483,16 @@ export function createScene({ onLost }) {
     lastFrame = still ? 0 : now;
   }
 
+  // True when the point (client px) lands on the car, which then starts or stops unless only looking
+  const ray = new T.Raycaster(), ndc = new T.Vector2();
+  function pick(x, y, look = false) {
+    if (disposed || !posCurve) return false;
+    const b = canvas.getBoundingClientRect();
+    ndc.set(((x - b.left) / b.width) * 2 - 1, -((y - b.top) / b.height) * 2 + 1);
+    ray.setFromCamera(ndc, camera);
+    return car.pick(ray, look);
+  }
+
   // Fits the renderer to the window; the picture is redrawn by the caller
   function resize() {
     renderer.setSize(innerWidth, innerHeight, false);
@@ -502,5 +520,5 @@ export function createScene({ onLost }) {
     canvas.remove();
   }
 
-  return { compose, render, resize, dispose };
+  return { compose, render, resize, dispose, pick, over: (x, y) => pick(x, y, true) };
 }
