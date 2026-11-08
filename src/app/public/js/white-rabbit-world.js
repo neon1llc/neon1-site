@@ -754,7 +754,7 @@ export function createWorld({ scene, touch }) {
       pane(Wd, g.eave, x, Y + g.eave / 2, cz, Math.PI / 2);
       const tri = new T.BufferGeometry(); tri.setAttribute("position", new T.Float32BufferAttribute([0, Y + g.eave, g.z0, 0, Y + g.eave, g.z1, 0, Y + g.ridge, cz], 3)); tri.computeVertexNormals();
       const t = keep(new T.Mesh(tri, panelMat)); t.position.x = x;
-      for (const z of [g.z0, g.z1]) { const r = bar(0.04, rl, 0.04, x, Y + (g.eave + g.ridge) / 2, (z + cz) / 2); r.rotation.x = (z < cz ? -1 : 1) * (Math.PI / 2 - slope); }
+      for (const z of [g.z0, g.z1]) { const r = bar(0.04, rl, 0.04, x, Y + (g.eave + g.ridge) / 2, (z + cz) / 2); r.rotation.x = (z < cz ? 1 : -1) * (Math.PI / 2 - slope); }
       if (door) { for (const z of [cz - 0.42, cz, cz + 0.42]) bar(0.04, 1.85, 0.04, x + 0.02, Y + 0.93, z); bar(0.04, 0.04, 0.88, x + 0.02, Y + 1.85, cz); bar(0.04, 0.035, 0.84, x + 0.02, Y + 0.95, cz); }
     }
     // Two roof vents propped open on the left slope
