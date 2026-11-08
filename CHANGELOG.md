@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.20.6
+
+- The swing frame's diagonal braces join the legs at the bottom and the top bar at the top, two at each end, instead of floating free.
+
 ## v0.20.5
 
 - The soil, in the borders and the stone bed, is a darker, richer brown.
