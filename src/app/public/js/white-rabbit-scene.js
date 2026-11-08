@@ -578,5 +578,5 @@ export function createScene({ onLost, onSound = () => {} }) {
     canvas.remove();
   }
 
-  return { compose, render, resize, dispose, pick, over: (x, y) => pick(x, y, true), get facing() { return facing; }, get wind() { return sky.wind; } };
+  return { compose, render, resize, dispose, pick, over: (x, y) => pick(x, y, true), get facing() { return facing; }, get wind() { return sky.wind; }, get carRunning() { return car.running; } };
 }

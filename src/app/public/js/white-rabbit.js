@@ -89,8 +89,9 @@ export function whiteRabbit({ rain, root }) {
   // Sound belongs to the scene; the card is always silent
   const wanted = () => mode === "scene";
 
-  // Opens the audio device inside a click or tap, then builds the sounds once their module loads
-  function openAudio() {
+  // Opens the audio device inside a click or tap, then builds the sounds once their module loads;
+  // idling picks the car's engine back up, for a device rebuilt while it runs
+  function openAudio(idling = false) {
     const AC = window.AudioContext || window.webkitAudioContext;
     if (audio || !AC || !wanted()) return;
     const ctx = (audio = new AC());
@@ -101,6 +102,7 @@ export function whiteRabbit({ rain, root }) {
       if (audio !== ctx) return;
       sound = m.createSound(ctx);
       sound.start(mode);
+      if (idling) sound.car("idle");
     }).catch(() => {});
   }
 
@@ -111,14 +113,25 @@ export function whiteRabbit({ rain, root }) {
     audio = sound = null;
   }
 
-  // A hidden tab goes quiet, and the sound comes back with it. Phones may refuse to resume until
-  // the next touch, or interrupt the device on their own, so any touch, click, or key retries
+  // A hidden tab goes quiet, and the sound comes back with it. Phones may refuse to resume until the
+  // next touch, or come back from the background with a device that claims to run but stays silent,
+  // so on a touch screen the first touch, click, or key after returning builds the sound afresh
+  // (inside that gesture, which phones require), picking the car's idle back up if it was running
+  const coarse = matchMedia("(pointer: coarse)");
+  let stale = false;
   document.addEventListener("visibilitychange", () => {
     if (!audio) return;
-    if (document.hidden) audio.suspend().catch(() => {}); else wake();
+    if (document.hidden) { stale = true; audio.suspend().catch(() => {}); } else wake();
   });
-  function wake() {
-    if (audio && !document.hidden && audio.state !== "running" && audio.state !== "closed") audio.resume().catch(() => {});
+  function wake(e) {
+    if (!audio || document.hidden) return;
+    if (stale && e && e.isTrusted && /^(pointerup|touchend|keydown)$/.test(e.type) && (coarse.matches || audio.state !== "running")) {
+      stale = false;
+      const idling = !!(scene && scene.carRunning);
+      closeAudio(); openAudio(idling);
+      return;
+    }
+    if (audio.state !== "running" && audio.state !== "closed") audio.resume().catch(() => {});
   }
   for (const type of ["pointerup", "touchend", "keydown"]) addEventListener(type, wake, { capture: true, passive: true });
   addEventListener("pageshow", wake);
