@@ -44,10 +44,12 @@ const YARD = { back: -30, right: -10, left: 12.5 };
 // stone (CURVE, plan points [x, z] from the foot of the deck's front stairs out toward the back); soil
 // borders run along the right fence and the back fence (SOIL wide); a circle is cut from the concrete for
 // a pear tree and its mint; the greenhouse stands square in the back-right corner of the concrete
-const CURVE = [[-12.9, 5.9], [-15.6, 4.1], [-19.0, 2.7], [-22.2, 2.6], [-24.6, 3.6], [-26.2, 4.8]];
+const CURVE = [[-12.9, 2.7], [-15.6, 0.9], [-19.0, -0.5], [-22.2, -0.6], [-24.6, 0.4], [-26.2, 1.6]];   // starts 1.5 m right of the front stairs
 const SOIL = 1.8;
-const MINT = [-24.4, -2.8, 1.5];
-const GREEN = { x0: -28.2, x1: -24.5, z0: -8.2, z1: -5.8, eave: 1.85, ridge: 2.45 };
+const MINT = [-23.4, -2.85, 1.0];
+const GREEN = { x0: -28.2, x1: -23.0, z0: -8.2, z1: -4.9, eave: 2.05, ridge: 2.75 };   // about 1.4 times the 8 x 12 ft kit
+// The square of soil in front of the greenhouse, a foot from its door, where the squash trellis stands
+const PATCH = { x0: GREEN.x1 + 0.3, x1: GREEN.x1 + 0.3 + (GREEN.x1 - GREEN.x0), z0: GREEN.z0, z1: GREEN.z1 };
 const DECK = { x0: -11.4, x1: -2.05, z0: -2.3, z1: 10.5, y: GROUND + 0.8 };   // out from the house on the left, its right side at z0
 const CROSS = { walk1: [-10.6, -12.6], road: [-12.6, -19.6], walk2: [-19.6, -21.6] };
 
@@ -162,24 +164,31 @@ const GROUND_FRAG = /* glsl */`
     if (yard) {
       float zb = ${CURVE[0][1].toFixed(2)};
       ${CURVE.slice(1).map((p, i) => `if (x < ${CURVE[i][0].toFixed(2)}) zb = mix(${CURVE[i][1].toFixed(2)}, ${p[1].toFixed(2)}, clamp((x - (${CURVE[i][0].toFixed(2)})) / (${(p[0] - CURVE[i][0]).toFixed(2)}), 0.0, 1.0));`).join("\n      ")}
-      bool soil = z < ${(YARD.right + SOIL).toFixed(2)} || x < ${(YARD.back + SOIL).toFixed(2)} || (z > ${(YARD.left - SOIL).toFixed(2)} && x < ${(DECK.x0 - 0.2).toFixed(2)});
+      bool soil = z < ${(YARD.right + SOIL).toFixed(2)} || x < ${(YARD.back + SOIL).toFixed(2)} || (z > ${(YARD.left - SOIL).toFixed(2)} && x < ${(DECK.x0 - 0.2).toFixed(2)})
+        || (x > ${PATCH.x0.toFixed(2)} && x < ${PATCH.x1.toFixed(2)} && z > ${PATCH.z0.toFixed(2)} && z < ${PATCH.z1.toFixed(2)});
       if (soil) {
         col = vec3(0.17, 0.11, 0.07) * (0.75 + 0.45 * noise(vW.xz * 6.0)) * (0.85 + 0.3 * hash(floor(vW.xz * 30.0)));
         col = mix(col, vec3(0.3, 0.42, 0.12), 0.25 * step(0.8, noise(vW.xz * 2.3)));          // a weed or two
         paved = 1.0;
-      } else if (z < zb - 0.3) {
-        // Poured concrete in slabs, joints every 2 m, weathered: stains, hairline cracks, a darker damp edge
-        vec2 j = abs(fract(vW.xz / 2.0) - 0.5);
-        col = vec3(0.39, 0.38, 0.36) * (0.86 + 0.18 * fbm(vW.xz * 0.9)) * (0.94 + 0.06 * hash(floor(vW.xz * 40.0)));
-        col *= 1.0 - 0.4 * smoothstep(0.485, 0.5, max(j.x, j.y));
-        col *= 1.0 - 0.18 * smoothstep(0.62, 0.7, fbm(vW.xz * 0.35 + 4.0));
-        col *= 1.0 - 0.35 * smoothstep(0.015, 0.0, abs(fbm(vW.xz * 1.7) - 0.5)) * step(0.6, noise(vW.xz * 0.4));
+      } else if (z < zb - 0.75) {
+        // One old pour, medium dark grey and rough, cracked in wandering lines over the years, and patched here
+        // and there with lighter quick-set cement that has cracked in its turn
+        col = vec3(0.12, 0.12, 0.118) * (0.82 + 0.26 * fbm(vW.xz * 0.7)) * (0.86 + 0.28 * hash(floor(vW.xz * 70.0)));
+        col *= 1.0 - 0.15 * smoothstep(0.6, 0.72, fbm(vW.xz * 0.3 + 4.0));
+        float crack = smoothstep(0.012, 0.0, abs(fbm(vW.xz * 0.55 + 2.0) - 0.5)) * step(0.55, noise(vW.xz * 0.25 + 9.0));
+        crack = max(crack, smoothstep(0.008, 0.0, abs(fbm(vW.xz * 1.3 + 7.0) - 0.5)) * step(0.62, noise(vW.xz * 0.5 + 3.0)));
+        float patchM = smoothstep(0.66, 0.68, fbm(vW.xz * 0.45 + 13.0)) * step(0.45, noise(vW.xz * 0.2 + 5.0));
+        col = mix(col, vec3(0.2, 0.198, 0.19) * (0.9 + 0.2 * hash(floor(vW.xz * 90.0))), patchM);
+        crack = max(crack * (1.0 - patchM * 0.6), patchM * smoothstep(0.01, 0.0, abs(fbm(vW.xz * 2.4) - 0.5)));
+        col *= 1.0 - 0.6 * crack;
         paved = 1.0;
         float md = distance(vW.xz, vec2(${MINT[0].toFixed(2)}, ${MINT[1].toFixed(2)}));
-        if (md < ${MINT[2].toFixed(2)}) {
-          col = mix(vec3(0.07, 0.2, 0.05), vec3(0.22, 0.42, 0.12), fbm(vW.xz * 9.0)) * (0.8 + 0.4 * hash(floor(vW.xz * 50.0)));
+        // The mint runs wild, spilling out over the edge of its circle in leafy clumps
+        float spill = ${MINT[2].toFixed(2)} + 0.35 * fbm(vec2(atan(vW.z - (${MINT[1].toFixed(2)}), vW.x - (${MINT[0].toFixed(2)})) * 2.0, 1.0));
+        if (md < spill) {
+          col = mix(vec3(0.06, 0.18, 0.04), vec3(0.24, 0.45, 0.13), fbm(vW.xz * 11.0)) * (0.75 + 0.45 * hash(floor(vW.xz * 60.0)));
           paved = 0.0;
-        } else if (md < ${(MINT[2] + 0.1).toFixed(2)}) col *= 0.72;
+        } else if (md < spill + 0.1) col *= 0.7;
       }
     }
     // Deep shade under the deck
@@ -586,7 +595,7 @@ export function createWorld({ scene, touch }) {
   sprite("/media/white-rabbit/yard-swing-seat.webp", SW, SH, [0, -PIVOT, 0.01], null, 0, seat);
   // The garden was rendered square on to its row and lies along it (the back fence), so both its ends
   // stand at their true depths from any view
-  sprite("/media/white-rabbit/yard-garden.webp", 17.04, 2.99, [(BED[0] + BED[1]) / 2, GROUND, (BED[2] + BED[3]) / 2 + 0.17], [1, 0, 0], 1);
+  sprite("/media/white-rabbit/yard-garden.webp", 17.04, 2.99, [(BED[0] + BED[1]) / 2, GROUND - 0.32, (BED[2] + BED[3]) / 2 + 0.17], [1, 0, 0], 1);   // set into the soil
 
   // The stone bed: big rectangular stones mortared into a low curving wall along CURVE, two courses on
   // each face and a cap, soil inside, planted from end to end: a bushy green plant, flowers, a rose, more
@@ -594,7 +603,7 @@ export function createWorld({ scene, touch }) {
   // from Sketchfab, by RosticOstafi, CC BY 4.0; nettle, gazania, and periwinkle from Poly Haven, CC0)
   {
     const path = new T.CatmullRomCurve3(CURVE.map(([x, z]) => new T.Vector3(x, 0, z)), false, "centripetal");
-    const len = path.getLength(), W = 0.62, Hb = 0.55, n = Math.ceil(len / 0.3);
+    const len = path.getLength(), W = 1.43, Hb = 0.55, n = Math.ceil(len / 0.3);
     const stone = solid("#8A857C", 0.4), mortar = solid("#6C675F");
     const stones = keep(new T.InstancedMesh(new T.BoxGeometry(1, 1, 1), stone, n * 6)); let ks = 0;
     const p = new T.Vector3(), tng = new T.Vector3(), nrm = new T.Vector3();
@@ -614,16 +623,18 @@ export function createWorld({ scene, touch }) {
     }
     stones.count = ks;
     // The plants, standing in the bed and turning to the camera like the trees
-    const FLORA = { bush: [0.0, 0.5, 0.25, 0.8145, 1.3, 0.85], flowersA: [0.25, 0.5, 0.5, 0.9219, 0.75, 0.55], flowersB: [0.5, 0.5, 0.75, 0.8906, 0.85, 0.6],
+    const FLORA = { bush: [0.0, 0.5, 0.25, 0.8145, 1.3, 0.85], mint: [0.0, 0.5, 0.25, 0.8145, 0.75, 0.48], flowersA: [0.25, 0.5, 0.5, 0.9219, 0.75, 0.55], flowersB: [0.5, 0.5, 0.75, 0.8906, 0.85, 0.6],
       rose: [0.7964, 0.5, 0.9531, 1.0, 1.0, 1.45], andromeda: [0.2788, 0.0, 0.4707, 0.5, 3.0, 2.6], branchy: [0.5259, 0.0, 0.7241, 0.5, 2.0, 2.7],
-      pinkrose: [0.7964, 0.5, 0.9531, 1.0, 1.3, 2.1], daylily: [0.0, 0.0, 0.25, 0.2627, 1.25, 0.62], crepe: [0.2788, 0.0, 0.4707, 0.5, 4.4, 5.8], pear: [0.5259, 0.0, 0.7241, 0.5, 5.4, 7.6] };
+      pinkrose: [0.7964, 0.5, 0.9531, 1.0, 1.3, 2.1], daylily: [0.0, 0.0, 0.25, 0.2627, 1.25, 0.62], crepe: [0.2788, 0.0, 0.4707, 0.5, 4.4, 5.8], pear: [0.5054, 0.0, 0.7437, 0.5, 5.4, 5.65] };
     const plan = [["bush", 0.03], ["bush", 0.07], ["flowersA", 0.13], ["flowersB", 0.19], ["flowersA", 0.25], ["flowersA", 0.31], ["rose", 0.39],
       ["flowersB", 0.46], ["flowersA", 0.52], ["flowersB", 0.58], ["daylily", 0.65], ["daylily", 0.71], ["daylily", 0.77], ["daylily", 0.83], ["daylily", 0.88], ["rose", 0.95]];
     const items = plan.map(([k, u]) => { path.getPointAt(u, p); return [k, p.x + (rnd() - 0.5) * 0.15, GROUND + Hb - 0.05, p.z + (rnd() - 0.5) * 0.15, 0]; });
     items.push(["crepe", YARD.back + 0.9, GROUND, YARD.right + 0.9, 1], ["pear", MINT[0], GROUND, MINT[1], 0]);
     // The left border, from the back corner toward the house: a big Japanese andromeda, a smaller bush on
     // long bare branches, and a tall pink rose (the dog house is built below)
-    items.push(["andromeda", -25.2, GROUND, YARD.left - 0.95, 3], ["branchy", -20.6, GROUND, YARD.left - 0.9, 0], ["pinkrose", -16.6, GROUND, YARD.left - 0.85, 4]);
+    items.push(["andromeda", YARD.back + 0.95, GROUND, (GREEN.z0 + GREEN.z1) / 2, 3], ["branchy", -20.6, GROUND, YARD.left - 0.9, 0], ["pinkrose", -16.6, GROUND, YARD.left - 0.85, 4]);
+    // Mint, bushy and weedy, crowding the pear's circle and over its edge
+    for (let i = 0; i < 16; i++) { const a = rnd() * 6.28, r = MINT[2] * (0.25 + rnd() * 0.95); items.push(["mint", MINT[0] + Math.cos(a) * r, GROUND, MINT[1] + Math.sin(a) * r, 0]); }
     const base = [], size = [], cell = [], seed = [], pinks = [];
     for (const [k, x, y, z, pink] of items) {
       const f = FLORA[k], s = 0.9 + rnd() * 0.2;
@@ -693,6 +704,66 @@ export function createWorld({ scene, touch }) {
     }
     // Two roof vents propped open on the left slope
     for (const x of [g.x0 + L * 0.3, g.x0 + L * 0.7]) { const v = bar(0.6, 0.03, 0.5, x, Y + g.ridge - 0.12, cz + 0.3); v.rotation.x = slope + 0.35; }
+  }
+
+  // Inside the greenhouse, seen through its panels: a wooden workbench at the back with a swivel office
+  // chair, a folding table along the left wall, and a twin bed on a low metal frame along the right; and
+  // a black handle on each door
+  {
+    const g = GREEN, Y = GROUND, cz = (g.z0 + g.z1) / 2, wood = solid("#8B6A48", 1), metal = solid("#9AA0A4"), black = solid("#151515"), linen = solid("#E9E6DF"), fold = solid("#D8D5CC");
+    const box = (mat, w, h, d, x, y, z, ry = 0) => { const o = keep(new T.Mesh(new T.BoxGeometry(w, h, d), mat)); o.position.set(x, y, z); o.rotation.y = ry; return o; };
+    // Workbench along the back wall
+    box(wood, 0.6, 0.05, 1.7, g.x0 + 0.38, Y + 0.9, cz); for (const dz of [-0.8, 0.8]) for (const dx of [0.08, 0.6]) box(wood, 0.06, 0.88, 0.06, g.x0 + dx, Y + 0.44, cz + dz);
+    box(wood, 0.5, 0.03, 1.6, g.x0 + 0.38, Y + 0.3, cz);
+    // The swivel chair, turned a little from the bench
+    const chair = new T.Group(); chair.position.set(g.x0 + 0.95, Y, cz + 0.15); chair.rotation.y = 0.5; keep(chair);
+    const cb = (mat, w, h, d, x, y, z) => { const o = new T.Mesh(new T.BoxGeometry(w, h, d), mat); o.position.set(x, y, z); chair.add(o); };
+    cb(black, 0.48, 0.07, 0.48, 0, 0.48, 0); cb(black, 0.06, 0.5, 0.46, -0.24, 0.78, 0); cb(metal, 0.05, 0.4, 0.05, 0, 0.26, 0);
+    for (let i = 0; i < 5; i++) { const o = new T.Mesh(new T.BoxGeometry(0.32, 0.03, 0.04), black); o.position.set(Math.cos(i * 1.26) * 0.16, 0.05, Math.sin(i * 1.26) * 0.16); o.rotation.y = -i * 1.26; chair.add(o); }
+    // Folding table against the left wall (toward +z)
+    box(fold, 1.8, 0.04, 0.7, (g.x0 + g.x1) / 2 + 0.3, Y + 0.74, g.z1 - 0.45); for (const dx of [-0.8, 0.8]) for (const dz of [-0.28, 0.28]) box(metal, 0.03, 0.72, 0.03, (g.x0 + g.x1) / 2 + 0.3 + dx, Y + 0.36, g.z1 - 0.45 + dz);
+    // The twin bed along the right wall, on a low metal frame
+    const bx = (g.x0 + g.x1) / 2 + 0.2, bz = g.z0 + 0.6;
+    box(metal, 1.95, 0.05, 0.98, bx, Y + 0.32, bz); for (const dx of [-0.95, 0.95]) for (const dz of [-0.46, 0.46]) box(metal, 0.04, 0.32, 0.04, bx + dx, Y + 0.16, bz + dz);
+    box(linen, 1.9, 0.16, 0.95, bx, Y + 0.43, bz); box(linen, 0.35, 0.1, 0.6, bx - 0.75, Y + 0.56, bz);
+    box(metal, 0.04, 0.55, 0.98, bx - 0.97, Y + 0.6, bz);
+    // Door handles
+    for (const dz of [-0.06, 0.06]) box(black, 0.05, 0.16, 0.025, g.x1 + 0.05, Y + 1.0, cz + dz);
+  }
+
+  // The squash trellis in the soil square before the greenhouse: an arched A-frame of green-coated steel
+  // hoops and rails with netting stretched over it, the vines climbing it thick with leaves and yellow
+  // flowers, long squash hanging under (Crookneck-style fruit stretched, as in the back garden)
+  {
+    const P = PATCH, green = solid("#2F5A2B"), cx = (P.x0 + P.x1) / 2, cz = (P.z0 + P.z1) / 2, Y = GROUND;
+    const Lr = Math.min(3.2, (P.x1 - P.x0) - 0.6), span = 1.5, Ht = 1.95, hoops = 4;
+    const arch = new T.Group(); arch.position.set(cx, Y, cz); arch.rotation.y = 0.04; keep(arch);
+    const tube = (pts, r = 0.016) => { const c = new T.CatmullRomCurve3(pts.map((q) => new T.Vector3(...q))); arch.add(new T.Mesh(new T.TubeGeometry(c, 24, r, 6, false), green)); };
+    for (let i = 0; i < hoops; i++) {
+      const x = -Lr / 2 + (i / (hoops - 1)) * Lr, pts = [];
+      for (let k = 0; k <= 12; k++) { const t = k / 12 * Math.PI; pts.push([x, Math.sin(t) * 0.35 + (1 - Math.abs(Math.cos(t))) * (Ht - 0.35), Math.cos(t) * span / 2 * (1 - 0.15 * Math.sin(t))]); }
+      tube(pts);
+    }
+    for (const [y, z] of [[0.6, span / 2 - 0.03], [1.3, span / 2 - 0.12], [0.6, -span / 2 + 0.03], [1.3, -span / 2 + 0.12]]) tube([[-Lr / 2, y, z], [Lr / 2, y, z]], 0.012);
+    // Netting: a mesh texture on the two sloping faces and over the top
+    const nc = document.createElement("canvas"); nc.width = nc.height = 64; const ng = nc.getContext("2d"); ng.strokeStyle = "#3c6a35"; ng.lineWidth = 3; ng.strokeRect(0, 0, 64, 64);
+    const net = new T.CanvasTexture(nc); net.wrapS = net.wrapT = T.RepeatWrapping; net.repeat.set(Lr / 0.15, 15); textures.push(net);
+    const netMat = new T.MeshBasicMaterial({ map: net, transparent: true, alphaTest: 0.3, side: T.DoubleSide, color: "#5d8a52" });
+    for (const sgn of [-1, 1]) { const q = new T.Mesh(new T.PlaneGeometry(Lr, Ht), netMat); q.position.set(0, Ht / 2, sgn * span * 0.3); q.rotation.x = sgn * 0.33; arch.add(q); }
+    // Leaves (big lobed squash leaves on a canvas), flowers, and squash, all over the frame
+    const lc = document.createElement("canvas"); lc.width = lc.height = 64; const lg = lc.getContext("2d");
+    lg.fillStyle = "#2f6b24"; lg.beginPath(); for (let i = 0; i <= 40; i++) { const a = i / 40 * 6.28, r = 28 * (0.78 + 0.22 * Math.abs(Math.cos(2.5 * a))); lg.lineTo(32 + Math.cos(a) * r, 32 + Math.sin(a) * r); } lg.fill();
+    lg.strokeStyle = "#5b8f3a"; lg.lineWidth = 1.5; for (let i = 0; i < 5; i++) { lg.beginPath(); lg.moveTo(32, 32); lg.lineTo(32 + Math.cos(i * 1.26 - 1.57) * 26, 32 + Math.sin(i * 1.26 - 1.57) * 26); lg.stroke(); }
+    const leafTex = new T.CanvasTexture(lc); leafTex.colorSpace = T.SRGBColorSpace; textures.push(leafTex);
+    const leaves = new T.InstancedMesh(new T.PlaneGeometry(1, 1), new T.MeshLambertMaterial({ map: leafTex, alphaTest: 0.5, side: T.DoubleSide }), 260);
+    const flowers = new T.InstancedMesh(new T.SphereGeometry(0.035, 6, 4), new T.MeshLambertMaterial({ color: "#f2b81c", emissive: "#3a2a00" }), 40);
+    const fruits = new T.InstancedMesh(new T.CylinderGeometry(0.035, 0.045, 0.42, 8), new T.MeshLambertMaterial({ color: "#5e7a2c" }), 18);
+    const mm = new T.Matrix4(), qa = new T.Quaternion(), ea = new T.Euler(), va = new T.Vector3(), vs = new T.Vector3();
+    const onFrame = () => { const x = (rnd() - 0.5) * Lr, t = rnd() * Math.PI, side = Math.cos(t); return [x, Math.sin(t) * 0.35 + (1 - Math.abs(side)) * (Ht - 0.35) * (0.6 + 0.4 * rnd()) + (rnd() - 0.5) * 0.15, side * span / 2 * 0.9]; };
+    for (let i = 0; i < 260; i++) { const [x, y, z] = onFrame(); ea.set(rnd() * 6.28, rnd() * 6.28, rnd() * 6.28); const k = 0.16 + rnd() * 0.14; leaves.setMatrixAt(i, mm.compose(va.set(x, y * (0.3 + 0.7 * rnd() ** 0.5), z), qa.setFromEuler(ea), vs.set(k, k, k))); }
+    for (let i = 0; i < 40; i++) { const [x, y, z] = onFrame(); flowers.setMatrixAt(i, mm.compose(va.set(x, y, z * 1.03), qa.identity(), vs.set(1, 1, 1))); }
+    for (let i = 0; i < 18; i++) { const [x, y, z] = onFrame(); ea.set((rnd() - 0.5) * 0.4, 0, (rnd() - 0.5) * 0.4); fruits.setMatrixAt(i, mm.compose(va.set(x, Math.max(0.3, y - 0.3), z * 0.92), qa.setFromEuler(ea), vs.set(1, 0.8 + rnd() * 0.5, 1))); }
+    arch.add(leaves, flowers, fruits);
   }
 
   // The old dog house in the back-left corner: weathered boards, a shingle roof gone mossy, a dark doorway
