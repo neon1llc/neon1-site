@@ -61,7 +61,9 @@ const COMMON = /* glsl */`
 const hash = /* glsl */`
   float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
   float noise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
-    return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y); }`;
+    return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y); }
+  // Octaves at turned angles, so no grid shows through
+  float fbm(vec2 p) { return 0.5 * noise(mat2(0.8, -0.6, 0.6, 0.8) * p) + 0.3 * noise(mat2(0.36, 0.93, -0.93, 0.36) * p * 2.07 + 5.2) + 0.2 * noise(mat2(-0.5, 0.87, -0.87, -0.5) * p * 4.13 + 1.7); }`;
 
 
 // ---- The ground: lawn, verge, sidewalks, road, shore, and the soil of the flower bed ----
@@ -75,6 +77,7 @@ const GROUND_FRAG = /* glsl */`
   ${SHAPE_GLSL}
   uniform vec3 uTrees[48];
   uniform vec4 uBed;
+  uniform sampler2D uLawn, uLawnN;
   varying vec3 vW;
   void main() {
     float x = vW.x, z = vW.z;
@@ -84,16 +87,28 @@ const GROUND_FRAG = /* glsl */`
     // is thin, mowing stripes that wander and fade, longer darker grass where the mower can't reach along
     // the fence, the odd dandelion, bare earth worn under the swing and along the way from the back door to
     // the garden, and autumn leaves scattered under and downwind of the trees
-    float blades = hash(floor(vW.xz * 60.0)) * 0.16;
-    float mott = noise(vW.xz * 0.21) * 0.45 + noise(vW.xz * 0.9) * 0.3 + noise(vW.xz * 3.7) * 0.25;
-    float dry = smoothstep(0.55, 0.85, noise(vW.xz * 0.12 + 7.0));
-    vec3 grass = mix(vec3(0.15, 0.3, 0.07), vec3(0.3, 0.46, 0.13), mott);
-    grass = mix(grass, vec3(0.45, 0.45, 0.2), dry * 0.55);
-    grass = mix(grass, vec3(0.1, 0.24, 0.07), smoothstep(0.62, 0.75, noise(vW.xz * 1.6 + 3.0)) * 0.6);
-    grass *= 0.9 + blades;
+    // A photographed lawn (Poly Haven's leafy grass), sampled at two scales and angles and blended by a
+    // slow noise so it never visibly tiles, its normal map catching the sun so the turf has relief
+    vec2 u1 = vW.xz / 2.0, u2 = mat2(0.8, -0.6, 0.6, 0.8) * vW.xz / 3.3 + 0.37;
+    float pick = smoothstep(0.35, 0.65, noise(vW.xz * 0.18));
+    vec3 photo = mix(texture2D(uLawn, u1).rgb, texture2D(uLawn, u2).rgb, pick);
+    vec3 tn = mix(texture2D(uLawnN, u1).rgb, texture2D(uLawnN, u2).rgb, pick) * 2.0 - 1.0;
+    float mott = fbm(vW.xz * 0.25);
+    float dry = smoothstep(0.5, 0.8, fbm(vW.xz * 0.12 + 7.0));
+    // The photo's detail, by its brightness, on a lawn's greens (the photo itself is an autumn floor)
+    float lum = dot(photo, vec3(0.3, 0.55, 0.15));
+    vec3 grass = mix(vec3(0.07, 0.16, 0.03), vec3(0.3, 0.46, 0.12), clamp(lum * 1.7, 0.0, 1.0)) * mix(0.72, 1.18, mott);
+    // Clumps: a mid scale of darker, thicker tufts and thin, paler spots, so the lawn has texture from afar
+    grass *= mix(0.8, 1.12, smoothstep(0.25, 0.75, fbm(vW.xz * 2.6 + 11.0)));
+    grass = mix(grass, mix(grass, photo, 0.25) * vec3(1.25, 1.05, 0.65), dry * 0.55);
+    grass = mix(grass, grass * vec3(0.7, 0.9, 0.7), smoothstep(0.62, 0.75, noise(vW.xz * 1.6 + 3.0)) * 0.6);
     if (x > ${STRIP.fence.toFixed(1)}) {
       float wander = z + sin(x * 0.4) * 0.5 + noise(vec2(x * 0.3, 0.0)) * 0.8;
-      grass *= 0.95 + 0.07 * step(0.5, fract(wander / 1.6)) * (0.4 + 0.6 * noise(vW.xz * 0.15));
+      grass *= 0.9 + 0.16 * smoothstep(0.42, 0.58, abs(fract(wander / 3.2) * 2.0 - 1.0)) * (0.4 + 0.6 * fbm(vW.xz * 0.15));
+      // Darker, longer grass in the shade at the foot of the fence and round the beds
+      float edgeDist = min(min(x - ${YARD.back.toFixed(1)}, z - ${YARD.right.toFixed(1)}), ${YARD.left.toFixed(1)} - z);
+      grass *= mix(0.62, 1.0, smoothstep(0.0, 1.1, edgeDist));
+      grass *= mix(0.7, 1.0, smoothstep(0.0, 0.7, max(x - uBed.y, 0.0) + step(x, uBed.x) * 9.0));
       grass = mix(grass, vec3(0.12, 0.25, 0.08), smoothstep(-19.0, -19.9, x) * 0.6);
       float wear = smoothstep(1.7, 0.4, distance(vW.xz, vec2(-11.0, -4.0)) + noise(vW.xz * 3.0) * 0.6);
       vec2 a = vec2(-2.2, 1.0), b = vec2(-18.0, 6.0), ab = b - a;
@@ -105,7 +120,7 @@ const GROUND_FRAG = /* glsl */`
     grass = mix(grass, vec3(0.92, 0.75, 0.12), dande);
     float leaves = 0.0;
     for (int i = 0; i < 48; i++) leaves = max(leaves, smoothstep(uTrees[i].z * 1.1, uTrees[i].z * 0.2, distance(vW.xz, uTrees[i].xy + vec2(2.0, 1.0))));
-    float leaf = step(1.0 - leaves * 0.35, hash(floor(vW.xz * 18.0)));
+    float leaf = step(1.0 - leaves * 0.18, hash(floor(vW.xz * 18.0)));
     vec3 leafCol = mix(vec3(0.62, 0.28, 0.06), vec3(0.78, 0.55, 0.12), hash(floor(vW.xz * 18.0) + 1.7));
     grass = mix(grass, leafCol, leaf);
     vec3 col = grass;
@@ -147,7 +162,13 @@ const GROUND_FRAG = /* glsl */`
       shade = max(shade, smoothstep(uTrees[i].z * 0.42, uTrees[i].z * 0.12, distance(vW.xz, c)));
     }
     col *= 1.0 - 0.45 * shade * (0.3 + 0.7 * uSun);
-    gl_FragColor = vec4(outdoor(col, vec3(0.0, 1.0, 0.0), vW), 1.0);
+    // The turf's own relief only on grass, not on paving
+    float turf = (x > ${STRIP.sidewalk1[0].toFixed(1)} || (x < ${STRIP.sidewalk2[1].toFixed(1)} && e > 4.2)) ? 1.0 : 0.0;
+    // Gentle rolls in the ground (a lawn is never flat), as a slope from a slow noise, catching the sun
+    vec2 eps = vec2(0.6, 0.0);
+    vec2 roll = vec2(noise(vW.xz * 0.23 + eps) - noise(vW.xz * 0.23 - eps), noise(vW.xz * 0.23 + eps.yx) - noise(vW.xz * 0.23 - eps.yx));
+    vec3 n = normalize(vec3((tn.x * 0.9 + roll.x * 3.0) * turf, 1.0, (-tn.y * 0.9 + roll.y * 3.0) * turf));
+    gl_FragColor = vec4(outdoor(col, n, vW), 1.0);
   }`;
 
 // ---- Water ----
@@ -292,9 +313,11 @@ export function createWorld({ scene, touch }) {
     t.colorSpace = T.SRGBColorSpace; atlas.value = t; textures.push(t); done();
   }, undefined, () => done()));
 
-  // The ground, from the house out past the pond
+  // The ground, from the house out past the pond; the lawn photo and its relief tile
+  const tile = (name, srgb) => { const t = loader.load(`/media/white-rabbit/tex/${name}.webp`); t.wrapS = t.wrapT = T.RepeatWrapping; if (srgb) t.colorSpace = T.SRGBColorSpace; textures.push(t); return t; };
+  const lawn = tile("lawn-color", true), lawnN = tile("lawn-normal", false);
   const ground = keep(new T.Mesh(new T.PlaneGeometry(1100, 1800), new T.ShaderMaterial({
-    uniforms: { ...common, uTrees: { value: shade }, uBed: { value: new T.Vector4(...BED) } }, vertexShader: GROUND_VERT, fragmentShader: GROUND_FRAG,
+    uniforms: { ...common, uTrees: { value: shade }, uBed: { value: new T.Vector4(...BED) }, uLawn: { value: lawn }, uLawnN: { value: lawnN } }, vertexShader: GROUND_VERT, fragmentShader: GROUND_FRAG,
   })));
   ground.rotation.x = -Math.PI / 2; ground.position.set(-2.0 - 550, GROUND, 0);
 
@@ -507,9 +530,9 @@ export function createWorld({ scene, touch }) {
   const hinge = new T.Group(); hinge.position.set(SWING[0], SWING[1] + PIVOT, SWING[2]); hinge.rotation.y = Math.atan2(SWING_TO[0], SWING_TO[2]); keep(hinge);
   const seat = new T.Group(); hinge.add(seat);
   sprite("/media/white-rabbit/yard-swing-seat.webp", SW, SH, [0, -PIVOT, 0.01], null, 0, seat);
-  // The garden's card lies along its row (the back fence), widened by the slant it was rendered at, so its
-  // two ends stay at their true depths
-  sprite("/media/white-rabbit/yard-garden.webp", 16.51 / Math.cos(Math.atan2(6.4, 17.05)), 4.5, [(BED[0] + BED[1]) / 2, GROUND, (BED[2] + BED[3]) / 2], [1, 0, 0], 1);
+  // The garden was rendered square on to its row and lies along it (the back fence), so both its ends
+  // stand at their true depths from any view
+  sprite("/media/white-rabbit/yard-garden.webp", 17.28, 3.25, [(BED[0] + BED[1]) / 2, GROUND, (BED[2] + BED[3]) / 2 + 0.29], [1, 0, 0], 1);
 
   // Ducks: a few mallards and one white duck, each paddling a slow loop of its own near the near bank
   const ducks = [], drake = solid("#5A4632"), hen = solid("#7A6046"), green = solid("#1F4F2E"), white = solid("#F2F0E8"), bill = solid("#E0A028");
