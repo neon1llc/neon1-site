@@ -134,7 +134,7 @@ function beams(win) {
 // are tiny fibres, straight or bent, that turn as they float
 const DUST_VERT = /* glsl */`
   uniform float uLevel, uTime, uSize, uGust, uGustLate, uOpen;
-  uniform vec3 uLight;
+  uniform vec3 uLight, uStir;
   attribute vec4 aSeed;
   varying float vA, vShape, vTurn, vSoft;
   void main() {
@@ -145,7 +145,10 @@ const DUST_VERT = /* glsl */`
     // The wind: in through the window (+x), gusty and erratic near it, arriving later and gentler farther in
     float near = smoothstep(2.4, 0.2, distance(home, vec3(-1.95, 1.4, 0.6)));
     float g = mix(uGustLate, uGust, near) * (0.25 + 0.75 * uOpen);
-    p += vec3(0.35 * near + 0.12, sin(uTime * 2.7 + s.x * 30.0) * 0.08, sin(uTime * 3.3 + s.z * 30.0) * 0.14 * near) * g;
+    p += vec3(0.22 * near + 0.08, sin(uTime * 1.1 + s.x * 30.0) * 0.05, sin(uTime * 1.4 + s.z * 30.0) * 0.08 * near) * g;
+    // Moving through the air pushes the motes near the camera along, swirling a little
+    float wake = smoothstep(1.0, 0.15, distance(p, cameraPosition));
+    p += (uStir * 0.18 + vec3(sin(uTime * 3.0 + s.y * 20.0), sin(uTime * 2.3 + s.x * 20.0), cos(uTime * 2.7 + s.z * 20.0)) * length(uStir) * 0.04) * wake;
     vec4 w = modelMatrix * vec4(p, 1.0);
     // In a beam? Trace toward the sun to the window wall and check the opening
     float t = (-1.95 - w.x) / min(uLight.x, -1e-3);
@@ -191,7 +194,7 @@ function dust(win, count) {
   geo.setAttribute("position", new T.Float32BufferAttribute(pos, 3));
   geo.setAttribute("aSeed", new T.Float32BufferAttribute(seed, 4));
   const mat = new T.ShaderMaterial({
-    uniforms: { uLevel: { value: 0 }, uTime: { value: 0 }, uSize: { value: 4 }, uLight: { value: LIGHT }, uGust: { value: 0 }, uGustLate: { value: 0 }, uOpen: { value: 0 } },
+    uniforms: { uLevel: { value: 0 }, uTime: { value: 0 }, uSize: { value: 4 }, uLight: { value: LIGHT }, uGust: { value: 0 }, uGustLate: { value: 0 }, uOpen: { value: 0 }, uStir: { value: new T.Vector3() } },
     vertexShader: DUST_VERT, fragmentShader: DUST_FRAG, transparent: true, blending: T.AdditiveBlending, depthWrite: false,
   });
   const points = new T.Points(geo, mat);
@@ -337,5 +340,5 @@ export function createSky({ scene, win, touch }) {
   // Frees the layers' images; the meshes go with the scene
   function dispose() { textures.forEach((t) => t.dispose()); }
 
-  return { update, aim, block, dispose, ready, get sun() { return sun; }, get wind() { return wind; }, get phase() { return phase; }, set open(v) { open = v; } };
+  return { update, aim, block, dispose, ready, get sun() { return sun; }, get wind() { return wind; }, get phase() { return phase; }, set open(v) { open = v; }, set stir(v) { motes.material.uniforms.uStir.value.lerp(v, 0.2); } };
 }
