@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.14.3
+
+- Each process step's dot lines up with its green number.
+
 ## v0.14.2
 
 - The window's lower sash is raised about 40%, so the opening below it looks straight out at the trees.

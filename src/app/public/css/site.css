@@ -222,7 +222,8 @@ h2 .pr { display: inline-block; width: .7ex; height: 1ex; margin-right: .3em; ve
 .timeline { display: block; border-left: 1px solid rgba(18,36,26,.16); margin-left: 6px; }
 .timeline div { position: relative; border: 0; padding: 0 0 clamp(14px, 2.6vh, 28px) 32px; }
 .timeline div:last-child { padding-bottom: 0; }
-.timeline div::after { content: ""; position: absolute; left: -5px; top: 6px; width: 9px; height: 9px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 0 4px var(--paper); }
+.timeline div::after { content: ""; position: absolute; left: -5px; top: 5px; width: 9px; height: 9px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 0 4px var(--paper); }
+.timeline div::before { display: block; line-height: 20px; }
 .timeline h3 { font-size: 18px; margin: 2px 0 4px; }
 .timeline p { font-size: 15.5px; line-height: 1.5; max-width: 640px; }
 @media (max-width: 760px) { .split { grid-template-columns: 1fr; gap: 8px; } .split h2 { position: static; } }
