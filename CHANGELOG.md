@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.19.5
+
+- The white rabbit loads its art by release version, so browsers holding year-long cached copies pick up the current yard instead of an old one.
+
 ## v0.19.4
 
 - The pear tree's mint circle is 15% smaller and sits about 2 feet farther back and 1 foot to the left.
