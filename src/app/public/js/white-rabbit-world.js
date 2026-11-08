@@ -596,12 +596,12 @@ export function createWorld({ scene, touch }) {
     return mesh;
   };
   // On the concrete in line with the greenhouse and the trellis square, just past the square toward the
-  // house, with its riders facing left (both cards mirrored); it swings left and right
-  const SWING = [-14.9, GROUND, (GREEN.z0 + GREEN.z1) / 2 + 0.6], SWING_TO = [14.8, 0, 8.0], SW = 2.48 * 1.04, SH = 2.92, PIVOT = 0.848 * SH;
-  sprite("/media/white-rabbit/yard-swing.webp", SW, SH, SWING, SWING_TO).scale.x = -1;
+  // house, with its riders facing left (rendered turned around, frame and seat together); it swings left and right
+  const SWING = [-14.5, GROUND, (GREEN.z0 + GREEN.z1) / 2 + 0.6], SWING_TO = [14.8, 0, 8.0], SW = 2.48 * 1.04, SH = 3.02, PIVOT = 0.812 * SH;
+  sprite("/media/white-rabbit/yard-swing.webp", SW, SH, SWING, SWING_TO);
   const hinge = new T.Group(); hinge.position.set(SWING[0], SWING[1] + PIVOT, SWING[2]); hinge.rotation.y = Math.atan2(SWING_TO[0], SWING_TO[2]); keep(hinge);
   const seat = new T.Group(); hinge.add(seat);
-  sprite("/media/white-rabbit/yard-swing-seat.webp", SW, SH, [0, -PIVOT, 0.01], null, 0, seat).scale.x = -1;
+  sprite("/media/white-rabbit/yard-swing-seat.webp", SW, SH, [0, -PIVOT, 0.01], null, 0, seat);
   // The garden was rendered square on to its row and lies along it (the back fence), so both its ends
   // stand at their true depths from any view
   sprite("/media/white-rabbit/yard-garden.webp", 17.04, 2.99, [(BED[0] + BED[1]) / 2, GROUND - 0.32, (BED[2] + BED[3]) / 2 + 0.17], [1, 0, 0], 1);   // set into the soil
