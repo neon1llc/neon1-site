@@ -92,23 +92,64 @@ function rug() {
   });
 }
 
-// The rug's pile as tufts: each texel a fibre's height (0 to 1) in red, clumped a little so tufts
-// stand together, tiling seamlessly; the pile shells keep a texel only while it is taller than their layer
+// The rug's pile as shag strands seen from above: each strand a small disc whose red is its height,
+// highest at its middle and falling to the rim, so a shell at height L keeps a smaller disc the higher it
+// is and strands taper to rounded tips; green is each strand's own shade. A low floor of red keeps the
+// roots dense. Tiles seamlessly
 function fibres() {
-  const n = 256, r = seeded(11), hi = new Float32Array(n * n);
-  for (let i = 0; i < n * n; i++) hi[i] = r();
+  const n = 256, r = seeded(11), red = new Float32Array(n * n).fill(0.06), green = new Float32Array(n * n).fill(0.5);
+  for (let k = 0; k < 3600; k++) {
+    const cx = r() * n, cy = r() * n, rad = 1.4 + r() * 1.1, tall = 0.55 + r() * 0.45, tone = r();
+    for (let dy = -3; dy <= 3; dy++) for (let dx = -3; dx <= 3; dx++) {
+      const x = Math.floor(cx) + dx, y = Math.floor(cy) + dy, d = Math.hypot(x + 0.5 - cx, y + 0.5 - cy) / rad;
+      if (d >= 1) continue;
+      const i = ((y + n) % n) * n + ((x + n) % n), v = tall * (1 - d * d * d);
+      if (v > red[i]) { red[i] = v; green[i] = tone; }
+    }
+  }
   const c = document.createElement("canvas"); c.width = c.height = n;
   const g = c.getContext("2d"), img = g.createImageData(n, n);
-  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
-    const at = (dx, dy) => hi[((y + dy + n) % n) * n + ((x + dx + n) % n)];
-    const v = Math.min(1, 0.55 * at(0, 0) + 0.15 * (at(1, 0) + at(0, 1) + at(-1, 0) + at(0, -1)) * 0.75 + 0.05);
-    const k = (y * n + x) * 4;
-    img.data[k] = img.data[k + 1] = img.data[k + 2] = Math.round(v * 255); img.data[k + 3] = 255;
-  }
+  for (let i = 0; i < n * n; i++) { img.data[i * 4] = Math.round(red[i] * 255); img.data[i * 4 + 1] = Math.round(green[i] * 255); img.data[i * 4 + 3] = 255; }
   g.putImageData(img, 0, 0);
   const t = new T.CanvasTexture(c);
   t.wrapS = t.wrapT = T.RepeatWrapping;
   return t;
+}
+
+// The rug's backing: a rounded rectangle w by d, flat at height h in the middle and easing down over its
+// outer `rim` in a soft shoulder to a hair off the floor, then a lip of that hair to the floor; rings of
+// the outline at growing insets, the middle filled from its center. Top only, since it lies on the floor
+function backing(w, d, h, rim, radius) {
+  const A = w / 2, B = d / 2, M = 6, rings = 8, pos = [], uv = [], idx = [];
+  const lift = (u) => 0.0015 + (h - 0.0015) * (1 - (1 - u) ** 2.4) * (0.5 - 0.5 * Math.cos(Math.min(1, u * 1.4) * Math.PI)) ** 0.25;
+  const vert = (x, y, z) => { pos.push(x, y, z); uv.push((x + A) / w, 1 - (z + B) / d); return pos.length / 3 - 1; };
+  const ring = (t, y) => {
+    const a = A - t, b = B - t, rr = Math.max(0, radius - t), out = [];
+    for (const [sx, sz, a0] of [[1, 1, 0], [-1, 1, Math.PI / 2], [-1, -1, Math.PI], [1, -1, Math.PI * 1.5]]) {
+      for (let i = 0; i <= M; i++) {
+        const ang = a0 + (i / M) * Math.PI / 2;
+        out.push(vert(sx * (a - rr) + Math.cos(ang) * rr, y, sz * (b - rr) + Math.sin(ang) * rr));
+      }
+    }
+    return out;
+  };
+  const all = [ring(0, 0)];
+  for (let k = 0; k <= rings; k++) all.push(ring((rim * k) / rings, lift(k / rings)));
+  for (let k = 0; k < all.length - 1; k++) {
+    const o = all[k], i = all[k + 1], n = o.length;
+    for (let j = 0; j < n; j++) { const j1 = (j + 1) % n; idx.push(o[j], i[j], i[j1], o[j], i[j1], o[j1]); }
+  }
+  const last = all[all.length - 1], mid = vert(0, h, 0);
+  for (let j = 0; j < last.length; j++) idx.push(mid, last[(j + 1) % last.length], last[j]);
+  const geo = new T.BufferGeometry();
+  geo.setAttribute("position", new T.Float32BufferAttribute(pos, 3));
+  geo.setAttribute("uv", new T.Float32BufferAttribute(uv, 2));
+  // Wound so the top faces up
+  const ax = pos[last[0] * 3] - pos[mid * 3], az = pos[last[0] * 3 + 2] - pos[mid * 3 + 2], bx = pos[last[1] * 3] - pos[mid * 3], bz = pos[last[1] * 3 + 2] - pos[mid * 3 + 2];
+  if (bz * ax - bx * az < 0) for (let k = 0; k < idx.length; k += 3) [idx[k + 1], idx[k + 2]] = [idx[k + 2], idx[k + 1]];
+  geo.setIndex(idx);
+  geo.computeVertexNormals();
+  return geo;
 }
 
 // The speaker cloth behind the brass slats: a dark, fine weave
@@ -534,16 +575,16 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
   add(merged(light, standard({ color: MARK, roughness: 0.55 })));
 
   // ---- The rug, and soft shadows where things meet ----
-  // The rug: a thick slab, the backing and the roots of the pile, darker; the pile itself stands on it
-  // as thin shells (see pile below), and each foot leaves a soft contact shadow
-  const RUG = { x: 0.06, z: -1.35, w: 3.0, d: 1.9 }, SLAB = 0.026, feet = [];
+  // The rug: a thin backing, the roots of the pile, darker, easing down to the floor at its edges; the
+  // shag itself stands on it as thin shells (see pile below), and each foot leaves a soft contact shadow
+  const RUG = { x: 0.06, z: -1.35, w: 3.0, d: 1.9 }, SLAB = 0.007, feet = [];
   for (const [lx, lz] of [[-0.43, -0.22], [0.43, -0.22], [-0.43, 0.22], [0.43, 0.22]]) feet.push([sc.x + 0.06 + lx, -1.98 + lz, 0.016]);
   for (const [x, z, t] of CHAIRS) for (const [lx, lz] of CHAIR_LEGS) {
     feet.push([x + lx * Math.cos(t) + lz * Math.sin(t), z - lx * Math.sin(t) + lz * Math.cos(t), 0.022]);
   }
   const onRug = feet.filter(([fx, fz]) => Math.abs(fx - RUG.x) < RUG.w / 2 - 0.05 && Math.abs(fz - RUG.z) < RUG.d / 2 - 0.05);
   const wool = rug(), nap = photo("carpet-normal", [7, 4.5]);
-  const slab = add(merged([place(new T.RoundedBoxGeometry(RUG.w, SLAB, RUG.d, 2, 0.01), { p: [RUG.x, SLAB / 2, RUG.z] })],
+  const slab = add(merged([place(backing(RUG.w, RUG.d, SLAB, 0.07, 0.05), { p: [RUG.x, 0, RUG.z] })],
     standard({ color: "#A39C90", map: wool, normalMap: nap, normalScale: new T.Vector2(0.9, 0.9), roughness: 0.95 })));
   add(merged(onRug.map(([fx, fz, f]) => place(new T.PlaneGeometry(f * 4.5, f * 4.5), { p: [fx, SLAB + 0.002, fz], r: [-Math.PI / 2, 0, 0] })),
     new T.MeshBasicMaterial({ map: shadow(), transparent: true, depthWrite: false })));
@@ -682,33 +723,36 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
   Object.values(chair).flat().forEach((g) => g.dispose());
 
   // ---- The pile ----
-  // Thin shells over the rug's top, each a layer higher, keep only the fibres taller than their layer,
-  // so the wool has real depth and stands up at a glance. Fibres lean and curl a little, are darker
-  // toward their roots, and are pressed down around every foot on the rug, darker where crushed.
-  // Built from the slab as it ends up (after baking, with its light map), so the shells share that light
+  // Shag: thin shells over the backing, each a layer higher, keep only the strands taller than their
+  // layer, so the wool has real depth. Higher up, strands flop over in loose swirls, the way shag lies;
+  // they are darker toward their roots, each strand a shade of its own, and the pile thins to nothing
+  // over the backing's rounded edge. Around every foot on the rug the strands are pressed flat and splay
+  // out from under it, rather than the pile sinking. Built from the backing as it ends up (after baking,
+  // with its light map), so the shells share that light
   function pile() {
     const top = slab.geometry.index ? slab.geometry.toNonIndexed() : slab.geometry.clone();
     const names = ["position", "normal", "uv", "uv1"].filter((k) => top.attributes[k]);
     const keep = [], ny = top.attributes.normal;
-    for (let i = 0; i < ny.count; i += 3) if (ny.getY(i) > 0.9 && ny.getY(i + 1) > 0.9 && ny.getY(i + 2) > 0.9) keep.push(i);
-    const layers = touch ? 7 : 12, height = 0.014, out = {};
+    for (let i = 0; i < ny.count; i += 3) if (ny.getY(i) > 0.3 && ny.getY(i + 1) > 0.3 && ny.getY(i + 2) > 0.3) keep.push(i);
+    const layers = touch ? 9 : 16, height = 0.02, out = {};
     for (const k of names) out[k] = [];
-    const layer = [];
+    const layer = [], py = top.attributes.position;
     for (let l = 1; l <= layers; l++) for (const i of keep) for (let j = i; j < i + 3; j++) {
+      const k0 = Math.min(1, Math.max(0, (py.getY(j) - 0.0015) / (SLAB - 0.0015))) ** 0.8;
       for (const k of names) {
         const a = top.attributes[k];
-        for (let c = 0; c < a.itemSize; c++) out[k].push(k === "position" && c === 1 ? a.getY(j) + (height * l) / layers : a.array[j * a.itemSize + c]);
+        for (let c = 0; c < a.itemSize; c++) out[k].push(k === "position" && c === 1 ? a.getY(j) + (height * l * k0) / layers : a.array[j * a.itemSize + c]);
       }
       layer.push(l / layers);
     }
-    top.dispose();
     const geo = new T.BufferGeometry();
     for (const k of names) geo.setAttribute(k, new T.Float32BufferAttribute(out[k], top.attributes[k].itemSize));
     geo.setAttribute("aLayer", new T.Float32BufferAttribute(layer, 1));
+    top.dispose();
     const fibre = fibres();
-    fibre.repeat.set(RUG.w * 280 / 256, RUG.d * 280 / 256);
+    fibre.repeat.set((RUG.w * 400) / 256, (RUG.d * 400) / 256);
     const src = slab.material, feetOn = onRug.slice(0, 16);
-    const mat = standard({ map: wool, normalMap: nap, normalScale: new T.Vector2(0.6, 0.6), roughness: 0.97, aoMap: src.aoMap, aoMapIntensity: src.aoMapIntensity });
+    const mat = standard({ map: wool, normalMap: nap, normalScale: new T.Vector2(0.4, 0.4), roughness: 0.97, aoMap: src.aoMap, aoMapIntensity: src.aoMapIntensity });
     const uniforms = {
       uFibre: { value: fibre }, uRug: { value: new T.Vector4(RUG.x, RUG.z, RUG.w, RUG.d) }, uRepeat: { value: fibre.repeat },
       uFeet: { value: Array.from({ length: 16 }, (_, i) => new T.Vector3(...(feetOn[i] || [99, 99, 0]))) },
@@ -717,17 +761,27 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
       Object.assign(sh.uniforms, uniforms);
       sh.vertexShader = "attribute float aLayer;\nvarying float vLayer;\nvarying vec2 vXZ;\n" + sh.vertexShader.replace("#include <worldpos_vertex>",
         "#include <worldpos_vertex>\n  vLayer = aLayer; vXZ = (modelMatrix * vec4(transformed, 1.0)).xz;");
-      sh.fragmentShader = "uniform sampler2D uFibre;\nuniform vec4 uRug;\nuniform vec2 uRepeat;\nuniform vec3 uFeet[16];\nvarying float vLayer;\nvarying vec2 vXZ;\n" +
+      sh.fragmentShader = "uniform sampler2D uFibre;\nuniform vec4 uRug;\nuniform vec2 uRepeat;\nuniform vec3 uFeet[16];\nvarying float vLayer;\nvarying vec2 vXZ;\nfloat vShade;\n" +
         sh.fragmentShader.replace("#include <clipping_planes_fragment>", `#include <clipping_planes_fragment>
   vec2 fuv = (vXZ - uRug.xy) / uRug.zw * uRepeat;
-  fuv += vLayer * vLayer * vec2(0.18 * sin(fuv.y * 0.9 + fuv.x * 0.4), 0.18 * cos(fuv.x * 0.8 - fuv.y * 0.3)) / 40.0;
-  float press = 0.0;
-  for (int i = 0; i < 16; i++) { float d = distance(vXZ, uFeet[i].xy); press = max(press, 1.0 - smoothstep(uFeet[i].z * 1.1, uFeet[i].z * 2.8, d)); }
-  float tall = texture2D(uFibre, fuv).r * (1.0 - 0.88 * press);
-  if (tall < vLayer) discard;`).replace("#include <color_fragment>", `#include <color_fragment>
-  diffuseColor.rgb *= (0.62 + 0.38 * vLayer) * (1.0 - 0.18 * press);`);
+  // Shag flops over in loose swirls, more the higher up a strand
+  float flop = vLayer * sqrt(vLayer);
+  vec2 lie = vec2(sin(vXZ.x * 31.0 + sin(vXZ.y * 17.0) * 2.0), cos(vXZ.y * 27.0 + sin(vXZ.x * 13.0) * 2.0));
+  fuv += lie * flop * (3.5 / 256.0);
+  // Feet press the strands flat: they lie down, splayed outward from under the foot
+  float press = 0.0; vec2 away = vec2(0.0);
+  for (int i = 0; i < 16; i++) {
+    vec2 dv = vXZ - uFeet[i].xy; float d = length(dv);
+    float k = 1.0 - smoothstep(uFeet[i].z * 1.0, uFeet[i].z * 3.2, d);
+    if (k > press) { press = k; away = dv / max(d, 1e-4); }
+  }
+  fuv -= away * press * vLayer * (9.0 / 256.0);
+  vec4 fib = texture2D(uFibre, fuv);
+  if (fib.r * (1.0 - 0.8 * press) < vLayer) discard;
+  vShade = (0.68 + 0.32 * vLayer) * (0.9 + 0.2 * fib.g) * (1.0 + 0.08 * press);`).replace("#include <color_fragment>", `#include <color_fragment>
+  diffuseColor.rgb *= vShade;`);
     };
-    mat.customProgramCacheKey = () => "rug-pile";
+    mat.customProgramCacheKey = () => "rug-shag";
     const mesh = new T.Mesh(geo, mat);
     mesh.receiveShadow = true;
     mesh.userData.room = true;
