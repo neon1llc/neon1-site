@@ -18,6 +18,8 @@
     document.body.classList.add("leaving");
     setTimeout(() => (location.href = a.href), 450);
   }));
+  // Coming back with the browser's Back button restores the page as it was left, faded out; undo the fade
+  addEventListener("pageshow", (e) => { if (e.persisted) document.body.classList.remove("leaving"); });
 
   // ---- Menu: open/close, Esc, close on link; returns focus to the button ----
   // The page behind an open menu is inert, so Tab moves only between the menu and its button.

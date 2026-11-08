@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.29.1
+
+- Back from 1NEON to neon1.tech shows the page again. The fade on the way out had stayed on when the browser restored the page.
+- Opening Neo no longer puts the cursor in the question box, so phones keep the keyboard down until you tap in.
+
 ## v0.29.0
 
 - The yard is rescaled to the photo from the window. Measured from that photo, the back fence is about 14 m from the house, not 28 m, so everything past the deck pulls 14 m closer: the lawn, the concrete, and the stone bed are all about half as long as before.

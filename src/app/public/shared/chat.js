@@ -176,7 +176,9 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
         panel.classList.add("n1chat-grow");
         panel.addEventListener("animationend", () => panel.classList.remove("n1chat-grow"), { once: true });
       }
-      input.focus({ preventScroll: true });
+      // Focus lands on the window, not the box, so phones don't raise the keyboard until someone taps in
+      if (!panel.hasAttribute("tabindex")) panel.tabIndex = -1;
+      panel.focus({ preventScroll: true });
       return;
     }
 
@@ -201,7 +203,6 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
     history.length = 0;
     log.replaceChildren(hello, chips);
     chips.hidden = false;
-    input.focus();
   });
 
   // Enter sends, Shift+Enter adds a line

@@ -81,6 +81,8 @@
 
 .n1chat-launch:focus-visible, .n1chat button:focus-visible, .n1chat a:focus-visible, .n1chat-input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .n1chat-launch.n1chat-light:focus-visible { outline-color: var(--brand); }
+/* The window takes focus when it opens (not the box, so phones keep the keyboard down); no ring for that */
+.n1chat:focus { outline: none; }
 
 /* ---- Motion: the window grows up out of the launcher's circle and folds back into it;
  * messages slide up into place ---- */
