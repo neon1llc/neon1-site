@@ -2,6 +2,14 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.24.0
+
+- The white rabbit's ending: squared up at the window with the sash all the way up, the view leans left toward the car to look right and down over the concrete and greenhouse, then right to look left and down over the lawn and the stockade, then glides straight in until the frame is gone and only the yard is ahead. It holds there for a pause of scrolling before the white. The trip down to the grass is gone.
+- The stone bed is tan split-face retaining block in three courses, as in the photos.
+- The lawn has real grass blades, olive green and darker at the roots like the photos, and their tips nod in the wind.
+- Trees sway a little more, and lean harder in gusts. Leafy bushes rustle in small clumps instead of swaying.
+- The ticking sound that followed the wind is gone.
+
 ## v0.23.1
 
 - The "ask neon1" window offers four starting questions, a "new" button to start over, and a line under the question box to book a free call or send an email, so a person is always one click away.

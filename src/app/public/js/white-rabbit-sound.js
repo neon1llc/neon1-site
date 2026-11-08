@@ -90,20 +90,7 @@ export function createSound(ctx) {
   echo.connect(damp); echo2.connect(damp); damp.connect(feed); feed.connect(echo2);
   const birdsSend = gain(0.22, echo);
   // No steady breeze or creek bed: as the window opened they read as plain white noise, so the outdoors
-  // is only the rustle of leaves in the gusts and the birds
-
-  // A one-shot noise grain: a leaf ticking against others, short, bright, and placed left or right
-  function grain(level) {
-    const t = now(), len = 0.012 + Math.random() * 0.045;
-    const src = ctx.createBufferSource(); src.buffer = noise;
-    const band = ctx.createBiquadFilter(); band.type = "bandpass"; band.frequency.value = 2000 + Math.random() * 4000; band.Q.value = 1.2 + Math.random() * 2;
-    const pan = ctx.createStereoPanner(); pan.pan.value = Math.random() * 1.8 - 0.9;
-    const g = ctx.createGain(); g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(level, t + 0.002); g.gain.exponentialRampToValueAtTime(0.0001, t + len);
-    src.connect(band).connect(g).connect(pan).connect(through);
-    src.start(t, Math.random() * 1.8, len + 0.01);
-    src.onended = () => pan.disconnect();
-  }
+  // is only the birds (the leaf-tick grains that followed the wind are gone too: they read as clicking)
 
   // A bird: a pure tone through a gain envelope, gliding between pitches; notes are [start, length,
   // from Hz, to Hz, level]; far birds are quieter and duller, and every bird sits left or right
@@ -141,7 +128,7 @@ export function createSound(ctx) {
   let nextBird = 2 + Math.random() * 5;
 
   // Outside, each frame: the wind (g, 0 calm to 1 at a gust's peak, the same wind that moves the trees)
-  // swells the breeze with grains of rustle thickest at its peak, birds sing now and then, and the
+  // swells the breeze (no ticking grains: they read as clicks), birds sing now and then, and the
   // window's openness sets how much of it reaches the room
   let last = 0;
   function outdoors(level, openness, g) {
@@ -150,7 +137,6 @@ export function createSound(ctx) {
     glide(outside.gain, level, 0.4);
     glide(through.frequency, 700 + 8000 * openness * openness, 0.3);
     if (level < 0.01) return;
-    for (let n = dt * (6 + 140 * g); n > 0; n--) if (Math.random() < n) grain(0.02 + 0.05 * g * Math.random());
     if (t > nextBird) { bird(songs[Math.random() * songs.length | 0](), Math.random()); nextBird = t + 4 + Math.random() * 11; }
   }
 

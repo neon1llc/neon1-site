@@ -46,11 +46,16 @@ const BEATS = [
   [0.72, [-0.7, 1.55, 0.62], [-1.95, 1.38, 0.6], 50],            // square to it
   [0.79, [-0.72, 1.55, 0.6], [-1.95, 1.35, 0.6], 50],            // looking out
   [0.85, [-0.95, 1.5, 0.6], [-2.4, 1.2, 0.6], 50],               // a step closer, the sash going up (see OPEN)
-  [0.89, [-0.98, 1.45, 0.6], [-2.8, 1.1, 0.6], 50],              // a breath
-  [0.93, [-1.95, 1.12, 0.6], [-3.2, 1.05, 0.6], 52],             // through the opening
-  [0.945, [-2.35, 1.1, 0.6], [-3.6, 1.0, 0.6], 52],              // outside
-  [0.985, [-2.37, 1.1, 0.62], [-3.6, 1.0, 0.58], 52],            // a long look at it all, before the white
-  [1, [-2.38, 1.1, 0.62], [-3.6, 1.0, 0.58], 52],
+  // then, with the sash all the way up: leaning left toward the car, looking right and down through the opening to
+  // the concrete, the greenhouse, and the right fence; across to the right, looking left and down at the lawn,
+  // the left border, and the stockade; and back to center, square to the window, gliding in until the frame is
+  // gone and only the yard is ahead, held there before the white
+  [0.875, [-1.05, 1.47, 1.12], [-3.3, 0.45, -0.5], 52], [0.885, [-1.06, 1.47, 1.12], [-3.3, 0.44, -0.52], 52],
+  [0.915, [-1.05, 1.47, 0.08], [-3.3, 0.45, 1.7], 52], [0.925, [-1.06, 1.47, 0.08], [-3.3, 0.44, 1.72], 52],
+  [0.945, [-1.55, 1.3, 0.6], [-3.1, 1.02, 0.6], 52],
+  [0.97, [-2.37, 1.1, 0.62], [-3.6, 1.0, 0.6], 52],             // through the opening: the yard straight on
+  [0.985, [-2.37, 1.1, 0.62], [-3.6, 1.0, 0.6], 52],            // held, before the white
+  [1, [-2.37, 1.1, 0.62], [-3.6, 1.0, 0.6], 52],
 ];
 const KEYS = BEATS.map((b) => b[0]), FOV = BEATS.map((b) => b[3]), LOOK = BEATS.map((b) => b[2]);
 // The sash starts a little up and goes the rest of the way as the camera steps closer
@@ -61,29 +66,14 @@ const WALK = [0.59, 0.72], STEPS = 7;
 // The lighting, screen, and grade below were timed on an earlier, shorter walk; this maps progress
 // onto that timeline (the room appearing, the window coming into view, the white-out)
 const LEGACY = [[0, 0], [0.09, 0.28], [0.17, 0.4], [0.33, 0.6], [0.64, 0.82], [0.89, 0.94], [0.985, 0.95], [1, 1]];
-// The scroll's whole span (q) holds the walk above (its progress, pr) for most of its length, then, once
-// outside, a long look: a pan right to the sidewalk and the cross street, a pan left to the neighbor's,
-// back to center, and down over the deck rail to the lawn, to touch the grass, before the white
-const WALKED = 0.64, LOOKED = 0.975;
+// The scroll's whole span (q) runs the walk (its progress, pr) straight through to the yard, then holds the
+// view outside for a pause of scrolling (HOLD), and the last stretch whitens
+const HOLD = [0.94, 0.975];
 function progress(q) {
-  if (q <= WALKED) return (q / WALKED) * 0.945;
-  if (q <= LOOKED) return 0.945 + ((q - WALKED) / (LOOKED - WALKED)) * 0.04;
-  return 0.985 + ((q - LOOKED) / (1 - LOOKED)) * 0.015;
+  if (q <= HOLD[0]) return (q / HOLD[0]) * 0.97;
+  if (q <= HOLD[1]) return 0.97 + ((q - HOLD[0]) / (HOLD[1] - HOLD[0])) * 0.015;
+  return 0.985 + ((q - HOLD[1]) / (1 - HOLD[1])) * 0.015;
 }
-const GROUND_Y = -4.3;
-const OUTSIDE = [
-  [WALKED, [-2.35, 1.1, 0.6], [-3.6, 1.0, 0.6], 52],
-  [0.68, [-2.37, 1.1, 0.62], [-3.6, 1.0, 0.58], 52],                 // a look straight out
-  [0.735, [-2.9, 1.1, 0.5], [-4.1, 0.75, -0.75], 56],                // panning right: the sidewalk and the cross street
-  [0.77, [-2.9, 1.1, 0.49], [-4.1, 0.74, -0.78], 56],
-  [0.835, [-2.9, 1.1, 0.75], [-4.1, 0.75, 2.0], 56],                 // and left: the neighbor's
-  [0.87, [-2.9, 1.1, 0.76], [-4.1, 0.74, 2.03], 56],
-  [0.9, [-3.2, 0.6, 1.6], [-5.0, -0.6, 2.6], 56],                    // out, over the deck
-  [0.93, [-8.6, -1.6, 6.8], [-11.5, -3.3, 7.4], 56],
-  [0.955, [-12.8, GROUND_Y + 0.75, 7.6], [-15.8, GROUND_Y + 0.2, 5.4], 58], // down to the lawn
-  [LOOKED, [-13.3, GROUND_Y + 0.42, 7.2], [-16.4, GROUND_Y + 0.05, 4.6], 60], // in the grass, the garden ahead
-  [1, [-13.32, GROUND_Y + 0.41, 7.2], [-16.4, GROUND_Y + 0.05, 4.6], 60],
-];
 function linear(p, pts) {
   if (p <= pts[0][0]) return pts[0][1];
   for (let i = 1; i < pts.length; i++) if (p <= pts[i][0]) { const [a, x] = pts[i - 1], [b, y] = pts[i]; return x + ((y - x) * (p - a)) / (b - a); }
@@ -572,9 +562,6 @@ export function createScene({ onLost, onSound = () => {} }) {
   // ---- One frame ----
   const P = new T.Vector3(), L = new T.Vector3(), D = new T.Vector3(), sunAt = new T.Vector3(), stirV = new T.Vector3(), lastCam = new T.Vector3();
   let frames = 0, spent = 0, lastFrame = 0, prev = 0, facing = 1, beat = 0, open = 0;
-  const outPos = new T.CatmullRomCurve3(OUTSIDE.map((b) => new T.Vector3(...b[1])), false, "centripetal");
-  const outLook = new T.CatmullRomCurve3(OUTSIDE.map((b) => new T.Vector3(...b[2])), false, "centripetal");
-  const OUTKEYS = OUTSIDE.map((b) => b[0]);
   function render(q, { speed = 0, still = false } = {}) {
     if (disposed || !posCurve) return;
     const pr = progress(q);
@@ -608,14 +595,6 @@ export function createScene({ onLost, onSound = () => {} }) {
       P.y -= (0.5 - 0.5 * Math.cos(ph)) * 0.028 * fade; P.z += Math.sin(ph / 2) * 0.012 * fade;
     }
     if (pr < 0.9) P.set(T.MathUtils.clamp(P.x, -1.85, 3.05), T.MathUtils.clamp(P.y, 0.2, 2.4), T.MathUtils.clamp(P.z, -2.35, 2.35));
-    // Outside, the long look takes over the camera
-    if (q > WALKED) {
-      let i = 0; while (i < OUTKEYS.length - 2 && q > OUTKEYS[i + 1]) i++;
-      const t = Math.min(1, (q - OUTKEYS[i]) / (OUTKEYS[i + 1] - OUTKEYS[i])), ts = t * t * (3 - 2 * t), u2 = (i + ts) / (OUTKEYS.length - 1);
-      outPos.getPoint(u2, P); outLook.getPoint(u2, L);
-      fov = OUTSIDE[i][3] + (OUTSIDE[i + 1][3] - OUTSIDE[i][3]) * ts;
-      fov = Math.min(Math.max(fov, wide), across);
-    }
     camera.position.copy(P); camera.lookAt(L);
     camera.rotateZ(ramp(pr, ROLL));
     camera.fov = fov; camera.aspect = aspect; camera.updateProjectionMatrix();

@@ -111,7 +111,7 @@ const GROUND_FRAG = /* glsl */`
     float dry = smoothstep(0.5, 0.8, fbm(vW.xz * 0.12 + 7.0));
     // The photo's detail, by its brightness, on a lawn's greens (the photo itself is an autumn floor)
     float lum = dot(photo, vec3(0.3, 0.55, 0.15));
-    vec3 grass = mix(vec3(0.07, 0.2, 0.035), vec3(0.3, 0.58, 0.12), clamp(lum * 1.7, 0.0, 1.0)) * mix(0.78, 1.15, mott);
+    vec3 grass = mix(vec3(0.07, 0.13, 0.04), vec3(0.27, 0.38, 0.13), clamp(lum * 1.7, 0.0, 1.0)) * mix(0.8, 1.12, mott);   // the photos' olive turf, not a bright green
     // Clumps: a mid scale of darker, thicker tufts and thin, paler spots, so the lawn has texture from afar
     grass *= mix(0.74, 1.16, smoothstep(0.25, 0.75, fbm(vW.xz * 2.6 + 11.0))) * mix(0.86, 1.1, fbm(vW.xz * 8.0 + 5.0));   // tufts at two scales, so it has depth
     grass = mix(grass, mix(grass, photo, 0.25) * vec3(1.2, 1.05, 0.7), dry * 0.22);
@@ -286,6 +286,7 @@ const TREE_VERT = /* glsl */`
   attribute vec2 aSize;
   attribute vec4 aCell;
   attribute float aSeed;
+  attribute float aBush;
   uniform float uPhase, uWind;
   varying vec2 vUv;
   varying vec3 vW;
@@ -300,10 +301,18 @@ const TREE_VERT = /* glsl */`
     // bobbing a beat apart from it. Every motion is broad (a few waves across the whole tree at most), so
     // limbs and clumps move as pieces and the picture itself never ripples
     float t = uPhase, s0 = aSeed * 6.283, g = uWind, small = 1.0 + 1.2 * (1.0 - smoothstep(1.0, 3.0, aSize.y));
-    float sway = ((0.004 + 0.022 * g) * sin(t * 0.55 + s0) + (0.002 + 0.009 * g) * sin(t * 1.3 + s0 * 1.7) + 0.018 * g * g) * small;
-    float limb = (0.0015 + 0.008 * g) * small * smoothstep(0.35, 1.0, position.y) * (0.4 + 1.6 * abs(position.x));
+    float sway = ((0.005 + 0.03 * g) * sin(t * 0.55 + s0) + (0.0025 + 0.012 * g) * sin(t * 1.3 + s0 * 1.7) + 0.03 * g * g) * small;
+    float limb = (0.002 + 0.011 * g) * small * smoothstep(0.35, 1.0, position.y) * (0.4 + 1.6 * abs(position.x));
     float lx = limb * sin(t * 1.9 + s0 * 3.1 + position.x * 2.6 + position.y * 1.7);
     float ly = limb * 0.6 * cos(t * 2.2 + s0 * 2.3 + position.x * 3.1) * abs(position.x) * 2.0;
+    // Bushes (aBush) hardly sway: they rustle, each clump of leaves stirring on its own, quick and small,
+    // more in the gusts, as if the bush were breathing
+    vec2 cellId = floor(position.xy * vec2(4.0, 8.0) + 0.5);
+    float ph = fract(sin(dot(cellId, vec2(12.9898, 78.233)) + aSeed * 17.0) * 43758.5453) * 6.283;
+    float rust = aBush * (0.006 + 0.022 * g) * smoothstep(0.1, 0.4, position.y);
+    sway *= 1.0 - 0.7 * aBush; lx *= 1.0 - 0.6 * aBush;
+    lx += rust * (sin(t * 3.3 + ph) + 0.5 * sin(t * 7.1 + ph * 2.3));
+    ly += rust * 0.7 * cos(t * 2.9 + ph * 1.7);
     vec3 w = aBase + right * (position.x * aSize.x + (sway * top + lx) * aSize.y) + vec3(0.0, (position.y + ly) * aSize.y, 0.0);
     vUv = mix(aCell.xy, aCell.zw, position.xy + vec2(0.5, 0.0));
     vW = w; vSeed = aSeed; vCell = aCell;
@@ -414,6 +423,7 @@ export function createWorld({ scene, touch }) {
   quad.setAttribute("aSize", new T.InstancedBufferAttribute(new Float32Array(size), 2));
   quad.setAttribute("aCell", new T.InstancedBufferAttribute(new Float32Array(cell), 4));
   quad.setAttribute("aSeed", new T.InstancedBufferAttribute(new Float32Array(seed), 1));
+  quad.setAttribute("aBush", new T.InstancedBufferAttribute(new Float32Array(trees.length), 1));   // trees sway, never rustle
   quad.instanceCount = trees.length;
   const atlas = { value: null };
   const treeMesh = keep(new T.Mesh(quad, new T.ShaderMaterial({ uniforms: { ...common, ...timed, uMap: atlas }, vertexShader: TREE_VERT, fragmentShader: TREE_FRAG, side: T.DoubleSide })));
@@ -451,6 +461,43 @@ export function createWorld({ scene, touch }) {
     const hole = new T.Shape(); hole.absarc(MINT[0], MINT[1], MINT[2] + 0.12, 0, Math.PI * 2, true); sh.holes.push(hole);
     const slab = keep(new T.Mesh(new T.ExtrudeGeometry(sh, { depth: SLAB, bevelEnabled: false, curveSegments: 40 }), ground.material));
     slab.rotation.x = Math.PI / 2; slab.position.y = GROUND + SLAB;
+  }
+
+  // Grass blades over the lawn, so it has a pile and is never a flat picture: tufts of six thin blades each,
+  // scattered over the lawn alone (off the beds, borders, and concrete), each turned and sized its own way,
+  // olive green going darker toward the roots as in the photos, the tips nodding in the wind
+  {
+    const zb = (x) => { let z = CURVE[0][1]; for (let i = 1; i < CURVE.length; i++) if (x < CURVE[i - 1][0]) z = CURVE[i - 1][1] + (CURVE[i][1] - CURVE[i - 1][1]) * Math.min(1, Math.max(0, (x - CURVE[i - 1][0]) / (CURVE[i][0] - CURVE[i - 1][0]))); return z; };
+    const pos = [], tip = [];
+    for (let b = 0; b < 6; b++) {
+      const a = rnd() * 6.283, r = rnd() * 0.05, bx = Math.cos(a) * r, bz = Math.sin(a) * r, h = 0.06 + rnd() * 0.07, turn = rnd() * 6.283, w = 0.006 + rnd() * 0.004;
+      const lx = Math.cos(a) * h * 0.35, lz = Math.sin(a) * h * 0.35, cx = Math.cos(turn) * w, cz = Math.sin(turn) * w;
+      pos.push(bx - cx, 0, bz - cz, bx + cx, 0, bz + cz, bx + lx, h, bz + lz); tip.push(0, 0, 1);
+    }
+    const geo = new T.InstancedBufferGeometry();
+    geo.setAttribute("position", new T.Float32BufferAttribute(pos, 3)); geo.setAttribute("aTip", new T.Float32BufferAttribute(tip, 1));
+    const off = [], N = 7000, x0 = YARD.back + SOIL + 0.12, x1 = DECK.x0 - 0.15, zl = YARD.left - SOIL - 0.1;
+    for (let i = 0; i < N * 3 && off.length < N * 4; i++) {
+      const x = x0 + rnd() * (x1 - x0), z = rnd() * 12 - 1;
+      if (z > zl + WOB(x + 7) || z < zb(x) + 0.78 || x < x0 + WOB(z + 3)) continue;
+      off.push(x, z, 0.7 + rnd() * 0.6, rnd() * 6.283);
+    }
+    geo.setAttribute("aOff", new T.InstancedBufferAttribute(new Float32Array(off), 4)); geo.instanceCount = off.length / 4;
+    const blades = keep(new T.Mesh(geo, new T.ShaderMaterial({
+      uniforms: { ...common, ...timed }, side: T.DoubleSide,
+      vertexShader: `attribute vec4 aOff; attribute float aTip; uniform float uPhase, uWind; varying vec3 vW; varying float vTip;
+        void main() { float c = cos(aOff.w), s = sin(aOff.w); vec3 p = position * aOff.z; p.xz = mat2(c, -s, s, c) * p.xz;
+          float k = aTip * (0.012 + 0.035 * uWind);
+          p.x += k * (sin(uPhase * 1.6 + aOff.x * 0.8 + aOff.y * 0.3) + 0.4 * sin(uPhase * 3.7 + aOff.y * 2.1));
+          p.z += k * 0.6 * cos(uPhase * 1.3 + aOff.y * 0.7);
+          vec3 w = vec3(aOff.x, ${GROUND.toFixed(2)}, aOff.y) + p; vW = w; vTip = aTip;
+          gl_Position = projectionMatrix * viewMatrix * vec4(w, 1.0); }`,
+      fragmentShader: `${COMMON}\n${hash}\nvarying vec3 vW; varying float vTip;
+        void main() { float patchy = fbm(vW.xz * 0.25), clump = noise(vW.xz * 2.6 + 11.0);
+          vec3 c = mix(vec3(0.05, 0.09, 0.03), vec3(0.27, 0.38, 0.13) * mix(0.8, 1.12, patchy) * mix(0.8, 1.1, clump), vTip);
+          gl_FragColor = vec4(outdoor(c, vec3(0.0, 1.0, 0.0), vW), 1.0); }`,
+    })));
+    blades.frustumCulled = false;
   }
 
   // The pond's water, cut to its outline in the shader
@@ -804,8 +851,9 @@ export function createWorld({ scene, touch }) {
   // stand at their true depths from any view
   sprite("/media/white-rabbit/yard-garden.webp", 17.04, 2.99, [(BED[0] + BED[1]) / 2, GROUND - 0.32, (BED[2] + BED[3]) / 2 + 0.17], [1, 0, 0], 1);   // set into the soil
 
-  // The stone bed: a low curving wall along CURVE of long, blocky, jagged stones, no two alike, grey and
-  // reddish, laid in two staggered courses on both faces and across both ends, filled with dirt that the
+  // The stone bed: a low curving wall along CURVE of tan split-face retaining blocks, as in the photos, each a
+  // little rough and its own shade of sun-faded tan, laid in three staggered courses on both faces and across
+  // both ends, filled with dirt that the
   // plants grow from; planted from end to end: a bushy green plant, flowers, a rose, more
   // flowers, a run of daylily leaves, and a last rose (plants rendered in Blender into one atlas; the rose
   // from Sketchfab, by RosticOstafi, CC BY 4.0; nettle, gazania, and periwinkle from Poly Haven, CC0)
@@ -819,7 +867,7 @@ export function createWorld({ scene, touch }) {
       const g = new T.BoxGeometry(1, 1, 1, 4, 2, 2).toNonIndexed(), pos = g.attributes.position, off = new Map();
       for (let i = 0; i < pos.count; i++) {
         const key = `${pos.getX(i).toFixed(3)},${pos.getY(i).toFixed(3)},${pos.getZ(i).toFixed(3)}`;
-        if (!off.has(key)) off.set(key, [(rnd() - 0.5) * 0.3, (rnd() - 0.5) * 0.34, (rnd() - 0.5) * 0.22]);
+        if (!off.has(key)) off.set(key, [(rnd() - 0.5) * 0.05, (rnd() - 0.5) * 0.07, (rnd() - 0.5) * (k === 4 ? 0.22 : 0.12)]);   // blocks: square, faces a little split and rough
         const o = off.get(key); pos.setXYZ(i, pos.getX(i) * (1 + o[0]), pos.getY(i) * (1 + o[1]) + (pos.getY(i) > 0 ? o[1] * 0.4 : 0), pos.getZ(i) + o[2] * 0.5);
       }
       g.computeVertexNormals(); return g;
@@ -831,9 +879,9 @@ export function createWorld({ scene, touch }) {
       const k = Math.floor(rnd() * 4), inst = sets[k];
       e.set((rnd() - 0.5) * 0.08, yaw + (rnd() - 0.5) * 0.1, (rnd() - 0.5) * 0.08, "YXZ");
       inst.setMatrixAt(used[k], m.compose(at0.set(x, y, z), qq.setFromEuler(e), sc0.set(sx, sy, sz)));
-      // Every stone its own grey, anywhere between a medium dark grey and a darker one
-      const g = 0.075 + rnd() * 0.075, warm = 0.98 + rnd() * 0.04;
-      inst.setColorAt(used[k]++, tint.setRGB(g * warm, g, g / warm));
+      // Every block its own sun-faded tan, a few darker with weather
+      const g = (0.34 + rnd() * 0.1) * (rnd() < 0.15 ? 0.8 : 1);
+      inst.setColorAt(used[k]++, tint.setRGB(g, g * 0.86, g * 0.64));
     };
     // Dark green moss grown into the joints: tufts in the gaps between stones and runs along the course line
     const moss = keep(new T.InstancedMesh(rough(4), mossMat, cap * 2)); let km = 0;
@@ -844,17 +892,17 @@ export function createWorld({ scene, touch }) {
       const g = 0.7 + rnd() * 0.5; moss.setColorAt(km++, tint.setRGB(0.045 * g, 0.1 * g, 0.032 * g));
     };
     // Both faces: each course walks the curve laying stones of its own lengths, so the joints never line up
-    for (const side of [-1, 1]) for (const [y0, h0] of [[0.0, 0.27], [0.25, 0.27]]) {
+    for (const side of [-1, 1]) for (const [y0, h0] of [[0.0, 0.19], [0.18, 0.19], [0.36, 0.19]]) {
       let s0 = rnd() * 0.3;
       while (s0 < len - 0.05) {
-        const L = Math.min(0.7 * (0.8 + rnd() * 0.4), len - s0), u = (s0 + L / 2) / len;
+        const L = Math.min(0.42 * (0.92 + rnd() * 0.16), len - s0), u = (s0 + L / 2) / len;
         path.getPointAt(Math.min(u, 1), p); path.getTangentAt(Math.min(u, 1), tng); nrm.set(-tng.z, 0, tng.x);
-        const th = 0.15 + rnd() * 0.16, h = h0 + (rnd() - 0.35) * 0.14, inset = W / 2 - th / 2 + (rnd() - 0.5) * 0.04;
+        const th = 0.26 + rnd() * 0.03, h = h0 + (rnd() - 0.5) * 0.015, inset = W / 2 - th / 2 + (rnd() - 0.5) * 0.02;
         const yaw = Math.atan2(tng.x, tng.z), face = inset + th / 2 - 0.01;
         lay(p.x + nrm.x * side * inset, GROUND + y0 + h / 2, p.z + nrm.z * side * inset, yaw, th, h, L + 0.04);
         // moss in the joint at this stone's end, and along the course line under the upper stones
-        if (rnd() < 0.6) { const ex = tng.x * L / 2, ez = tng.z * L / 2; tuft(p.x + nrm.x * side * face + ex, GROUND + y0 + h * (0.3 + rnd() * 0.4), p.z + nrm.z * side * face + ez, yaw, 0.05, h * (0.4 + rnd() * 0.5), 0.045 + rnd() * 0.03); }
-        if (y0 > 0.1 && rnd() < 0.5) { const o = (rnd() - 0.5) * L * 0.5; tuft(p.x + nrm.x * side * face + tng.x * o, GROUND + y0 + 0.005, p.z + nrm.z * side * face + tng.z * o, yaw, 0.045, 0.035 + rnd() * 0.02, L * (0.25 + rnd() * 0.4)); }
+        if (rnd() < 0.12) { const ex = tng.x * L / 2, ez = tng.z * L / 2; tuft(p.x + nrm.x * side * face + ex, GROUND + y0 + h * (0.3 + rnd() * 0.4), p.z + nrm.z * side * face + ez, yaw, 0.05, h * (0.4 + rnd() * 0.5), 0.045 + rnd() * 0.03); }
+        if (y0 > 0.1 && rnd() < 0.1) { const o = (rnd() - 0.5) * L * 0.5; tuft(p.x + nrm.x * side * face + tng.x * o, GROUND + y0 + 0.005, p.z + nrm.z * side * face + tng.z * o, yaw, 0.045, 0.035 + rnd() * 0.02, L * (0.25 + rnd() * 0.4)); }
         s0 += L + (rnd() - 0.5) * 0.04;
       }
     }
@@ -862,10 +910,10 @@ export function createWorld({ scene, touch }) {
     for (const u of [0, 1]) {
       path.getPointAt(u, p); path.getTangentAt(u, tng); nrm.set(-tng.z, 0, tng.x);
       const yaw = Math.atan2(nrm.x, nrm.z), back = u === 0 ? 1 : -1;
-      for (const [y0, h0] of [[0.0, 0.27], [0.25, 0.27]]) {
+      for (const [y0, h0] of [[0.0, 0.19], [0.18, 0.19], [0.36, 0.19]]) {
         let w0 = -W / 2 + rnd() * 0.15;
         while (w0 < W / 2 - 0.05) {
-          const L = Math.min(0.62 * (0.8 + rnd() * 0.4), W / 2 + 0.05 - w0), c = w0 + L / 2, th = 0.18 + rnd() * 0.08, h = h0 + (rnd() - 0.3) * 0.08;
+          const L = Math.min(0.42 * (0.92 + rnd() * 0.16), W / 2 + 0.05 - w0), c = w0 + L / 2, th = 0.26 + rnd() * 0.03, h = h0 + (rnd() - 0.5) * 0.015;
           lay(p.x + nrm.x * c + tng.x * back * th / 2, GROUND + y0 + h / 2, p.z + nrm.z * c + tng.z * back * th / 2, yaw, th, h, L + 0.03);
           w0 += L;
         }
@@ -902,10 +950,12 @@ export function createWorld({ scene, touch }) {
       const a = rnd() * 6.28, f = Math.sqrt(rnd()), r = MINT[2] * (0.15 + f * 1.1);
       items.push([f > 0.7 ? "mintLow" : "mint", MINT[0] + Math.cos(a) * r, GROUND, MINT[1] + Math.sin(a) * r, 5]);
     }
-    const base = [], size = [], cell = [], seed = [], pinks = [];
+    // Leafy bushes rustle in the wind; the trees, the flowers on their stems, and the daylilies sway
+    const BUSHY = new Set(["bush", "mint", "mintLow", "rose", "pinkrose", "andromeda", "andromedaXL", "branchy"]);
+    const base = [], size = [], cell = [], seed = [], pinks = [], bush = [];
     for (const [k, x, y, z, pink] of items) {
       const f = FLORA[k], s = 0.9 + rnd() * 0.2;
-      base.push(x, y, z); size.push(f[4] * s, f[5] * s); cell.push(f[0], f[1], f[2], f[3]); seed.push(rnd()); pinks.push(pink + (k === "rose" ? 2 : 0));
+      base.push(x, y, z); size.push(f[4] * s, f[5] * s); cell.push(f[0], f[1], f[2], f[3]); seed.push(rnd()); pinks.push(pink + (k === "rose" ? 2 : 0)); bush.push(BUSHY.has(k) ? 1 : 0);
     }
     const fq = new T.InstancedBufferGeometry();
     cardGrid(fq);
@@ -914,6 +964,7 @@ export function createWorld({ scene, touch }) {
     fq.setAttribute("aCell", new T.InstancedBufferAttribute(new Float32Array(cell), 4));
     fq.setAttribute("aSeed", new T.InstancedBufferAttribute(new Float32Array(seed), 1));
     fq.setAttribute("aPink", new T.InstancedBufferAttribute(new Float32Array(pinks), 1));
+    fq.setAttribute("aBush", new T.InstancedBufferAttribute(new Float32Array(bush), 1));
     fq.instanceCount = items.length;
     const flora = { value: null };
     loader.load("/media/white-rabbit/flora-atlas.webp", (t) => { t.colorSpace = T.SRGBColorSpace; flora.value = t; textures.push(t); });
