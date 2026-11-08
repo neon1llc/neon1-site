@@ -966,10 +966,10 @@ export function createWorld({ scene, touch }) {
       pinkrose: [0.7964, 0.5, 0.9531, 1.0, 1.3, 2.1], daylily: [0.0, 0.0, 0.25, 0.2627, 1.25, 0.62], crepe: [0.2788, 0.0, 0.4707, 0.5, 4.4, 5.8], pear: [0.5054, 0.0, 0.7437, 0.5, 5.25, 5.5] };
     // As the photos have it, planted thick: a crowd of color at the deck end (marigolds and cosmos), then the
     // bed filled on up its length, two staggered rows of daylily leaves, mint, bushy plants, roses, and more
-    // flowers, with the long-leafed spiky shrub (built below) at the far end
+    // flowers, with the long-leafed spiky shrub (built below) at the deck end, before the flowers
     const plan = [], near = ["flowersA", "flowersB", "flowersA", "flowersB", "flowersA", "flowersB", "daylily", "flowersB"];
     const along = ["daylily", "flowersB", "mint", "bush", "flowersA", "daylily", "mintLow", "bush", "flowersB", "rose", "daylily", "mint"];
-    for (let i = 0, u = 0.02; u < 0.93; i++, u += u < 0.22 ? 0.016 : 0.024) plan.push([u < 0.22 ? near[i % near.length] : along[i % along.length], u, i % 2 ? 1 : -1]);
+    for (let i = 0, u = 0.075; u < 0.95; i++, u += u < 0.22 ? 0.016 : 0.024) plan.push([u < 0.22 ? near[i % near.length] : along[i % along.length], u, i % 2 ? 1 : -1]);
     const tan = new T.Vector3();
     const items = plan.map(([k, u, side]) => {
       path.getPointAt(u, p); path.getTangentAt(u, tan);
@@ -977,16 +977,17 @@ export function createWorld({ scene, touch }) {
       return [k, p.x - tan.z * off + (rnd() - 0.5) * 0.08, GROUND + Hb - 0.05, p.z + tan.x * off + (rnd() - 0.5) * 0.08, k === "mint" ? 5 : 0];
     });
     items.push(["crepe", YARD.back + 0.9, GROUND, YARD.right + 0.9, 1], ["pear", MINT[0], GROUND, MINT[1], 0]);
-    // At the bed's far end, a full, spiky shrub of long, stiff, sword-like leaves, like a much longer-leafed agave,
+    // At the bed's deck end, a full, spiky shrub of long, stiff, sword-like leaves, like a much longer-leafed agave,
     // all one green a little darker than the lawn: each leaf a slim tapered blade, folded down its middle, that
-    // rises from the crown and arches out, long ones outside and short ones upright at the heart
+    // rises from the crown and arches out, short ones upright at the heart and many long outer ones bending over
+    // and down to the plant's foot, so it reads as a full, frilled mound
     {
-      path.getPointAt(0.985, p);
-      const pos = [], N = 70;
+      path.getPointAt(0.02, p);
+      const pos = [], N = 130;
       for (let i = 0; i < N; i++) {
-        const a = i * 2.39996 + rnd() * 0.3, t = i / N, tilt = 0.12 + 1.05 * t + (rnd() - 0.5) * 0.12;   // inner leaves upright, outer ones splayed
-        const L = 0.55 + 0.75 * t + rnd() * 0.25, w = 0.045 + 0.02 * rnd(), droop = 0.18 * t;
-        const ca = Math.cos(a), sa = Math.sin(a), seg = 4, pts = [];
+        const a = i * 2.39996 + rnd() * 0.3, t = i / N, tilt = 0.1 + 1.0 * t + (rnd() - 0.5) * 0.12;   // inner leaves upright, outer ones splayed
+        const L = 0.5 + 0.8 * t + rnd() * 0.25, w = 0.04 + 0.02 * rnd(), droop = t < 0.45 ? 0.2 * t : 0.4 + 1.9 * (t - 0.45) + rnd() * 0.3;   // the outer half arcs over and down
+        const ca = Math.cos(a), sa = Math.sin(a), seg = 6, pts = [];
         for (let k = 0; k <= seg; k++) {
           const f = k / seg, ang = tilt + droop * f * f, r = L * f * Math.sin(ang), y = L * f * Math.cos(ang) - 0.05 * t * f * f * L;
           const half = w * (1 - f) * (k === seg ? 0 : 1);
@@ -999,7 +1000,7 @@ export function createWorld({ scene, touch }) {
       }
       const g = new T.BufferGeometry(); g.setAttribute("position", new T.Float32BufferAttribute(pos, 3)); g.computeVertexNormals();
       const mat = solid("#2C5424", 0.5); mat.side = T.DoubleSide;
-      const agave = keep(new T.Mesh(g, mat)); agave.position.set(p.x, GROUND + Hb - 0.08, p.z); agave.scale.setScalar(1.4);
+      const agave = keep(new T.Mesh(g, mat)); agave.position.set(p.x, GROUND + Hb - 0.08, p.z); agave.scale.setScalar(1.25);
     }
     // An andromeda behind the greenhouse; and the left border, from the back corner toward the house: the dog
     // house (built below), a huge Japanese andromeda, a smaller bush on long thick branches with its leaves

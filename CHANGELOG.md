@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.30.3
+
+- The spiky shrub moves to the stone bed's deck end, with the flowers starting just past it. It is fuller, and its outer leaves arch over and down to the plant's foot.
+
 ## v0.30.2
 
 - The deck runs left to the left border's soil, in place of the edging that sat between the lawn and the mulch beside it. Its front stairs are centered on the lawn.
