@@ -126,11 +126,12 @@ const GROUND_FRAG = /* glsl */`
       float path = smoothstep(0.55, 0.15, distance(vW.xz, a + ab * t) + (noise(vW.xz * 2.0) - 0.5) * 0.5) * 0.55;
       grass = mix(grass, vec3(0.36, 0.3, 0.2) * (0.8 + 0.4 * hash(floor(vW.xz * 25.0))), max(wear * 0.85, path));
     }
-    float dande = step(0.9965, hash(floor(vW.xz * 7.0))) * step(0.4, noise(vW.xz * 0.5));
+    float dande = step(0.9965, hash(floor(vW.xz * 7.0))) * step(0.4, noise(vW.xz * 0.5)) * smoothstep(0.2, 0.12, length(fract(vW.xz * 7.0) - 0.5));   // round flower heads
     grass = mix(grass, vec3(0.92, 0.75, 0.12), dande);
     float leaves = 0.0;
     for (int i = 0; i < 48; i++) leaves = max(leaves, smoothstep(uTrees[i].z * 1.1, uTrees[i].z * 0.2, distance(vW.xz, uTrees[i].xy + vec2(2.0, 1.0))));
-    float leaf = step(1.0 - leaves * 0.18, hash(floor(vW.xz * 18.0)));
+    float la = hash(floor(vW.xz * 18.0) + 3.1) * 6.283; vec2 lc = fract(vW.xz * 18.0) - 0.5; lc = mat2(cos(la), -sin(la), sin(la), cos(la)) * lc;
+    float leaf = step(1.0 - leaves * 0.18, hash(floor(vW.xz * 18.0))) * smoothstep(0.42, 0.36, length(lc * vec2(1.0, 2.2)));   // fallen leaves, each its own way round
     vec3 leafCol = mix(vec3(0.62, 0.28, 0.06), vec3(0.78, 0.55, 0.12), hash(floor(vW.xz * 18.0) + 1.7));
     grass = mix(grass, leafCol, leaf);
     vec3 col = grass;
@@ -319,6 +320,7 @@ const BREATHE = /* glsl */`
   }`;
 const TREE_FRAG = /* glsl */`
   ${COMMON}
+  ${hash}
   ${BREATHE}
   uniform sampler2D uMap;
   varying vec2 vUv;
@@ -327,6 +329,10 @@ const TREE_FRAG = /* glsl */`
   void main() {
     vec4 c = texture2D(uMap, breathe(vUv, vSeed, 0.006));
     if (c.a < 0.45) discard;
+    // About a third of the trees wear mixed autumn leaves: patches of the crown turned redder, others more gold
+    vec2 L = (vUv - vCell.xy) / (vCell.zw - vCell.xy);
+    float mixed = step(0.66, fract(vSeed * 5.3)), leaf = hash(floor(L * vec2(18.0, 22.0) + vSeed * 40.0));
+    c.rgb *= mix(vec3(1.0), leaf < 0.33 ? vec3(1.18, 0.72, 0.6) : leaf < 0.66 ? vec3(1.05, 1.05, 0.7) : vec3(0.92, 0.88, 0.8), mixed * smoothstep(0.25, 0.45, L.y));
     gl_FragColor = vec4(outdoor(c.rgb * (0.92 + 0.16 * vSeed) * 1.25 * shimmer(vUv, vSeed), normalize(vec3(0.3, 0.7, 0.2)), vW), 1.0);
   }`;
 
@@ -373,6 +379,10 @@ export function createWorld({ scene, touch }) {
   // 0.6) so the lake shows between them, and a few in the yard's corners
   const trees = [];
   for (let z = -46; z < 46; z += 6 + rnd() * 4) if ((Math.abs(z - 0.6) > 9 || rnd() < 0.2) && (z > -10 || z < -22.5)) trees.push([STRIP.fence - 0.9 - rnd() * 0.5, z, rnd(), 1]);
+  // Along the cross street: a row on the far side of its far sidewalk, and a few on the verge beyond the back
+  // street's far sidewalk, each tree flagged to wear mixed autumn leaves (see TREE_FRAG)
+  for (let x = -27; x < 1; x += 6.5 + rnd() * 3.5) trees.push([x, CROSS.walk2[1] - 0.9 - rnd() * 0.5, rnd(), 0.95 + rnd() * 0.15]);
+  for (let z = -18; z < 30; z += 9 + rnd() * 6) trees.push([STRIP.sidewalk2[1] - 1.2 - rnd() * 0.6, z, rnd(), 1]);
   // In the park on the near bank, behind the walkway, spaced so the water shows between them; the far
   // banks, a kilometer off, get a continuous wooded line instead (below)
   for (let a = -0.4; a < 0.4 && trees.length < 48; a += 0.025 + rnd() * 0.03) {
@@ -384,7 +394,7 @@ export function createWorld({ scene, touch }) {
   for (const [x, z, r, scale] of trees) {
     const k = Math.floor(r * 6) % 6, h = TALL[k] * scale * (0.85 + rnd() * 0.3), c = CELLS[k];
     base.push(x, GROUND, z); size.push(h * c[4], h); cell.push(c[0], c[1], c[2], c[3]); seed.push(rnd());
-    shade.push(new T.Vector3(x, z, h * c[4]));
+    if (shade.length < 48) shade.push(new T.Vector3(x, z, h * c[4]));
   }
   while (shade.length < 48) shade.push(new T.Vector3(999, 999, 0));
   const quad = new T.InstancedBufferGeometry();
@@ -410,6 +420,20 @@ export function createWorld({ scene, touch }) {
     uniforms: { ...common, uTrees: { value: shade }, uBed: { value: new T.Vector4(...BED) }, uLawn: { value: lawn }, uLawnN: { value: lawnN } }, vertexShader: GROUND_VERT, fragmentShader: GROUND_FRAG,
   })));
   ground.rotation.x = -Math.PI / 2; ground.position.set(-2.0 - 550, GROUND, 0);
+  // The concrete is a slab an inch proud of the soil around it: its outline runs along the right border,
+  // around the trellis square, up the back border, and along the stone bed, with the mint's circle cut out;
+  // it wears the same ground shader, so its top and edges paint as concrete
+  {
+    const SLAB = 0.025, X1 = -2.1, zr = YARD.right + SOIL, xb = YARD.back + SOIL;
+    const edge = (x) => { let zb = CURVE[0][1]; for (let i = 1; i < CURVE.length; i++) if (x < CURVE[i - 1][0]) zb = CURVE[i - 1][1] + (CURVE[i][1] - CURVE[i - 1][1]) * Math.min(1, Math.max(0, (x - CURVE[i - 1][0]) / (CURVE[i][0] - CURVE[i - 1][0]))); return zb - 0.75; };
+    const sh = new T.Shape();
+    sh.moveTo(X1, zr); sh.lineTo(PATCH.x1, zr); sh.lineTo(PATCH.x1, PATCH.z1); sh.lineTo(PATCH.x0, PATCH.z1); sh.lineTo(PATCH.x0, zr); sh.lineTo(xb, zr);
+    for (let x = xb; x <= X1 + 0.001; x += 0.25) sh.lineTo(x, edge(x));
+    sh.lineTo(X1, edge(X1));
+    const hole = new T.Shape(); hole.absarc(MINT[0], MINT[1], MINT[2] + 0.12, 0, Math.PI * 2, true); sh.holes.push(hole);
+    const slab = keep(new T.Mesh(new T.ExtrudeGeometry(sh, { depth: SLAB, bevelEnabled: false, curveSegments: 40 }), ground.material));
+    slab.rotation.x = Math.PI / 2; slab.position.y = GROUND + SLAB;
+  }
 
   // The pond's water, cut to its outline in the shader
   const water = keep(new T.Mesh(new T.PlaneGeometry(POND.ax * 2.8, POND.az * 2.8), new T.ShaderMaterial({ uniforms: { ...common, ...timed }, vertexShader: GROUND_VERT, fragmentShader: WATER_FRAG })));
@@ -686,32 +710,43 @@ export function createWorld({ scene, touch }) {
       f.strokeStyle = "rgba(40,50,25,0.35)"; f.lineWidth = 0.6; f.beginPath(); f.moveTo(-l * 0.9, 0); f.lineTo(l * 0.9, 0); f.stroke(); f.restore();
     }
     const fabTex = new T.CanvasTexture(fc); fabTex.colorSpace = T.SRGBColorSpace; fabTex.wrapS = fabTex.wrapT = T.RepeatWrapping; textures.push(fabTex);
-    const fabric = new T.ShaderMaterial({
-      uniforms: { ...common, uMap: { value: fabTex } },
+    // Sun-faded: the cream gone dull and a little yellowed, the print paler, the seat most of all
+    const fabricFor = (fade) => new T.ShaderMaterial({
+      uniforms: { ...common, uMap: { value: fabTex }, uFade: { value: fade } },
       vertexShader: `varying vec3 vW, vN; varying vec2 vUv; void main() { vUv = uv; vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; vN = normalize(mat3(modelMatrix) * normal); gl_Position = projectionMatrix * viewMatrix * w; }`,
       fragmentShader: `${COMMON}\nuniform sampler2D uMap; varying vec3 vW, vN; varying vec2 vUv;
-        void main() { vec3 c = texture2D(uMap, vUv).rgb * 0.82; gl_FragColor = vec4(outdoor(c, normalize(vN), vW), 1.0); }`,
+        uniform float uFade;
+        void main() { vec3 c = texture2D(uMap, vUv).rgb * 0.82; float g = dot(c, vec3(0.33));
+          c = mix(c, vec3(g) * vec3(0.95, 0.9, 0.78), uFade) * (1.0 - 0.18 * uFade);
+          gl_FragColor = vec4(outdoor(c, normalize(vN), vW), 1.0); }`,
     });
-    // Each section a soft pillow: a subdivided box swelled in the middle, its edges rounded down where it is stitched
-    const puff = (w, h, d, thick) => {
-      const g = new T.BoxGeometry(w, h, d, 8, 6, 8), pos = g.attributes.position, uvs = g.attributes.uv;
-      const half = [w / 2, h / 2, d / 2];
+    const fabric = fabricFor(0.35), fabricSeat = fabricFor(0.6);
+    // One cushion for the seat and one for the back, each the full width: puffed thick, and pulled in along two
+    // stitched seams so it reads as three places to sit
+    const cushion = (w, h, d, thick, mat) => {
+      const g = new T.BoxGeometry(w, h, d, 48, thick === 1 ? 4 : 10, thick === 1 ? 10 : 4), pos = g.attributes.position, uvs = g.attributes.uv;
+      const half = [w / 2, h / 2, d / 2], cross = thick === 1 ? 2 : 1;
       for (let i = 0; i < pos.count; i++) {
         const v = [pos.getX(i), pos.getY(i), pos.getZ(i)], q = v.map((c, k) => c / half[k]);
-        const others = [0, 1, 2].filter((k) => k !== thick), bulge = (1 - q[others[0]] ** 2) * (1 - q[others[1]] ** 2);
-        v[thick] *= 1 + 1.1 * bulge;
-        // round the corners in
-        for (const k of others) v[k] *= 1 - 0.12 * Math.abs(q[thick]) ** 2;
+        const sec = ((v[0] + w / 2) / (w / 3)) % 1, along = Math.max(0, Math.sin(sec * Math.PI));           // 0 at the seams, 1 mid-seat
+        const sx = (v[0] + w / 2) / (w / 3), seam = Math.exp(-(((sx - 1) / 0.06) ** 2)) + Math.exp(-(((sx - 2) / 0.06) ** 2));
+        const bulge = (0.35 + 0.65 * along ** 0.6) * (1 - q[cross] ** 2) * (1 - q[0] ** 8);
+        // the stitched seams pull in, and each place is tufted with a button at its middle
+        const tuft = Math.exp(-(((sec - 0.5) / 0.09) ** 2) - ((q[cross] / 0.16) ** 2));
+        v[thick] *= (1 + 1.1 * bulge) * (1 - 0.55 * Math.min(1, seam) * (q[thick] > 0 ? 1 : 0.3)) * (1 - 0.32 * tuft * (q[thick] > 0 ? 1 : 0));
+        v[cross] *= 1 - 0.1 * Math.abs(q[thick]) ** 2;
+        v[0] *= 1 - 0.04 * Math.abs(q[thick]) ** 2;
         pos.setXYZ(i, v[0], v[1], v[2]); uvs.setXY(i, (v[0] + v[2]) * 1.6, (v[1] + v[2] * 0.5) * 1.6);
       }
-      g.computeVertexNormals(); return new T.Mesh(g, fabric);
+      g.computeVertexNormals(); const o = new T.Mesh(g, mat);
+      for (let i = 0; i < 3; i++) {
+        const b = new T.Mesh(new T.SphereGeometry(0.022, 10, 6), mat); b.scale.setComponent(thick, 0.45);
+        const at = [(-1 + i) * w / 3, 0, 0]; at[thick] = half[thick] * 2.1 * 0.68; b.position.set(...at); o.add(b);
+      }
+      return o;
     };
-    const cw = SL / 3 - 0.015;
-    for (let i = 0; i < 3; i++) {
-      const x = -SL / 2 + (i + 0.5) * SL / 3;
-      const c = puff(cw, 0.13, SD - 0.04, 1); c.position.set(x, SY + 0.11, 0.03); c.rotation.z = (rnd() - 0.5) * 0.02; seat.add(c);
-      const bk = puff(cw, 0.52, 0.12, 2); bk.position.set(x, SY + 0.44, -SD / 2 - 0.02); bk.rotation.x = -0.32; seat.add(bk);
-    }
+    const cs = cushion(SL - 0.02, 0.13, SD - 0.04, 1, fabricSeat); cs.position.set(0, SY + 0.11, 0.03); seat.add(cs);
+    const cb = cushion(SL - 0.02, 0.52, 0.12, 2, fabric); cb.position.set(0, SY + 0.44, -SD / 2 - 0.02); cb.rotation.x = -0.32; seat.add(cb);
   }
   // The garden was rendered square on to its row and lies along it (the back fence), so both its ends
   // stand at their true depths from any view
