@@ -92,6 +92,25 @@ function rug() {
   });
 }
 
+// The rug's pile as tufts: each texel a fibre's height (0 to 1) in red, clumped a little so tufts
+// stand together, tiling seamlessly; the pile shells keep a texel only while it is taller than their layer
+function fibres() {
+  const n = 256, r = seeded(11), hi = new Float32Array(n * n);
+  for (let i = 0; i < n * n; i++) hi[i] = r();
+  const c = document.createElement("canvas"); c.width = c.height = n;
+  const g = c.getContext("2d"), img = g.createImageData(n, n);
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
+    const at = (dx, dy) => hi[((y + dy + n) % n) * n + ((x + dx + n) % n)];
+    const v = Math.min(1, 0.55 * at(0, 0) + 0.15 * (at(1, 0) + at(0, 1) + at(-1, 0) + at(0, -1)) * 0.75 + 0.05);
+    const k = (y * n + x) * 4;
+    img.data[k] = img.data[k + 1] = img.data[k + 2] = Math.round(v * 255); img.data[k + 3] = 255;
+  }
+  g.putImageData(img, 0, 0);
+  const t = new T.CanvasTexture(c);
+  t.wrapS = t.wrapT = T.RepeatWrapping;
+  return t;
+}
+
 // The speaker cloth behind the brass slats: a dark, fine weave
 function grille() {
   const r = seeded(9);
@@ -513,17 +532,17 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
   add(merged(light, standard({ color: MARK, roughness: 0.55 })));
 
   // ---- The rug, and soft shadows where things meet ----
-  // The rug: one thick slab whose top carries a fibre normal map over the heathered wool, so the
-  // pile reads as soft carpet without layers of geometry; each foot leaves a soft contact shadow
-  const RUG = { x: 0.06, z: -1.35, w: 3.0, d: 1.9 }, SLAB = 0.024, feet = [];
+  // The rug: a thick slab, the backing and the roots of the pile, darker; the pile itself stands on it
+  // as thin shells (see pile below), and each foot leaves a soft contact shadow
+  const RUG = { x: 0.06, z: -1.35, w: 3.0, d: 1.9 }, SLAB = 0.026, feet = [];
   for (const [lx, lz] of [[-0.43, -0.22], [0.43, -0.22], [-0.43, 0.22], [0.43, 0.22]]) feet.push([sc.x + 0.06 + lx, -1.98 + lz, 0.016]);
   for (const [x, z, t] of CHAIRS) for (const [lx, lz] of CHAIR_LEGS) {
     feet.push([x + lx * Math.cos(t) + lz * Math.sin(t), z - lx * Math.sin(t) + lz * Math.cos(t), 0.022]);
   }
   const onRug = feet.filter(([fx, fz]) => Math.abs(fx - RUG.x) < RUG.w / 2 - 0.05 && Math.abs(fz - RUG.z) < RUG.d / 2 - 0.05);
-  const pile = photo("carpet-normal", [7, 4.5]);
-  add(merged([place(new T.RoundedBoxGeometry(RUG.w, SLAB, RUG.d, 2, 0.01), { p: [RUG.x, SLAB / 2, RUG.z] })],
-    standard({ map: rug(), normalMap: pile, normalScale: new T.Vector2(0.9, 0.9), roughness: 0.95 })));
+  const wool = rug(), nap = photo("carpet-normal", [7, 4.5]);
+  const slab = add(merged([place(new T.RoundedBoxGeometry(RUG.w, SLAB, RUG.d, 2, 0.01), { p: [RUG.x, SLAB / 2, RUG.z] })],
+    standard({ color: "#A39C90", map: wool, normalMap: nap, normalScale: new T.Vector2(0.9, 0.9), roughness: 0.95 })));
   add(merged(onRug.map(([fx, fz, f]) => place(new T.PlaneGeometry(f * 4.5, f * 4.5), { p: [fx, SLAB + 0.002, fz], r: [-Math.PI / 2, 0, 0] })),
     new T.MeshBasicMaterial({ map: shadow(), transparent: true, depthWrite: false })));
   const ao = [];
@@ -621,8 +640,10 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
     place(new T.CylinderGeometry(0.075, 0.075, 0.64, 14), { p: [-0.37, 0.6, -0.01], r: [Math.PI / 2, 0, 0] }),
     place(new T.CylinderGeometry(0.075, 0.075, 0.64, 14), { p: [0.37, 0.6, -0.01], r: [Math.PI / 2, 0, 0] }));
   // Wood below each arm, as on the real chair: the panther's head at the front of the armrest,
-  // its neck curving down and out into the front post and on into a bulbous turned leg, a carved
-  // side panel, and a squared back leg that kicks back a little
+  // its neck curving down and out into the front post and on into a bulbous turned leg, and a
+  // squared back leg that kicks back a little. The post's straight stretch, between the head and the
+  // top of the leg, carries straight back as the chair's side: one board flush with the post's outer
+  // face and running into it, so post and side read as one carved piece, with a raised panel on it
   const leg = [[0.022, 0], [0.026, 0.014], [0.02, 0.034], [0.037, 0.074], [0.031, 0.11], [0.037, 0.14], [0.034, 0.17], [0, 0.17]];
   for (const k of [-1, 1]) {
     const [fx, fz] = CHAIR_LEGS[k < 0 ? 0 : 1], [bx, bz] = CHAIR_LEGS[k < 0 ? 2 : 3];
@@ -630,11 +651,11 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
       swept([[bx, 0.17, bz + 0.035], [bx, 0.09, bz + 0.012], [bx, 0, bz]], [0.044, 0.044], [0.032, 0.032], 8, 16),
       swept([[k * 0.372, 0.58, 0.38], [k * 0.384, 0.53, 0.405], [k * 0.39, 0.42, 0.412], [k * 0.39, 0.28, 0.4], [fx, 0.165, fz]], [0.074, 0.07], [0.068, 0.062]),
       rb(0.082, 0.03, 0.078, 1, 0.006, { p: [fx, 0.185, fz] }),
-      rb(0.024, 0.39, 0.74, 1, 0.006, { p: [k * 0.432, 0.34, -0.01] }),
+      rb(0.026, 0.365, 0.79, 1, 0.006, { p: [k * 0.414, 0.3525, 0.005] }),
       place(turned([[0, 0], [0.081, 0], [0.084, 0.02], [0.08, 0.05], [0.066, 0.075], [0, 0.078]], 20), { p: [k * 0.37, 0.6, 0.3], r: [Math.PI / 2, 0, 0] }),
       place(panther(touch ? 36 : 56), { p: [k * 0.37, 0.6, 0.4] }));
     const { face, sides } = raised(0.58, 0.24, 0.022, 0.01);
-    for (const g of [face, sides]) chair.wood.push(place(g, { p: [k * 0.444, 0.34, -0.01], r: [0, k * Math.PI / 2, 0] }));
+    for (const g of [face, sides]) chair.wood.push(place(g, { p: [k * 0.427, 0.35, -0.02], r: [0, k * Math.PI / 2, 0] }));
   }
   // Each chair takes its own leather: the left one redder, the right darker and duller toward the top,
   // both mottled where years of hands and sun have worked at them
@@ -657,5 +678,58 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
   chair.wood.forEach((g) => { if (!g.attributes.color) g.setAttribute("color", new T.Float32BufferAttribute(new Float32Array(g.attributes.position.count * 3).fill(1), 3)); });
   add(merged(both(chair.wood), shiny(0.7, { color: "#7A563C", map: photo("walnut-color", [2, 2], true), normalMap: photo("walnut-normal", [2, 2]), roughness: 0.38, vertexColors: true })));
   Object.values(chair).flat().forEach((g) => g.dispose());
-  return { glossy, ready: Promise.all(loads) };
+
+  // ---- The pile ----
+  // Thin shells over the rug's top, each a layer higher, keep only the fibres taller than their layer,
+  // so the wool has real depth and stands up at a glance. Fibres lean and curl a little, are darker
+  // toward their roots, and are pressed down around every foot on the rug, darker where crushed.
+  // Built from the slab as it ends up (after baking, with its light map), so the shells share that light
+  function pile() {
+    const top = slab.geometry.index ? slab.geometry.toNonIndexed() : slab.geometry.clone();
+    const names = ["position", "normal", "uv", "uv1"].filter((k) => top.attributes[k]);
+    const keep = [], ny = top.attributes.normal;
+    for (let i = 0; i < ny.count; i += 3) if (ny.getY(i) > 0.9 && ny.getY(i + 1) > 0.9 && ny.getY(i + 2) > 0.9) keep.push(i);
+    const layers = touch ? 7 : 12, height = 0.014, out = {};
+    for (const k of names) out[k] = [];
+    const layer = [];
+    for (let l = 1; l <= layers; l++) for (const i of keep) for (let j = i; j < i + 3; j++) {
+      for (const k of names) {
+        const a = top.attributes[k];
+        for (let c = 0; c < a.itemSize; c++) out[k].push(k === "position" && c === 1 ? a.getY(j) + (height * l) / layers : a.array[j * a.itemSize + c]);
+      }
+      layer.push(l / layers);
+    }
+    top.dispose();
+    const geo = new T.BufferGeometry();
+    for (const k of names) geo.setAttribute(k, new T.Float32BufferAttribute(out[k], top.attributes[k].itemSize));
+    geo.setAttribute("aLayer", new T.Float32BufferAttribute(layer, 1));
+    const fibre = fibres();
+    fibre.repeat.set(RUG.w * 280 / 256, RUG.d * 280 / 256);
+    const src = slab.material, feetOn = onRug.slice(0, 16);
+    const mat = standard({ map: wool, normalMap: nap, normalScale: new T.Vector2(0.6, 0.6), roughness: 0.97, aoMap: src.aoMap, aoMapIntensity: src.aoMapIntensity });
+    const uniforms = {
+      uFibre: { value: fibre }, uRug: { value: new T.Vector4(RUG.x, RUG.z, RUG.w, RUG.d) }, uRepeat: { value: fibre.repeat },
+      uFeet: { value: Array.from({ length: 16 }, (_, i) => new T.Vector3(...(feetOn[i] || [99, 99, 0]))) },
+    };
+    mat.onBeforeCompile = (sh) => {
+      Object.assign(sh.uniforms, uniforms);
+      sh.vertexShader = "attribute float aLayer;\nvarying float vLayer;\nvarying vec2 vXZ;\n" + sh.vertexShader.replace("#include <worldpos_vertex>",
+        "#include <worldpos_vertex>\n  vLayer = aLayer; vXZ = (modelMatrix * vec4(transformed, 1.0)).xz;");
+      sh.fragmentShader = "uniform sampler2D uFibre;\nuniform vec4 uRug;\nuniform vec2 uRepeat;\nuniform vec3 uFeet[16];\nvarying float vLayer;\nvarying vec2 vXZ;\n" +
+        sh.fragmentShader.replace("#include <clipping_planes_fragment>", `#include <clipping_planes_fragment>
+  vec2 fuv = (vXZ - uRug.xy) / uRug.zw * uRepeat;
+  fuv += vLayer * vLayer * vec2(0.18 * sin(fuv.y * 0.9 + fuv.x * 0.4), 0.18 * cos(fuv.x * 0.8 - fuv.y * 0.3)) / 40.0;
+  float press = 0.0;
+  for (int i = 0; i < 16; i++) { float d = distance(vXZ, uFeet[i].xy); press = max(press, 1.0 - smoothstep(uFeet[i].z * 1.1, uFeet[i].z * 2.8, d)); }
+  float tall = texture2D(uFibre, fuv).r * (1.0 - 0.88 * press);
+  if (tall < vLayer) discard;`).replace("#include <color_fragment>", `#include <color_fragment>
+  diffuseColor.rgb *= (0.62 + 0.38 * vLayer) * (1.0 - 0.18 * press);`);
+    };
+    mat.customProgramCacheKey = () => "rug-pile";
+    const mesh = new T.Mesh(geo, mat);
+    mesh.receiveShadow = true;
+    mesh.userData.room = true;
+    scene.add(mesh);
+  }
+  return { glossy, ready: Promise.all(loads), pile };
 }
