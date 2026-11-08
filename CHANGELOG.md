@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.16.1
+
+- The sunflowers grow in their own raised bed beside the squash and tomatoes.
+
 ## v0.16.0
 
 - The yard has edges: a taller white fence around the back and both sides, a neighbor's two-story house past the left fence, and a cross street past the right.
