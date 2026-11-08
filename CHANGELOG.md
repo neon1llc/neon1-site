@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.19.8
+
+- The porch swing's cushion is thick and puffy, stitched into three seats and three backs, in a cream fabric printed with green and light orange leaves on curling stems.
+
 ## v0.19.7
 
 - The porch swing's frame is black, with only a little rust in a much darker orange-brown.
