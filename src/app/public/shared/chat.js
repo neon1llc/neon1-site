@@ -10,6 +10,10 @@ const ENDPOINT = "/chat/api/chat";
 const MAX_CHARS = 1200;
 const MAX_TURNS = 11;
 
+// Starting points for a first-time visitor, and the two ways to reach a person
+const SUGGESTIONS = ["What does neon1 do?", "How does a project work?", "What is 1NEON?", "What are your hours?"];
+const BOOKING = "https://calendly.com/1isgladtobeofservice/neon1-consultation";
+
 // Small element helper: tag, class, text, and attributes
 function el(tag, cls, text, attrs = {}) {
   const node = document.createElement(tag);
@@ -51,22 +55,38 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
   const panel = el("div", "n1chat", null, { id: "n1chat", role: "dialog", "aria-label": "Ask neon1", hidden: "" });
 
   const head = el("div", "n1chat-head");
+  const fresh = el("button", "n1chat-close", "new", { type: "button", "aria-label": "Start a new conversation" });
   const close = el("button", "n1chat-close", "close", { type: "button", "aria-label": "Close" });
-  head.append(el("strong", null, "ask neon1"), close);
+  const tools = el("span", "n1chat-tools");
+  tools.append(fresh, close);
+  head.append(el("strong", null, "ask neon1"), tools);
 
   const log = el("div", "n1chat-log", null, { role: "log", "aria-live": "polite" });
   const hello = el("p", "n1chat-msg n1chat-bot");
   render(hello, "Hi. Ask about services, process, case studies, projects, or 1NEON. For anything else, email hello@neon1.tech.");
   log.append(hello);
 
+  // Suggested questions, shown until the first question is asked
+  const chips = el("div", "n1chat-chips");
+  for (const q of SUGGESTIONS) {
+    const chip = el("button", "n1chat-chip", q, { type: "button" });
+    chip.addEventListener("click", () => ask(q));
+    chips.append(chip);
+  }
+  log.append(chips);
+
   const form = el("form", "n1chat-form");
   const input = el("textarea", "n1chat-input", null, { rows: "2", maxlength: String(MAX_CHARS), "aria-label": "Your question", placeholder: "Your question" });
   const send = el("button", "n1chat-send", "send", { type: "submit" });
   form.append(input, send);
 
+  // A person is always one click away, whatever the assistant says
+  const human = el("p", "n1chat-human");
+  human.append("Talk to a person: ", el("a", "n1chat-link", "book a free call", { href: BOOKING, target: "_blank", rel: "noopener" }), " or ", el("a", "n1chat-link", "email", { href: "mailto:hello@neon1.tech" }), ".");
+
   const note = el("p", "n1chat-note", "Automated answers from neon1.tech, which can be wrong. Please don't share personal details.");
 
-  panel.append(head, log, form, note);
+  panel.append(head, log, form, human, note);
   if (className) for (const node of [launcher, panel]) node.classList.add(className);
   root.append(launcher, panel);
 
@@ -79,6 +99,14 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
   }
   launcher.addEventListener("click", () => open(true));
   close.addEventListener("click", () => open(false));
+
+  // A new conversation: the history and replies go, the greeting and suggestions come back
+  fresh.addEventListener("click", () => {
+    history.length = 0;
+    log.replaceChildren(hello, chips);
+    chips.hidden = false;
+    input.focus();
+  });
   panel.addEventListener("keydown", (e) => e.key === "Escape" && open(false));
 
   // Enter sends, Shift+Enter adds a line
@@ -98,12 +126,16 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
   }
 
   // ---- Ask: the recent turns go up, one reply comes back ----
-  form.addEventListener("submit", async (e) => {
+  form.addEventListener("submit", (e) => {
     e.preventDefault();
-    const q = input.value.trim();
+    ask(input.value.trim());
+  });
+
+  async function ask(q) {
     if (!q || send.disabled) return;
 
     input.value = "";
+    chips.hidden = true;
     say(q, "you");
     history.push({ role: "user", content: q.slice(0, MAX_CHARS) });
     while (history.length > MAX_TURNS) history.splice(0, 2);
@@ -135,7 +167,7 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
       send.disabled = false;
       input.focus();
     }
-  });
+  }
 
   return { open: () => open(true), close: () => open(false) };
 }
