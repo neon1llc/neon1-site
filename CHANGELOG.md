@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.16.2
+
+- The lawn is built from a photographed grass texture, with thicker and thinner clumps, gentle rolls in the ground that catch the sun, softer mowing stripes, and darker grass in the shade of the fence and beds.
+- The garden sits level along the back fence from every angle.
+
 ## v0.16.1
 
 - The sunflowers grow in their own raised bed beside the squash and tomatoes.
