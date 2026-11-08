@@ -2,6 +2,13 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.27.0
+
+- Services has a short chooser: pick where it hurts and what's going on, and it points to the right service, a similar case study, and a free call. It's plain radio buttons, so it works without scripts, and nothing is saved.
+- Contact shows the fit at a glance: remote from anywhere or on site within about 30 miles, the hours, project sizes, what the first call covers, and what comes after. The FAQ now says on-site work is within about 30 miles.
+- An optional brief under the booking button: three questions, a live preview, and copy or save as text. Nothing typed into it is sent or stored.
+- A new sample tour at /tour.html walks a made-up bakery project through Needs, Execute, Observe, and Normalize in 1NEON, without signing in or touching any real data. Process links to it.
+
 ## v0.26.0
 
 - The assistant is now Neo. Its launcher is a round neon1 mark that stretches to "ask Neo", and the window grows up out of it and folds back into it.

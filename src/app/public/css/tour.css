@@ -1,0 +1,53 @@
+/* src/app/public/css/tour.css - The light, plain look of the 1NEON sample tour, on the shared tokens */
+
+/* ---- Page ---- */
+body.tour { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.55 var(--sans); }
+.tour a { color: var(--brand); }
+
+/* ---- Header: home link and the always-visible demo label ---- */
+.tour-top { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px;
+  padding: 12px 16px; background: rgba(242, 244, 242, .95); border-bottom: 1px solid rgba(18, 36, 26, .12); }
+.tour-home { font: 700 18px var(--mono); letter-spacing: .06em; text-decoration: none; }
+.tour-home .ne { color: var(--ink); } .tour-home .one { color: var(--brand); }
+.tour-flag { margin: 0; font: 500 12px var(--mono); color: #6b4e00; background: #fff4cc; border: 1px solid #e9d27a;
+  border-radius: var(--glass-r); padding: 4px 10px; }
+
+/* ---- Sections ---- */
+.tour main { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
+.tour-intro h1 { font: 600 clamp(26px, 4vw, 38px)/1.2 var(--sans); letter-spacing: -.02em; margin: 6px 0 14px; }
+.tour-kicker { margin: 0; font: 500 12px var(--mono); color: var(--mark); }
+.tour-layer { padding-top: 36px; scroll-margin-top: 112px; }
+.tour-layer h2 { font: 600 28px var(--sans); margin: 4px 0 14px; color: var(--brand); }
+.tour .nl { text-decoration: underline; text-underline-offset: 4px; }
+
+/* ---- Step links ---- */
+.tour-steps { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.tour-steps a { font: 500 13px var(--mono); text-decoration: none; padding: 6px 12px; border: 1px solid rgba(3, 87, 4, .3); border-radius: var(--glass-r); background: #fff; }
+
+/* ---- Cards ---- */
+.tour-card { background: #fff; border: 1px solid rgba(18, 36, 26, .12); border-radius: var(--glass-r); padding: 16px 18px; margin-bottom: 12px; }
+.tour-card h3 { margin: 0 0 8px; font: 600 16px var(--sans); }
+.tour-card p { margin: 0 0 8px; } .tour-card p:last-child { margin-bottom: 0; }
+.tour-hint { font-size: 13px; color: #56665c; }
+.tour-options, .tour-work { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.tour-options li { padding: 10px 12px; border: 1px solid rgba(18, 36, 26, .12); border-radius: var(--glass-r); }
+.tour-options li.picked { border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand) inset; }
+.tour-tag { font: 500 11px var(--mono); color: #fff; background: var(--brand); border-radius: 999px; padding: 2px 8px; margin-left: 6px; }
+.tour-work li { padding-left: 26px; position: relative; }
+.tour-work li::before { position: absolute; left: 0; font: 600 14px var(--mono); }
+.tour-work li.done::before { content: "✓"; color: var(--brand); }
+.tour-work li.now::before { content: "…"; color: #6b4e00; }
+.tour-measures { margin: 0; display: grid; gap: 8px; }
+.tour-measures div { display: grid; grid-template-columns: 180px 1fr; gap: 12px; }
+.tour-measures dt { color: #56665c; } .tour-measures dd { margin: 0; font-weight: 600; }
+.tour-measures s { color: #56665c; font-weight: 400; }
+@media (max-width: 480px) { .tour-measures div { grid-template-columns: 1fr; gap: 0; } }
+
+/* ---- End and buttons (the light-page versions of the site's buttons) ---- */
+.tour-end { padding-top: 36px; }
+.tour-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.tour .btn { display: inline-flex; align-items: center; font: 500 14px var(--mono); padding: 10px 16px; border: 1px solid var(--brand);
+  border-radius: var(--glass-r); text-decoration: none; }
+.tour .btn-primary { background: var(--brand); color: #fff; }
+.tour .btn-ghost { background: transparent; color: var(--brand); }
+.tour a:focus-visible, .tour .btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }

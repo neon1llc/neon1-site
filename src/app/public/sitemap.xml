@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- neon1.tech sitemap: the home page; legal pages join once their final versions are published -->
+<!-- neon1.tech sitemap: the home page and the sample tour; legal pages join once their final versions are published -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://neon1.tech/</loc></url>
+  <url><loc>https://neon1.tech/tour.html</loc></url>
 </urlset>

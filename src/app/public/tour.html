@@ -1,0 +1,121 @@
+<!doctype html>
+<!-- src/app/public/tour.html - A read-only tour of one made-up project in 1NEON. Every record here
+     is fictional and written into this page; it calls no API and links to no client data. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>A sample project in 1NEON · neon1</title>
+  <meta name="description" content="Walk through one made-up project in 1NEON, neon1's client portal: the need, the options, the work, the measured result, and the handover." />
+  <link rel="canonical" href="https://neon1.tech/tour.html" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22 fill=%22none%22 stroke=%22%2300B84F%22 stroke-width=%225%22 stroke-linecap=%22round%22><path d=%22M6 6a24 24 0 0 1 24 24v30M6 18a12 12 0 0 1 12 12v30M34 6a24 24 0 0 1 24 24v30M34 18a12 12 0 0 1 12 12v30%22/></svg>" />
+  <link rel="stylesheet" href="/shared/neon1.css" />
+  <link rel="stylesheet" href="/css/tour.css" />
+</head>
+<body class="tour">
+  <!-- Header: back to the site, and the demo label that stays in view -->
+  <header class="tour-top">
+    <a class="tour-home" href="/"><span class="ne">neon</span><span class="one">1</span></a>
+    <p class="tour-flag" role="note">Sample project. Every name, number, and file here is made up.</p>
+  </header>
+
+  <main id="main">
+    <!-- Intro: the fictional client and what the tour shows -->
+    <section class="tour-intro" id="start" aria-labelledby="tour-h">
+      <p class="tour-kicker">1NEON · sample</p>
+      <h1 id="tour-h">Maple Street Bakery: orders without retyping</h1>
+      <p>This is what a small project looks like in 1NEON, the portal every client gets. A two-person bakery takes orders by email and phone, then retypes them into a spreadsheet each night. Follow it through the four layers: <b>Needs</b>, <b>Execute</b>, <b>Observe</b>, and <b>Normalize</b>.</p>
+      <nav class="tour-steps" aria-label="Tour steps">
+        <a href="#needs">1 · Needs</a><a href="#execute">2 · Execute</a><a href="#observe">3 · Observe</a><a href="#normalize">4 · Normalize</a>
+      </nav>
+    </section>
+
+    <!-- Needs: the request in the client's words, the options, and the decision -->
+    <section class="tour-layer" id="needs" aria-labelledby="needs-h">
+      <p class="tour-kicker">step 1</p>
+      <h2 id="needs-h"><span class="nl">N</span>eeds</h2>
+      <article class="tour-card">
+        <h3>Request</h3>
+        <p><b>Currently:</b> every night we copy about 40 orders from email and voicemail notes into a spreadsheet. It takes an hour, and a few orders get missed each week.</p>
+        <p><b>Goal:</b> orders land in one list on their own, and nobody retypes them.</p>
+        <p><b>Timing:</b> before the holiday rush.</p>
+      </article>
+      <article class="tour-card">
+        <h3>Options</h3>
+        <p class="tour-hint">Every proposal offers a few choices, each with its cost, effort, and what it gets you. The figures below are illustrative.</p>
+        <ul class="tour-options">
+          <li><b>Quick fix</b> · an order form that writes straight into the spreadsheet · about 4 hours</li>
+          <li class="picked"><b>Solid setup</b> · the form, plus emailed orders parsed into the same list, with a daily summary · about 16 hours <span class="tour-tag">chosen</span></li>
+          <li><b>Fuller build</b> · all of that, plus a small order page with pickup times and reminders · about 40 hours</li>
+        </ul>
+      </article>
+      <article class="tour-card">
+        <h3>Decision</h3>
+        <p>The owner picked <b>Solid setup</b> in the portal on Oct 3. The decision, who made it, and the estimate are kept with the project.</p>
+      </article>
+    </section>
+
+    <!-- Execute: the work items and an update the client sees -->
+    <section class="tour-layer" id="execute" aria-labelledby="execute-h">
+      <p class="tour-kicker">step 2</p>
+      <h2 id="execute-h"><span class="nl">E</span>xecute</h2>
+      <article class="tour-card">
+        <h3>Work</h3>
+        <ul class="tour-work">
+          <li class="done">Order form connected to the spreadsheet</li>
+          <li class="done">Emailed orders read into the same list</li>
+          <li class="done">Daily summary at 7pm</li>
+          <li class="now">Two weeks running side by side with the old way</li>
+        </ul>
+      </article>
+      <article class="tour-card">
+        <h3>Update · Oct 17</h3>
+        <p>Health: <b>on track</b>. Emailed orders now arrive in the list within a minute. One order with a photo attachment needed a manual fix; that case is handled now. Waiting on you: confirm the summary should go to both owners.</p>
+      </article>
+    </section>
+
+    <!-- Observe: the measure, its baseline, and the result -->
+    <section class="tour-layer" id="observe" aria-labelledby="observe-h">
+      <p class="tour-kicker">step 3</p>
+      <h2 id="observe-h"><span class="nl">O</span>bserve</h2>
+      <article class="tour-card">
+        <h3>Measures</h3>
+        <p class="tour-hint">Measured the same way before and after, over two weeks each. Illustrative numbers.</p>
+        <dl class="tour-measures">
+          <div><dt>Nightly retyping</dt><dd><s>60 min</s> → 5 min</dd></div>
+          <div><dt>Missed orders a week</dt><dd><s>3</s> → 0</dd></div>
+          <div><dt>Target</dt><dd>under 10 minutes a night, no missed orders</dd></div>
+        </dl>
+      </article>
+    </section>
+
+    <!-- Normalize: what the client keeps and how ongoing care works -->
+    <section class="tour-layer" id="normalize" aria-labelledby="normalize-h">
+      <p class="tour-kicker">step 4</p>
+      <h2 id="normalize-h"><span class="nl">N</span>ormalize</h2>
+      <article class="tour-card">
+        <h3>Handover</h3>
+        <ul class="tour-work">
+          <li class="done">A one-page runbook: where orders go, and what to do if one looks wrong</li>
+          <li class="done">A 30-minute walkthrough with both owners, recorded for new staff</li>
+          <li class="done">Every account and bill in the bakery's own name</li>
+        </ul>
+      </article>
+      <article class="tour-card">
+        <h3>Care</h3>
+        <p>Optional and monthly: a check that the numbers above still hold, and small changes as the bakery grows. The bakery can also run it without neon1.</p>
+      </article>
+    </section>
+
+    <!-- End: start over, or talk about a real project -->
+    <section class="tour-end" aria-label="Next">
+      <p>That's the whole loop. Your project would follow the same steps, with your own need and numbers.</p>
+      <p class="tour-actions">
+        <a class="btn btn-primary" href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a free call</a>
+        <a class="btn btn-ghost" href="#start">start the tour again</a>
+        <a class="btn btn-ghost" href="/">back to neon1.tech</a>
+      </p>
+    </section>
+  </main>
+</body>
+</html>
