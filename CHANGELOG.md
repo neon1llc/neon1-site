@@ -2,6 +2,15 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.29.0
+
+- The yard is rescaled to the photo from the window. Measured from that photo, the back fence is about 14 m from the house, not 28 m, so everything past the deck pulls 14 m closer: the lawn, the concrete, and the stone bed are all about half as long as before.
+- The deck is centered on the window, as in the photo. The last view, out through the opening, now shows its floor, its front rail, and the front stairs, with the lawn, the bed, the garden, the trees, and the water beyond.
+- The stone bed is the same backward C, fitted between just past the deck's front stairs and the greenhouse.
+- The peach tree stands just past the deck's front-left corner. The swing and the squash patch sit between the deck and the greenhouse.
+- The leans to each side stand a step back from the window, so both sides of the frame stay in view while they look out to the far trees and the water.
+- The yard is drawn from its own plan, shifted as one piece, so its shapes keep their proportions.
+
 ## v0.28.2
 
 - The stone bed is one backward C again, with no straight run that made it read as a question mark. It keeps the C's first shape, starting 1.5 m past the deck's front and ending where it always has.

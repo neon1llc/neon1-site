@@ -40,13 +40,18 @@ const BED = [-29.7, -28.3, -6.5, 11.5];   // the garden along the back fence: x0
 // The yard: the back fence, and the side fences from the house to it (the right side, toward -z, meets
 // a cross street; the left, toward +z, a neighbor's house), and the deck below the window
 const YARD = { back: -30, right: -10, left: 12.5 };
-const DECK_FRONT = -2.05 - (16 * 0.16 + 1.0);   // the deck's front edge (see DECK)
+// The yard is laid out in its own plan, then drawn SHIFT over from it: 14 m toward the house, so the back fence
+// is about 14 m from the house as in the photo from the window (the near part of the plan sits under the house,
+// out of sight), and 3.5 m to the right, so the deck is centered on the window as in that photo. Every shader
+// works in plan coordinates (see shaderMat); only where things land on screen moves
+const SHIFT = new T.Vector3(14, 0, -3.5), HOUSE_X = -2.05 - SHIFT.x;   // the house wall, in plan coordinates
+const DECK_FRONT = HOUSE_X - (16 * 0.16 + 1.0);   // the deck's front edge (see DECK)
 // The right side of the yard is concrete, parted from the lawn on the left by a curving raised bed of
 // stone (CURVE, plan points [x, z] from the foot of the deck's front stairs out toward the back); soil
 // borders run along the right fence and the back fence (SOIL wide); a circle is cut from the concrete for
 // a pear tree and its mint; the greenhouse stands square in the back-right corner of the concrete
 const C_SHAPE = [[-12.9, 2.7], [-15.6, 0.9], [-19.0, -0.5], [-22.2, -0.6], [-24.6, 0.4], [-26.2, 1.6]];   // the backward C as first fitted to the photos (it began 1.5 m past a 9.35 m deck)
-const CURVE = C_SHAPE.map(([x, z]) => [DECK_FRONT - 1.5 + (x + 12.9) * (-26.2 - (DECK_FRONT - 1.5)) / (-26.2 + 12.9), z]);   // the same C, stretched out along x to start 1.5 m past the deck's front and end where it always did; no straight lead, so it never reads as a question mark
+const CURVE = C_SHAPE.map(([x, z]) => [DECK_FRONT - 0.6 + (x + 12.9) * (-27.4 - (DECK_FRONT - 0.6)) / (-26.2 + 12.9), z]);   // the same C, fitted between just past the deck's front and the greenhouse; no straight lead, so it never reads as a question mark
 const SOIL = 1.8;
 // Edges are never ruled straight: every soil, concrete, and mulch boundary wanders by a few centimeters
 const WOB = (s) => 0.07 * Math.sin(s * 1.13 + 0.7) + 0.045 * Math.sin(s * 2.71 + 2.1) + 0.025 * Math.sin(s * 6.3 + 4.0);
@@ -54,10 +59,10 @@ const WOB_GLSL = "float wob(float s) { return 0.07 * sin(s * 1.13 + 0.7) + 0.045
 const MINT = [-24.0, -2.55, 0.85];
 const GREEN = { x0: -28.2, x1: -23.0, z0: -8.2, z1: -4.9, eave: 2.05, ridge: 2.75 };   // about 1.4 times the 8 x 12 ft kit
 // The square of soil in front of the greenhouse, a foot from its door, where the squash trellis stands
-const PATCH = { x0: GREEN.x1 + 0.3, x1: GREEN.x1 + 0.3 + (GREEN.x1 - GREEN.x0), z0: GREEN.z0, z1: GREEN.z1 };
+const PATCH = { x0: GREEN.x1 + 0.3, x1: GREEN.x1 + 0.3 + 2.6, z0: GREEN.z0, z1: GREEN.z1 };   // half the greenhouse's length, so the swing fits before the deck
 // Its depth is the right side's own count: 7 spindles from the front corner to the right stairs, the stairs (1 m),
 // and 7 more back to the house, at 16 cm apart
-const DECK = { x0: -2.05 - (16 * 0.16 + 1.0), x1: -2.05, z0: -2.3, z1: 10.5, y: GROUND + 0.8 };   // out from the house on the left, its left side by the left border, its right side at z0
+const DECK = { x0: DECK_FRONT, x1: HOUSE_X, z0: -2.3, z1: 10.5, y: GROUND + 0.8 };   // out from the house on the left, its left side by the left border, its right side at z0
 const CROSS = { walk1: [-10.6, -12.6], road: [-12.6, -19.6], walk2: [-19.6, -21.6] };
 
 // The atlas cells: u0, v0, u1, v1, and width over height (from blender/world.py), and each kind's height in meters
@@ -388,12 +393,21 @@ const cardGrid = (geo) => {
 };
 
 /** Builds the lakefront into scene; ready resolves when the tree atlas is in */
+// Every outdoor shader is written in plan coordinates: vW, the camera, the trees' bases, and the grass all stay
+// in the plan, and only gl_Position is moved over by SHIFT (meshes get it from the group's position; the trees
+// and the grass, which build their points from attributes, add it themselves)
+const OFF_GLSL = `#define OFF vec3(${SHIFT.x.toFixed(2)}, ${SHIFT.y.toFixed(2)}, ${SHIFT.z.toFixed(2)})\n`;
+const planCam = (src) => src.replace(/\bcameraPosition\b/g, "(cameraPosition - OFF)");
+const shaderMat = (o) => new T.ShaderMaterial({ ...o,
+  vertexShader: OFF_GLSL + planCam(o.vertexShader).replace(/vW = w\.xyz/g, "vW = w.xyz - OFF").replace(/viewMatrix \* vec4\(w, 1\.0\)/g, "viewMatrix * vec4(w + OFF, 1.0)"),
+  fragmentShader: OFF_GLSL + planCam(o.fragmentShader) });
+
 export function createWorld({ scene, touch }) {
   const common = { uSunDir: { value: SUNDIR }, uHaze: { value: HAZE }, uSun: { value: 1 } };
   const timed = { uTime: { value: 0 }, uPhase: { value: 0 }, uWind: { value: 0 } };
   const group = new T.Group(), textures = [];
   const keep = (o) => { group.add(o); return o; };
-  scene.add(group);
+  scene.add(group); group.position.copy(SHIFT);
   const rnd = (() => { let n = 7; return () => ((n = (n * 16807) % 2147483647) - 1) / 2147483646; })();
 
   // Trees: on the verge past the fence and along the shore, thinned where the window looks out (z near
@@ -427,7 +441,7 @@ export function createWorld({ scene, touch }) {
   quad.setAttribute("aBush", new T.InstancedBufferAttribute(new Float32Array(trees.length), 1));   // trees sway, never rustle
   quad.instanceCount = trees.length;
   const atlas = { value: null };
-  const treeMesh = keep(new T.Mesh(quad, new T.ShaderMaterial({ uniforms: { ...common, ...timed, uMap: atlas }, vertexShader: TREE_VERT, fragmentShader: TREE_FRAG, side: T.DoubleSide })));
+  const treeMesh = keep(new T.Mesh(quad, shaderMat({ uniforms: { ...common, ...timed, uMap: atlas }, vertexShader: TREE_VERT, fragmentShader: TREE_FRAG, side: T.DoubleSide })));
   treeMesh.frustumCulled = false;
   const loader = new T.TextureLoader();
   const ready = new Promise((done) => loader.load("/media/white-rabbit/trees-atlas.webp", (t) => {
@@ -437,7 +451,7 @@ export function createWorld({ scene, touch }) {
   // The ground, from the house out past the pond; the lawn photo and its relief tile
   const tile = (name, srgb) => { const t = loader.load(`/media/white-rabbit/tex/${name}.webp`); t.wrapS = t.wrapT = T.RepeatWrapping; if (srgb) t.colorSpace = T.SRGBColorSpace; textures.push(t); return t; };
   const lawn = tile("lawn-color", true), lawnN = tile("lawn-normal", false);
-  const ground = keep(new T.Mesh(new T.PlaneGeometry(1100, 1800), new T.ShaderMaterial({
+  const ground = keep(new T.Mesh(new T.PlaneGeometry(1100, 1800), shaderMat({
     uniforms: { ...common, uTrees: { value: shade }, uBed: { value: new T.Vector4(...BED) }, uLawn: { value: lawn }, uLawnN: { value: lawnN } }, vertexShader: GROUND_VERT, fragmentShader: GROUND_FRAG,
   })));
   ground.rotation.x = -Math.PI / 2; ground.position.set(-2.0 - 550, GROUND, 0);
@@ -484,7 +498,7 @@ export function createWorld({ scene, touch }) {
       off.push(x, z, 0.7 + rnd() * 0.6, rnd() * 6.283);
     }
     geo.setAttribute("aOff", new T.InstancedBufferAttribute(new Float32Array(off), 4)); geo.instanceCount = off.length / 4;
-    const blades = keep(new T.Mesh(geo, new T.ShaderMaterial({
+    const blades = keep(new T.Mesh(geo, shaderMat({
       uniforms: { ...common, ...timed }, side: T.DoubleSide,
       vertexShader: `attribute vec4 aOff; attribute float aTip; uniform float uPhase, uWind; varying vec3 vW; varying float vTip;
         void main() { float c = cos(aOff.w), s = sin(aOff.w); vec3 p = position * aOff.z; p.xz = mat2(c, -s, s, c) * p.xz;
@@ -502,14 +516,14 @@ export function createWorld({ scene, touch }) {
   }
 
   // The pond's water, cut to its outline in the shader
-  const water = keep(new T.Mesh(new T.PlaneGeometry(POND.ax * 2.8, POND.az * 2.8), new T.ShaderMaterial({ uniforms: { ...common, ...timed }, vertexShader: GROUND_VERT, fragmentShader: WATER_FRAG })));
+  const water = keep(new T.Mesh(new T.PlaneGeometry(POND.ax * 2.8, POND.az * 2.8), shaderMat({ uniforms: { ...common, ...timed }, vertexShader: GROUND_VERT, fragmentShader: WATER_FRAG })));
   water.rotation.x = -Math.PI / 2; water.position.set(POND.x, LAKE, POND.z);
 
   // The far banks: the old far tree row as a wooded line around the far side of the pond, in segments
   // facing across the water, with hazy hills behind
   const shoreTex = loader.load("/media/white-rabbit/trees-far.webp", (t) => { t.colorSpace = T.SRGBColorSpace; });
   shoreTex.wrapS = T.RepeatWrapping; textures.push(shoreTex);
-  const bankMat = new T.ShaderMaterial({
+  const bankMat = shaderMat({
     uniforms: { ...common, uMap: { value: shoreTex } }, vertexShader: GROUND_VERT, side: T.DoubleSide,
     fragmentShader: `${COMMON}\nuniform sampler2D uMap; varying vec3 vW; varying vec2 vUv;
       void main() { vec4 c = texture2D(uMap, vUv * vec2(3.0, 1.0)); if (c.a < 0.4) discard; vec3 k = c.rgb * vec3(0.78, 0.66, 0.5); gl_FragColor = vec4(outdoor(k, vec3(0.3, 0.8, 0.2), vW), 1.0); }`,
@@ -522,7 +536,7 @@ export function createWorld({ scene, touch }) {
     bank.position.set((p0.x + p1.x) / 2, GROUND + 9, (p0.z + p1.z) / 2);
     bank.rotation.y = -Math.atan2(p1.z - p0.z, p1.x - p0.x);
   }
-  const hills = keep(new T.Mesh(new T.PlaneGeometry(7000, 200), new T.ShaderMaterial({
+  const hills = keep(new T.Mesh(new T.PlaneGeometry(7000, 200), shaderMat({
     uniforms: { ...common }, vertexShader: GROUND_VERT,
     fragmentShader: `${COMMON}\n${hash}\nvarying vec3 vW; varying vec2 vUv;
       void main() { float h = 0.25 + 0.18 * noise(vec2(vUv.x * 9.0, 0.0)) + 0.1 * noise(vec2(vUv.x * 31.0, 0.0)); if (vUv.y > h) discard;
@@ -534,11 +548,11 @@ export function createWorld({ scene, touch }) {
   // (tongue-and-groove boards between a top and bottom rail, square posts with flat caps every 1.83 m,
   // grimed a little toward the ground), and down the left side an old six-foot cedar stockade gone
   // silver-brown, its pointed boards uneven, on two rails, sagging here and there
-  const solid = (color, grain = 0) => new T.ShaderMaterial({ uniforms: { ...common, uColor: { value: new T.Color(color) }, uGrain: { value: grain } }, vertexShader: SOLID_VERT, fragmentShader: SOLID_FRAG });
+  const solid = (color, grain = 0) => shaderMat({ uniforms: { ...common, uColor: { value: new T.Color(color) }, uGrain: { value: grain } }, vertexShader: SOLID_VERT, fragmentShader: SOLID_FRAG });
   const m = new T.Matrix4(), qq = new T.Quaternion(), e = new T.Euler(), at0 = new T.Vector3(), sc0 = new T.Vector3(), tint = new T.Color();
   const FH = 1.83, PANEL = 1.83, runs = [[YARD.back, YARD.right, YARD.back, YARD.left, "vinyl"], [-2.1, YARD.right, YARD.back, YARD.right, "vinyl"], [-2.1, YARD.left, YARD.back, YARD.left, "wood"]];
   // Vinyl: the boards' grooves run up the panel, every 18 cm along it, and it weathers a little at the foot
-  const vinyl = (along) => new T.ShaderMaterial({
+  const vinyl = (along) => shaderMat({
     uniforms: { ...common }, vertexShader: SOLID_VERT,
     fragmentShader: `${COMMON}\n${hash}\nvarying vec3 vW, vN, vTint;
       void main() { float a = ${along}, y = vW.y - ${GROUND.toFixed(1)};
@@ -611,7 +625,7 @@ export function createWorld({ scene, touch }) {
   // white-trimmed windows (a few lit warm, a couple with blinds half down), a back door and step, and a
   // downspout, weathered a little where the rain runs
   const HOUSE = { x0: -18.5, x1: -7.5, z0: 14, z1: 24, h: 6.2, ridge: 9.0 };
-  const siding = new T.ShaderMaterial({
+  const siding = shaderMat({
     uniforms: { ...common }, vertexShader: SOLID_VERT,
     fragmentShader: `${COMMON}\n${hash}\nvarying vec3 vW, vN, vTint;
       void main() {
@@ -645,7 +659,7 @@ export function createWorld({ scene, touch }) {
     const v = [x0, y0, z0, x1, y0, z0, x1, y1, zm, x0, y0, z0, x1, y1, zm, x0, y1, zm, x1, y0, z1, x0, y0, z1, x0, y1, zm, x1, y0, z1, x0, y1, zm, x1, y1, zm,
       x0, y0, z0, x0, y1, zm, x0, y0, z1, x1, y0, z1, x1, y1, zm, x1, y0, z0];
     const g = new T.BufferGeometry(); g.setAttribute("position", new T.Float32BufferAttribute(v, 3)); g.computeVertexNormals();
-    keep(new T.Mesh(g, new T.ShaderMaterial({
+    keep(new T.Mesh(g, shaderMat({
       uniforms: { ...common }, vertexShader: SOLID_VERT, side: T.DoubleSide,
       fragmentShader: `${COMMON}\n${hash}\nvarying vec3 vW, vN, vTint;
         void main() { vec3 n = normalize(vN); float row = floor((vW.y) / 0.14);
@@ -758,7 +772,7 @@ export function createWorld({ scene, touch }) {
     const map = { value: null };
     loader.load(url, (t) => { t.colorSpace = T.SRGBColorSpace; map.value = t; textures.push(t); });
     const card = new T.PlaneGeometry(w, h, 24, 4); card.translate(0, h / 2, 0);
-    const mesh = new T.Mesh(card, new T.ShaderMaterial({
+    const mesh = new T.Mesh(card, shaderMat({
       uniforms: { ...common, ...timed, uMap: map, uSway: { value: sway } }, transparent: true, depthWrite: false, side: T.DoubleSide,
       vertexShader: `uniform float uPhase, uWind, uSway; varying vec3 vW; varying vec2 vUv;
         void main() { vUv = uv; vec3 p = position;
@@ -780,7 +794,7 @@ export function createWorld({ scene, touch }) {
   // with a little dark rust at the feet; the seat hangs from springs on the bar, facing left (+z), with a thick
   // cushion stitched into three seats and three backs in a cream fabric printed with green and light orange
   // leaves. It swings left and right, about the bar
-  const SWING = [-14.5, GROUND, (GREEN.z0 + GREEN.z1) / 2 + 0.6];
+  const SWING = [PATCH.x1 + 1.3, GROUND, (GREEN.z0 + GREEN.z1) / 2 + 0.6];
   const seat = new T.Group();
   {
     const sw = new T.Group(); sw.position.set(SWING[0], SWING[1], SWING[2]); sw.rotation.y = 0.03; keep(sw);
@@ -827,7 +841,7 @@ export function createWorld({ scene, touch }) {
     }
     const fabTex = new T.CanvasTexture(fc); fabTex.colorSpace = T.SRGBColorSpace; fabTex.wrapS = fabTex.wrapT = T.RepeatWrapping; textures.push(fabTex);
     // Sun-faded: the cream gone dull and a little yellowed, the print paler, the seat most of all
-    const fabricFor = (fade) => new T.ShaderMaterial({
+    const fabricFor = (fade) => shaderMat({
       uniforms: { ...common, uMap: { value: fabTex }, uFade: { value: fade } },
       vertexShader: `varying vec3 vW, vN; varying vec2 vUv; void main() { vUv = uv; vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; vN = normalize(mat3(modelMatrix) * normal); gl_Position = projectionMatrix * viewMatrix * w; }`,
       fragmentShader: `${COMMON}\nuniform sampler2D uMap; varying vec3 vW, vN; varying vec2 vUv;
@@ -963,9 +977,8 @@ export function createWorld({ scene, touch }) {
     items.push(["andromedaXL", -25.4, GROUND - 1.2, YARD.left - 1.75, 3], ["branchy", -21.6, GROUND, YARD.left - 1.05, 0], ["pinkrose", -18.4, GROUND, YARD.left - 0.8, 4]);
     // and nearer the deck, as in the photos: low rounded shrubs and leafy clumps along the stockade, mulch between
     // The peach tree, in the left border just past the deck's front-left corner
-    items.push(["pear", -12.4, GROUND, YARD.left - 1.0, 0]);
+    items.push(["pear", DECK_FRONT - 1.0, GROUND, YARD.left - 1.0, 0]);
     // low shrubs and leafy clumps in the stretch of border beside the deck's front
-    items.push(["bush", -6.6, GROUND, YARD.left - 0.75, 0], ["mintLow", -7.8, GROUND, YARD.left - 1.2, 0], ["bush", -9.2, GROUND, YARD.left - 0.7, 0], ["mintLow", -10.6, GROUND, YARD.left - 1.25, 0]);
     items.push(["mintLow", -13.1, GROUND, YARD.left - 1.25, 0], ["bush", -14.1, GROUND, YARD.left - 0.75, 0], ["bush", -15.3, GROUND, YARD.left - 0.6, 0],
       ["mintLow", -16.2, GROUND, YARD.left - 1.3, 0], ["andromeda", -17.0, GROUND - 1.1, YARD.left - 0.8, 3], ["mintLow", -19.6, GROUND, YARD.left - 1.2, 0], ["bush", -20.4, GROUND, YARD.left - 0.7, 0]);
     // Mint, a dark crowd of it filling the pear's circle and over the edge: the clumps in the middle stand up,
@@ -992,7 +1005,7 @@ export function createWorld({ scene, touch }) {
     fq.instanceCount = items.length;
     const flora = { value: null };
     loader.load("/media/white-rabbit/flora-atlas.webp", (t) => { t.colorSpace = T.SRGBColorSpace; flora.value = t; textures.push(t); });
-    const fm = keep(new T.Mesh(fq, new T.ShaderMaterial({
+    const fm = keep(new T.Mesh(fq, shaderMat({
       uniforms: { ...common, ...timed, uMap: flora }, side: T.DoubleSide,
       // Each plant is mirrored or not, leans its own way, and is a little wider or narrower than the last,
       // so repeats of the same plant never match: the flowers stay true, the growth doesn't
@@ -1019,7 +1032,7 @@ export function createWorld({ scene, touch }) {
   // The greenhouse: an 8 by 12 foot kit (Palram-style) square in the back-right corner of the concrete,
   // its gable door facing the house: silver aluminum frame, clear twin-wall panels, two roof vents
   {
-    const g = GREEN, alu = solid("#B8BCC0"), panelMat = new T.ShaderMaterial({
+    const g = GREEN, alu = solid("#B8BCC0"), panelMat = shaderMat({
       uniforms: { ...common }, vertexShader: SOLID_VERT, transparent: true, depthWrite: false, side: T.DoubleSide,
       fragmentShader: `${COMMON}\nvarying vec3 vW, vN, vTint;
         void main() { vec3 n = normalize(vN); float rib = 0.5 + 0.5 * sin((abs(n.x) > 0.5 ? vW.z : vW.x) * 260.0);
