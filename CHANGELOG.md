@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.30.0
+
+- The sample project lives in 1NEON now, at /1NEON/example, in the portal's own frame. The old tour page sends visitors there.
+- The home page also links to the 1NEON demo, a working copy of the portal with made-up clients that runs in the browser.
+
 ## v0.29.1
 
 - Back from 1NEON to neon1.tech shows the page again. The fade on the way out had stayed on when the browser restored the page.
