@@ -42,7 +42,8 @@ function render(target, text) {
   target.append(text.slice(last));
 }
 
-export function chat({ root = document.body, endpoint = ENDPOINT } = {}) {
+// className lets a host page place the window, such as 1NEON clearing its side rail
+export function chat({ root = document.body, endpoint = ENDPOINT, className = "" } = {}) {
   const history = [];
 
   // ---- The launcher and the window ----
@@ -66,6 +67,7 @@ export function chat({ root = document.body, endpoint = ENDPOINT } = {}) {
   const note = el("p", "n1chat-note", "Automated answers from neon1.tech, which can be wrong. Please don't share personal details.");
 
   panel.append(head, log, form, note);
+  if (className) for (const node of [launcher, panel]) node.classList.add(className);
   root.append(launcher, panel);
 
   // ---- Open, close, and keep focus sensible ----
