@@ -2,6 +2,16 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.25.0
+
+- The deck matches the photo from the window: 6 m out from the house and 9 m across, in a deeper brownish burgundy, with 5/4 x 6 boards running left to right in staggered lengths with thin gaps.
+- The deck railing has a wide, flat 2x6 cap, bigger square posts that rise above the cap at the corners and stairs, flush posts of the same size between them, and turned spindles 14 cm apart everywhere. The left side is railed back to the house, the front stairs sit left of center, and the right stairs start 7 spindles in from the front corner.
+- The stone bed now starts at the deck's front, just right of the front stairs.
+- The left border near the deck has low rounded shrubs, leafy clumps, and a small andromeda along the stockade.
+- The grey edging stones run straight and true along their edges, with only the odd one a little off.
+- Small plants and small bushes move a little less in the wind.
+- At the window, the leans to each side look further down, over the deck and into the yard.
+
 ## v0.24.0
 
 - The white rabbit's ending: squared up at the window with the sash all the way up, the view leans left toward the car to look right and down over the concrete and greenhouse, then right to look left and down over the lawn and the stockade, then glides straight in until the frame is gone and only the yard is ahead. It holds there for a pause of scrolling before the white. The trip down to the grass is gone.

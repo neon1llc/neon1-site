@@ -50,8 +50,8 @@ const BEATS = [
   // the concrete, the greenhouse, and the right fence; across to the right, looking left and down at the lawn,
   // the left border, and the stockade; and back to center, square to the window, gliding in until the frame is
   // gone and only the yard is ahead, held there before the white
-  [0.875, [-1.05, 1.47, 1.12], [-3.3, 0.45, -0.5], 52], [0.885, [-1.06, 1.47, 1.12], [-3.3, 0.44, -0.52], 52],
-  [0.915, [-1.05, 1.47, 0.08], [-3.3, 0.45, 1.7], 52], [0.925, [-1.06, 1.47, 0.08], [-3.3, 0.44, 1.72], 52],
+  [0.875, [-1.35, 1.5, 1.1], [-3.3, -0.35, -0.5], 54], [0.885, [-1.36, 1.5, 1.1], [-3.3, -0.36, -0.52], 54],
+  [0.915, [-1.35, 1.5, 0.1], [-3.3, -0.35, 1.7], 54], [0.925, [-1.36, 1.5, 0.1], [-3.3, -0.36, 1.72], 54],
   [0.945, [-1.55, 1.3, 0.6], [-3.1, 1.02, 0.6], 52],
   [0.97, [-2.37, 1.1, 0.62], [-3.6, 1.0, 0.6], 52],             // through the opening: the yard straight on
   [0.985, [-2.37, 1.1, 0.62], [-3.6, 1.0, 0.6], 52],            // held, before the white
