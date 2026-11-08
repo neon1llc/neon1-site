@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.19.1
+
+- Out of the TV, you first sit back up straight from being hunched at the screen, then scoot back three times, each a small push with a slight dip and a pause after it.
+- The whole walk takes half again as much scrolling, so every step and pause lasts longer.
+
 ## v0.19.0
 
 - The stone bed is 2.3 times as wide and sits further right, leaving more lawn on the left and a walkable gap beside the pear tree.
