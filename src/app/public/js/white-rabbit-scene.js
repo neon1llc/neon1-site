@@ -346,7 +346,7 @@ export function createScene({ onLost, onSound = () => {} }) {
 
   // ---- The room, the TV around its screen, the table, and the chairs ----
   const env = environment(renderer);
-  const { glossy, ready: photos, pile } = furnish(scene, { win: WINDOW, sc: SC, sw: SW, sh: SH, env, touch });
+  const { glossy, ready: photos, pile, openWindow } = furnish(scene, { win: WINDOW, sc: SC, sw: SW, sh: SH, env, touch });
 
   // Baked light: the room's lit meshes take geometry with a second UV map from room.glb and a baked
   // occlusion map on it (made by blender/room.py from this same build); the painted stand-in
@@ -504,6 +504,10 @@ export function createScene({ onLost, onSound = () => {} }) {
     let fov = ramp(p, KEYS.map((k, i) => [k, FOV[i]]));
     const wide = T.MathUtils.radToDeg(2 * Math.atan(Math.tan(T.MathUtils.degToRad(19)) / aspect));
     fov += (Math.max(fov, wide) - fov) * ramp(p, [[0.28, 0], [0.45, 1]]);
+    // Wide screens: the view across is held to about 72 degrees, past which a flat picture stretches
+    // whatever sits near its sides, like looking through a fishbowl
+    const across = T.MathUtils.radToDeg(2 * Math.atan(Math.tan(T.MathUtils.degToRad(36)) / aspect));
+    fov += (Math.min(fov, across) - fov) * ramp(p, [[0.12, 0], [0.28, 1]]);
     const back = Math.max(0, 0.9 / aspect - 0.9) * ramp(p, [[0.3, 0], [0.5, 1]]);
     D.subVectors(P, L).normalize();
     P.addScaledVector(D, back);
@@ -546,6 +550,8 @@ export function createScene({ onLost, onSound = () => {} }) {
     fill.intensity = light * (0.55 + 0.35 * s);
     for (const [m, k] of glossy) m.envMapIntensity = k * light;
     car.update(time, light);
+    // The lower sash, raised about 40%; moving it redraws the shadows it throws
+    if (openWindow(0.4)) renderer.shadowMap.needsUpdate = true;
     glow.intensity = ramp(p, [[0, 0], [0.28, 0.6], [0.6, 0.3], [0.82, 0.2]]) * 0.02;
     grade.uniforms.uTint.value.copy(WHITE).lerp(TINT_COOL.clone().lerp(TINT_WARM, s), room);
 

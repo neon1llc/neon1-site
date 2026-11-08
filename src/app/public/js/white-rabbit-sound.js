@@ -198,21 +198,39 @@ export function createSound(ctx) {
   const shotNoise = (to, len) => { const s = ctx.createBufferSource(); s.buffer = noise; s.connect(to); s.start(now(), Math.random(), len); };
   const shotTone = (type, f, to, len) => { const o = ctx.createOscillator(); o.type = type; o.frequency.value = f; o.connect(to); o.start(); o.stop(now() + len); return o; };
 
+  // An electric zap: a sharp crack, then an arc's sizzle, noise through a narrow band that falls in
+  // pitch while its level crackles at random, over a distorted mains buzz
+  const crunch = (() => { const c = new Float32Array(256); for (let i = 0; i < 256; i++) { const x = i / 127.5 - 1; c[i] = Math.tanh(x * 6); } return c; })();
+  function zap(len, peak) {
+    const t = now(), crackle = Float32Array.from({ length: 48 }, (_, i) => (Math.random() ** 2.5) * (1 - i / 60));
+    const out = burst(len + 0.03, peak);
+    // The crack
+    shotNoise(filter("highpass", 3500, 0.7, burst(0.012, peak * 1.6)), 0.014);
+    // The sizzle
+    const band = filter("bandpass", 4200, 7, out), level = ctx.createGain();
+    band.frequency.setValueAtTime(4200 + Math.random() * 1500, t); band.frequency.exponentialRampToValueAtTime(900 + Math.random() * 500, t + len);
+    level.gain.setValueCurveAtTime(crackle, t, len);
+    level.connect(band);
+    shotNoise(level, len);
+    // The buzz under it
+    const shape = ctx.createWaveShaper(); shape.curve = crunch;
+    shape.connect(filter("bandpass", 1600, 1.2, out));
+    shotTone("sawtooth", 100 + Math.random() * 40, shape, len);
+  }
+
   // Each move of the rain's glitch gets its own sound; a freeze is silence
   function glitch(kind, ms) {
     const len = Math.max(0.03, ms / 1000);
     if (kind === "tear") {
       shotNoise(filter("highpass", 1800, 0.7, burst(len, 0.16)), len);
-      shotTone("square", 140 + Math.random() * 80, filter("lowpass", 1200, 1, burst(len, 0.05)), len);
+      zap(Math.min(0.3, len), 0.07);
     } else if (kind === "jump") {
-      const o = shotTone("square", 1400, burst(0.06, 0.06), 0.06);
-      o.frequency.exponentialRampToValueAtTime(180, now() + 0.06);
+      zap(0.07 + Math.random() * 0.05, 0.09);
     } else if (kind === "flash") {
       shotNoise(burst(len + 0.04, 0.2), len + 0.04);
       shotTone("sine", 55, burst(0.18, 0.25), 0.18);
     } else if (kind === "shift") {
-      const g = filter("bandpass", 420, 2, burst(len, 0.12));
-      shotTone("sawtooth", 88, g, len); shotTone("sawtooth", 93, g, len);
+      zap(Math.min(0.35, len), 0.1);
     } else if (kind === "run") {
       shotNoise(filter("bandpass", 3200, 3, burst(0.025, 0.08)), 0.03);
     }
@@ -364,9 +382,16 @@ export function createSound(ctx) {
   }
 
   // ---- Close ----
-  // Fades everything out and closes the context, freeing the audio device and the recording
-  function close() {
+  // Fades everything out and closes the context, freeing the audio device and the recording; at once (at) skips the fade
+  function close(at = false) {
     closed = true;
+    if (at) {
+      if (engine) engine.stop(now());
+      v8 = null; engine = null;
+      sources.forEach((s) => { try { s.stop(); } catch { /* already stopped */ } });
+      ctx.close().catch(() => {});
+      return;
+    }
     glide(master.gain, 0, 0.08); glide(fx.gain, 0, 0.08);
     if (engine) engine.stop(now());
     v8 = null; engine = null;
