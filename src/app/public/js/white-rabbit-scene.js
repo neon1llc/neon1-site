@@ -15,6 +15,9 @@ import { createWorld, SUNDIR } from "/js/white-rabbit-world.js";
 
 // The white-out, the floor's bounce light, the landing's void, and where the screen sits
 // (meters; the floor is y 0, the TV faces +z; the room itself is built in white-rabbit-room.js)
+// Media is served with a year-long immutable cache, so every load asks for this release's copy by version
+const VER = document.querySelector('meta[name="version"]')?.content || "0";
+T.DefaultLoadingManager.setURLModifier((u) => (u.startsWith("/media/") ? `${u}?v=${VER}` : u));
 const PAPER = "#F2F4F2", FLOOR = "#D9CDB8", VOID = "#0D0208";
 const SW = 0.48, SH = 0.36;                  // screen size
 const SC = new T.Vector3(0, 0.51, -1.775);  // screen center
@@ -431,7 +434,7 @@ export function createScene({ onLost, onSound = () => {} }) {
     // The chairs are too dense to ship twice: their occlusion comes as one byte per vertex, in the
     // same order as their geometry, and darkens the vertex colors they already carry
     const dense = [...byName.values()].filter((m) => !m.geometry.attributes.uv1);
-    Promise.all(dense.map((m) => fetch(`/media/white-rabbit/lm/${m.name}.ao`).then((r) => (r.ok ? r.arrayBuffer() : null)).then((buf) => {
+    Promise.all(dense.map((m) => fetch(`/media/white-rabbit/lm/${m.name}.ao?v=${VER}`).then((r) => (r.ok ? r.arrayBuffer() : null)).then((buf) => {
       const ao = buf && new Uint8Array(buf), col = m.geometry.attributes.color, n = m.geometry.attributes.position.count;
       if (!ao || ao.length !== n || !col) return;
       for (let i = 0; i < n; i++) col.setXYZ(i, col.getX(i) * ao[i] / 255, col.getY(i) * ao[i] / 255, col.getZ(i) * ao[i] / 255);
