@@ -16,6 +16,6 @@ squash on "Crookneck Squash" by vtIndigenousCommunityGarden
 beds and cages, stretched and recolored, and rendered as a picture.
 
 Trees (tree_small_02, jacaranda_tree), grass clumps (grass_medium_01), dandelions (dandelion_01), and the leather, walnut, carpet, plaster, and floor
-and wood planks textures are from Poly Haven (https://polyhaven.com), CC0.
+wood planks, and leafy grass textures are from Poly Haven (https://polyhaven.com), CC0.
 
 The V8 recording is the site owner's own.
