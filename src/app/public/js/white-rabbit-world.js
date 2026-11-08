@@ -180,13 +180,21 @@ const GROUND_FRAG = /* glsl */`
         float patchM = smoothstep(0.66, 0.68, fbm(vW.xz * 0.45 + 13.0)) * step(0.45, noise(vW.xz * 0.2 + 5.0));
         col = mix(col, vec3(0.2, 0.198, 0.19) * (0.9 + 0.2 * hash(floor(vW.xz * 90.0))), patchM);
         crack = max(crack * (1.0 - patchM * 0.6), patchM * smoothstep(0.01, 0.0, abs(fbm(vW.xz * 2.4) - 0.5)));
+        // Hairline cracks branching off the big ones, and a few running in from the edges
+        crack = max(crack, 0.6 * smoothstep(0.005, 0.0, abs(fbm(vW.xz * 2.1 + 21.0) - 0.5)) * step(0.5, noise(vW.xz * 0.7 + 17.0)));
+        crack = max(crack, 0.8 * smoothstep(0.007, 0.0, abs(fbm(vW.zx * 0.9 + 31.0) - 0.5)) * step(0.58, noise(vW.xz * 0.35 + 23.0)));
         col *= 1.0 - 0.6 * crack;
+        // Indentations: shallow dents and pitted spots where the surface spalled, dark inside with a worn lip
+        float dent = fbm(vW.xz * 1.6 + 41.0);
+        col *= 1.0 - 0.24 * smoothstep(0.66, 0.71, dent) + 0.08 * smoothstep(0.58, 0.63, dent) * (1.0 - smoothstep(0.63, 0.66, dent));
+        float pit = smoothstep(0.78, 0.86, noise(vW.xz * 9.0 + 3.0)) * step(0.5, noise(vW.xz * 0.6 + 11.0));
+        col *= 1.0 - 0.45 * pit;
         paved = 1.0;
         float md = distance(vW.xz, vec2(${MINT[0].toFixed(2)}, ${MINT[1].toFixed(2)}));
         // The mint runs wild, spilling out over the edge of its circle in leafy clumps
         float spill = ${MINT[2].toFixed(2)} + 0.35 * fbm(vec2(atan(vW.z - (${MINT[1].toFixed(2)}), vW.x - (${MINT[0].toFixed(2)})) * 2.0, 1.0));
         if (md < spill) {
-          col = mix(vec3(0.06, 0.18, 0.04), vec3(0.24, 0.45, 0.13), fbm(vW.xz * 11.0)) * (0.75 + 0.45 * hash(floor(vW.xz * 60.0)));
+          col = mix(vec3(0.025, 0.06, 0.02), vec3(0.07, 0.14, 0.05), fbm(vW.xz * 11.0)) * (0.7 + 0.5 * hash(floor(vW.xz * 60.0)));
           paved = 0.0;
         } else if (md < spill + 0.1) col *= 0.7;
       }
@@ -587,54 +595,99 @@ export function createWorld({ scene, touch }) {
     if (toward) mesh.rotation.y = Math.atan2(toward[0], toward[2]);
     return mesh;
   };
-  // Parallel to the right fence, a couple of feet in front of its soil, facing left; it swings left and right
-  const SWING = [-16, GROUND, -7.2], SWING_TO = [14.8, 0, 8.0], SW = 2.48 * 1.04, SH = 2.92, PIVOT = 0.848 * SH;
-  sprite("/media/white-rabbit/yard-swing.webp", SW, SH, SWING, SWING_TO);
+  // On the concrete in line with the greenhouse and the trellis square, just past the square toward the
+  // house, with its riders facing left (both cards mirrored); it swings left and right
+  const SWING = [-14.9, GROUND, (GREEN.z0 + GREEN.z1) / 2 + 0.6], SWING_TO = [14.8, 0, 8.0], SW = 2.48 * 1.04, SH = 2.92, PIVOT = 0.848 * SH;
+  sprite("/media/white-rabbit/yard-swing.webp", SW, SH, SWING, SWING_TO).scale.x = -1;
   const hinge = new T.Group(); hinge.position.set(SWING[0], SWING[1] + PIVOT, SWING[2]); hinge.rotation.y = Math.atan2(SWING_TO[0], SWING_TO[2]); keep(hinge);
   const seat = new T.Group(); hinge.add(seat);
-  sprite("/media/white-rabbit/yard-swing-seat.webp", SW, SH, [0, -PIVOT, 0.01], null, 0, seat);
+  sprite("/media/white-rabbit/yard-swing-seat.webp", SW, SH, [0, -PIVOT, 0.01], null, 0, seat).scale.x = -1;
   // The garden was rendered square on to its row and lies along it (the back fence), so both its ends
   // stand at their true depths from any view
   sprite("/media/white-rabbit/yard-garden.webp", 17.04, 2.99, [(BED[0] + BED[1]) / 2, GROUND - 0.32, (BED[2] + BED[3]) / 2 + 0.17], [1, 0, 0], 1);   // set into the soil
 
-  // The stone bed: big rectangular stones mortared into a low curving wall along CURVE, two courses on
-  // each face and a cap, soil inside, planted from end to end: a bushy green plant, flowers, a rose, more
+  // The stone bed: a low curving wall along CURVE of long, blocky, jagged stones, no two alike, grey and
+  // reddish, laid in two staggered courses on both faces and across both ends, filled with dirt that the
+  // plants grow from; planted from end to end: a bushy green plant, flowers, a rose, more
   // flowers, a run of daylily leaves, and a last rose (plants rendered in Blender into one atlas; the rose
   // from Sketchfab, by RosticOstafi, CC BY 4.0; nettle, gazania, and periwinkle from Poly Haven, CC0)
   {
     const path = new T.CatmullRomCurve3(CURVE.map(([x, z]) => new T.Vector3(x, 0, z)), false, "centripetal");
     const len = path.getLength(), W = 1.43, Hb = 0.55, n = Math.ceil(len / 0.3);
-    const stone = solid("#8A857C", 0.4), mortar = solid("#6C675F");
-    const stones = keep(new T.InstancedMesh(new T.BoxGeometry(1, 1, 1), stone, n * 6)); let ks = 0;
-    const p = new T.Vector3(), tng = new T.Vector3(), nrm = new T.Vector3();
-    for (let i = 0; i < n; i++) {
-      const u = (i + 0.5) / n; path.getPointAt(u, p); path.getTangentAt(u, tng); nrm.set(-tng.z, 0, tng.x);
-      const yaw = Math.atan2(tng.x, tng.z);
-      for (const side of [-1, 1]) for (const [y, hgt] of [[0.13, 0.24], [0.38, 0.22]]) {
-        const sl = 0.42 + rnd() * 0.12, off = (y > 0.2 ? 0.15 : 0);
-        e.set((rnd() - 0.5) * 0.04, yaw + (rnd() - 0.5) * 0.06, (rnd() - 0.5) * 0.04, "YXZ");
-        stones.setMatrixAt(ks, m.compose(at0.set(p.x + nrm.x * side * (W / 2 - 0.06) + tng.x * off, GROUND + y, p.z + nrm.z * side * (W / 2 - 0.06) + tng.z * off), qq.setFromEuler(e), sc0.set(0.14, hgt - 0.02, sl)));
-        const w = 0.82 + rnd() * 0.3; stones.setColorAt(ks++, tint.setRGB(w, w * (0.95 + rnd() * 0.08), w * (0.88 + rnd() * 0.1)));
+    const stone = solid("#8A857C", 0.6), dirt = solid("#3B2818", 1);
+    // Four rough stone shapes: a subdivided box with every corner pushed about (shared corners move
+    // together, so the faces stay closed), chipped and lumpy; each placement also stretches and turns its own
+    const rough = (k) => {
+      const g = new T.BoxGeometry(1, 1, 1, 4, 2, 2).toNonIndexed(), pos = g.attributes.position, off = new Map();
+      for (let i = 0; i < pos.count; i++) {
+        const key = `${pos.getX(i).toFixed(3)},${pos.getY(i).toFixed(3)},${pos.getZ(i).toFixed(3)}`;
+        if (!off.has(key)) off.set(key, [(rnd() - 0.5) * 0.3, (rnd() - 0.5) * 0.34, (rnd() - 0.5) * 0.22]);
+        const o = off.get(key); pos.setXYZ(i, pos.getX(i) * (1 + o[0]), pos.getY(i) * (1 + o[1]) + (pos.getY(i) > 0 ? o[1] * 0.4 : 0), pos.getZ(i) + o[2] * 0.5);
       }
-      e.set(0, yaw + (rnd() - 0.5) * 0.05, 0, "YXZ");
-      stones.setMatrixAt(ks, m.compose(at0.set(p.x, GROUND + Hb - 0.03, p.z), qq.setFromEuler(e), sc0.set(W + 0.04, 0.07, 0.28)));
-      stones.setColorAt(ks++, tint.setRGB(0.95, 0.93, 0.88));
-      const core = keep(new T.Mesh(new T.BoxGeometry(W - 0.12, Hb - 0.1, len / n + 0.02), mortar)); core.position.set(p.x, GROUND + (Hb - 0.1) / 2, p.z); core.rotation.y = yaw;
+      g.computeVertexNormals(); return g;
+    };
+    const cap = Math.ceil(len / 0.4) * 2 + 40;
+    const sets = [0, 1, 2, 3].map((k) => keep(new T.InstancedMesh(rough(k), stone, cap))), used = [0, 0, 0, 0];
+    const p = new T.Vector3(), tng = new T.Vector3(), nrm = new T.Vector3();
+    const lay = (x, y, z, yaw, sx, sy, sz) => {
+      const k = Math.floor(rnd() * 4), inst = sets[k];
+      e.set((rnd() - 0.5) * 0.08, yaw + (rnd() - 0.5) * 0.1, (rnd() - 0.5) * 0.08, "YXZ");
+      inst.setMatrixAt(used[k], m.compose(at0.set(x, y, z), qq.setFromEuler(e), sc0.set(sx, sy, sz)));
+      // Grey granite, or a reddish sandstone, each a shade of its own
+      const w = 0.7 + rnd() * 0.45, red = rnd() < 0.45;
+      inst.setColorAt(used[k]++, red ? tint.setRGB(w * (1.05 + rnd() * 0.15), w * (0.68 + rnd() * 0.08), w * (0.55 + rnd() * 0.08)) : tint.setRGB(w, w * (0.97 + rnd() * 0.05), w * (0.92 + rnd() * 0.08)));
+    };
+    // Both faces: each course walks the curve laying stones of its own lengths, so the joints never line up
+    for (const side of [-1, 1]) for (const [y0, h0] of [[0.0, 0.27], [0.25, 0.27]]) {
+      let s0 = rnd() * 0.3;
+      while (s0 < len - 0.05) {
+        const L = Math.min(0.5 + rnd() * 0.5, len - s0), u = (s0 + L / 2) / len;
+        path.getPointAt(Math.min(u, 1), p); path.getTangentAt(Math.min(u, 1), tng); nrm.set(-tng.z, 0, tng.x);
+        const th = 0.15 + rnd() * 0.16, h = h0 + (rnd() - 0.35) * 0.14, inset = W / 2 - th / 2 + (rnd() - 0.5) * 0.04;
+        lay(p.x + nrm.x * side * inset, GROUND + y0 + h / 2, p.z + nrm.z * side * inset, Math.atan2(tng.x, tng.z), th, h, L + 0.04);
+        s0 += L + (rnd() - 0.5) * 0.04;
+      }
     }
-    stones.count = ks;
+    // Both ends: stones laid across, again of mixed lengths
+    for (const u of [0, 1]) {
+      path.getPointAt(u, p); path.getTangentAt(u, tng); nrm.set(-tng.z, 0, tng.x);
+      const yaw = Math.atan2(nrm.x, nrm.z), back = u === 0 ? 1 : -1;
+      for (const [y0, h0] of [[0.0, 0.27], [0.25, 0.27]]) {
+        let w0 = -W / 2 + rnd() * 0.15;
+        while (w0 < W / 2 - 0.05) {
+          const L = Math.min(0.45 + rnd() * 0.4, W / 2 + 0.05 - w0), c = w0 + L / 2, th = 0.18 + rnd() * 0.08, h = h0 + (rnd() - 0.3) * 0.08;
+          lay(p.x + nrm.x * c + tng.x * back * th / 2, GROUND + y0 + h / 2, p.z + nrm.z * c + tng.z * back * th / 2, yaw, th, h, L + 0.03);
+          w0 += L;
+        }
+      }
+    }
+    for (let k = 0; k < 4; k++) sets[k].count = used[k];
+    // The dirt inside, a little below the stones' tops, clumped and uneven
+    for (let i = 0; i < n; i++) {
+      const u = (i + 0.5) / n; path.getPointAt(u, p); path.getTangentAt(u, tng);
+      const top = Hb - 0.06 + (rnd() - 0.5) * 0.03;
+      const core = keep(new T.Mesh(new T.BoxGeometry(W - 0.22, top, len / n + 0.03), dirt)); core.position.set(p.x, GROUND + top / 2, p.z); core.rotation.y = Math.atan2(tng.x, tng.z);
+    }
     // The plants, standing in the bed and turning to the camera like the trees
-    const FLORA = { bush: [0.0, 0.5, 0.25, 0.8145, 1.3, 0.85], mint: [0.0, 0.5, 0.25, 0.8145, 0.75, 0.48], flowersA: [0.25, 0.5, 0.5, 0.9219, 0.75, 0.55], flowersB: [0.5, 0.5, 0.75, 0.8906, 0.85, 0.6],
-      rose: [0.7964, 0.5, 0.9531, 1.0, 1.0, 1.45], andromeda: [0.2788, 0.0, 0.4707, 0.5, 3.0, 2.6], branchy: [0.5259, 0.0, 0.7241, 0.5, 2.0, 2.7],
-      pinkrose: [0.7964, 0.5, 0.9531, 1.0, 1.3, 2.1], daylily: [0.0, 0.0, 0.25, 0.2627, 1.25, 0.62], crepe: [0.2788, 0.0, 0.4707, 0.5, 4.4, 5.8], pear: [0.5054, 0.0, 0.7437, 0.5, 5.4, 5.65] };
+    const FLORA = { bush: [0.0, 0.5, 0.25, 0.8145, 1.3, 0.85], mint: [0.0, 0.5, 0.25, 0.8145, 1.0, 0.78], flowersA: [0.25, 0.5, 0.5, 0.9219, 0.75, 0.55], flowersB: [0.5, 0.5, 0.75, 0.8906, 0.85, 0.6],
+      rose: [0.7964, 0.5, 0.9531, 1.0, 1.0, 1.45], andromeda: [0.2788, 0.0, 0.4707, 0.5, 3.0, 2.6], andromedaXL: [0.2788, 0.0, 0.4707, 0.5, 4.6, 4.4],
+      mintLow: [0.0, 0.5, 0.25, 0.8145, 1.45, 0.42], branchy: [0.5259, 0.0, 0.7241, 0.5, 2.0, 2.7],
+      pinkrose: [0.7964, 0.5, 0.9531, 1.0, 1.3, 2.1], daylily: [0.0, 0.0, 0.25, 0.2627, 1.25, 0.62], crepe: [0.2788, 0.0, 0.4707, 0.5, 4.4, 5.8], pear: [0.5054, 0.0, 0.7437, 0.5, 8.0, 8.4] };
     const plan = [["bush", 0.03], ["bush", 0.07], ["flowersA", 0.13], ["flowersB", 0.19], ["flowersA", 0.25], ["flowersA", 0.31], ["rose", 0.39],
       ["flowersB", 0.46], ["flowersA", 0.52], ["flowersB", 0.58], ["daylily", 0.65], ["daylily", 0.71], ["daylily", 0.77], ["daylily", 0.83], ["daylily", 0.88], ["rose", 0.95]];
     const items = plan.map(([k, u]) => { path.getPointAt(u, p); return [k, p.x + (rnd() - 0.5) * 0.15, GROUND + Hb - 0.05, p.z + (rnd() - 0.5) * 0.15, 0]; });
     items.push(["crepe", YARD.back + 0.9, GROUND, YARD.right + 0.9, 1], ["pear", MINT[0], GROUND, MINT[1], 0]);
-    // The left border, from the back corner toward the house: a big Japanese andromeda, a smaller bush on
-    // long bare branches, and a tall pink rose (the dog house is built below)
-    items.push(["andromeda", YARD.back + 0.95, GROUND, (GREEN.z0 + GREEN.z1) / 2, 3], ["branchy", -20.6, GROUND, YARD.left - 0.9, 0], ["pinkrose", -16.6, GROUND, YARD.left - 0.85, 4]);
-    // Mint, bushy and weedy, crowding the pear's circle and over its edge
-    for (let i = 0; i < 16; i++) { const a = rnd() * 6.28, r = MINT[2] * (0.25 + rnd() * 0.95); items.push(["mint", MINT[0] + Math.cos(a) * r, GROUND, MINT[1] + Math.sin(a) * r, 0]); }
+    // An andromeda behind the greenhouse; and the left border, from the back corner toward the house: the dog
+    // house (built below), a huge Japanese andromeda, a smaller bush on long thick branches with its leaves
+    // up top, and a tall pink rose
+    items.push(["andromeda", YARD.back + 0.95, GROUND, (GREEN.z0 + GREEN.z1) / 2, 3]);
+    items.push(["andromedaXL", -25.4, GROUND - 1.2, YARD.left - 1.1, 3], ["branchy", -21.6, GROUND, YARD.left - 0.85, 0], ["pinkrose", -18.4, GROUND, YARD.left - 0.8, 4]);
+    // Mint, a dark crowd of it filling the pear's circle and over the edge: the clumps in the middle stand up,
+    // and the ones around the outside are shoved over, low and sprawling
+    for (let i = 0; i < 70; i++) {
+      const a = rnd() * 6.28, f = Math.sqrt(rnd()), r = MINT[2] * (0.15 + f * 1.1);
+      items.push([f > 0.7 ? "mintLow" : "mint", MINT[0] + Math.cos(a) * r, GROUND, MINT[1] + Math.sin(a) * r, 5]);
+    }
     const base = [], size = [], cell = [], seed = [], pinks = [];
     for (const [k, x, y, z, pink] of items) {
       const f = FLORA[k], s = 0.9 + rnd() * 0.2;
@@ -666,7 +719,9 @@ export function createWorld({ scene, touch }) {
           // The andromeda: dense dark evergreen, hung with strings of tiny white flowers
           if (vPink > 2.5 && vPink < 3.5) { k *= vec3(0.6, 0.85, 0.55); k = mix(k, vec3(0.95, 0.93, 0.88), 0.55 * step(0.62, hash(floor(vUv * 330.0))) * step(0.3, vUv.y - ${(0.0).toFixed(1)})); }
           // The tall rose in pink
-          if (vPink > 3.5) { float red = smoothstep(0.02, 0.12, c.r - c.g); k = mix(k * vec3(1.1, 1.25, 1.0), vec3(0.95, 0.5, 0.65), red * 0.85); }
+          if (vPink > 3.5 && vPink < 4.5) { float red = smoothstep(0.02, 0.12, c.r - c.g); k = mix(k * vec3(1.5, 2.0, 1.4), vec3(0.97, 0.55, 0.7), red * 0.9); }
+          // Mint: a deep, dull green, never bright
+          if (vPink > 4.5) k *= vec3(0.42, 0.55, 0.4) * (0.8 + 0.4 * hash(floor(vUv * 90.0 + vSeed * 7.0)));
           gl_FragColor = vec4(outdoor(k, normalize(vec3(0.3, 0.7, 0.2)), vW), 1.0); }`,
     })));
     fm.frustumCulled = false;
@@ -766,17 +821,24 @@ export function createWorld({ scene, touch }) {
     arch.add(leaves, flowers, fruits);
   }
 
-  // The old dog house in the back-left corner: weathered boards, a shingle roof gone mossy, a dark doorway
+  // The old dog house in the back-left corner, wide and low, turned a little off square toward the yard:
+  // weathered boards, a shingle roof gone mossy, and a doorway hung with three dark plastic flaps
   {
-    const wood = solid("#7A6650", 1), dark = solid("#151210"), roof = solid("#3E3C34");
-    const dh = new T.Group(); dh.position.set(YARD.back + 1.0, GROUND, YARD.left - 1.0); dh.rotation.y = 0.35 + Math.PI / 2; keep(dh);
+    const wood = solid("#7A6650", 1), trim = solid("#5E4D3B", 1), dark = solid("#151210"), roof = solid("#3E3C34"), flap = solid("#2C3236", 0.15);
+    const dh = new T.Group(); dh.position.set(YARD.back + 1.15, GROUND, YARD.left - 1.25); dh.rotation.y = Math.PI / 2 - 0.35; keep(dh);
     const add = (geo, mat, x, y, z, rx = 0, ry = 0, rz = 0) => { const o = new T.Mesh(geo, mat); o.position.set(x, y, z); o.rotation.set(rx, ry, rz); dh.add(o); return o; };
-    add(new T.BoxGeometry(0.9, 0.75, 1.1), wood, 0, 0.42, 0);
-    add(new T.BoxGeometry(0.02, 0.45, 0.32), dark, 0.456, 0.3, 0.05);                                         // the doorway
-    for (const s of [-1, 1]) add(new T.BoxGeometry(0.62, 0.03, 1.22), roof, s * 0.24, 0.98, 0, 0, 0, s * -0.72);
-    const gable = new T.BufferGeometry(); gable.setAttribute("position", new T.Float32BufferAttribute([0.45, 0.8, -0.55, 0.45, 0.8, 0.55, 0.45, 1.15, 0, -0.45, 0.8, 0.55, -0.45, 0.8, -0.55, -0.45, 1.15, 0], 3));
-    gable.computeVertexNormals(); add(gable, wood, 0, 0, 0).material.side = T.DoubleSide;
-    add(new T.BoxGeometry(0.96, 0.08, 1.16), wood, 0, 0.04, 0);                                               // the base, sunk a little
+    const D = 1.65;
+    add(new T.BoxGeometry(0.9, 0.75, D), wood, 0, 0.42, 0);
+    add(new T.BoxGeometry(0.02, 0.47, 0.5), dark, 0.456, 0.31, 0.12);                                          // the doorway
+    for (const [y, h, z, w] of [[0.56, 0.04, 0.12, 0.58], [0.31, 0.47, -0.15, 0.04], [0.31, 0.47, 0.39, 0.04]]) add(new T.BoxGeometry(0.03, h, w), trim, 0.462, y, z);
+    // Three flaps, hung from the top of the frame, none quite plumb
+    for (let i = 0; i < 3; i++) add(new T.BoxGeometry(0.008, 0.44, 0.158), flap, 0.472, 0.32, 0.12 + (i - 1) * 0.163, (rnd() - 0.5) * 0.04, 0, (rnd() - 0.4) * 0.12);
+    for (const s of [-1, 1]) add(new T.BoxGeometry(0.62, 0.03, D + 0.12), roof, s * 0.24, 0.98, 0, 0, 0, s * -0.72);
+    const g = D / 2;
+    // The gables are the short ends: fill each end under the ridge
+    const ends = new T.BufferGeometry(); ends.setAttribute("position", new T.Float32BufferAttribute([-0.45, 0.8, -g, 0.45, 0.8, -g, 0, 1.15, -g, 0.45, 0.8, g, -0.45, 0.8, g, 0, 1.15, g], 3));
+    ends.computeVertexNormals(); add(ends, wood, 0, 0, 0).material.side = T.DoubleSide;
+    add(new T.BoxGeometry(0.96, 0.08, D + 0.06), wood, 0, 0.04, 0);                                           // the base, sunk a little
   }
 
   // Ducks: a few mallards and one white duck, each paddling a slow loop of its own near the near bank
