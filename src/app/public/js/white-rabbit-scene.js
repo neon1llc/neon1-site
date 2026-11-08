@@ -92,16 +92,47 @@ const SCREEN_FRAG = /* glsl */`
     gl_FragColor = vec4(col, 1.0);
   }`;
 
-// Glass: the window reflected as a soft diagonal band, a bright spot up high, and a sheen toward the rim
-const GLASS_FRAG = /* glsl */`
-  uniform float uStrength;
+// Glass: the tube's convex face reflecting the room. Its normal bows outward toward the rim (the face is
+// a shallow dome, more curved than the bulge the picture takes), and each point reflects the view
+// direction off it into a simple room: the window as a soft bright pane with its sash bars, a pale
+// ceiling and walls, and a darker floor, weighted by Fresnel so the glare is faint face on and stronger
+// at a slant. So the window's reflection is a small curved highlight that slides and stretches across
+// the screen as the camera moves, never a fixed blotch
+const GLASS_VERT = /* glsl */`
+  uniform float uGeoBulge;
+  varying vec3 vWorld, vNormal;
   varying vec2 vUv;
   void main() {
-    vec2 c = vUv * 2.0 - 1.0;
-    float band = smoothstep(0.22, 0.0, abs(vUv.x * 0.8 - vUv.y + 0.35)) * 0.7;
-    float spot = exp(-dot(c - vec2(-0.45, 0.5), c - vec2(-0.45, 0.5)) * 9.0) * 1.6;
-    float edge = smoothstep(0.55, 1.1, length(c));
-    gl_FragColor = vec4(vec3(0.85, 0.92, 1.0) * uStrength * (band + spot + edge), 1.0);
+    vUv = uv;
+    vec2 c = position.xy / vec2(${SW / 2}, ${SH / 2});
+    vec3 p = position;
+    p.z += uGeoBulge * 0.025 * max(0.0, 1.0 - 0.5 * dot(c, c));
+    vNormal = normalize(mat3(modelMatrix) * vec3(c.x * 0.3, c.y * 0.24, 1.0));
+    vec4 w = modelMatrix * vec4(p, 1.0);
+    vWorld = w.xyz;
+    gl_Position = projectionMatrix * viewMatrix * w;
+  }`;
+const GLASS_FRAG = /* glsl */`
+  uniform float uStrength;
+  uniform vec3 uWin, uWinSize;
+  varying vec3 vWorld, vNormal;
+  varying vec2 vUv;
+  void main() {
+    vec3 n = normalize(vNormal), v = normalize(vWorld - cameraPosition), r = reflect(v, n);
+    // Where the reflected ray meets the window wall (x = uWin.x), in the window's own across and up
+    float t = (uWin.x - vWorld.x) / min(r.x, -1e-3);
+    vec3 hit = vWorld + r * t;
+    vec2 q = vec2((hit.z - uWin.z) / uWinSize.x, (hit.y - uWin.y) / uWinSize.y);
+    float pane = (r.x < -0.05) ? smoothstep(0.62, 0.42, abs(q.x)) * smoothstep(0.62, 0.42, abs(q.y)) : 0.0;
+    pane *= 1.0 - 0.55 * smoothstep(0.05, 0.0, abs(q.y - 0.2));   // the meeting rail, raised with the lower sash
+    // The room around it: brighter above, dim below
+    float room = 0.07 + 0.08 * smoothstep(-0.3, 0.8, r.y);
+    // A broad, soft glow around the window's reflection, as the tube's glass is never a perfect mirror
+    float halo = (r.x < -0.05) ? exp(-dot(q, q) * 1.6) * 0.32 : 0.0;
+    float fres = 0.04 + 0.96 * pow(1.0 - max(0.0, dot(n, -v)), 5.0);
+    float edge = smoothstep(0.75, 1.0, length(vUv * 2.0 - 1.0)) * 0.25;
+    vec3 col = vec3(0.92, 0.96, 1.0) * (pane * 1.3 + halo + room + edge) * mix(0.35, 1.0, fres);
+    gl_FragColor = vec4(col * uStrength * 2.2, 1.0);
   }`;
 
 // Grade: grain, outer vignette, exposure, the room's warm or cool tint, a filmic curve for the lit room, and the white-out
@@ -364,9 +395,12 @@ export function createScene({ onLost, onSound = () => {} }) {
   const screenGeo = new T.PlaneGeometry(SW, SH, 48, 36);
   const screen = new T.Mesh(screenGeo, new T.ShaderMaterial({ uniforms: screenU, vertexShader: SCREEN_VERT, fragmentShader: SCREEN_FRAG }));
   screen.position.copy(SC); scene.add(screen);
-  const glassU = { uGeoBulge: screenU.uGeoBulge, uStrength: { value: 0 } };
+  const glassU = {
+    uGeoBulge: screenU.uGeoBulge, uStrength: { value: 0 },
+    uWin: { value: new T.Vector3(-1.99, WINDOW.y, WINDOW.z) }, uWinSize: { value: new T.Vector3(WINDOW.w, WINDOW.h, 0) },
+  };
   const glass = new T.Mesh(screenGeo, new T.ShaderMaterial({
-    uniforms: glassU, vertexShader: SCREEN_VERT, fragmentShader: GLASS_FRAG,
+    uniforms: glassU, vertexShader: GLASS_VERT, fragmentShader: GLASS_FRAG,
     transparent: true, blending: T.AdditiveBlending, depthWrite: false,
   }));
   glass.position.copy(SC).add(new T.Vector3(0, 0, 0.002)); scene.add(glass);
