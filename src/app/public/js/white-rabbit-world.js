@@ -162,7 +162,7 @@ const GROUND_FRAG = /* glsl */`
     if (yard) {
       float zb = ${CURVE[0][1].toFixed(2)};
       ${CURVE.slice(1).map((p, i) => `if (x < ${CURVE[i][0].toFixed(2)}) zb = mix(${CURVE[i][1].toFixed(2)}, ${p[1].toFixed(2)}, clamp((x - (${CURVE[i][0].toFixed(2)})) / (${(p[0] - CURVE[i][0]).toFixed(2)}), 0.0, 1.0));`).join("\n      ")}
-      bool soil = z < ${(YARD.right + SOIL).toFixed(2)} || x < ${(YARD.back + SOIL).toFixed(2)};
+      bool soil = z < ${(YARD.right + SOIL).toFixed(2)} || x < ${(YARD.back + SOIL).toFixed(2)} || (z > ${(YARD.left - SOIL).toFixed(2)} && x < ${(DECK.x0 - 0.2).toFixed(2)});
       if (soil) {
         col = vec3(0.17, 0.11, 0.07) * (0.75 + 0.45 * noise(vW.xz * 6.0)) * (0.85 + 0.3 * hash(floor(vW.xz * 30.0)));
         col = mix(col, vec3(0.3, 0.42, 0.12), 0.25 * step(0.8, noise(vW.xz * 2.3)));          // a weed or two
@@ -170,7 +170,7 @@ const GROUND_FRAG = /* glsl */`
       } else if (z < zb - 0.3) {
         // Poured concrete in slabs, joints every 2 m, weathered: stains, hairline cracks, a darker damp edge
         vec2 j = abs(fract(vW.xz / 2.0) - 0.5);
-        col = vec3(0.47, 0.46, 0.43) * (0.86 + 0.18 * fbm(vW.xz * 0.9)) * (0.94 + 0.06 * hash(floor(vW.xz * 40.0)));
+        col = vec3(0.39, 0.38, 0.36) * (0.86 + 0.18 * fbm(vW.xz * 0.9)) * (0.94 + 0.06 * hash(floor(vW.xz * 40.0)));
         col *= 1.0 - 0.4 * smoothstep(0.485, 0.5, max(j.x, j.y));
         col *= 1.0 - 0.18 * smoothstep(0.62, 0.7, fbm(vW.xz * 0.35 + 4.0));
         col *= 1.0 - 0.35 * smoothstep(0.015, 0.0, abs(fbm(vW.xz * 1.7) - 0.5)) * step(0.6, noise(vW.xz * 0.4));
@@ -615,11 +615,15 @@ export function createWorld({ scene, touch }) {
     stones.count = ks;
     // The plants, standing in the bed and turning to the camera like the trees
     const FLORA = { bush: [0.0, 0.5, 0.25, 0.8145, 1.3, 0.85], flowersA: [0.25, 0.5, 0.5, 0.9219, 0.75, 0.55], flowersB: [0.5, 0.5, 0.75, 0.8906, 0.85, 0.6],
-      rose: [0.7964, 0.5, 0.9531, 1.0, 1.0, 1.45], daylily: [0.0, 0.0, 0.25, 0.2627, 1.25, 0.62], crepe: [0.2788, 0.0, 0.4707, 0.5, 4.4, 5.8], pear: [0.5259, 0.0, 0.7241, 0.5, 5.4, 7.6] };
+      rose: [0.7964, 0.5, 0.9531, 1.0, 1.0, 1.45], andromeda: [0.2788, 0.0, 0.4707, 0.5, 3.0, 2.6], branchy: [0.5259, 0.0, 0.7241, 0.5, 2.0, 2.7],
+      pinkrose: [0.7964, 0.5, 0.9531, 1.0, 1.3, 2.1], daylily: [0.0, 0.0, 0.25, 0.2627, 1.25, 0.62], crepe: [0.2788, 0.0, 0.4707, 0.5, 4.4, 5.8], pear: [0.5259, 0.0, 0.7241, 0.5, 5.4, 7.6] };
     const plan = [["bush", 0.03], ["bush", 0.07], ["flowersA", 0.13], ["flowersB", 0.19], ["flowersA", 0.25], ["flowersA", 0.31], ["rose", 0.39],
       ["flowersB", 0.46], ["flowersA", 0.52], ["flowersB", 0.58], ["daylily", 0.65], ["daylily", 0.71], ["daylily", 0.77], ["daylily", 0.83], ["daylily", 0.88], ["rose", 0.95]];
     const items = plan.map(([k, u]) => { path.getPointAt(u, p); return [k, p.x + (rnd() - 0.5) * 0.15, GROUND + Hb - 0.05, p.z + (rnd() - 0.5) * 0.15, 0]; });
     items.push(["crepe", YARD.back + 0.9, GROUND, YARD.right + 0.9, 1], ["pear", MINT[0], GROUND, MINT[1], 0]);
+    // The left border, from the back corner toward the house: a big Japanese andromeda, a smaller bush on
+    // long bare branches, and a tall pink rose (the dog house is built below)
+    items.push(["andromeda", -25.2, GROUND, YARD.left - 0.95, 3], ["branchy", -20.6, GROUND, YARD.left - 0.9, 0], ["pinkrose", -16.6, GROUND, YARD.left - 0.85, 4]);
     const base = [], size = [], cell = [], seed = [], pinks = [];
     for (const [k, x, y, z, pink] of items) {
       const f = FLORA[k], s = 0.9 + rnd() * 0.2;
@@ -643,7 +647,11 @@ export function createWorld({ scene, touch }) {
           vec3 k = c.rgb * (0.92 + 0.16 * vSeed) * 1.2;
           // The crepe myrtle's crown in pink bloom, flecked through the green; the roses lifted from near black to deep red
           if (vPink > 0.5 && vPink < 1.5) k = mix(k, vec3(0.95, 0.42, 0.66) * (0.7 + 0.5 * hash(floor(vUv * 400.0))), 0.7 * step(0.35, hash(floor(vUv * 260.0))) * smoothstep(0.2, 0.5, (vUv.y - ${(0.0).toFixed(1)}) * 2.0));
-          if (vPink > 1.5) k = k * vec3(2.4, 1.6, 1.6) + vec3(0.06, 0.0, 0.01);
+          if (vPink > 1.5 && vPink < 2.5) k = k * vec3(2.4, 1.6, 1.6) + vec3(0.06, 0.0, 0.01);
+          // The andromeda: dense dark evergreen, hung with strings of tiny white flowers
+          if (vPink > 2.5 && vPink < 3.5) { k *= vec3(0.6, 0.85, 0.55); k = mix(k, vec3(0.95, 0.93, 0.88), 0.55 * step(0.62, hash(floor(vUv * 330.0))) * step(0.3, vUv.y - ${(0.0).toFixed(1)})); }
+          // The tall rose in pink
+          if (vPink > 3.5) { float red = smoothstep(0.02, 0.12, c.r - c.g); k = mix(k * vec3(1.1, 1.25, 1.0), vec3(0.95, 0.5, 0.65), red * 0.85); }
           gl_FragColor = vec4(outdoor(k, normalize(vec3(0.3, 0.7, 0.2)), vW), 1.0); }`,
     })));
     fm.frustumCulled = false;
@@ -681,6 +689,19 @@ export function createWorld({ scene, touch }) {
     }
     // Two roof vents propped open on the left slope
     for (const x of [g.x0 + L * 0.3, g.x0 + L * 0.7]) { const v = bar(0.6, 0.03, 0.5, x, Y + g.ridge - 0.12, cz + 0.3); v.rotation.x = slope + 0.35; }
+  }
+
+  // The old dog house in the back-left corner: weathered boards, a shingle roof gone mossy, a dark doorway
+  {
+    const wood = solid("#7A6650", 1), dark = solid("#151210"), roof = solid("#3E3C34");
+    const dh = new T.Group(); dh.position.set(YARD.back + 1.0, GROUND, YARD.left - 1.0); dh.rotation.y = 0.35 + Math.PI / 2; keep(dh);
+    const add = (geo, mat, x, y, z, rx = 0, ry = 0, rz = 0) => { const o = new T.Mesh(geo, mat); o.position.set(x, y, z); o.rotation.set(rx, ry, rz); dh.add(o); return o; };
+    add(new T.BoxGeometry(0.9, 0.75, 1.1), wood, 0, 0.42, 0);
+    add(new T.BoxGeometry(0.02, 0.45, 0.32), dark, 0.456, 0.3, 0.05);                                         // the doorway
+    for (const s of [-1, 1]) add(new T.BoxGeometry(0.62, 0.03, 1.22), roof, s * 0.24, 0.98, 0, 0, 0, s * -0.72);
+    const gable = new T.BufferGeometry(); gable.setAttribute("position", new T.Float32BufferAttribute([0.45, 0.8, -0.55, 0.45, 0.8, 0.55, 0.45, 1.15, 0, -0.45, 0.8, 0.55, -0.45, 0.8, -0.55, -0.45, 1.15, 0], 3));
+    gable.computeVertexNormals(); add(gable, wood, 0, 0, 0).material.side = T.DoubleSide;
+    add(new T.BoxGeometry(0.96, 0.08, 1.16), wood, 0, 0.04, 0);                                               // the base, sunk a little
   }
 
   // Ducks: a few mallards and one white duck, each paddling a slow loop of its own near the near bank
