@@ -2,6 +2,13 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.16.0
+
+- The yard has edges: a taller white fence around the back and both sides, a neighbor's two-story house past the left fence, and a cross street past the right.
+- A weathered wooden deck sits below the window with railings, a gate left ajar at the top of the steps into the yard, and a second flight down at its end.
+- The garden runs along the back fence: wilting sunflowers, a raised bed with two lattice trellises where squash vines climb, flower, hang long squash, and run on along the fence, and cherry tomatoes in wire cages.
+- The garden sways with the wind, and the swing drifts on its chains.
+
 ## v0.15.4
 
 - The yard looks lived in: an old rusted swing set and a late-season sunflower bed, leaning and nodding among weeds, rendered from real models; a fence that sags, leans, weathers, and misses a picket here and there; and a lawn with drier and lusher patches, clover, a worn path, bare earth under the swing, dandelions, and fallen leaves.
