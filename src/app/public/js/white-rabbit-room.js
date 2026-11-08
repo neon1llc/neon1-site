@@ -463,12 +463,14 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
   // The sill: a squat Doric capital half sunk in the wall, its slab running back to the sash
   trim.push(place(capital(DORIC, { x: -1.95, za: z0 - NECK, zb: z1 + NECK, y: y0, back: 0.1 })));
 
-  // A double-hung window, closed. The upper sash sits in the outer track; the lower sash sits in the
-  // inner track, a sash's depth nearer the room, and is the one that slides. Its top rail is the
-  // meeting rail, overlapping the upper sash's bottom rail, with the lock on it; its bottom rail is
-  // deeper, with a lift, and seats on the sill. A parting bead runs between the tracks, and stops
-  // hold the lower sash in from the room side
+  // A double-hung window, raised about 40%. The upper sash sits in the outer track; the lower sash sits
+  // in the inner track, a sash's depth nearer the room, and is the one that slides. Its top rail is the
+  // meeting rail, with the lock on it; raised, it rides up in front of the upper sash's glass, and the
+  // upper sash's bottom rail, with the lock's keeper, shows through the lower glass where the meeting rail
+  // sat closed. Its bottom rail is deeper, with a lift lip and brass lifts, and below it the opening is
+  // clear to the trees. A parting bead runs between the tracks, and stops hold the lower sash in from the room side
   const mid = y0 + win.h / 2, sw2 = 0.045, deep = 0.034, sashes = [], panes = [];
+  const LIFT = 0.26;                                            // how far the lower sash is raised (0.4 of its height)
   const outerX = -2.03, innerX = -1.99;
   const sash = (x, bottom, top, topRail, bottomRail) => {
     const h = top - bottom, cy = (bottom + top) / 2;
@@ -478,19 +480,19 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
     panes.push(place(new T.PlaneGeometry(win.w - 0.02 - 2 * sw2, ph), { p: [x, bottom + bottomRail + ph / 2, win.z], r: [0, Math.PI / 2, 0] }));
   };
   sash(outerX, mid - 0.012, y1, sw2, 0.03);                     // upper sash: its bottom rail tucks behind the meeting rail
-  sash(innerX, y0 + 0.028, mid + 0.026, 0.05, 0.075);          // lower sash: meeting rail on top, deep bottom rail on the sill
+  sash(innerX, y0 + 0.028 + LIFT, mid + 0.026 + LIFT, 0.05, 0.075); // lower sash: meeting rail on top, deep bottom rail, raised
   // Parting beads between the tracks and stops on the room side, up both jambs and across the head
   for (const z of [z0 + 0.006, z1 - 0.006]) {
     sashes.push(box(0.008, win.h, 0.012, [-2.01, win.y, z]), box(0.014, win.h, 0.014, [-1.966, win.y, z + (z < win.z ? 0.001 : -0.001)]));
   }
   sashes.push(box(0.008, 0.012, win.w, [-2.01, y1 - 0.006, win.z]), box(0.014, 0.014, win.w, [-1.966, y1 - 0.007, win.z]));
   // A lift lip along the bottom rail's face, so the lower sash can be raised
-  sashes.push(box(0.012, 0.01, win.w * 0.5, [innerX + deep / 2 + 0.006, y0 + 0.028 + 0.05, win.z]));
+  sashes.push(box(0.012, 0.01, win.w * 0.5, [innerX + deep / 2 + 0.006, y0 + 0.028 + LIFT + 0.05, win.z]));
   add(merged([...trim, ...sashes], shiny(0.35, { color: WINDOW_TRIM, roughness: 0.5 })));
   add(merged(panes, standard({ color: "#DCEBF2", roughness: 0.05, transparent: true, opacity: 0.08, depthWrite: false })));
   // Brass: the sash lock on the meeting rail, and two lifts on the bottom rail
-  add(merged([box(0.016, 0.01, 0.06, [innerX + deep / 2 - 0.004, mid + 0.031, win.z]), box(0.012, 0.012, 0.022, [innerX - deep / 2 - 0.004, mid + 0.031, win.z + 0.03]),
-    box(0.014, 0.02, 0.012, [innerX + deep / 2 + 0.007, y0 + 0.07, win.z - 0.3]), box(0.014, 0.02, 0.012, [innerX + deep / 2 + 0.007, y0 + 0.07, win.z + 0.3])],
+  add(merged([box(0.016, 0.01, 0.06, [innerX + deep / 2 - 0.004, mid + 0.031 + LIFT, win.z]), box(0.006, 0.012, 0.022, [outerX + deep / 2 + 0.003, mid + 0.003, win.z + 0.03]),
+    box(0.014, 0.02, 0.012, [innerX + deep / 2 + 0.007, y0 + 0.07 + LIFT, win.z - 0.3]), box(0.014, 0.02, 0.012, [innerX + deep / 2 + 0.007, y0 + 0.07 + LIFT, win.z + 0.3])],
     shiny(1, { color: BRASS, metalness: 0.7, roughness: 0.3 })));
 
   // ---- The carved sign above the window, hung a hair off level ----

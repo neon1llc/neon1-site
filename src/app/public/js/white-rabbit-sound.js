@@ -2,7 +2,7 @@
 // Usage: const sound = createSound(new AudioContext()); sound.start("scene"); sound.update(p, tv, wind); sound.close()
 //
 // Imported by white-rabbit.js after a catch, with an AudioContext made in that same click
-// or tap, and silent until the scroll out of the TV begins. The tube's low mains hum and
+// or tap. Apart from the glitch as the rain stops, it is silent until the scroll out of the TV begins. The tube's low mains hum and
 // faint whine, static while the screen shows snow, the room's quiet air, the
 // outdoors (a breeze, leaves rustling in gusts, birds now and then, a faint creek), and the
 // glitch as the rain stops are built from oscillators, noise, and filters. The car's
@@ -38,6 +38,10 @@ export function createSound(ctx) {
   const master = ctx.createGain();
   master.gain.value = 0;
   master.connect(out).connect(ctx.destination);
+  // The catch's glitch is heard at once, apart from the beds, which wait for the scroll
+  const fx = ctx.createGain();
+  fx.gain.value = LEVEL;
+  fx.connect(out);
 
   // Two seconds of white noise, shared by everything that hisses
   const noise = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
@@ -185,7 +189,7 @@ export function createSound(ctx) {
   // ---- The glitch as the rain stops ----
   // A short envelope on a new gain: up fast, then down over len seconds
   function burst(len, peak) {
-    const g = gain(0), t = now();
+    const g = gain(0, fx), t = now();
     g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(peak, t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + len);
     setTimeout(() => g.disconnect(), (len + 0.2) * 1000);
     return g;
@@ -233,7 +237,7 @@ export function createSound(ctx) {
     for (let i = 0; i < n; i++) d[i] /= peak;
     return buf;
   }
-  let engine = null, starter = null, v8 = null, v8Load = null;
+  let engine = null, starter = null, v8 = null, v8Load = null, closed = false;
 
   // Fetches and decodes the recording once; a failure leaves the synthesized engine in its place
   function loadV8() {
@@ -311,6 +315,18 @@ export function createSound(ctx) {
   function car(kind) {
     const t = now();
     if (kind === "click") { loadV8(); return; }
+    // Straight to idle, for a sound rebuilt while the engine runs: the recording's idle, or the synthesized one
+    if (kind === "idle") {
+      loadV8();
+      v8Load.then(() => {
+        if (engine || closed) return;
+        if (!v8) { car("fire"); return; }
+        const idle = idler(now());
+        idle.g.gain.setValueAtTime(0, now()); idle.g.gain.linearRampToValueAtTime(0.42, now() + 0.6);
+        engine = { stop: idle.stop };
+      });
+      return;
+    }
     if (kind === "crank" && v8) { ignition(); return; }
     if (kind === "fire" && engine) return; // the recording already caught
     if (kind === "crank") {
@@ -350,7 +366,8 @@ export function createSound(ctx) {
   // ---- Close ----
   // Fades everything out and closes the context, freeing the audio device and the recording
   function close() {
-    glide(master.gain, 0, 0.08);
+    closed = true;
+    glide(master.gain, 0, 0.08); glide(fx.gain, 0, 0.08);
     if (engine) engine.stop(now());
     v8 = null; engine = null;
     setTimeout(() => { sources.forEach((s) => { try { s.stop(); } catch { /* already stopped */ } }); ctx.close().catch(() => {}); }, 300);
