@@ -17,7 +17,7 @@
 
 
 // Feel: scroll length for one pass, spring, rubber band, and gesture idle time
-const PASS = 2.6;          // viewport heights of input for the whole scene
+const PASS = 6;            // viewport heights of input for the whole walk
 const STIFF = 90;          // spring stiffness, per second squared
 const DAMP = 2 * Math.sqrt(STIFF);
 const BAND = 0.02;         // the most input can pull past the end
@@ -382,7 +382,7 @@ export function whiteRabbit({ rain, root }) {
     }
     const q = clamp(p, 0, 1);
     scene.render(q, { speed: Math.abs(v) });
-    if (sound) sound.update(q, scene.facing, scene.wind);
+    if (sound) sound.update(scene.beat, scene.facing, scene.wind, scene.open);
     root.dataset.progress = q.toFixed(3);
     grass.parentElement.style.opacity = smooth(0.97, 1, q).toFixed(3);
     if (q > 0.995) announce(true);

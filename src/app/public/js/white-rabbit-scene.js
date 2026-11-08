@@ -4,12 +4,13 @@
 // Imported by white-rabbit.js only after a catch, with three.js behind it. The
 // still landing becomes the picture on an old CRT. Progress 0 frames that picture
 // exactly as the page showed it, so the hand-off has no jump; progress 1 is the
-// window, the sun, and a white-out. Everything is built in code: no images or models.
+// window, through it, and a white-out over the lakefront below.
 
 import * as T from "/js/vendor/three-0.187.0.rabbit.min.js";
 import { createSky, createShafts, LIGHT } from "/js/white-rabbit-sky.js";
 import { furnish } from "/js/white-rabbit-room.js";
 import { createCar, unpacked } from "/js/white-rabbit-car.js";
+import { createWorld, SUNDIR } from "/js/white-rabbit-world.js";
 
 
 // The white-out, the floor's bounce light, the landing's void, and where the screen sits
@@ -19,11 +20,37 @@ const SW = 0.48, SH = 0.36;                  // screen size
 const SC = new T.Vector3(0, 0.51, -1.775);  // screen center
 const WINDOW = { z: 0.6, y: 1.45, w: 1.2, h: 1.3 };
 
-// Beats: progress, then camera position and look target; B0 to B2 are filled in from the picture's fit
-const KEYS = [0, 0.12, 0.28, 0.40, 0.60, 0.82, 0.94, 1];
-const FOV = [40, 40, 44, 50, 55, 52, 48, 48];
-const LOOK = [SC, SC, SC, [0, 0.5, -1.8], [0, 0.45, -2.0], [-2.0, 1.45, 0.7], [-2.0, 1.75, 0.6], [-2.0, 1.9, 0.6]];
-const POS_ROOM = [[0, 0.52, -0.9], [0.1, 0.55, 0.3], [0.5, 0.95, 1.6], [0.6, 1.0, 2.0]];
+// Beats, as a person would take them: out of the TV, sitting back from it, turning in the chair toward
+// the window and pondering it, standing, walking over at an angle to the car on the sill, a pause there,
+// stepping square to the window, a pause looking out, raising the sash, a breath, then out through the
+// opening into the white. Each is [progress, camera position, look target, vertical fov]; the first
+// three positions are filled in from the picture's fit
+const BEATS = [
+  [0, null, SC, 40], [0.06, null, SC, 40], [0.14, null, SC, 44],
+  [0.2, [0, 0.62, -0.9], [0, 0.5, -1.8], 50],                   // pulling back from the set
+  [0.26, [0.15, 0.95, 0.35], [0, 0.55, -1.9], 54],              // sat back between the chairs
+  [0.32, [0.2, 0.95, 0.42], [-1.95, 1.4, 0.7], 54],             // turning toward the window
+  [0.4, [0.19, 0.96, 0.44], [-1.95, 1.48, 0.66], 53],           // pondering it, still seated
+  [0.48, [0.05, 1.58, 0.62], [-1.95, 1.42, 0.72], 52],          // standing up
+  [0.58, [-0.95, 1.55, 1.75], [-1.87, 0.94, 0.9], 50],          // walked over, at an angle to the car
+  [0.64, [-0.99, 1.54, 1.71], [-1.87, 0.96, 0.88], 49],         // a pause on the car
+  [0.72, [-0.65, 1.55, 0.62], [-1.95, 1.38, 0.6], 50],          // square to the window
+  [0.8, [-0.69, 1.55, 0.6], [-1.95, 1.34, 0.6], 50],            // looking out
+  [0.88, [-0.85, 1.5, 0.6], [-2.4, 1.2, 0.6], 50],              // raising the sash (see OPEN)
+  [0.92, [-0.9, 1.45, 0.6], [-2.8, 1.1, 0.6], 50],              // a breath
+  [0.97, [-1.95, 1.12, 0.6], [-3.2, 1.1, 0.6], 52],             // through the opening
+  [1, [-2.35, 1.1, 0.6], [-3.6, 1.1, 0.6], 52],                 // outside, into the white
+];
+const KEYS = BEATS.map((b) => b[0]), FOV = BEATS.map((b) => b[3]), LOOK = BEATS.map((b) => b[2]);
+const OPEN = [[0.8, 0], [0.88, 1]];
+// The lighting, screen, and grade below were timed on an earlier, shorter walk; this maps progress
+// onto that timeline (the room appearing, the window coming into view, the white-out)
+const LEGACY = [[0, 0], [0.14, 0.28], [0.24, 0.4], [0.34, 0.6], [0.62, 0.82], [0.93, 0.94], [1, 1]];
+function linear(p, pts) {
+  if (p <= pts[0][0]) return pts[0][1];
+  for (let i = 1; i < pts.length; i++) if (p <= pts[i][0]) { const [a, x] = pts[i - 1], [b, y] = pts[i]; return x + ((y - x) * (p - a)) / (b - a); }
+  return pts[pts.length - 1][1];
+}
 
 // Piecewise smooth interpolation through [progress, value] pairs, flat outside them
 function ramp(p, pts) {
@@ -140,15 +167,15 @@ const GRADE = {
   uniforms: {
     tDiffuse: { value: null }, uGrain: { value: 0 }, uVignette: { value: 0 }, uExposure: { value: 1 },
     uTone: { value: 0 }, uWhite: { value: 0 }, uTime: { value: 0 }, uPaper: { value: new T.Color(PAPER) },
-    uTint: { value: new T.Vector3(1, 1, 1) },
+    uTint: { value: new T.Vector3(1, 1, 1) }, uFlare: { value: new T.Vector3(0.5, 0.5, 0) }, uAspect: { value: 1 },
   },
   vertexShader: /* glsl */`
     varying vec2 vUv;
     void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
   fragmentShader: /* glsl */`
     uniform sampler2D tDiffuse;
-    uniform float uGrain, uVignette, uExposure, uTone, uWhite, uTime;
-    uniform vec3 uPaper, uTint;
+    uniform float uGrain, uVignette, uExposure, uTone, uWhite, uTime, uAspect;
+    uniform vec3 uPaper, uTint, uFlare;
     varying vec2 vUv;
     float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
     vec3 aces(vec3 x) { return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), 0.0, 1.0); }
@@ -158,6 +185,21 @@ const GRADE = {
       c = mix(c, aces(c * 0.9), uTone);
       c += (hash(vUv * 1000.0 + fract(uTime) * 100.0) - 0.5) * uGrain;
       c *= 1.0 - uVignette * smoothstep(0.35, 0.95, distance(vUv, vec2(0.5)));
+      // The sun in your eyes: a hot core and a wide glow around it, a faint horizontal streak, a few
+      // ghosts of the lens along the line through the middle, and a veil of light over everything
+      if (uFlare.z > 0.001) {
+        vec2 a = vec2(uAspect, 1.0), d = (vUv - uFlare.xy) * a;
+        float r = length(d);
+        vec3 warm = vec3(1.0, 0.9, 0.74);
+        vec3 f = warm * (exp(-r * 30.0) * 2.2 + exp(-r * 7.0) * 0.55 + exp(-r * 2.2) * 0.18);
+        f += warm * exp(-abs(d.y) * 160.0) * exp(-abs(d.x) * 4.0) * 0.28;
+        for (int i = 1; i <= 3; i++) {
+          vec2 gp = mix(uFlare.xy, vec2(0.5), 1.0 + float(i) * 0.45);
+          float gr = length((vUv - gp) * a);
+          f += vec3(0.55, 0.75, 1.0) * smoothstep(0.05 + 0.03 * float(i), 0.0, gr) * 0.06 / float(i);
+        }
+        c = c * (1.0 - 0.12 * uFlare.z) + f * uFlare.z + warm * 0.1 * uFlare.z;
+      }
       gl_FragColor = vec4(mix(c, uPaper, uWhite), t.a);
     }`,
 };
@@ -343,6 +385,7 @@ export function createScene({ onLost, onSound = () => {} }) {
 
   // ---- Sky, sun, and clouds, seen only through the window ----
   const sky = createSky({ scene, win: WINDOW, touch });
+  const world = createWorld({ scene, touch });
 
   // ---- The room, the TV around its screen, the table, and the chairs ----
   const env = environment(renderer);
@@ -455,7 +498,7 @@ export function createScene({ onLost, onSound = () => {} }) {
   const pic = document.createElement("canvas");
   let tex = null, fit = { h: SH, d0: 0.5 };
   async function compose() {
-    const [{ cw, ch, rh }] = await Promise.all([picture(pic), sky.ready, car.ready, baked, photos]);
+    const [{ cw, ch, rh }] = await Promise.all([picture(pic), sky.ready, car.ready, baked, photos, world.ready]);
     if (disposed) return;
     if (!tex || tex.image.width !== cw || tex.image.height !== ch) {
       if (tex) tex.dispose();
@@ -473,9 +516,7 @@ export function createScene({ onLost, onSound = () => {} }) {
   let posCurve = null, lookCurve = null;
   function path() {
     const sz = SC.z, d0 = fit.d0;
-    const pos = [[0, SC.y, sz + d0], [0, SC.y, sz + d0 + 0.05], [0, SC.y, sz + Math.max(0.62, d0 + 0.2)], ...POS_ROOM];
-    const end = new T.Vector3(...POS_ROOM[3]), toWin = new T.Vector3(...LOOK[7]).sub(end).normalize();
-    pos.push(end.clone().addScaledVector(toWin, 0.15).toArray());
+    const pos = [[0, SC.y, sz + d0], [0, SC.y, sz + d0 + 0.05], [0, SC.y, sz + Math.max(0.62, d0 + 0.2)], ...BEATS.slice(3).map((b) => b[1])];
     const v = (a) => (a.isVector3 ? a.clone() : new T.Vector3(...a));
     posCurve = new T.CatmullRomCurve3(pos.map(v), false, "centripetal");
     lookCurve = new T.CatmullRomCurve3(LOOK.map(v), false, "centripetal");
@@ -491,24 +532,27 @@ export function createScene({ onLost, onSound = () => {} }) {
   }
 
   // ---- One frame ----
-  const P = new T.Vector3(), L = new T.Vector3(), D = new T.Vector3();
-  let frames = 0, spent = 0, lastFrame = 0, prev = 0, facing = 1;
-  function render(p, { speed = 0, still = false } = {}) {
+  const P = new T.Vector3(), L = new T.Vector3(), D = new T.Vector3(), sunAt = new T.Vector3();
+  let frames = 0, spent = 0, lastFrame = 0, prev = 0, facing = 1, beat = 0, open = 0;
+  function render(pr, { speed = 0, still = false } = {}) {
     if (disposed || !posCurve) return;
     const now = performance.now(), time = now / 1000, dt = prev ? (now - prev) / 1000 : 0;
     prev = now;
-    const aspect = innerWidth / innerHeight, u = along(p);
+    // pr is the walk's progress; p is the same moment on the lighting's timeline (see LEGACY)
+    const aspect = innerWidth / innerHeight, u = along(pr), p = linear(pr, LEGACY);
+    beat = p;
 
     // Camera: curve, portrait widening and pull-back, a little handheld sway, and the room's walls
+    // (only until the camera goes out through the window)
     posCurve.getPoint(u, P); lookCurve.getPoint(u, L);
-    let fov = ramp(p, KEYS.map((k, i) => [k, FOV[i]]));
+    let fov = ramp(pr, KEYS.map((k, i) => [k, FOV[i]]));
     const wide = T.MathUtils.radToDeg(2 * Math.atan(Math.tan(T.MathUtils.degToRad(19)) / aspect));
     fov += (Math.max(fov, wide) - fov) * ramp(p, [[0.28, 0], [0.45, 1]]);
     // Wide screens: the view across is held to about 72 degrees, past which a flat picture stretches
     // whatever sits near its sides, like looking through a fishbowl
     const across = T.MathUtils.radToDeg(2 * Math.atan(Math.tan(T.MathUtils.degToRad(36)) / aspect));
     fov += (Math.min(fov, across) - fov) * ramp(p, [[0.12, 0], [0.28, 1]]);
-    const back = Math.max(0, 0.9 / aspect - 0.9) * ramp(p, [[0.3, 0], [0.5, 1]]);
+    const back = Math.max(0, 0.9 / aspect - 0.9) * ramp(p, [[0.3, 0], [0.5, 1]]) * ramp(pr, [[0.84, 1], [0.94, 0]]);
     D.subVectors(P, L).normalize();
     P.addScaledVector(D, back);
     if (!still) {
@@ -516,7 +560,7 @@ export function createScene({ onLost, onSound = () => {} }) {
       P.x += Math.sin(time * 1.3) * 0.003 * sway; P.y += Math.sin(time * 0.9 + 1) * 0.002 * sway;
       L.x += Math.sin(time * 0.7) * 0.0026 * P.distanceTo(L) * sway;
     }
-    P.set(T.MathUtils.clamp(P.x, -1.85, 1.85), T.MathUtils.clamp(P.y, 0.2, 2.4), T.MathUtils.clamp(P.z, -2.35, 2.35));
+    if (pr < 0.9) P.set(T.MathUtils.clamp(P.x, -1.85, 1.85), T.MathUtils.clamp(P.y, 0.2, 2.4), T.MathUtils.clamp(P.z, -2.35, 2.35));
     camera.position.copy(P); camera.lookAt(L);
     camera.fov = fov; camera.aspect = aspect; camera.updateProjectionMatrix();
     // How squarely and closely the camera faces the set, for the sound of its hum
@@ -544,14 +588,16 @@ export function createScene({ onLost, onSound = () => {} }) {
     const room = ramp(p, [[0.4, 0], [0.6, 1]]);
     sky.update(dt, ramp(p, [[0.5, 0], [0.7, 1]]), ratio);
     const s = sky.sun;
+    world.update(time, sky.wind, sky.phase, s);
     hemi.intensity = light * (0.62 + 0.15 * s) * ramp(p, [[0.55, 3.5], [0.86, 1.3]]); // the room dims a little as the window takes over
     hemi.color.copy(COOL).lerp(WARM, s);
     sun.intensity = light * (0.15 + 1.2 * s);
     fill.intensity = light * (0.55 + 0.35 * s);
     for (const [m, k] of glossy) m.envMapIntensity = k * light;
     car.update(time, light);
-    // The lower sash, raised about 40%; moving it redraws the shadows it throws
-    if (openWindow(0.4)) renderer.shadowMap.needsUpdate = true;
+    // The lower sash goes up with the scroll; moving it redraws the shadows it throws
+    open = ramp(pr, OPEN);
+    if (openWindow(open)) renderer.shadowMap.needsUpdate = true;
     glow.intensity = ramp(p, [[0, 0], [0.28, 0.6], [0.6, 0.3], [0.82, 0.2]]) * 0.02;
     grade.uniforms.uTint.value.copy(WHITE).lerp(TINT_COOL.clone().lerp(TINT_WARM, s), room);
 
@@ -561,10 +607,28 @@ export function createScene({ onLost, onSound = () => {} }) {
     grade.uniforms.uVignette.value = ramp(p, [[0.28, 0], [0.6, 0.25], [0.94, 0.1]]);
     grade.uniforms.uTone.value = ramp(p, [[0.12, 0], [0.4, 1]]);
     grade.uniforms.uExposure.value = ramp(p, [[0.4, 1], [0.58, 1.15], [0.82, 1.15], [0.94, 1.25], [1, 1.6]]); // brighter once out of the TV
-    grade.uniforms.uWhite.value = ramp(p, [[0.94, 0], [0.985, 1]]);
+    grade.uniforms.uWhite.value = ramp(pr, [[0.965, 0], [0.995, 1]]);  // once through the frame
     bloom.strength = bloomOn ? ramp(p, [[0.6, 0], [0.94, 0.12]]) : 0;
     bloom.enabled = bloom.strength > 0.001;
-    sky.aim(camera, shafts, ramp(p, [[0.55, 0], [0.75, 1]]) * 0.55);
+    sky.aim(camera, shafts, ramp(p, [[0.55, 0], [0.75, 1]]) * 0.3);
+    sky.open = open;
+    // The sun in the eyes: where it sits on screen, and how much of it reaches the camera: through the
+    // window opening while inside, past the clouds, and only when it is near the middle of the view
+    sunAt.copy(camera.position).addScaledVector(SUNDIR, 1000);
+    const sp = sunAt.clone().project(camera);
+    let seen = 0;
+    if (sp.z < 1 && Math.abs(sp.x) < 1.3 && Math.abs(sp.y) < 1.3) {
+      if (camera.position.x < -1.97) seen = 1;
+      else {
+        const k = (-1.95 - camera.position.x) / SUNDIR.x, hy = camera.position.y + SUNDIR.y * k, hz = camera.position.z + SUNDIR.z * k;
+        const y0 = WINDOW.y - WINDOW.h / 2, y1 = WINDOW.y + WINDOW.h / 2, z0 = WINDOW.z - WINDOW.w / 2, z1 = WINDOW.z + WINDOW.w / 2;
+        seen = T.MathUtils.smoothstep(Math.min(hy - y0, y1 - hy, hz - z0, z1 - hz), 0, 0.06);
+      }
+    }
+    camera.getWorldDirection(D);
+    const facingSun = Math.max(0, D.dot(SUNDIR)) ** 6;
+    grade.uniforms.uFlare.value.set((sp.x + 1) / 2, (sp.y + 1) / 2, seen * s * facingSun * 0.9 * ramp(p, [[0.5, 0], [0.62, 1]]));
+    grade.uniforms.uAspect.value = aspect;
     composer.render();
 
     // Slow frames step the pixel ratio down, and bloom goes first
@@ -610,7 +674,7 @@ export function createScene({ onLost, onSound = () => {} }) {
       }
     });
     if (tex) tex.dispose();
-    env.dispose(); carEnv.dispose(); sky.dispose(); car.dispose(); bakedTextures.forEach((t) => t.dispose());
+    env.dispose(); carEnv.dispose(); sky.dispose(); world.dispose(); car.dispose(); bakedTextures.forEach((t) => t.dispose());
     composer.passes.forEach((pass) => pass.dispose && pass.dispose());
     composer.dispose();
     renderer.dispose();
@@ -618,5 +682,5 @@ export function createScene({ onLost, onSound = () => {} }) {
     canvas.remove();
   }
 
-  return { compose, render, resize, dispose, pick, over: (x, y) => pick(x, y, true), get facing() { return facing; }, get wind() { return sky.wind; }, get carRunning() { return car.running; } };
+  return { compose, render, resize, dispose, pick, over: (x, y) => pick(x, y, true), get facing() { return facing; }, get wind() { return sky.wind; }, get carRunning() { return car.running; }, get beat() { return beat; }, get open() { return open; } };
 }
