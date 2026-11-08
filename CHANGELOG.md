@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.18.2
+
+- No two plants in the beds and borders stand the same: each is mirrored or not, leans its own way, and grows a little wider or narrower.
+
 ## v0.18.1
 
 - A soil border runs down the left fence too: an old worn dog house in the back corner, then a big Japanese andromeda, a smaller bush on long bare branches, and a tall pink rose nearer the house.
