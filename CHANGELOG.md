@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.21.1
+
+- The stone bed's stones are all grey, each somewhere between a medium dark grey and a darker one, with no light grey or burgundy.
+
 ## v0.21.0
 
 - The white rabbit's walk scrolls about 2.6 times longer, 48 screen heights in all.
