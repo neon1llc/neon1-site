@@ -23,21 +23,19 @@ const SW = 0.48, SH = 0.36;                  // screen size
 const SC = new T.Vector3(0, 0.51, -1.775);  // screen center
 const WINDOW = { z: 0.6, y: 1.45, w: 1.2, h: 1.3 };
 
-// Beats, as a person would take them: out of the TV, then scooting back across the floor in three
-// shoves with a pause after each, until the set and both chairs are in view; still sitting, turning slowly
+// Beats, as a person would take them: out of the TV, then gliding back across the floor in one steady
+// move, sitting the whole way, until the set and both chairs are in view; still sitting, turning slowly
 // toward the window (through the sun, for a moment, right in the eyes) and settling on the sky and treetops;
 // a pondering pause; getting up (the view dips and tilts, then rights itself); walking over with the bob
 // of each step, glancing down at the car on the sill on the way, then squaring up to the window; a pause
 // looking out; a step closer as the sash, already a little up, goes the rest of the way; a breath; and out
 // through the opening into the white. Each is [progress, camera position, look target, vertical fov]; the
-// first three positions are filled in from the picture's fit. Pauses are pairs of beats a hair apart
+// first two positions are filled in from the picture's fit. Pauses are pairs of beats a hair apart
 const BEATS = [
-  [0, null, SC, 40], [0.04, null, SC, 40], [0.09, null, SC, 44],                                       // face right at the screen, hunched
-  [0.13, [0.03, 0.9, -1.32], [0, 0.56, -1.9], 48], [0.16, [0.04, 0.9, -1.3], [0, 0.56, -1.9], 48],     // sitting back up straight, still close to the set, then a pause
-  [0.19, [0.24, 0.9, -0.58], [0, 0.56, -1.9], 50], [0.215, [0.25, 0.9, -0.56], [0, 0.56, -1.9], 50],    // first scoot back, pause
-  [0.24, [0.47, 0.9, 0.16], [0, 0.56, -1.9], 52], [0.265, [0.48, 0.9, 0.18], [0, 0.56, -1.9], 52],      // second, pause
-  [0.29, [0.69, 0.9, 0.9], [0, 0.56, -1.9], 53], [0.315, [0.7, 0.9, 0.92], [0, 0.56, -1.9], 53],        // third, pause
-  [0.345, [0.9, 0.9, 1.58], [0, 0.56, -1.9], 54], [0.37, [0.91, 0.9, 1.6], [0.02, 0.56, -1.9], 54],     // fourth: the set and both chairs
+  [0, null, SC, 40], [0.09, null, SC, 44],                                                               // face right at the screen, hunched
+  // then one steady glide back across the floor, still sitting the whole way, until the set and both chairs are in view
+  [0.13, [0.03, 0.9, -1.32], [0, 0.56, -1.9], 48], [0.25, [0.47, 0.9, 0.14], [0.01, 0.56, -1.9], 51],
+  [0.37, [0.91, 0.9, 1.6], [0.02, 0.56, -1.9], 54],
   [0.42, [0.92, 0.9, 1.6], [-0.86, 1.56, 0.88], 54],             // turning to the window: the sun in the eyes
   [0.46, [0.92, 0.9, 1.6], [-1.95, 1.3, 0.92], 54],              // past it, to the sky and treetops
   [0.51, [0.92, 0.91, 1.59], [-1.95, 1.33, 0.86], 54],           // watching the light and the dust
@@ -54,8 +52,6 @@ const BEATS = [
   [0.985, [-2.37, 1.1, 0.62], [-3.6, 1.0, 0.58], 52],            // a long look at it all, before the white
   [1, [-2.38, 1.1, 0.62], [-3.6, 1.0, 0.58], 52],
 ];
-// The scoots' dips: the look drops a little as each push begins and comes back level by its end
-const SCOOTS = [[0.16, 0.19], [0.215, 0.24], [0.265, 0.29], [0.315, 0.345]];
 const KEYS = BEATS.map((b) => b[0]), FOV = BEATS.map((b) => b[3]), LOOK = BEATS.map((b) => b[2]);
 // The sash starts a little up and goes the rest of the way as the camera steps closer
 const OPEN = [[0.79, 0.3], [0.85, 1]];
@@ -558,7 +554,7 @@ export function createScene({ onLost, onSound = () => {} }) {
   let posCurve = null, lookCurve = null;
   function path() {
     const sz = SC.z, d0 = fit.d0;
-    const pos = [[0, SC.y, sz + d0], [0, SC.y, sz + d0 + 0.05], [0, SC.y, sz + Math.max(0.62, d0 + 0.2)], ...BEATS.slice(3).map((b) => b[1])];
+    const pos = [[0, SC.y, sz + d0], [0, SC.y, sz + Math.max(0.62, d0 + 0.2)], ...BEATS.slice(2).map((b) => b[1])];
     const v = (a) => (a.isVector3 ? a.clone() : new T.Vector3(...a));
     posCurve = new T.CatmullRomCurve3(pos.map(v), false, "centripetal");
     lookCurve = new T.CatmullRomCurve3(LOOK.map(v), false, "centripetal");
@@ -591,7 +587,6 @@ export function createScene({ onLost, onSound = () => {} }) {
     // Camera: curve, portrait widening and pull-back, a little handheld sway, and the room's walls
     // (only until the camera goes out through the window)
     posCurve.getPoint(u, P); lookCurve.getPoint(u, L);
-    for (const [a, b] of SCOOTS) if (pr > a && pr < b) { const t = (pr - a) / (b - a); L.y -= Math.max(0, Math.sin(Math.min(1, t * 1.6) * Math.PI)) ** 0.7 * 0.12 * (1 - t * 0.4); }
     let fov = ramp(pr, KEYS.map((k, i) => [k, FOV[i]]));
     const wide = T.MathUtils.radToDeg(2 * Math.atan(Math.tan(T.MathUtils.degToRad(19)) / aspect));
     fov += (Math.max(fov, wide) - fov) * ramp(p, [[0.28, 0], [0.45, 1]]);

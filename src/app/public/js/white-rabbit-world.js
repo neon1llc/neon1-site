@@ -46,6 +46,9 @@ const YARD = { back: -30, right: -10, left: 12.5 };
 // a pear tree and its mint; the greenhouse stands square in the back-right corner of the concrete
 const CURVE = [[-12.9, 2.7], [-15.6, 0.9], [-19.0, -0.5], [-22.2, -0.6], [-24.6, 0.4], [-26.2, 1.6]];   // starts 1.5 m right of the front stairs
 const SOIL = 1.8;
+// Edges are never ruled straight: every soil, concrete, and mulch boundary wanders by a few centimeters
+const WOB = (s) => 0.07 * Math.sin(s * 1.13 + 0.7) + 0.045 * Math.sin(s * 2.71 + 2.1) + 0.025 * Math.sin(s * 6.3 + 4.0);
+const WOB_GLSL = "float wob(float s) { return 0.07 * sin(s * 1.13 + 0.7) + 0.045 * sin(s * 2.71 + 2.1) + 0.025 * sin(s * 6.3 + 4.0); }";
 const MINT = [-24.0, -2.55, 0.85];
 const GREEN = { x0: -28.2, x1: -23.0, z0: -8.2, z1: -4.9, eave: 2.05, ridge: 2.75 };   // about 1.4 times the 8 x 12 ft kit
 // The square of soil in front of the greenhouse, a foot from its door, where the squash trellis stands
@@ -84,6 +87,7 @@ const GROUND_VERT = /* glsl */`
 const GROUND_FRAG = /* glsl */`
   ${COMMON}
   ${hash}
+  ${WOB_GLSL}
   ${SHAPE_GLSL}
   uniform vec3 uTrees[48];
   uniform vec4 uBed;
@@ -107,10 +111,10 @@ const GROUND_FRAG = /* glsl */`
     float dry = smoothstep(0.5, 0.8, fbm(vW.xz * 0.12 + 7.0));
     // The photo's detail, by its brightness, on a lawn's greens (the photo itself is an autumn floor)
     float lum = dot(photo, vec3(0.3, 0.55, 0.15));
-    vec3 grass = mix(vec3(0.07, 0.16, 0.03), vec3(0.3, 0.46, 0.12), clamp(lum * 1.7, 0.0, 1.0)) * mix(0.72, 1.18, mott);
+    vec3 grass = mix(vec3(0.07, 0.2, 0.035), vec3(0.3, 0.58, 0.12), clamp(lum * 1.7, 0.0, 1.0)) * mix(0.78, 1.15, mott);
     // Clumps: a mid scale of darker, thicker tufts and thin, paler spots, so the lawn has texture from afar
-    grass *= mix(0.8, 1.12, smoothstep(0.25, 0.75, fbm(vW.xz * 2.6 + 11.0)));
-    grass = mix(grass, mix(grass, photo, 0.25) * vec3(1.25, 1.05, 0.65), dry * 0.55);
+    grass *= mix(0.74, 1.16, smoothstep(0.25, 0.75, fbm(vW.xz * 2.6 + 11.0))) * mix(0.86, 1.1, fbm(vW.xz * 8.0 + 5.0));   // tufts at two scales, so it has depth
+    grass = mix(grass, mix(grass, photo, 0.25) * vec3(1.2, 1.05, 0.7), dry * 0.22);
     grass = mix(grass, grass * vec3(0.7, 0.9, 0.7), smoothstep(0.62, 0.75, noise(vW.xz * 1.6 + 3.0)) * 0.6);
     if (x > ${STRIP.fence.toFixed(1)}) {
       float wander = z + sin(x * 0.4) * 0.5 + noise(vec2(x * 0.3, 0.0)) * 0.8;
@@ -165,15 +169,16 @@ const GROUND_FRAG = /* glsl */`
     if (yard) {
       float zb = ${CURVE[0][1].toFixed(2)};
       ${CURVE.slice(1).map((p, i) => `if (x < ${CURVE[i][0].toFixed(2)}) zb = mix(${CURVE[i][1].toFixed(2)}, ${p[1].toFixed(2)}, clamp((x - (${CURVE[i][0].toFixed(2)})) / (${(p[0] - CURVE[i][0]).toFixed(2)}), 0.0, 1.0));`).join("\n      ")}
-      bool soil = z < ${(YARD.right + SOIL).toFixed(2)} || x < ${(YARD.back + SOIL).toFixed(2)} || (z > ${(YARD.left - SOIL).toFixed(2)} && x < ${(DECK.x0 - 0.2).toFixed(2)})
-        || (x > ${PATCH.x0.toFixed(2)} && x < ${PATCH.x1.toFixed(2)} && z > ${PATCH.z0.toFixed(2)} && z < ${PATCH.z1.toFixed(2)});
+      bool soil = z < ${(YARD.right + SOIL).toFixed(2)} + wob(x) || x < ${(YARD.back + SOIL).toFixed(2)} + wob(z + 3.0) || (z > ${(YARD.left - SOIL).toFixed(2)} + wob(x + 7.0) && x < ${(DECK.x0 - 0.2).toFixed(2)})
+        || (x > ${PATCH.x0.toFixed(2)} + wob(z + 11.0) && x < ${PATCH.x1.toFixed(2)} + wob(z + 13.0) && z > ${PATCH.z0.toFixed(2)} && z < ${PATCH.z1.toFixed(2)} + wob(x + 19.0));
       if (soil) {
         // Dark, rich soil
         col = vec3(0.1, 0.058, 0.03) * (0.75 + 0.45 * noise(vW.xz * 6.0)) * (0.85 + 0.3 * hash(floor(vW.xz * 30.0)));
         col = mix(col, vec3(0.3, 0.42, 0.12), 0.25 * step(0.8, noise(vW.xz * 2.3)));          // a weed or two
         // The left border is mulched in red bark chips, thinning to bare soil in patches and around the
         // base of each plant (the andromeda, the branchy bush, the rose, and the dog house)
-        if (z > ${(YARD.left - SOIL).toFixed(2)}) {
+        // The back border is mulched the same, as it is in the yard
+        if (z > ${(YARD.left - SOIL).toFixed(2)} + wob(x + 7.0) || x < ${(YARD.back + SOIL).toFixed(2)} + wob(z + 3.0)) {
           vec2 cp = vW.xz * 26.0; vec2 cell = floor(cp + 0.5 * vec2(hash(floor(cp.yx)), 0.0));
           float chip = hash(cell), edge = smoothstep(0.42, 0.5, max(abs(fract(cp.x + 0.5 * hash(floor(cp.yx))) - 0.5), abs(fract(cp.y) - 0.5)));
           vec3 mulch = mix(vec3(0.17, 0.04, 0.022), vec3(0.27, 0.065, 0.032), chip) * (0.8 + 0.35 * noise(vW.xz * 3.0)) * (1.0 - 0.45 * edge);
@@ -182,14 +187,15 @@ const GROUND_FRAG = /* glsl */`
           bare = max(bare, smoothstep(0.6, 0.75, noise(vW.xz * 1.7 + 5.0)) * 0.7);
           bare = max(bare, step(0.93, hash(floor(vW.xz * 9.0))) * 0.5);
           // the mulch's ragged edge where it meets the lawn
-          float lip = smoothstep(${(YARD.left - SOIL).toFixed(2)}, ${(YARD.left - SOIL + 0.2).toFixed(2)}, z + 0.12 * noise(vW.xz * 4.0));
+          float lip = smoothstep(${(YARD.left - SOIL).toFixed(2)}, ${(YARD.left - SOIL + 0.2).toFixed(2)}, z - wob(x + 7.0) + 0.12 * noise(vW.xz * 4.0));
+          lip = max(lip, smoothstep(${(YARD.back + SOIL).toFixed(2)}, ${(YARD.back + SOIL - 0.2).toFixed(2)}, x - wob(z + 3.0) - 0.12 * noise(vW.xz * 4.0)));
           col = mix(col, mulch, (1.0 - bare) * lip);
         }
         paved = 1.0;
       } else if (z < zb - 0.75) {
         // One old pour, medium dark grey and rough, cracked in wandering lines over the years, and patched here
         // and there with lighter quick-set cement that has cracked in its turn
-        col = vec3(0.12, 0.12, 0.118) * (0.82 + 0.26 * fbm(vW.xz * 0.7)) * (0.86 + 0.28 * hash(floor(vW.xz * 70.0)));
+        col = vec3(0.17, 0.17, 0.165) * (0.82 + 0.26 * fbm(vW.xz * 0.7)) * (0.86 + 0.28 * hash(floor(vW.xz * 70.0)));
         col *= 1.0 - 0.15 * smoothstep(0.6, 0.72, fbm(vW.xz * 0.3 + 4.0));
         float crack = smoothstep(0.012, 0.0, abs(fbm(vW.xz * 0.55 + 2.0) - 0.5)) * step(0.55, noise(vW.xz * 0.25 + 9.0));
         crack = max(crack, smoothstep(0.008, 0.0, abs(fbm(vW.xz * 1.3 + 7.0) - 0.5)) * step(0.62, noise(vW.xz * 0.5 + 3.0)));
@@ -289,30 +295,27 @@ const TREE_VERT = /* glsl */`
     vec3 toCam = cameraPosition - aBase; toCam.y = 0.0;
     vec3 right = normalize(cross(vec3(0.0, 1.0, 0.0), normalize(toCam)));
     float top = position.y * position.y;
-    // The card itself never moves, so the trunk stays put; the branches move in the fragment shader (BREATHE)
-    float sway = 0.0;
-    vec3 w = aBase + right * (position.x * aSize.x + sway * aSize.y * top) + vec3(0.0, position.y * aSize.y, 0.0);
+    // Wind moves the card itself, the way a tree moves: the trunk holds at the ground and bends more
+    // toward the top, the whole crown rocking slowly and leaning off in the gusts, and the outer limbs
+    // bobbing a beat apart from it. Every motion is broad (a few waves across the whole tree at most), so
+    // limbs and clumps move as pieces and the picture itself never ripples
+    float t = uPhase, s0 = aSeed * 6.283, g = uWind, small = 1.0 + 1.2 * (1.0 - smoothstep(1.0, 3.0, aSize.y));
+    float sway = ((0.004 + 0.022 * g) * sin(t * 0.55 + s0) + (0.002 + 0.009 * g) * sin(t * 1.3 + s0 * 1.7) + 0.018 * g * g) * small;
+    float limb = (0.0015 + 0.008 * g) * small * smoothstep(0.35, 1.0, position.y) * (0.4 + 1.6 * abs(position.x));
+    float lx = limb * sin(t * 1.9 + s0 * 3.1 + position.x * 2.6 + position.y * 1.7);
+    float ly = limb * 0.6 * cos(t * 2.2 + s0 * 2.3 + position.x * 3.1) * abs(position.x) * 2.0;
+    vec3 w = aBase + right * (position.x * aSize.x + (sway * top + lx) * aSize.y) + vec3(0.0, (position.y + ly) * aSize.y, 0.0);
     vUv = mix(aCell.xy, aCell.zw, position.xy + vec2(0.5, 0.0));
     vW = w; vSeed = aSeed; vCell = aCell;
     gl_Position = projectionMatrix * viewMatrix * vec4(w, 1.0);
   }`;
-// Trees breathe: the trunk holds still, and the crown moves in patches, each its own way at once, more toward
-// the outside and the top where the twigs are thin; a gust stirs it all harder rather than pushing it one way
+// Leaves catch the light as they turn in the wind (the motion itself is in TREE_VERT)
 const BREATHE = /* glsl */`
   uniform float uPhase, uWind;
   varying vec4 vCell;
-  vec2 breathe(vec2 uv, float seed, float amount) {
-    vec2 span = vCell.zw - vCell.xy, L = (uv - vCell.xy) / span;
-    float reach = smoothstep(0.18, 0.75, L.y) * (0.35 + 1.3 * abs(L.x - 0.5) * 2.0 + 0.6 * smoothstep(0.6, 1.0, L.y));
-    float t = uPhase, g = 1.0 + 2.6 * uWind;
-    vec2 q = L * vec2(5.0, 6.5) + seed * 17.0;
-    vec2 d = vec2(sin(q.y * 1.7 + t * 1.25 + sin(q.x * 2.3 + t * 0.7)), cos(q.x * 1.9 - t * 1.05 + sin(q.y * 1.3 - t * 0.85)));
-    d += 0.55 * vec2(sin(q.x * 4.3 + q.y * 1.1 + t * 2.4), cos(q.y * 3.9 - q.x * 0.7 - t * 2.7));
-    // and the leaves themselves flutter: a fine, quick tremble on top of the slow patches
-    vec2 f = L * vec2(38.0, 44.0) + seed * 29.0;
-    d += 0.35 * vec2(sin(f.x + t * 7.3 + sin(f.y * 0.7)), cos(f.y - t * 8.1 + sin(f.x * 0.6))) * (0.5 + uWind);
-    return uv + d * reach * amount * g * span;
-  }
+  // The picture is never warped (that read as heat haze): the card moves instead (TREE_VERT), and only
+  // the light on the leaves flickers (shimmer). Kept as a pass-through so every caller reads the same
+  vec2 breathe(vec2 uv, float seed, float amount) { return uv; }
   // Leaves turning in the wind catch the light: a small, quick flicker of brightness, patch by patch
   float shimmer(vec2 uv, float seed) {
     vec2 L = (uv - vCell.xy) / (vCell.zw - vCell.xy), f = L * vec2(30.0, 34.0) + seed * 11.0;
@@ -327,7 +330,7 @@ const TREE_FRAG = /* glsl */`
   varying vec3 vW;
   varying float vSeed;
   void main() {
-    vec4 c = texture2D(uMap, breathe(vUv, vSeed, 0.006));
+    vec4 c = texture2D(uMap, breathe(vUv, vSeed, 0.004));
     if (c.a < 0.45) discard;
     // About a third of the trees wear mixed autumn leaves: patches of the crown turned redder, others more gold
     vec2 L = (vUv - vCell.xy) / (vCell.zw - vCell.xy);
@@ -366,6 +369,14 @@ const SOLID_FRAG = /* glsl */`
     gl_FragColor = vec4(outdoor(c, normalize(vN), vW), 1.0);
   }`;
 
+// A card cut 4 across and 8 up, so the wind can bend it smoothly from trunk to crown (see TREE_VERT)
+const cardGrid = (geo) => {
+  const pos = [], idx = [], NX = 4, NY = 8;
+  for (let j = 0; j <= NY; j++) for (let i = 0; i <= NX; i++) pos.push(i / NX - 0.5, j / NY, 0);
+  for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) { const a = j * (NX + 1) + i; idx.push(a, a + 1, a + NX + 2, a, a + NX + 2, a + NX + 1); }
+  geo.setAttribute("position", new T.Float32BufferAttribute(pos, 3)); geo.setIndex(idx); return geo;
+};
+
 /** Builds the lakefront into scene; ready resolves when the tree atlas is in */
 export function createWorld({ scene, touch }) {
   const common = { uSunDir: { value: SUNDIR }, uHaze: { value: HAZE }, uSun: { value: 1 } };
@@ -398,8 +409,7 @@ export function createWorld({ scene, touch }) {
   }
   while (shade.length < 48) shade.push(new T.Vector3(999, 999, 0));
   const quad = new T.InstancedBufferGeometry();
-  quad.setAttribute("position", new T.Float32BufferAttribute([-0.5, 0, 0, 0.5, 0, 0, 0.5, 1, 0, -0.5, 1, 0], 3));
-  quad.setIndex([0, 1, 2, 0, 2, 3]);
+  cardGrid(quad);
   quad.setAttribute("aBase", new T.InstancedBufferAttribute(new Float32Array(base), 3));
   quad.setAttribute("aSize", new T.InstancedBufferAttribute(new Float32Array(size), 2));
   quad.setAttribute("aCell", new T.InstancedBufferAttribute(new Float32Array(cell), 4));
@@ -427,8 +437,16 @@ export function createWorld({ scene, touch }) {
     const SLAB = 0.025, X1 = -2.1, zr = YARD.right + SOIL, xb = YARD.back + SOIL;
     const edge = (x) => { let zb = CURVE[0][1]; for (let i = 1; i < CURVE.length; i++) if (x < CURVE[i - 1][0]) zb = CURVE[i - 1][1] + (CURVE[i][1] - CURVE[i - 1][1]) * Math.min(1, Math.max(0, (x - CURVE[i - 1][0]) / (CURVE[i][0] - CURVE[i - 1][0]))); return zb - 0.75; };
     const sh = new T.Shape();
-    sh.moveTo(X1, zr); sh.lineTo(PATCH.x1, zr); sh.lineTo(PATCH.x1, PATCH.z1); sh.lineTo(PATCH.x0, PATCH.z1); sh.lineTo(PATCH.x0, zr); sh.lineTo(xb, zr);
-    for (let x = xb; x <= X1 + 0.001; x += 0.25) sh.lineTo(x, edge(x));
+    const run = (a, b, f) => { const n = Math.max(2, Math.ceil(Math.abs(b - a) / 0.2)); for (let i = 0; i <= n; i++) f(a + (b - a) * i / n); };
+    const px1 = (z) => PATCH.x1 + WOB(z + 13), px0 = (z) => PATCH.x0 + WOB(z + 11), pz1 = (x) => PATCH.z1 + WOB(x + 19), rz = (x) => zr + WOB(x), bx = (z) => xb + WOB(z + 3);
+    sh.moveTo(X1, rz(X1));
+    run(X1, px1(zr), (x) => sh.lineTo(x, rz(x)));
+    run(zr, PATCH.z1, (z) => sh.lineTo(px1(z), z));
+    run(px1(PATCH.z1), px0(PATCH.z1), (x) => sh.lineTo(x, pz1(x)));
+    run(PATCH.z1, zr, (z) => sh.lineTo(px0(z), z));
+    run(px0(zr), bx(zr), (x) => sh.lineTo(x, rz(x)));
+    run(zr, edge(xb), (z) => sh.lineTo(bx(z), z));
+    for (let x = xb + 0.25; x <= X1 + 0.001; x += 0.25) sh.lineTo(x, edge(x));
     sh.lineTo(X1, edge(X1));
     const hole = new T.Shape(); hole.absarc(MINT[0], MINT[1], MINT[2] + 0.12, 0, Math.PI * 2, true); sh.holes.push(hole);
     const slab = keep(new T.Mesh(new T.ExtrudeGeometry(sh, { depth: SLAB, bevelEnabled: false, curveSegments: 40 }), ground.material));
@@ -464,47 +482,81 @@ export function createWorld({ scene, touch }) {
   })));
   hills.rotation.y = Math.PI / 2; hills.position.set(-2600, GROUND + 70, 0);
 
-  // The fence: white pickets 1.5 m tall on two rails between posts every 2.4 m, around the back and both
-  // sides of the yard, years old. Pickets differ a little in height and lean, sections sag, the paint has
-  // weathered unevenly and gone grey and green near the ground, a few pickets lean hard, and here and there
-  // one is missing
+  // The fences, as they are: six-foot white vinyl privacy panels across the back and down the right side
+  // (tongue-and-groove boards between a top and bottom rail, square posts with flat caps every 1.83 m,
+  // grimed a little toward the ground), and down the left side an old six-foot cedar stockade gone
+  // silver-brown, its pointed boards uneven, on two rails, sagging here and there
   const solid = (color, grain = 0) => new T.ShaderMaterial({ uniforms: { ...common, uColor: { value: new T.Color(color) }, uGrain: { value: grain } }, vertexShader: SOLID_VERT, fragmentShader: SOLID_FRAG });
   const m = new T.Matrix4(), qq = new T.Quaternion(), e = new T.Euler(), at0 = new T.Vector3(), sc0 = new T.Vector3(), tint = new T.Color();
-  const PICKET = 1.5, runs = [[YARD.back, YARD.right, YARD.back, YARD.left], [-2.1, YARD.right, YARD.back, YARD.right], [-2.1, YARD.left, YARD.back, YARD.left]];
-  const lens = runs.map(([x0, z0, x1, z1]) => Math.hypot(x1 - x0, z1 - z0)), total = lens.reduce((a, b) => a + b, 0);
-  const pickets = keep(new T.InstancedMesh(new T.BoxGeometry(0.02, PICKET, 0.09), solid("#FFFFFF"), Math.ceil(total / 0.16) + 3));
-  // 4x4 posts at the corners and every 2.4 m, standing a little above the pickets under pyramid caps
-  const POST = PICKET + 0.2, nPosts = Math.ceil(total / 2.4) + 6;
-  const posts = keep(new T.InstancedMesh(new T.BoxGeometry(0.089, POST, 0.089), solid("#E4E1D8"), nPosts));
-  const caps = keep(new T.InstancedMesh(new T.ConeGeometry(0.075, 0.09, 4).rotateY(Math.PI / 4), solid("#E4E1D8"), nPosts));
-  let np = 0, nq = 0;
-  runs.forEach(([x0, z0, x1, z1], r) => {
-    const len = lens[r], turn = Math.atan2(x1 - x0, z1 - z0), sag = (d) => 0.035 * Math.sin((d / 2.4) * Math.PI) ** 2 * (0.4 + 0.6 * Math.abs(Math.sin(d * 0.37 + r)));
-    const at = (d) => [x0 + ((x1 - x0) * d) / len, z0 + ((z1 - z0) * d) / len];
-    for (let d = 0.08; d < len; d += 0.16) {
-      const hard = rnd() < 0.004, gone = rnd() < 0.002, h = 1 + (rnd() - 0.5) * 0.05, [x, z] = at(d + (rnd() - 0.5) * 0.015);
-      e.set((rnd() - 0.5) * 0.04 + (hard ? (rnd() - 0.5) * 0.4 : 0), turn, (rnd() - 0.5) * 0.04 + (hard ? 0.16 : 0), "YXZ");
-      at0.set(x + (rnd() - 0.5) * 0.01, GROUND + (PICKET / 2) * h - sag(d), z); sc0.set(1, gone ? 0.0001 : h, 1);
-      pickets.setMatrixAt(np, m.compose(at0, qq.setFromEuler(e), sc0));
-      const w = 0.82 + rnd() * 0.18;
-      pickets.setColorAt(np++, tint.setRGB(0.93 * w, 0.92 * w, 0.88 * w - rnd() * 0.04));
-    }
-    for (let d = 0; d <= len + 0.01; d += 2.4) {
-      const [x, z] = at(Math.min(d, len));
-      e.set((rnd() - 0.5) * 0.05, turn, (rnd() - 0.5) * 0.06, "YXZ");
-      e.set((rnd() - 0.5) * 0.015, turn, (rnd() - 0.5) * 0.015, "YXZ");
-      posts.setMatrixAt(nq, m.compose(at0.set(x, GROUND + POST / 2, z), qq.setFromEuler(e), sc0.set(1, 1, 1)));
-      caps.setMatrixAt(nq++, m.compose(at0.set(x, GROUND + POST + 0.045, z), qq.setFromEuler(e), sc0.set(1, 1, 1)));
-    }
-    for (const y of [0.35, PICKET - 0.3]) {
-      const rail = keep(new T.Mesh(new T.BoxGeometry(0.04, 0.08, len, 1, 1, Math.ceil(len * 3)), solid("#DAD6CA")));
-      const pos = rail.geometry.attributes.position;
-      for (let i = 0; i < pos.count; i++) pos.setY(i, pos.getY(i) - sag(pos.getZ(i) + len / 2));
-      rail.geometry.computeVertexNormals();
-      const [cx, cz] = at(len / 2); rail.position.set(cx, GROUND + y, cz); rail.rotation.y = turn;
-    }
+  const FH = 1.83, PANEL = 1.83, runs = [[YARD.back, YARD.right, YARD.back, YARD.left, "vinyl"], [-2.1, YARD.right, YARD.back, YARD.right, "vinyl"], [-2.1, YARD.left, YARD.back, YARD.left, "wood"]];
+  // Vinyl: the boards' grooves run up the panel, every 18 cm along it, and it weathers a little at the foot
+  const vinyl = (along) => new T.ShaderMaterial({
+    uniforms: { ...common }, vertexShader: SOLID_VERT,
+    fragmentShader: `${COMMON}\n${hash}\nvarying vec3 vW, vN, vTint;
+      void main() { float a = ${along}, y = vW.y - ${GROUND.toFixed(1)};
+        vec3 c = vec3(0.8, 0.79, 0.75) * (1.0 - 0.18 * smoothstep(0.012, 0.0, abs(fract(a / 0.178) - 0.5) - 0.48));
+        c *= mix(vec3(0.74, 0.76, 0.68), vec3(1.0), smoothstep(0.0, 0.5, y)) * (0.96 + 0.06 * noise(vec2(a * 3.0, y * 2.0)));
+        c *= 1.0 - 0.08 * smoothstep(0.65, 0.9, noise(vec2(a * 0.7, y * 1.3) + 4.0));   // a streak of dirt from the rain
+        gl_FragColor = vec4(outdoor(c, normalize(vN), vW), 1.0); }`,
   });
-  pickets.count = np; posts.count = nq; caps.count = nq;
+  const cedar = solid("#6F6658", 1), post5 = solid("#E6E3DA");
+  for (const [x0, z0, x1, z1, kind] of runs) {
+    const len = Math.hypot(x1 - x0, z1 - z0), turn = Math.atan2(x1 - x0, z1 - z0), at = (d) => [x0 + ((x1 - x0) * d) / len, z0 + ((z1 - z0) * d) / len];
+    if (kind === "vinyl") {
+      const mat = vinyl(Math.abs(x1 - x0) > Math.abs(z1 - z0) ? "vW.x" : "vW.z");
+      for (let d = 0; d < len - 0.01; d += PANEL) {
+        const w = Math.min(PANEL, len - d), [cx, cz] = at(d + w / 2);
+        const pan = keep(new T.Mesh(new T.BoxGeometry(0.035, FH - 0.12, w), mat)); pan.position.set(cx, GROUND + 0.06 + (FH - 0.12) / 2 + (rnd() - 0.5) * 0.01, cz); pan.rotation.y = turn;
+        pan.rotation.x = (rnd() - 0.5) * 0.006;
+        for (const [y, h] of [[FH - 0.05, 0.1], [0.08, 0.08]]) { const r = keep(new T.Mesh(new T.BoxGeometry(0.06, h, w), post5)); r.position.set(cx, GROUND + y, cz); r.rotation.y = turn; }
+      }
+      for (let d = 0; d <= len + 0.01; d += PANEL) {
+        const [x, z] = at(Math.min(d, len)), lean = (rnd() - 0.5) * 0.012;
+        const po = keep(new T.Mesh(new T.BoxGeometry(0.127, FH + 0.08, 0.127), post5)); po.position.set(x, GROUND + (FH + 0.08) / 2, z); po.rotation.set(lean, turn, (rnd() - 0.5) * 0.012);
+        const cp = keep(new T.Mesh(new T.BoxGeometry(0.155, 0.05, 0.155), post5)); cp.position.set(x, GROUND + FH + 0.1, z); cp.rotation.y = turn;
+      }
+    } else {
+      // Stockade: 9 cm boards, tops cut to a point, each its own height, shade, and tilt; sections sag
+      const n = Math.ceil(len / 0.095), boards = keep(new T.InstancedMesh(new T.BoxGeometry(0.02, 1, 0.09), cedar, n)), tips = keep(new T.InstancedMesh(new T.ConeGeometry(0.064, 0.09, 4).rotateY(Math.PI / 4).scale(0.3, 1, 1), cedar, n));
+      for (let i = 0; i < n; i++) {
+        const d = (i + 0.5) * 0.095, [x, z] = at(d), sag = 0.04 * Math.sin((d / 2.4) * Math.PI) ** 2, h = FH - 0.09 + (rnd() - 0.5) * 0.04 - sag;
+        e.set((rnd() - 0.5) * 0.02, turn, (rnd() - 0.5) * 0.025, "YXZ");
+        boards.setMatrixAt(i, m.compose(at0.set(x, GROUND + h / 2, z), qq.setFromEuler(e), sc0.set(1, h, 1)));
+        tips.setMatrixAt(i, m.compose(at0.set(x, GROUND + h + 0.045, z), qq.setFromEuler(e), sc0.set(1, 1, 1)));
+        const w = 0.72 + rnd() * 0.4; boards.setColorAt(i, tint.setRGB(w, w * 0.97, w * 0.93)); tips.setColorAt(i, tint.setRGB(w, w * 0.97, w * 0.93));
+      }
+      for (const y of [0.35, FH - 0.35]) { const r = keep(new T.Mesh(new T.BoxGeometry(0.04, 0.09, len), cedar)); const [cx, cz] = at(len / 2); r.position.set(cx, GROUND + y, cz + 0.035); r.rotation.y = turn; }   // rails and posts on the neighbor's side
+      for (let d = 0; d <= len + 0.01; d += 2.4) { const [x, z] = at(Math.min(d, len)); const po = keep(new T.Mesh(new T.BoxGeometry(0.1, FH + 0.02, 0.1), cedar)); po.position.set(x, GROUND + (FH + 0.02) / 2, z + 0.07); po.rotation.y = turn; }
+    }
+  }
+
+  // Scalloped grey edging stones, three arches along each top, set on the soil side of the lawn's left and
+  // back edges and of the trellis square's edge toward the lawn, following each edge's wander: each sunk
+  // its own depth, a little out of line and tipped, its own grey, with a gap here and there
+  {
+    const BL = 0.3, BH = 0.14, sh = new T.Shape();
+    sh.moveTo(0, 0); sh.lineTo(BL, 0); sh.lineTo(BL, BH - 0.025);
+    for (let k = 2; k >= 0; k--) { const c = (k + 0.5) * BL / 3; sh.absarc(c, BH - 0.025 - 0.04, 0.065, Math.atan2(0.04, BL / 6), Math.PI - Math.atan2(0.04, BL / 6), false); }
+    sh.lineTo(0, 0);
+    const geo = new T.ExtrudeGeometry(sh, { depth: 0.05, bevelEnabled: true, bevelSize: 0.004, bevelThickness: 0.004, bevelSegments: 1, curveSegments: 6 }).translate(-BL / 2, 0, -0.025);
+    const edges = [
+      [(d) => [d, YARD.left - SOIL + WOB(d + 7) + 0.04], YARD.back + SOIL + 0.1, DECK.x0 - 0.3],     // the left mulch border, along x
+      [(d) => [YARD.back + SOIL + WOB(d + 3) - 0.04, d], CURVE[CURVE.length - 1][1] + 0.75, YARD.left - SOIL],   // the back border, along z
+      [(d) => [d, PATCH.z1 + WOB(d + 19) - 0.04], PATCH.x0, PATCH.x1],                              // the trellis square's lawn-side edge
+    ];
+    const count = edges.reduce((a, [, a0, a1]) => a + Math.ceil(Math.abs(a1 - a0) / BL) + 2, 0);
+    const stones = keep(new T.InstancedMesh(geo, solid("#FFFFFF", 0.4), count)); let nb = 0;
+    for (const [f, a0, a1] of edges) {
+      for (let d = Math.min(a0, a1); d < Math.max(a0, a1) - 0.1; d += BL + 0.008 + rnd() * 0.012) {
+        if (rnd() < 0.03) continue;                                                                   // one gone
+        const [x, z] = f(d + BL / 2), [x2, z2] = f(d + BL / 2 + 0.05), yaw = Math.atan2(-(z2 - z), x2 - x);
+        e.set((rnd() - 0.5) * 0.12, yaw + (rnd() - 0.5) * 0.08, (rnd() - 0.5) * 0.05, "YXZ");
+        stones.setMatrixAt(nb, m.compose(at0.set(x, GROUND - 0.035 - rnd() * 0.03, z), qq.setFromEuler(e), sc0.set(1, 1, 1)));
+        const g = 0.36 + rnd() * 0.14; stones.setColorAt(nb++, tint.setRGB(g, g * 0.99, g * 0.96));
+      }
+    }
+    stones.count = nb;
+  }
 
   // The neighbor's house past the left fence: two stories of pale clapboard under a dark shingle gable, with
   // white-trimmed windows (a few lit warm, a couple with blinds half down), a back door and step, and a
@@ -647,7 +699,7 @@ export function createWorld({ scene, touch }) {
       vertexShader: `uniform float uPhase, uWind, uSway; varying vec3 vW; varying vec2 vUv;
         void main() { vUv = uv; vec3 p = position;
           float k = uv.y * uv.y * uSway;
-          p.x += (sin(uPhase * 1.1 + uv.x * 23.0) * 0.05 + sin(uPhase * 2.7 + uv.x * 61.0) * 0.015) * (1.0 + 2.0 * uWind) * k + uWind * 0.07 * k;
+          p.x += (sin(uPhase * 0.9 + uv.x * 9.0) * 0.04 + sin(uPhase * 1.9 + uv.x * 17.0) * 0.012) * (1.0 + 2.0 * uWind) * k + uWind * 0.07 * k;   // each plant a beat apart, never a ripple
           vec4 w = modelMatrix * vec4(p, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`,
       fragmentShader: `${COMMON}\nuniform sampler2D uMap; varying vec3 vW; varying vec2 vUv;
         void main() { vec4 c = texture2D(uMap, vUv); if (c.a < 0.02) discard;
@@ -832,9 +884,12 @@ export function createWorld({ scene, touch }) {
       rose: [0.7964, 0.5, 0.9531, 1.0, 1.0, 1.45], andromeda: [0.2788, 0.0, 0.4707, 0.5, 3.0, 2.6], andromedaXL: [0.2788, 0.0, 0.4707, 0.5, 4.6, 4.4],
       mintLow: [0.0, 0.5, 0.25, 0.8145, 1.45, 0.42], branchy: [0.5259, 0.0, 0.7241, 0.5, 2.0, 2.7],
       pinkrose: [0.7964, 0.5, 0.9531, 1.0, 1.3, 2.1], daylily: [0.0, 0.0, 0.25, 0.2627, 1.25, 0.62], crepe: [0.2788, 0.0, 0.4707, 0.5, 4.4, 5.8], pear: [0.5054, 0.0, 0.7437, 0.5, 5.25, 5.5] };
-    const plan = [["bush", 0.03], ["bush", 0.07], ["flowersA", 0.13], ["flowersB", 0.19], ["flowersA", 0.25], ["flowersA", 0.31], ["rose", 0.39],
-      ["flowersB", 0.46], ["flowersA", 0.52], ["flowersB", 0.58], ["daylily", 0.65], ["daylily", 0.71], ["daylily", 0.77], ["daylily", 0.83], ["daylily", 0.88], ["rose", 0.95]];
-    const items = plan.map(([k, u]) => { path.getPointAt(u, p); return [k, p.x + (rnd() - 0.5) * 0.15, GROUND + Hb - 0.05, p.z + (rnd() - 0.5) * 0.15, 0]; });
+    // As the photos have it: spiky daylily leaves at the house end, then cosmos and marigolds crowding the
+    // middle, a rose among them, and the bushy plant and the last rose out by the trellis
+    const plan = [["daylily", 0.03], ["daylily", 0.08], ["daylily", 0.13], ["flowersA", 0.17], ["flowersB", 0.21], ["flowersA", 0.25], ["flowersB", 0.29], ["flowersA", 0.33],
+      ["flowersB", 0.37], ["rose", 0.42], ["flowersA", 0.46], ["flowersB", 0.5], ["flowersA", 0.54], ["flowersB", 0.58], ["flowersA", 0.62], ["flowersB", 0.66],
+      ["flowersA", 0.7], ["daylily", 0.75], ["flowersB", 0.79], ["bush", 0.85], ["bush", 0.9], ["rose", 0.95]];
+    const items = plan.map(([k, u]) => { path.getPointAt(u, p); return [k, p.x + (rnd() - 0.5) * 0.3, GROUND + Hb - 0.05, p.z + (rnd() - 0.5) * 0.3, 0]; });
     items.push(["crepe", YARD.back + 0.9, GROUND, YARD.right + 0.9, 1], ["pear", MINT[0], GROUND, MINT[1], 0]);
     // An andromeda behind the greenhouse; and the left border, from the back corner toward the house: the dog
     // house (built below), a huge Japanese andromeda, a smaller bush on long thick branches with its leaves
@@ -853,7 +908,7 @@ export function createWorld({ scene, touch }) {
       base.push(x, y, z); size.push(f[4] * s, f[5] * s); cell.push(f[0], f[1], f[2], f[3]); seed.push(rnd()); pinks.push(pink + (k === "rose" ? 2 : 0));
     }
     const fq = new T.InstancedBufferGeometry();
-    fq.setAttribute("position", new T.Float32BufferAttribute([-0.5, 0, 0, 0.5, 0, 0, 0.5, 1, 0, -0.5, 1, 0], 3)); fq.setIndex([0, 1, 2, 0, 2, 3]);
+    cardGrid(fq);
     fq.setAttribute("aBase", new T.InstancedBufferAttribute(new Float32Array(base), 3));
     fq.setAttribute("aSize", new T.InstancedBufferAttribute(new Float32Array(size), 2));
     fq.setAttribute("aCell", new T.InstancedBufferAttribute(new Float32Array(cell), 4));
@@ -867,16 +922,16 @@ export function createWorld({ scene, touch }) {
       // Each plant is mirrored or not, leans its own way, and is a little wider or narrower than the last,
       // so repeats of the same plant never match: the flowers stay true, the growth doesn't
       vertexShader: TREE_VERT.replace("attribute float aSeed;", "attribute float aSeed;\n  attribute float aPink;\n  varying float vPink;")
-        .replace("vec3 w = aBase + right * (position.x * aSize.x", "float flip = fract(aSeed * 7.31) > 0.5 ? 1.0 : -1.0, lean = (fract(aSeed * 13.7) - 0.5) * 0.35, stretch = 0.8 + 0.4 * fract(aSeed * 3.9);\n    vec3 w = aBase + right * (position.x * aSize.x * stretch * flip + lean * aSize.y * top")
+        .replace("vec3 w = aBase + right * (position.x * aSize.x", "float flip = fract(aSeed * 7.31) > 0.5 ? 1.0 : -1.0, lean = (fract(aSeed * 13.7) - 0.5) * 0.35 * (1.0 - step(4.0, aSize.y)), stretch = 0.8 + 0.4 * fract(aSeed * 3.9);\n    vec3 w = aBase + right * (position.x * aSize.x * stretch * flip + lean * aSize.y * top")
         .replace("vW = w; vSeed = aSeed;", "vW = w; vSeed = aSeed; vPink = aPink;"),
       fragmentShader: `${COMMON}\n${hash}\n${BREATHE}\nuniform sampler2D uMap; varying vec2 vUv; varying vec3 vW; varying float vSeed, vPink;
-        void main() { vec4 c = texture2D(uMap, breathe(vUv, vSeed, 0.005)); if (c.a < 0.45) discard;
+        void main() { vec4 c = texture2D(uMap, breathe(vUv, vSeed, 0.0035)); if (c.a < 0.45) discard;
           vec3 k = c.rgb * (0.92 + 0.16 * vSeed) * 1.2 * shimmer(vUv, vSeed);
           // The crepe myrtle's crown in pink bloom, flecked through the green; the roses lifted from near black to deep red
           if (vPink > 0.5 && vPink < 1.5) k = mix(k, vec3(0.95, 0.42, 0.66) * (0.7 + 0.5 * hash(floor(vUv * 400.0))), 0.7 * step(0.35, hash(floor(vUv * 260.0))) * smoothstep(0.2, 0.5, (vUv.y - ${(0.0).toFixed(1)}) * 2.0));
           if (vPink > 1.5 && vPink < 2.5) k = k * vec3(2.4, 1.6, 1.6) + vec3(0.06, 0.0, 0.01);
           // The andromeda: dense dark evergreen, hung with strings of tiny white flowers
-          if (vPink > 2.5 && vPink < 3.5) { k *= vec3(0.6, 0.85, 0.55); k = mix(k, vec3(0.95, 0.93, 0.88), 0.55 * step(0.62, hash(floor(vUv * 330.0))) * step(0.3, vUv.y - ${(0.0).toFixed(1)})); }
+          if (vPink > 2.5 && vPink < 3.5) { vec2 Lc = (vUv - vCell.xy) / (vCell.zw - vCell.xy); k *= vec3(0.6, 0.85, 0.55); k = mix(k, vec3(0.93, 0.92, 0.86), 0.45 * step(0.9, hash(floor(Lc * vec2(150.0, 170.0)))) * smoothstep(0.15, 0.4, Lc.y)); }
           // The tall rose in pink
           if (vPink > 3.5 && vPink < 4.5) { float red = smoothstep(0.02, 0.12, c.r - c.g); k = mix(k * vec3(1.5, 2.0, 1.4), vec3(0.97, 0.55, 0.7), red * 0.9); }
           // Mint: a deep, dull green, never bright

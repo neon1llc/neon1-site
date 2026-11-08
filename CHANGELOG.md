@@ -2,6 +2,18 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.22.0
+
+- The white rabbit's walk scrolls in a third of the time, 16 screen heights in all.
+- Backing away from the TV is one steady glide across the floor, sitting the whole way, with no dips or pauses.
+- Trees and plants move in the wind as whole pieces: the trunk holds, the crown rocks and leans in gusts, and the outer limbs bob, instead of the picture rippling like heat haze. The Japanese andromeda no longer glitches at the top.
+- The pear and the big trees stand upright.
+- The fences match the real yard: white vinyl privacy panels across the back and down the right side, and a weathered cedar stockade down the left.
+- Grey scalloped edging stones line the soil side of the lawn's left and back edges and the trellis square's edge toward the lawn.
+- Soil, mulch, and concrete edges wander a little instead of running ruler straight, and the back border is red mulch like the left.
+- The lawn is a fuller, greener, more textured turf, and the concrete is a lighter grey.
+- The stone bed is planted as in the photos: daylily leaves at the house end, cosmos and marigolds crowding the middle, and the bushy plant and a rose out by the trellis.
+
 ## v0.21.1
 
 - The stone bed's stones are all grey, each somewhere between a medium dark grey and a darker one, with no light grey or burgundy.
