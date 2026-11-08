@@ -63,7 +63,7 @@ const GREEN = { x0: -28.2, x1: -23.0, z0: -8.2, z1: -4.9, eave: 2.05, ridge: 2.7
 const PATCH = { x0: GREEN.x1 + 0.3, x1: GREEN.x1 + 0.3 + (GREEN.x1 - GREEN.x0), z0: GREEN.z0, z1: GREEN.z1 };
 // Its depth is the right side's own count: 7 spindles from the front corner to the right stairs, the stairs (1 m),
 // and 7 more back to the house, at 16 cm apart
-const DECK = { x0: DECK_FRONT, x1: HOUSE_X, z0: 0.1, z1: 6.7, y: GROUND + 0.8 };   // out from the house on the left, its left side by the left border, its right side at z0
+const DECK = { x0: DECK_FRONT, x1: HOUSE_X, z0: 0.1, z1: YARD.left - SOIL, y: GROUND + 0.8 };   // out from the house on the left, its left side by the left border, its right side at z0
 const CROSS = { walk1: [-10.6, -12.6], road: [-12.6, -19.6], walk2: [-19.6, -21.6] };
 
 // The atlas cells: u0, v0, u1, v1, and width over height (from blender/world.py), and each kind's height in meters
@@ -176,7 +176,7 @@ const GROUND_FRAG = /* glsl */`
     if (yard) {
       float zb = ${CURVE[0][1].toFixed(2)};
       ${CURVE.slice(1).map((p, i) => `if (x < ${CURVE[i][0].toFixed(2)}) zb = mix(${CURVE[i][1].toFixed(2)}, ${p[1].toFixed(2)}, clamp((x - (${CURVE[i][0].toFixed(2)})) / (${(p[0] - CURVE[i][0]).toFixed(2)}), 0.0, 1.0));`).join("\n      ")}
-      bool soil = z < ${(YARD.right + SOIL).toFixed(2)} + wob(x) || x < ${(YARD.back + SOIL).toFixed(2)} + 0.25 * wob(z + 3.0) || (z > ${(YARD.left - SOIL).toFixed(2)} + 0.25 * wob(x + 7.0)) || (z > ${(DECK.z1 + 0.35).toFixed(2)} + 0.25 * wob(x + 5.0) && x > ${(DECK.x0 - 0.6).toFixed(2)} + 0.25 * wob(z + 9.0))
+      bool soil = z < ${(YARD.right + SOIL).toFixed(2)} + wob(x) || x < ${(YARD.back + SOIL).toFixed(2)} + 0.25 * wob(z + 3.0) || (z > ${(YARD.left - SOIL).toFixed(2)} + 0.25 * wob(x + 7.0))
         || (x > ${PATCH.x0.toFixed(2)} + wob(z + 11.0) && x < ${PATCH.x1.toFixed(2)} + wob(z + 13.0) && z > ${PATCH.z0.toFixed(2)} && z < ${PATCH.z1.toFixed(2)} + 0.25 * wob(x + 19.0));
       if (soil) {
         // Dark, rich soil
@@ -603,8 +603,7 @@ export function createWorld({ scene, touch }) {
     sh.lineTo(0, 0);
     const geo = new T.ExtrudeGeometry(sh, { depth: 0.05, bevelEnabled: true, bevelSize: 0.004, bevelThickness: 0.004, bevelSegments: 1, curveSegments: 6 }).translate(-BL / 2, 0, -0.025);
     const edges = [
-      [(d) => [d, YARD.left - SOIL + 0.25 * WOB(d + 7) + 0.04], YARD.back + SOIL + 0.1, DECK.x0 - 0.6],     // the left mulch border, along x
-      [(d) => [DECK.x0 - 0.6 + 0.25 * WOB(d + 9) - 0.04, d], DECK.z1 + 0.35, YARD.left - SOIL],                  // where it widens beside the deck, to its left rail
+      [(d) => [d, YARD.left - SOIL + 0.25 * WOB(d + 7) + 0.04], YARD.back + SOIL + 0.1, DECK.x0 - 0.3],     // the left mulch border, along x, up to the deck's front-left corner
       [(d) => [YARD.back + SOIL + 0.25 * WOB(d + 3) - 0.04, d], CURVE[CURVE.length - 1][1] + 0.75, YARD.left - SOIL],   // the back border, along z
       [(d) => [d, PATCH.z1 + 0.25 * WOB(d + 19) - 0.04], PATCH.x0, PATCH.x1],                              // the trellis square's lawn-side edge
     ];
@@ -731,8 +730,8 @@ export function createWorld({ scene, touch }) {
         spindles.setMatrixAt(ns++, m.compose(at0.set(x0 + (x1 - x0) * t, y0 + (y1 - y0) * t + 0.1, z0 + (z1 - z0) * t), qq.identity(), sc0.set(1, sy, 1)));
       }
     };
-    // Openings: the front stairs (F0 to F1, left of center) and the right stairs (R0 to R1, 7 spindles in from the front corner)
-    const F0 = 4.2, F1 = 5.4, R0 = DECK.x0 + 8 * OC, R1 = R0 + 1.0;   // R1 to the house is 7 spindles too
+    // Openings: the front stairs (F0 to F1, centered on the lawn between the bed and the left border) and the right stairs (R0 to R1, 7 spindles in from the front corner)
+    const F0 = 6.1, F1 = 7.3, R0 = DECK.x0 + 8 * OC, R1 = R0 + 1.0;   // R1 to the house is 7 spindles too
     railing(DECK.x0, H, DECK.z1, DECK.x0, H, F1); railing(DECK.x0, H, F0, DECK.x0, H, DECK.z0);
     railing(DECK.x0, H, DECK.z0, R0, H, DECK.z0, [false, true]); railing(R1, H, DECK.z0, DECK.x1, H, DECK.z0);
     railing(DECK.x0, H, DECK.z1, DECK.x1, H, DECK.z1, [false, true]);
@@ -965,13 +964,43 @@ export function createWorld({ scene, touch }) {
       rose: [0.7964, 0.5, 0.9531, 1.0, 1.0, 1.45], andromeda: [0.2788, 0.0, 0.4707, 0.5, 3.0, 2.6], andromedaXL: [0.2788, 0.0, 0.4707, 0.5, 3.3, 4.2],
       mintLow: [0.0, 0.5, 0.25, 0.8145, 1.45, 0.42], branchy: [0.5259, 0.0, 0.7241, 0.5, 2.0, 2.7],
       pinkrose: [0.7964, 0.5, 0.9531, 1.0, 1.3, 2.1], daylily: [0.0, 0.0, 0.25, 0.2627, 1.25, 0.62], crepe: [0.2788, 0.0, 0.4707, 0.5, 4.4, 5.8], pear: [0.5054, 0.0, 0.7437, 0.5, 5.25, 5.5] };
-    // As the photos have it: spiky daylily leaves at the house end, then cosmos and marigolds crowding the
-    // middle, a rose among them, and the bushy plant and the last rose out by the trellis
-    const plan = [["daylily", 0.03], ["daylily", 0.08], ["daylily", 0.13], ["flowersA", 0.17], ["flowersB", 0.21], ["flowersA", 0.25], ["flowersB", 0.29], ["flowersA", 0.33],
-      ["flowersB", 0.37], ["rose", 0.42], ["flowersA", 0.46], ["flowersB", 0.5], ["flowersA", 0.54], ["flowersB", 0.58], ["flowersA", 0.62], ["flowersB", 0.66],
-      ["flowersA", 0.7], ["daylily", 0.75], ["flowersB", 0.79], ["bush", 0.85], ["bush", 0.9], ["rose", 0.95]];
-    const items = plan.map(([k, u]) => { path.getPointAt(u, p); return [k, p.x + (rnd() - 0.5) * 0.3, GROUND + Hb - 0.05, p.z + (rnd() - 0.5) * 0.3, 0]; });
+    // As the photos have it, planted thick: a crowd of color at the deck end (marigolds and cosmos), then the
+    // bed filled on up its length, two staggered rows of daylily leaves, mint, bushy plants, roses, and more
+    // flowers, with the long-leafed spiky shrub (built below) at the far end
+    const plan = [], near = ["flowersA", "flowersB", "flowersA", "flowersB", "flowersA", "flowersB", "daylily", "flowersB"];
+    const along = ["daylily", "flowersB", "mint", "bush", "flowersA", "daylily", "mintLow", "bush", "flowersB", "rose", "daylily", "mint"];
+    for (let i = 0, u = 0.02; u < 0.93; i++, u += u < 0.22 ? 0.016 : 0.024) plan.push([u < 0.22 ? near[i % near.length] : along[i % along.length], u, i % 2 ? 1 : -1]);
+    const tan = new T.Vector3();
+    const items = plan.map(([k, u, side]) => {
+      path.getPointAt(u, p); path.getTangentAt(u, tan);
+      const off = side * (0.18 + rnd() * 0.12);   // across the bed, alternating sides
+      return [k, p.x - tan.z * off + (rnd() - 0.5) * 0.08, GROUND + Hb - 0.05, p.z + tan.x * off + (rnd() - 0.5) * 0.08, k === "mint" ? 5 : 0];
+    });
     items.push(["crepe", YARD.back + 0.9, GROUND, YARD.right + 0.9, 1], ["pear", MINT[0], GROUND, MINT[1], 0]);
+    // At the bed's far end, a full, spiky shrub of long, stiff, sword-like leaves, like a much longer-leafed agave,
+    // all one green a little darker than the lawn: each leaf a slim tapered blade, folded down its middle, that
+    // rises from the crown and arches out, long ones outside and short ones upright at the heart
+    {
+      path.getPointAt(0.985, p);
+      const pos = [], N = 70;
+      for (let i = 0; i < N; i++) {
+        const a = i * 2.39996 + rnd() * 0.3, t = i / N, tilt = 0.12 + 1.05 * t + (rnd() - 0.5) * 0.12;   // inner leaves upright, outer ones splayed
+        const L = 0.55 + 0.75 * t + rnd() * 0.25, w = 0.045 + 0.02 * rnd(), droop = 0.18 * t;
+        const ca = Math.cos(a), sa = Math.sin(a), seg = 4, pts = [];
+        for (let k = 0; k <= seg; k++) {
+          const f = k / seg, ang = tilt + droop * f * f, r = L * f * Math.sin(ang), y = L * f * Math.cos(ang) - 0.05 * t * f * f * L;
+          const half = w * (1 - f) * (k === seg ? 0 : 1);
+          pts.push([[ca * r - sa * half, y, sa * r + ca * half], [ca * r, y + 0.012 * (1 - f), sa * r], [ca * r + sa * half, y, sa * r - ca * half]]);
+        }
+        for (let k = 0; k < seg; k++) for (const [e0, e1] of [[0, 1], [1, 2]]) {
+          const A = pts[k][e0], B = pts[k][e1], C = pts[k + 1][e0], D = pts[k + 1][e1];
+          pos.push(...A, ...B, ...C, ...B, ...D, ...C);
+        }
+      }
+      const g = new T.BufferGeometry(); g.setAttribute("position", new T.Float32BufferAttribute(pos, 3)); g.computeVertexNormals();
+      const mat = solid("#2C5424", 0.5); mat.side = T.DoubleSide;
+      const agave = keep(new T.Mesh(g, mat)); agave.position.set(p.x, GROUND + Hb - 0.08, p.z); agave.scale.setScalar(1.4);
+    }
     // An andromeda behind the greenhouse; and the left border, from the back corner toward the house: the dog
     // house (built below), a huge Japanese andromeda, a smaller bush on long thick branches with its leaves
     // up top, and a tall pink rose
@@ -979,7 +1008,7 @@ export function createWorld({ scene, touch }) {
     items.push(["andromedaXL", -25.4, GROUND - 1.2, YARD.left - 1.75, 3], ["branchy", -21.6, GROUND, YARD.left - 1.05, 0], ["pinkrose", -18.4, GROUND, YARD.left - 0.8, 4]);
     // and nearer the deck, as in the photos: low rounded shrubs and leafy clumps along the stockade, mulch between
     // The peach tree, in the left border just past the deck's front-left corner
-    items.push(["pear", DECK_FRONT + 0.5, GROUND, DECK.z1 + 1.5, 0]);   // the peach, behind the deck's left rail
+    items.push(["pear", DECK_FRONT - 0.9, GROUND, YARD.left - 0.9, 0]);   // the peach, in the left border just past the deck's front-left corner
     items.push(["bush", -9.2, GROUND, YARD.left - 0.7, 0], ["mintLow", -10.6, GROUND, YARD.left - 1.25, 0]);
     // low shrubs and leafy clumps in the stretch of border beside the deck's front
     items.push(["mintLow", -13.1, GROUND, YARD.left - 1.25, 0], ["bush", -14.1, GROUND, YARD.left - 0.75, 0], ["bush", -15.3, GROUND, YARD.left - 0.6, 0],

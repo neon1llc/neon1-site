@@ -2,6 +2,13 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.30.2
+
+- The deck runs left to the left border's soil, in place of the edging that sat between the lawn and the mulch beside it. Its front stairs are centered on the lawn.
+- The peach tree stands in the left border, just past the deck's front-left corner.
+- The stone bed is planted thick, as in the photos: a crowd of marigolds and cosmos at the deck end, then two staggered rows of daylily leaves, mint, bushy plants, flowers, and a rose on up its length.
+- At the bed's far end stands a full, spiky shrub of long, stiff, pointed leaves, like a longer-leafed agave, in one green a little darker than the lawn.
+
 ## v0.30.1
 
 - Out of the TV, the view goes straight back as it first did: low on the floor at the screen's height, looking level at the set the whole way, with no rising and no tilting down. It stays low through the turn to the window, then gets up.
