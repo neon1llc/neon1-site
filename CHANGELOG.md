@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.19.2
+
+- The chairs' arm upholstery no longer pokes through their wooden side boards.
+
 ## v0.19.1
 
 - Out of the TV, you first sit back up straight from being hunched at the screen, then scoot back three times, each a small push with a slight dip and a pause after it.
