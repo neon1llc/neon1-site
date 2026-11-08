@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.17.1
+
+- The window looks down from a true second story.
+- The deck is on the left now, built heavy and painted deep mahogany: 2x4 floor boards running left to right on a deep rim and 6x6 posts, a railing with a flat 2x4 cap and turned spindles between capped 4x4 posts, a wide flight of stairs down toward the garden, and a second flight off the right side.
+
 ## v0.17.0
 
 - The swing set is now a three-seat porch swing on a matte black A-frame, with silver bolts, a little rust, and a one-piece seat-and-back cushion, swaying on its springs.
