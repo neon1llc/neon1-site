@@ -2,7 +2,7 @@
 // 1NEON, and the phone menu. Each page loads it as a module; pages react to the menu through the
 // "n1:menu" event instead of reaching into it.
 {
-  // Footer year; without the script the line still reads "© NEON1 LLC"
+  // Footer year; without the script the line still reads "© neon1 LLC"
   const yr = document.getElementById("yr");
   if (yr) yr.textContent = new Date().getFullYear();
 
