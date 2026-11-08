@@ -2,6 +2,13 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.28.0
+
+- The sample tour now uses the home page's light bar: the logo, book a call, and 1NEON sit in the same places, and the note that everything is made up sits where the section links are. On phones the note shows as a thin line under the bar, next to the same menu.
+- The tour has the home page's footer, and its layer names follow the site's pattern: the N, E, O, or N in brand green and the rest of the word in ink, with no underline.
+- The tour's step links and end buttons react on hover like the home page's: book a free call lifts with a shadow, the others fill with light green, and "start the tour again" is now a small up arrow like the case-study arrows.
+- One frame for every page: the bar, menu, buttons, light surface, and footer styles live in css/frame.css, and the menu, footer year, and 1NEON fade in js/frame.js. The bar and footer markup is written once in index.html; `make frame` copies it to other pages and `make check` fails if a page drifts.
+
 ## v0.27.1
 
 - The stone bed is back to its earlier backward-C shape, starting 1.5 m right of the deck's front stairs, so the concrete on the right is its earlier size again.

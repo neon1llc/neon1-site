@@ -1,0 +1,128 @@
+/* src/app/public/css/frame.css - The frame every neon1.tech page shares: base type, buttons, the top bar
+ * (dark over the rain, light over the page), the phone menu, the light surface, and the footer.
+ * Fonts, brand tokens, the bar's position, and the logo come from /shared/neon1.css; each page adds
+ * its own layout on top (css/site.css for the home page, css/tour.css for the sample tour). */
+
+/* ---- Page tokens: the dark layer; .awake below swaps them for the light surface ---- */
+:root {
+  --text: #d6f5dc;
+  --muted: #84a98c;
+  --panel: rgba(13, 2, 8, 0.72);
+  --line: rgba(0, 255, 65, 0.16);
+  --r: 14px;
+}
+
+/* ---- Base: box model, anchor scrolling clear of the bar, links, and focus rings ---- */
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { margin: 0; background: var(--void); color: var(--text); font: 16px/1.65 var(--sans); transition: background-color .4s; }
+body.woke { background-color: var(--paper); }
+a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--glow); outline-offset: 3px; border-radius: 6px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* Skip link: hidden above the bar until it gets keyboard focus */
+.skip { position: fixed; left: 12px; top: -64px; z-index: 30; padding: 10px 16px; border-radius: 4px;
+  font: 500 14px var(--mono); color: var(--void); background: var(--neon); text-decoration: none; }
+.skip:focus { top: 12px; }
+
+/* ---- Buttons: one system, 44px tall with small corners (primary, ghost, and the round chip) ---- */
+.btn { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 20px; border: 1px solid var(--glow); border-radius: 4px;
+  font: 500 14px var(--mono); letter-spacing: .02em; text-decoration: none; cursor: pointer; transition: box-shadow .25s, background .25s, color .25s; }
+.btn-primary { background: var(--deep); border-color: var(--deep); color: #00FF41; }
+.btn-primary:hover { box-shadow: 0 0 30px rgba(0,230,118,.5); }
+.btn-ghost { background: transparent; color: var(--neon); border-color: var(--neon); }
+.btn-ghost:hover { background: rgba(0,230,118,.08); }
+.chip { font: 12px var(--mono); color: var(--muted); background: var(--panel); border: 1px solid var(--line);
+  border-radius: 99px; padding: 6px 12px; cursor: pointer; }
+.chip:hover, .chip[aria-pressed="true"] { color: var(--glow); border-color: rgba(0,230,118,.45); }
+/* A square arrow chip: the case-study rail's previous and next, and the tour's back-to-top */
+.chip.arrow { display: inline-grid; place-items: center; min-width: 44px; min-height: 44px; padding: 6px 14px; font-size: 15px; text-decoration: none; }
+
+/* N, E, O, N: the first letter of each stage in brand green, the rest of the word in the text color */
+.nl { color: var(--brand); font-weight: 700; }
+
+/* ---- Top bar: clear over the rain, frosted light once the page is light ---- */
+/* Position, height, and the logo's place come from .n1-bar, .n1-inner, and .n1-logo in /shared/neon1.css */
+.n1-bar { transition: background .24s cubic-bezier(.28,.11,.32,1), box-shadow .24s cubic-bezier(.28,.11,.32,1); }
+.n1-bar.light { background: rgba(242,244,242,.8); -webkit-backdrop-filter: saturate(1.8) blur(20px); backdrop-filter: saturate(1.8) blur(20px);
+  box-shadow: 0 1px 0 rgba(18,36,26,.08); }
+@media (prefers-reduced-motion: reduce) { .n1-bar { transition: none; } }
+
+/* The middle and right of the bar: section links, then book a call and 1NEON at the far right */
+.links { list-style: none; display: flex; align-items: center; gap: 4px; margin: 0 0 0 auto; padding: 0; }
+.links a { white-space: nowrap; justify-content: center; text-align: center; }
+.links a:not(.btn), .links .note { padding: 7px 12px; color: var(--muted); font: 13px var(--mono); text-decoration: none; }
+.links a:not(.btn):hover { color: var(--neon); }
+.links .btn { min-height: 36px; padding: 7px 14px; margin-left: 6px; font-size: 13px; border-radius: var(--glass-r); }
+/* 1NEON: quieter than book a call, with the portal's rings */
+.links .portal { color: var(--neon); border-color: var(--line); background: transparent; }
+.links .portal:hover { border-color: var(--neon); background: rgba(0,230,118,.08); }
+.links .portal svg { width: 14px; height: 14px; }
+/* Over the rain: clear glass, so the rain's lens shows through every item in the bar */
+.n1-bar:not(.light) .n1-logo, .n1-bar:not(.light) .links a, .n1-bar:not(.light) .menu-btn { border-radius: var(--glass-r); background: transparent; box-shadow: none; }
+.n1-bar:not(.light) .links .portal:hover { background: rgba(0,230,118,.08); }
+/* Over the light page: grey links that turn brand green, and brand-green buttons */
+.n1-bar.light .n1-logo { color: var(--brand); text-shadow: none; }
+.n1-bar.light .links a:not(.btn), .n1-bar.light .links .note { color: #56665c; }
+.n1-bar.light .links a:not(.btn):hover { color: var(--brand); }
+.n1-bar.light .btn-ghost { color: var(--brand); border-color: var(--brand); }
+.n1-bar.light .links .portal { color: var(--brand); border-color: rgba(3,87,4,.25); }
+.n1-bar.light .links .portal:hover { border-color: var(--brand); }
+
+/* ---- Phone menu: below the width the links need, they fold into a full-screen menu ---- */
+.menu-btn { margin-left: auto; display: none; border-radius: var(--glass-r); }
+.n1-bar.light .menu-btn { color: var(--brand); background: #fff; border-color: rgba(3,87,4,.25); }
+@media (max-width: 1040px) { .links { display: none; } .menu-btn { display: inline-block; } }
+.menu { position: fixed; inset: 0; z-index: 7; display: grid; place-items: center; background: rgba(13,2,8,.94); backdrop-filter: blur(6px); }
+.menu[hidden] { display: none; }
+/* Short or zoomed screens: the list scrolls inside the overlay, below the bar and its close button */
+@media (max-height: 520px) { .menu { place-items: start center; overflow-y: auto; overscroll-behavior: contain; padding: 80px 16px 24px; } }
+.menu ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 18px; text-align: center; }
+/* Menu links in the logo's neon, glowing brighter under a finger or focus */
+.menu a { font: 500 clamp(24px, 4vw, 40px) var(--mono); color: var(--neon); text-shadow: 0 0 8px rgba(108,255,168,.3); text-decoration: none; transition: color .2s, text-shadow .2s; }
+.menu a:hover, .menu a:focus-visible { color: #e9ffee; text-shadow: 0 0 14px rgba(108,255,168,.75); }
+/* With the menu open, the bar goes dark to match, even over the light page */
+.n1-bar.light.menu-open { background: transparent; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+.n1-bar.light.menu-open .n1-logo { color: var(--neon); text-shadow: 0 0 8px rgba(108,255,168,.45); }
+.n1-bar.light.menu-open .menu-btn { color: var(--neon); background: transparent; border-color: rgba(108,255,168,.4); }
+
+/* ---- Light surface: everything inside .awake reads dark green and ink on paper ---- */
+.awake { position: relative; z-index: 2; color: var(--text);
+  background: linear-gradient(to bottom, rgba(242,244,242,0) 0, rgba(242,244,242,.7) 140px, var(--paper) 280px);
+  --text: var(--ink); --muted: #56665c; --glow: var(--brand); --mid: var(--mark); --panel: #ffffff; --line: rgba(3,87,4,.16); }
+.awake .btn-primary { background: var(--brand); border-color: var(--brand); color: var(--paper); }
+.awake .btn-primary:hover { box-shadow: 0 6px 18px rgba(3,87,4,.25); }
+/* Ghost buttons on the light page take the brand green, not the dark-mode neon; hover keeps the light green wash */
+.awake .btn-ghost { color: var(--brand); border-color: var(--brand); }
+
+/* Leaving for 1NEON: the page fades out, so the portal can fade in */
+body.leaving header, body.leaving .top, body.leaving .awake, body.leaving .rainctl, body.leaving .menu { opacity: 0; transition: opacity .4s ease; }
+body.leaving .awake { pointer-events: none; }
+
+/* ---- Footer: the mark and slogan, contact, elsewhere, and the legal line ---- */
+footer { position: relative; z-index: 2; border-top: 1px solid var(--line); background: rgba(13,2,8,.92); }
+.awake footer { background: #e8ece8; }
+.foot { max-width: 1200px; margin: 0 auto; display: grid; gap: 28px; grid-template-columns: 2fr 1fr 1fr; font-size: 14px; color: var(--muted);
+  padding: 40px max(24px, env(safe-area-inset-right)) 28px max(24px, env(safe-area-inset-left)); }
+.foot h3 { font: 600 13px var(--mono); color: var(--text); margin: 0 0 10px; }
+.foot ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.foot a { color: var(--muted); text-decoration: none; } .foot a:hover { color: var(--glow); }
+.foot .slogan { margin: 0; }
+.mark-light { font: 700 17px var(--mono); letter-spacing: .06em; color: var(--brand); margin: 0 0 10px; }
+@media (max-width: 700px) { .foot { grid-template-columns: 1fr 1fr; } .foot > div:first-child { grid-column: 1 / -1; } }
+/* Legal line: the right padding keeps it clear of the home page's rain controls */
+.legal { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  font: 12px var(--mono); color: var(--muted); border-top: 1px solid var(--line); padding: 16px 140px 28px max(24px, env(safe-area-inset-left)); }
+@media (max-width: 700px) { .legal { padding-right: 20px; padding-bottom: 72px; } }
+.legal a { color: inherit; text-decoration: none; } .legal a:hover { color: var(--glow); }
+.legal .policies { display: flex; gap: 8px; flex-wrap: wrap; align-items: baseline; }
+.legal .sep { opacity: .6; }
+
+/* Running-text links (about, contact, case studies, the legal line), after the footer's plain links so they win: brand green, bold, and a small
+   arrow instead of an underline; the arrow nudges out on hover and focus */
+a.ext { color: var(--brand); font-weight: 600; text-decoration: none; white-space: nowrap; }
+a.ext::after { content: "↗"; display: inline-block; font-size: .8em; margin-left: 2px; transition: transform .15s ease; }
+a.ext:hover::after, a.ext:focus-visible::after { transform: translate(1px, -1px); }
+a.ext:hover { color: var(--brand); }
+@media (prefers-reduced-motion: reduce) { a.ext::after { transition: none; } }

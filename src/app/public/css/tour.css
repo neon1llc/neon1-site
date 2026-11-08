@@ -1,28 +1,36 @@
-/* src/app/public/css/tour.css - The light, plain look of the 1NEON sample tour, on the shared tokens */
+/* src/app/public/css/tour.css - The 1NEON sample tour's own layout. The base, buttons, bar, menu,
+ * light surface, and footer come from css/frame.css, the tokens from /shared/neon1.css. */
 
-/* ---- Page ---- */
-body.tour { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.55 var(--sans); }
-.tour a { color: var(--brand); }
+/* ---- Page: the light surface from the top, with room for the fixed bar ---- */
+body.tour { background: var(--paper); color: var(--ink); }
+.tour main { max-width: 760px; margin: 0 auto; padding: 88px 16px 64px; }
 
-/* ---- Header: home link and the always-visible demo label ---- */
-.tour-top { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px;
-  padding: 12px 16px; background: rgba(242, 244, 242, .95); border-bottom: 1px solid rgba(18, 36, 26, .12); }
-.tour-home { font: 700 18px var(--mono); letter-spacing: .06em; text-decoration: none; }
-.tour-home .ne { color: var(--ink); } .tour-home .one { color: var(--brand); }
-.tour-flag { margin: 0; font: 500 12px var(--mono); color: #6b4e00; background: #fff4cc; border: 1px solid #e9d27a;
-  border-radius: var(--glass-r); padding: 4px 10px; }
+/* ---- Bar note: in the links' place on wide screens; a thin strip under the bar once the links fold away ---- */
+.tour .links .note { display: block; white-space: nowrap; }
+@media (max-width: 1040px) {
+  html { scroll-padding-top: 104px; }
+  .tour main { padding-top: 112px; }
+  .tour .links { display: block; position: absolute; left: 0; right: 0; top: 100%; margin: 0; padding: 0 16px;
+    background: rgba(242,244,242,.92); box-shadow: 0 1px 0 rgba(18,36,26,.08); text-align: center; }
+  .tour .links li:not(.note-item) { display: none; }
+  .tour .links .note { padding: 6px 0; white-space: normal; font-size: 12px; }
+  /* The open menu covers the page, so the note steps aside with it */
+  .tour .menu-open .links { display: none; }
+}
 
-/* ---- Sections ---- */
-.tour main { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
+/* ---- Intro and the four layers ---- */
 .tour-intro h1 { font: 600 clamp(26px, 4vw, 38px)/1.2 var(--sans); letter-spacing: -.02em; margin: 6px 0 14px; }
 .tour-kicker { margin: 0; font: 500 12px var(--mono); color: var(--mark); }
-.tour-layer { padding-top: 36px; scroll-margin-top: 112px; }
-.tour-layer h2 { font: 600 28px var(--sans); margin: 4px 0 14px; color: var(--brand); }
-.tour .nl { text-decoration: underline; text-underline-offset: 4px; }
+.tour-layer { padding-top: 36px; scroll-margin-top: 88px; }
+/* Each layer's name: N, E, O, or N in brand green (.nl, from the frame), the rest of the word in ink */
+.tour-layer h2 { font: 600 28px var(--sans); margin: 4px 0 14px; color: var(--ink); }
 
-/* ---- Step links ---- */
+/* ---- Step links: quiet outlined buttons that turn brand green on hover, like 1NEON in the bar ---- */
 .tour-steps { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
-.tour-steps a { font: 500 13px var(--mono); text-decoration: none; padding: 6px 12px; border: 1px solid rgba(3, 87, 4, .3); border-radius: var(--glass-r); background: #fff; }
+.tour-steps a { font: 500 13px var(--mono); color: var(--ink); text-decoration: none; padding: 6px 12px; background: #fff;
+  border: 1px solid rgba(3,87,4,.25); border-radius: var(--glass-r); transition: border-color .2s, background .2s, color .2s; }
+.tour-steps a:hover { color: var(--brand); border-color: var(--brand); background: rgba(0,230,118,.08); }
+@media (prefers-reduced-motion: reduce) { .tour-steps a { transition: none; } }
 
 /* ---- Cards ---- */
 .tour-card { background: #fff; border: 1px solid rgba(18, 36, 26, .12); border-radius: var(--glass-r); padding: 16px 18px; margin-bottom: 12px; }
@@ -43,11 +51,7 @@ body.tour { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1
 .tour-measures s { color: #56665c; font-weight: 400; }
 @media (max-width: 480px) { .tour-measures div { grid-template-columns: 1fr; gap: 0; } }
 
-/* ---- End and buttons (the light-page versions of the site's buttons) ---- */
+/* ---- End: the home page's buttons, and the back-to-top arrow at the far right ---- */
 .tour-end { padding-top: 36px; }
-.tour-actions { display: flex; flex-wrap: wrap; gap: 10px; }
-.tour .btn { display: inline-flex; align-items: center; font: 500 14px var(--mono); padding: 10px 16px; border: 1px solid var(--brand);
-  border-radius: var(--glass-r); text-decoration: none; }
-.tour .btn-primary { background: var(--brand); color: #fff; }
-.tour .btn-ghost { background: transparent; color: var(--brand); }
-.tour a:focus-visible, .tour .btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.tour-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.tour-actions .tour-top { margin-left: auto; }

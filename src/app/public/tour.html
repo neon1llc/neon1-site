@@ -1,6 +1,7 @@
 <!doctype html>
 <!-- src/app/public/tour.html - A read-only tour of one made-up project in 1NEON. Every record here
-     is fictional and written into this page; it calls no API and links to no client data. -->
+     is fictional and written into this page; it calls no API and links to no client data. The bar
+     and footer are the home page's, copied in by scripts/frame.py (make frame). -->
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -9,24 +10,66 @@
   <meta name="description" content="Walk through one made-up project in 1NEON, neon1's client portal: the need, the options, the work, the measured result, and the handover." />
   <link rel="canonical" href="https://neon1.tech/tour.html" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22 fill=%22none%22 stroke=%22%2300B84F%22 stroke-width=%225%22 stroke-linecap=%22round%22><path d=%22M6 6a24 24 0 0 1 24 24v30M6 18a12 12 0 0 1 12 12v30M34 6a24 24 0 0 1 24 24v30M34 18a12 12 0 0 1 12 12v30%22/></svg>" />
+  <link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <!-- Brand tokens, then the frame every page shares, then the tour's own layout -->
   <link rel="stylesheet" href="/shared/neon1.css" />
+  <link rel="stylesheet" href="/css/frame.css" />
   <link rel="stylesheet" href="/css/tour.css" />
 </head>
 <body class="tour">
-  <!-- Header: back to the site, and the demo label that stays in view -->
-  <header class="tour-top">
-    <a class="tour-home" href="/"><span class="ne">neon</span><span class="one">1</span></a>
-    <p class="tour-flag" role="note">Sample project. Every name, number, and file here is made up.</p>
+  <a class="skip" href="#main">skip to content</a>
+
+  <!-- The bar, as on the light home page: logo, buttons, and menu are copied from index.html by
+       scripts/frame.py; the sample note sits where the home page has its section links -->
+  <header class="n1-bar light">
+    <nav class="n1-inner" aria-label="Main">
+      <!-- frame:logo -->
+      <!-- A plain link to neon1.tech, so it can be dragged to the bookmarks bar; a click springs back to the top -->
+      <a class="logo n1-logo" href="/" data-view="top" aria-label="neon1 home">
+        <!-- Brand mark: two arches of nested arcs falling into columns (from the neon1 logo) -->
+        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+          <path d="M6 6a24 24 0 0 1 24 24v30M6 12a18 18 0 0 1 18 18v30M6 18a12 12 0 0 1 12 12v30M6 24a6 6 0 0 1 6 6v30" />
+          <path d="M34 6a24 24 0 0 1 24 24v30M34 12a18 18 0 0 1 18 18v30M34 18a12 12 0 0 1 12 12v30M34 24a6 6 0 0 1 6 6v30" />
+        </svg>
+        <span><span class="ne">neon</span><span class="one">1</span></span>
+      </a>
+      <!-- /frame:logo -->
+      <ul class="links">
+        <li class="note-item"><span class="note" role="note">sample project; every name, number, and file here is made up</span></li>
+        <!-- frame:actions -->
+        <li><a class="btn btn-ghost" href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a call</a></li>
+        <!-- The client portal, a separate app on the same domain -->
+        <li><a class="btn portal" href="/1NEON/" data-handoff title="1NEON, the client portal">
+          <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="5" aria-hidden="true"><circle cx="32" cy="32" r="28" /><circle cx="32" cy="32" r="19" /><circle cx="32" cy="32" r="10" /><circle cx="32" cy="32" r="2" /></svg>1NEON</a></li>
+        <!-- /frame:actions -->
+      </ul>
+      <!-- frame:menu-button -->
+      <button class="chip menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="menu">menu</button>
+      <!-- /frame:menu-button -->
+    </nav>
   </header>
 
+  <!-- Phone menu: the tour's steps, then the way home and to the portal -->
+  <div class="menu" id="menu" hidden>
+    <ul>
+      <li><a href="#needs">needs</a></li>
+      <li><a href="#execute">execute</a></li>
+      <li><a href="#observe">observe</a></li>
+      <li><a href="#normalize">normalize</a></li>
+      <li><a href="/">neon1.tech</a></li>
+      <li><a href="/1NEON/" data-handoff>1NEON</a></li>
+    </ul>
+  </div>
+
+  <div class="awake">
   <main id="main">
     <!-- Intro: the fictional client and what the tour shows -->
     <section class="tour-intro" id="start" aria-labelledby="tour-h">
       <p class="tour-kicker">1NEON · sample</p>
       <h1 id="tour-h">Maple Street Bakery: orders without retyping</h1>
-      <p>This is what a small project looks like in 1NEON, the portal every client gets. A two-person bakery takes orders by email and phone, then retypes them into a spreadsheet each night. Follow it through the four layers: <b>Needs</b>, <b>Execute</b>, <b>Observe</b>, and <b>Normalize</b>.</p>
+      <p>This is what a small project looks like in 1NEON, the portal every client gets. A two-person bakery takes orders by email and phone, then retypes them into a spreadsheet each night. Follow it through the four layers: <b class="nl">N</b>eeds, <b class="nl">E</b>xecute, <b class="nl">O</b>bserve, and <b class="nl">N</b>ormalize.</p>
       <nav class="tour-steps" aria-label="Tour steps">
-        <a href="#needs">1 · Needs</a><a href="#execute">2 · Execute</a><a href="#observe">3 · Observe</a><a href="#normalize">4 · Normalize</a>
+        <a href="#needs">1 · <b class="nl">N</b>eeds</a><a href="#execute">2 · <b class="nl">E</b>xecute</a><a href="#observe">3 · <b class="nl">O</b>bserve</a><a href="#normalize">4 · <b class="nl">N</b>ormalize</a>
       </nav>
     </section>
 
@@ -112,10 +155,51 @@
       <p>That's the whole loop. Your project would follow the same steps, with your own need and numbers.</p>
       <p class="tour-actions">
         <a class="btn btn-primary" href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a free call</a>
-        <a class="btn btn-ghost" href="#start">start the tour again</a>
         <a class="btn btn-ghost" href="/">back to neon1.tech</a>
+        <a class="chip arrow tour-top" href="#start" aria-label="Go to top" title="Go to top">↑</a>
       </p>
     </section>
   </main>
+
+  <!-- frame:footer -->
+  <footer>
+    <div class="foot">
+      <div>
+        <p class="mark-light"><span class="ne">neon</span><span class="one">1</span></p>
+        <p class="slogan">1 is glad to be of service.</p>
+      </div>
+      <div>
+        <h3>contact</h3>
+        <ul>
+          <li><a href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a call</a></li>
+          <li><a href="mailto:hello@neon1.tech">email</a></li>
+          <li><a href="https://www.linkedin.com/in/pradeep-tathineni/" rel="noopener">linkedin</a></li>
+          <li><a href="tel:+14243263661" title="(424) 326-3661">(424) 32-neon1</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>elsewhere</h3>
+        <ul>
+          <li><a href="https://github.com/neon1llc" rel="noopener">github</a></li>
+          <li><a href="https://www.linkedin.com/company/neon1llc" rel="noopener">neon1 on linkedin</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="legal">
+      <span>© <span id="yr"></span> NEON1 LLC, New York</span>
+      <span class="policies">
+        <a href="/1NEON/privacy">privacy</a><span class="sep" aria-hidden="true">\</span>
+        <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
+        <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
+        <span>No ads or trackers</span><span class="sep" aria-hidden="true">\</span>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.28.0</a>
+      </span>
+    </div>
+  </footer>
+  <!-- /frame:footer -->
+  </div>
+
+  <!-- The shared frame: menu, footer year, and the fade on the way to 1NEON -->
+  <script type="module" src="/js/frame.js"></script>
 </body>
 </html>

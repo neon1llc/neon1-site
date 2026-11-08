@@ -1,11 +1,9 @@
-// src/app/public/js/page.js - Rain, menu, wordmark, and the white rabbit; the rain itself is shared with 1NEON.
+// src/app/public/js/page.js - Rain, wordmark, chat, and the white rabbit; the rain itself is shared with 1NEON,
+// and the menu, footer year, and 1NEON fade come from js/frame.js.
 
 import { rain, controls, TEXT } from "/shared/rain.js";
 import { whiteRabbit } from "/js/white-rabbit.js";
 {
-  // Footer year
-  document.getElementById("yr").textContent = new Date().getFullYear();
-
   // ---- Matrix rain, with the hero pane, header, and controls as glass ----
   // A rabbit drops in now and then, only when the egg is ready, and never under the text or controls
   let egg = null;
@@ -48,37 +46,8 @@ import { whiteRabbit } from "/js/white-rabbit.js";
   addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
-  // ---- 1NEON: the page fades to the rain, then hands over to the portal, which fades itself in ----
-  document.querySelectorAll("a[data-handoff]").forEach((a) => a.addEventListener("click", (e) => {
-    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return; // new tab or window: a plain link
-    e.preventDefault();
-    try { sessionStorage.setItem("neon1.handoff", "1"); } catch { /* storage blocked: the portal just won't fade in */ }
-    if (reduce.matches) { location.href = a.href; return; }
-    document.body.classList.add("leaving");
-    setTimeout(() => (location.href = a.href), 450);
-  }));
-
-  // ---- Menu: open/close, Esc, close on link; returns focus to the button ----
-  // The page behind an open menu is inert, so Tab moves only between the menu and its button
-  const menu = document.getElementById("menu"), menuBtn = document.getElementById("menuBtn");
-  // Looked up each time, because the chat window arrives after the page starts
-  const behind = () => document.querySelectorAll(".top, .awake, .rainctl, .n1chat-launch, .n1chat");
-  function setMenu(open) {
-    menu.hidden = !open;
-    behind().forEach((el) => (el.inert = open));
-    if (!open) onScroll(); // restores the rain controls' own inert state
-    menuBtn.setAttribute("aria-expanded", String(open));
-    menuBtn.textContent = open ? "close" : "menu";
-    header.classList.toggle("menu-open", open);
-    document.body.classList.toggle("menu-open", open); // the chat window steps aside under the menu
-    document.body.style.overflow = open ? "hidden" : "";
-    if (open) menu.querySelector("a").focus(); else menuBtn.focus();
-  }
-  menuBtn.addEventListener("click", () => setMenu(menu.hidden));
-  menu.addEventListener("click", (e) => { if (e.target.closest("a") || e.target === menu) setMenu(false); });
-  addEventListener("keydown", (e) => { if (e.key === "Escape" && !menu.hidden) setMenu(false); });
-  // Widening past the menu's breakpoint brings back the header links, so the menu closes
-  matchMedia("(min-width: 1041px)").addEventListener("change", (e) => { if (e.matches && !menu.hidden) setMenu(false); });
+  // The menu (js/frame.js) made the rain controls inert while open; closing restores their own state
+  document.addEventListener("n1:menu", (e) => { if (!e.detail.open) onScroll(); });
 
   // ---- The "ask neon1" window: optional, so it loads last and a failure leaves the page working ----
   // The contact section and its email and booking links stay the way to reach a person

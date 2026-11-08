@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.27.1" />
+  <meta name="version" content="0.28.0" />
   <title>neon1 · cloud, AI, and IT consulting</title>
   <meta name="description" content="neon1 is a one-person technology practice: cloud and AI engineering, business automation, networks, and cameras." />
   <meta name="theme-color" content="#0D0208" />
@@ -46,6 +46,8 @@
   <link rel="modulepreload" href="/js/white-rabbit.js" />
   <!-- The visible height, set before the first paint -->
   <script src="/js/viewport.js"></script>
+  <!-- The frame every page shares, then this page's own layout -->
+  <link rel="stylesheet" href="/css/frame.css" />
   <link rel="stylesheet" href="/css/site.css" />
 </head>
 <body>
@@ -55,8 +57,10 @@
   <canvas id="lens" aria-hidden="true"></canvas>
   <div class="veil" aria-hidden="true"></div>
 
+  <!-- The bar: blocks marked frame: are copied to every page by scripts/frame.py; edit them here -->
   <header class="n1-bar">
     <nav class="n1-inner" aria-label="Main">
+      <!-- frame:logo -->
       <!-- A plain link to neon1.tech, so it can be dragged to the bookmarks bar; a click springs back to the top -->
       <a class="logo n1-logo" href="/" data-view="top" aria-label="neon1 home">
         <!-- Brand mark: two arches of nested arcs falling into columns (from the neon1 logo) -->
@@ -66,18 +70,23 @@
         </svg>
         <span><span class="ne">neon</span><span class="one">1</span></span>
       </a>
+      <!-- /frame:logo -->
       <ul class="links">
         <li><a href="#services">services</a></li>
         <li><a href="#process">process</a></li>
         <li><a href="#projects">case studies</a></li>
         <li><a href="#work">projects</a></li>
         <li><a href="#why">about</a></li>
+        <!-- frame:actions -->
         <li><a class="btn btn-ghost" href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a call</a></li>
         <!-- The client portal, a separate app on the same domain -->
         <li><a class="btn portal" href="/1NEON/" data-handoff title="1NEON, the client portal">
           <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="5" aria-hidden="true"><circle cx="32" cy="32" r="28" /><circle cx="32" cy="32" r="19" /><circle cx="32" cy="32" r="10" /><circle cx="32" cy="32" r="2" /></svg>1NEON</a></li>
+        <!-- /frame:actions -->
       </ul>
+      <!-- frame:menu-button -->
       <button class="chip menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="menu">menu</button>
+      <!-- /frame:menu-button -->
     </nav>
   </header>
 
@@ -237,7 +246,7 @@
         </article>
 
       </div>
-        <div class="rail-nav"><button class="chip" type="button" data-rail="-1" aria-label="Previous">←</button><button class="chip" type="button" data-rail="1" aria-label="Next">→</button></div>
+        <div class="rail-nav"><button class="chip arrow" type="button" data-rail="-1" aria-label="Previous">←</button><button class="chip arrow" type="button" data-rail="1" aria-label="Next">→</button></div>
       </div>
     </section>
 
@@ -315,6 +324,7 @@
     </section>
   </main>
 
+  <!-- frame:footer -->
   <footer>
     <div class="foot">
       <div>
@@ -345,10 +355,11 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>No ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.27.1</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.28.0</a>
       </span>
     </div>
   </footer>
+  <!-- /frame:footer -->
   </div>
 
   <!-- Case study panel, filled from a card's template when opened -->
@@ -390,7 +401,8 @@
   <script defer src="/js/views.js"></script>
   <script defer src="/js/cases.js"></script>
 
-  <!-- Rain, menu, wordmark, and the white rabbit; the rain itself is shared with 1NEON -->
+  <!-- The shared frame (menu, footer year, 1NEON fade), then rain, wordmark, chat, and the white rabbit -->
+  <script type="module" src="/js/frame.js"></script>
   <script type="module" src="/js/page.js"></script>
   <script type="module" src="/js/brief.js"></script>
 </body>

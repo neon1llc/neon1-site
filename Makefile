@@ -32,24 +32,34 @@ WELL_KNOWN  := --include ".well-known/*"
 
 # Plain make shows the help
 .DEFAULT_GOAL := help
-.PHONY: help check html js links budget secrets serve three deploy invalidate verify
+.PHONY: help check html js links frame frame-check budget secrets serve three deploy invalidate verify
 
 
 ##@ Checks
 
-check: html js links budget secrets ## Run every static check
+check: html js links frame-check budget secrets ## Run every static check
 
-html: ## Validate index.html against the HTML standard
+# Every page served as HTML, so each check covers the tour as well as the home page
+PAGES := $(SITE_DIR)/index.html $(SITE_DIR)/tour.html
+
+html: ## Validate every page against the HTML standard
 	@command -v npx >/dev/null 2>&1 || { echo "html: install Node.js to get npx"; exit 1; }
-	npx --yes $(HTML_VALIDATE) $(SITE_DIR)/index.html
+	npx --yes $(HTML_VALIDATE) $(PAGES)
 
 js: ## Syntax-check the JavaScript files, vendored modules, shared modules, and inline scripts
 	@command -v node >/dev/null 2>&1 || { echo "js: install Node.js"; exit 1; }
 	@for f in $(SITE_DIR)/js/*.js $(SITE_DIR)/js/vendor/*.js $(SITE_DIR)/shared/*.js; do node --check "$$f" || exit 1; done
-	@python3 scripts/check_page.py scripts $(SITE_DIR)/index.html
+	@for f in $(PAGES); do python3 scripts/check_page.py scripts "$$f" || exit 1; done
 
 links: ## Check in-page anchors and root-relative asset paths
-	@python3 scripts/check_page.py links $(SITE_DIR)/index.html
+	@for f in $(PAGES); do python3 scripts/check_page.py links "$$f" || exit 1; done
+
+# The bar and footer markup lives once, in index.html; other pages get copies
+frame: ## Copy the shared bar and footer blocks from index.html into the other pages
+	@python3 scripts/frame.py sync $(SITE_DIR)
+
+frame-check: ## Fail if any page's bar or footer differs from index.html
+	@python3 scripts/frame.py check $(SITE_DIR)
 
 budget: ## Fail if the deployed files exceed BUDGET_KB
 	@kb=$$(find $(SITE_DIR) -type f ! -name '.*' -exec cat {} + | wc -c | awk '{print int($$1 / 1024)}'); \
