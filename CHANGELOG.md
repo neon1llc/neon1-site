@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.19.4
+
+- The pear tree's mint circle is 15% smaller and sits about 2 feet farther back and 1 foot to the left.
+
 ## v0.19.3
 
 - The concrete has more cracks, hairline and branching, plus shallow dents and pitted spots.
