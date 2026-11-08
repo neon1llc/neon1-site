@@ -309,9 +309,6 @@ html.case-lock { overflow: hidden; }
 .case-body th { font: 500 12px var(--mono); color: var(--brand); }
 .case-body .stat { font: 13px var(--mono); color: var(--muted); }
 /* Links to other sites inside a case study: brand green, a fine underline, and a small arrow */
-.case-body a.ext { color: var(--brand); font-weight: 600; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
-.case-body a.ext::after { content: "↗"; font-size: .8em; margin-left: 2px; }
-.case-body a.ext:hover { text-decoration-thickness: 2px; }
 .case-body .stat b { color: var(--brand); }
 
 /* Phones: the panel fills the screen below the header */
@@ -456,10 +453,13 @@ body.white-rabbit-scene > :not(.white-rabbit) { visibility: hidden; }
   font: 500 14px var(--mono); color: var(--void); background: var(--neon); text-decoration: none; }
 .skip:focus { top: 12px; }
 
-/* Links out of the about story and the legal line: brand green with a small arrow, like the case studies' */
-.story a.ext, .legal a.ext { color: var(--brand); font-weight: 600; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
-.story a.ext::after, .legal a.ext::after { content: "↗"; font-size: .8em; margin-left: 2px; }
-.story a.ext:hover, .legal a.ext:hover { color: var(--brand); text-decoration-thickness: 2px; }
+/* Links in running text, everywhere on the site (about, contact, case studies, the legal line): dark
+   brand green, bold, and a small arrow, with no underline; the arrow nudges out on hover and focus */
+a.ext { color: var(--brand); font-weight: 600; text-decoration: none; white-space: nowrap; }
+a.ext::after { content: "↗"; display: inline-block; font-size: .8em; margin-left: 2px; transition: transform .15s ease; }
+a.ext:hover::after, a.ext:focus-visible::after { transform: translate(1px, -1px); }
+a.ext:hover { color: var(--brand); }
+@media (prefers-reduced-motion: reduce) { a.ext::after { transition: none; } }
 
 /* Backslashes between the legal line's items */
 .legal .policies { gap: 8px; align-items: baseline; }

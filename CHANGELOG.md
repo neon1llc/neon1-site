@@ -2,6 +2,12 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.14.4
+
+- Contact invites what's on your mind or an opinion on your operations, with the email and number as links.
+- Links in running text look the same across the site: dark brand green, bold, and an arrow, with no underline.
+- The footer lists the phone number last, after LinkedIn.
+
 ## v0.14.3
 
 - Each process step's dot lines up with its green number.
