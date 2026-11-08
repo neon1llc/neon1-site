@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.19.6
+
+- The porch swing is rendered turned around, so the frame and the seat agree and the riders face left, instead of a mirrored image.
+
 ## v0.19.5
 
 - The white rabbit loads its art by release version, so browsers holding year-long cached copies pick up the current yard instead of an old one.
