@@ -2,6 +2,16 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.19.3
+
+- The concrete has more cracks, hairline and branching, plus shallow dents and pitted spots.
+- The porch swing faces left and stands on the concrete in line with the greenhouse and trellis, past the soil square.
+- The mint is a dark, dense crowd, with the outer clumps pushed low and sprawling.
+- The asian pear tree is taller and wilder, with uneven branching and clustered leaves.
+- The stone bed is built from long, jagged, staggered stones in grey and reddish tones on all four sides, filled with dirt.
+- The dog house is half again as wide, with a doorway hung with three plastic flaps, and it faces the yard.
+- The left border runs dog house, huge Japanese andromeda, branchy bush, and tall pink rose.
+
 ## v0.19.2
 
 - The chairs' arm upholstery no longer pokes through their wooden side boards.
