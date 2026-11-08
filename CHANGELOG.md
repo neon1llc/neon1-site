@@ -2,6 +2,13 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.28.1
+
+- The lawn is a deeper, living green instead of a dry, sun-bleached one, and the worn path across it is gone.
+- At the window, the leans to each side sit lower and look farther out and up, over the deck and the near concrete, to the far trees and the water, with both sides of the window frame still in view.
+- The deck is sized by its railing: from the far corner, 7 spindles, the right stairs, then 7 spindles back to the house, at 16 cm spacing. That puts it 3.56 m out from the house.
+- The stone bed runs straight from the deck's front before turning into its backward C, and the border by the deck has a few more shrubs.
+
 ## v0.28.0
 
 - The sample tour now uses the home page's light bar: the logo, book a call, and 1NEON sit in the same places, and the note that everything is made up sits where the section links are. On phones the note shows as a thin line under the bar, next to the same menu.

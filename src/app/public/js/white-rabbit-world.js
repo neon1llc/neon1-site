@@ -40,11 +40,12 @@ const BED = [-29.7, -28.3, -6.5, 11.5];   // the garden along the back fence: x0
 // The yard: the back fence, and the side fences from the house to it (the right side, toward -z, meets
 // a cross street; the left, toward +z, a neighbor's house), and the deck below the window
 const YARD = { back: -30, right: -10, left: 12.5 };
+const DECK_FRONT = -2.05 - (16 * 0.16 + 1.0);   // the deck's front edge (see DECK)
 // The right side of the yard is concrete, parted from the lawn on the left by a curving raised bed of
 // stone (CURVE, plan points [x, z] from the foot of the deck's front stairs out toward the back); soil
 // borders run along the right fence and the back fence (SOIL wide); a circle is cut from the concrete for
 // a pear tree and its mint; the greenhouse stands square in the back-right corner of the concrete
-const CURVE = [[-12.9, 2.7], [-15.6, 0.9], [-19.0, -0.5], [-22.2, -0.6], [-24.6, 0.4], [-26.2, 1.6]];   // starts at the deck's front, 1.5 m right of its front stairs
+const CURVE = [[DECK_FRONT - 0.45, 2.75], [-9.4, 2.75], [-12.9, 2.7], [-15.6, 0.9], [-19.0, -0.5], [-22.2, -0.6], [-24.6, 0.4], [-26.2, 1.6]];   // runs straight out from the deck's front, 1.5 m right of its front stairs, then curves
 const SOIL = 1.8;
 // Edges are never ruled straight: every soil, concrete, and mulch boundary wanders by a few centimeters
 const WOB = (s) => 0.07 * Math.sin(s * 1.13 + 0.7) + 0.045 * Math.sin(s * 2.71 + 2.1) + 0.025 * Math.sin(s * 6.3 + 4.0);
@@ -53,7 +54,9 @@ const MINT = [-24.0, -2.55, 0.85];
 const GREEN = { x0: -28.2, x1: -23.0, z0: -8.2, z1: -4.9, eave: 2.05, ridge: 2.75 };   // about 1.4 times the 8 x 12 ft kit
 // The square of soil in front of the greenhouse, a foot from its door, where the squash trellis stands
 const PATCH = { x0: GREEN.x1 + 0.3, x1: GREEN.x1 + 0.3 + (GREEN.x1 - GREEN.x0), z0: GREEN.z0, z1: GREEN.z1 };
-const DECK = { x0: -11.4, x1: -2.05, z0: -2.3, z1: 10.5, y: GROUND + 0.8 };   // out from the house on the left, its left side by the left border, its right side at z0
+// Its depth is the right side's own count: 7 spindles from the front corner to the right stairs, the stairs (1 m),
+// and 7 more back to the house, at 16 cm apart
+const DECK = { x0: -2.05 - (16 * 0.16 + 1.0), x1: -2.05, z0: -2.3, z1: 10.5, y: GROUND + 0.8 };   // out from the house on the left, its left side by the left border, its right side at z0
 const CROSS = { walk1: [-10.6, -12.6], road: [-12.6, -19.6], walk2: [-19.6, -21.6] };
 
 // The atlas cells: u0, v0, u1, v1, and width over height (from blender/world.py), and each kind's height in meters
@@ -111,10 +114,10 @@ const GROUND_FRAG = /* glsl */`
     float dry = smoothstep(0.5, 0.8, fbm(vW.xz * 0.12 + 7.0));
     // The photo's detail, by its brightness, on a lawn's greens (the photo itself is an autumn floor)
     float lum = dot(photo, vec3(0.3, 0.55, 0.15));
-    vec3 grass = mix(vec3(0.07, 0.13, 0.04), vec3(0.27, 0.38, 0.13), clamp(lum * 1.7, 0.0, 1.0)) * mix(0.8, 1.12, mott);   // the photos' olive turf, not a bright green
+    vec3 grass = mix(vec3(0.04, 0.11, 0.03), vec3(0.15, 0.31, 0.08), clamp(lum * 1.7, 0.0, 1.0)) * mix(0.85, 1.1, mott);   // a deep, healthy green, as in the photos
     // Clumps: a mid scale of darker, thicker tufts and thin, paler spots, so the lawn has texture from afar
     grass *= mix(0.74, 1.16, smoothstep(0.25, 0.75, fbm(vW.xz * 2.6 + 11.0))) * mix(0.86, 1.1, fbm(vW.xz * 8.0 + 5.0));   // tufts at two scales, so it has depth
-    grass = mix(grass, mix(grass, photo, 0.25) * vec3(1.2, 1.05, 0.7), dry * 0.22);
+    grass = mix(grass, mix(grass, photo, 0.25) * vec3(1.1, 1.05, 0.75), dry * 0.08);
     grass = mix(grass, grass * vec3(0.7, 0.9, 0.7), smoothstep(0.62, 0.75, noise(vW.xz * 1.6 + 3.0)) * 0.6);
     if (x > ${STRIP.fence.toFixed(1)}) {
       float wander = z + sin(x * 0.4) * 0.5 + noise(vec2(x * 0.3, 0.0)) * 0.8;
@@ -125,10 +128,7 @@ const GROUND_FRAG = /* glsl */`
       grass *= mix(0.7, 1.0, smoothstep(0.0, 0.7, max(x - uBed.y, 0.0) + step(x, uBed.x) * 9.0));
       grass = mix(grass, vec3(0.12, 0.25, 0.08), smoothstep(-19.0, -19.9, x) * 0.6);
       float wear = smoothstep(1.7, 0.4, distance(vW.xz, vec2(-11.0, -4.0)) + noise(vW.xz * 3.0) * 0.6);
-      vec2 a = vec2(-11.6, 4.8), b = vec2(-18.0, 6.5), ab = b - a;
-      float t = clamp(dot(vW.xz - a, ab) / dot(ab, ab), 0.0, 1.0);
-      float path = smoothstep(0.55, 0.15, distance(vW.xz, a + ab * t) + (noise(vW.xz * 2.0) - 0.5) * 0.5) * 0.55;
-      grass = mix(grass, vec3(0.36, 0.3, 0.2) * (0.8 + 0.4 * hash(floor(vW.xz * 25.0))), max(wear * 0.85, path));
+      grass = mix(grass, vec3(0.36, 0.3, 0.2) * (0.8 + 0.4 * hash(floor(vW.xz * 25.0))), wear * 0.85);   // worn only under the swing, no path across the lawn
     }
     float dande = step(0.9965, hash(floor(vW.xz * 7.0))) * step(0.4, noise(vW.xz * 0.5)) * smoothstep(0.2, 0.12, length(fract(vW.xz * 7.0) - 0.5));   // round flower heads
     grass = mix(grass, vec3(0.92, 0.75, 0.12), dande);
@@ -494,7 +494,7 @@ export function createWorld({ scene, touch }) {
           gl_Position = projectionMatrix * viewMatrix * vec4(w, 1.0); }`,
       fragmentShader: `${COMMON}\n${hash}\nvarying vec3 vW; varying float vTip;
         void main() { float patchy = fbm(vW.xz * 0.25), clump = noise(vW.xz * 2.6 + 11.0);
-          vec3 c = mix(vec3(0.05, 0.09, 0.03), vec3(0.27, 0.38, 0.13) * mix(0.8, 1.12, patchy) * mix(0.8, 1.1, clump), vTip);
+          vec3 c = mix(vec3(0.03, 0.08, 0.025), vec3(0.15, 0.31, 0.08) * mix(0.85, 1.1, patchy) * mix(0.85, 1.1, clump), vTip);
           gl_FragColor = vec4(outdoor(c, vec3(0.0, 1.0, 0.0), vW), 1.0); }`,
     })));
     blades.frustumCulled = false;
@@ -656,15 +656,15 @@ export function createWorld({ scene, touch }) {
   const spout = keep(new T.Mesh(new T.BoxGeometry(0.07, HOUSE.h, 0.07), solid("#E8E6E0")));
   spout.position.set(HOUSE.x1 + 0.05, GROUND + HOUSE.h / 2, HOUSE.z0 + 0.4);
 
-  // The deck, as in the photo from the window: 9.35 m out from the house and 12.8 m across, painted a deep brownish
+  // The deck, as in the photo from the window: 3.56 m out from the house and 12.8 m across, painted a deep brownish
   // burgundy, a little worn where feet go. 5/4 x 6 decking boards run left to right with thin gaps, in staggered
-  // lengths, over a rim joist on 6x6 posts. The railing has a wide, flat 2x6 cap over turned spindles 14 cm apart
+  // lengths, over a rim joist on 6x6 posts. The railing has a wide, flat 2x6 cap over turned spindles 16 cm apart
   // and a bottom rail; big square posts stand at every corner and stair, rising above the cap under their own
   // caps, and the same posts sit flush under the cap between them. Stairs go down off the front, left of
   // center, to the lawn, and off the right side, 7 spindles from the front corner, to the concrete; the left side
   // runs railed all the way back to the house
   {
-    const paint = solid("#34201F", 1), worn = new T.Color(), H = DECK.y, OC = 0.14, PS = 0.12, CAP = 0.92;
+    const paint = solid("#34201F", 1), worn = new T.Color(), H = DECK.y, OC = 0.16, PS = 0.12, CAP = 0.92;
     const D = DECK.x1 - DECK.x0, L = DECK.z1 - DECK.z0, BW = 0.14, rows = Math.floor(D / (BW + 0.01));
     const planks = keep(new T.InstancedMesh(new T.BoxGeometry(BW, 0.025, 1), paint, rows * 6));
     let k = 0;
@@ -698,7 +698,7 @@ export function createWorld({ scene, touch }) {
       if (main) { piece(PS + 0.04, 0.03, PS + 0.04, x, y + h + 0.015, z); piece(PS + 0.01, 0.025, PS + 0.01, x, y + h + 0.042, z); }
     };
     // A railing from (x0, y0, z0) to (x1, y1, z1): main posts at its ends, inner posts at most 1.9 m apart, a wide
-    // flat cap and a bottom rail, and spindles 14 cm apart (measured level, as on the stairs)
+    // flat cap and a bottom rail, and spindles 16 cm apart (measured level, as on the stairs)
     const railing = (x0, y0, z0, x1, y1, z1, ends = [true, true]) => {
       const run = Math.hypot(x1 - x0, z1 - z0), turn = Math.atan2(x1 - x0, z1 - z0), slope = Math.atan2(y1 - y0, run), len = Math.hypot(run, y1 - y0);
       const mx = (x0 + x1) / 2, my = (y0 + y1) / 2, mz = (z0 + z1) / 2;
@@ -715,7 +715,7 @@ export function createWorld({ scene, touch }) {
       }
     };
     // Openings: the front stairs (F0 to F1, left of center) and the right stairs (R0 to R1, 7 spindles in from the front corner)
-    const F0 = 4.2, F1 = 5.4, R0 = DECK.x0 + 8 * OC, R1 = R0 + 1.0;
+    const F0 = 4.2, F1 = 5.4, R0 = DECK.x0 + 8 * OC, R1 = R0 + 1.0;   // R1 to the house is 7 spindles too
     railing(DECK.x0, H, DECK.z1, DECK.x0, H, F1); railing(DECK.x0, H, F0, DECK.x0, H, DECK.z0);
     railing(DECK.x0, H, DECK.z0, R0, H, DECK.z0, [false, true]); railing(R1, H, DECK.z0, DECK.x1, H, DECK.z0);
     railing(DECK.x0, H, DECK.z1, DECK.x1, H, DECK.z1, [false, true]);
@@ -963,6 +963,8 @@ export function createWorld({ scene, touch }) {
     // and nearer the deck, as in the photos: low rounded shrubs and leafy clumps along the stockade, mulch between
     // The peach tree, in the left border just past the deck's front-left corner
     items.push(["pear", -12.4, GROUND, YARD.left - 1.0, 0]);
+    // low shrubs and leafy clumps in the stretch of border beside the deck's front
+    items.push(["bush", -6.6, GROUND, YARD.left - 0.75, 0], ["mintLow", -7.8, GROUND, YARD.left - 1.2, 0], ["bush", -9.2, GROUND, YARD.left - 0.7, 0], ["mintLow", -10.6, GROUND, YARD.left - 1.25, 0]);
     items.push(["mintLow", -13.1, GROUND, YARD.left - 1.25, 0], ["bush", -14.1, GROUND, YARD.left - 0.75, 0], ["bush", -15.3, GROUND, YARD.left - 0.6, 0],
       ["mintLow", -16.2, GROUND, YARD.left - 1.3, 0], ["andromeda", -17.0, GROUND - 1.1, YARD.left - 0.8, 3], ["mintLow", -19.6, GROUND, YARD.left - 1.2, 0], ["bush", -20.4, GROUND, YARD.left - 0.7, 0]);
     // Mint, a dark crowd of it filling the pear's circle and over the edge: the clumps in the middle stand up,

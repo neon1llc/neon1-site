@@ -50,8 +50,8 @@ const BEATS = [
   // the concrete, the greenhouse, and the right fence; across to the right, looking left and down at the lawn,
   // the left border, and the stockade; and back to center, square to the window, gliding in until the frame is
   // gone and only the yard is ahead, held there before the white
-  [0.875, [-1.72, 1.25, 1.0], [-5.5, -0.9, -2.0], 54], [0.885, [-1.73, 1.25, 1.0], [-5.5, -0.91, -2.03], 54],   // low and close to the opening, under the raised sash, so it looks through it, not at the sill
-  [0.915, [-1.72, 1.25, 0.2], [-5.5, -0.9, 3.3], 54], [0.925, [-1.73, 1.25, 0.2], [-5.5, -0.91, 3.33], 54],
+  [0.875, [-1.5, 1.12, 1.0], [-5.5, 0.05, -2.0], 54], [0.885, [-1.51, 1.12, 1.0], [-5.5, 0.04, -2.03], 54],   // low, under the raised sash, looking out over the yard to the far trees and the water, both sides of the frame in view
+  [0.915, [-1.5, 1.12, 0.2], [-5.5, 0.05, 3.3], 54], [0.925, [-1.51, 1.12, 0.2], [-5.5, 0.04, 3.33], 54],
   [0.945, [-1.55, 1.3, 0.6], [-3.1, 1.02, 0.6], 52],
   [0.97, [-2.37, 1.1, 0.62], [-3.6, 1.0, 0.6], 52],             // through the opening: the yard straight on
   [0.985, [-2.37, 1.1, 0.62], [-3.6, 1.0, 0.6], 52],            // held, before the white
