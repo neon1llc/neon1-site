@@ -17,7 +17,7 @@
 
 
 // Feel: scroll length for one pass, spring, rubber band, and gesture idle time
-const PASS = 8;            // viewport heights of input for the whole walk
+const PASS = 12;           // viewport heights of input for the whole walk
 const STIFF = 90;          // spring stiffness, per second squared
 const DAMP = 2 * Math.sqrt(STIFF);
 const BAND = 0.02;         // the most input can pull past the end

@@ -29,39 +29,38 @@ const WINDOW = { z: 0.6, y: 1.45, w: 1.2, h: 1.3 };
 // through the opening into the white. Each is [progress, camera position, look target, vertical fov]; the
 // first three positions are filled in from the picture's fit. Pauses are pairs of beats a hair apart
 const BEATS = [
-  [0, null, SC, 40], [0.04, null, SC, 40], [0.09, null, SC, 44],
-  // Three scoots back across the floor, hunched at the set's height at first and sitting up straighter
-  // each time; each one dips the view (hands reaching back to push) and levels out as the push carries back
-  [0.125, [0.18, 0.64, -0.55], [0, 0.55, -1.9], 50], [0.16, [0.19, 0.64, -0.53], [0, 0.55, -1.9], 50],
-  [0.195, [0.5, 0.77, 0.45], [0, 0.55, -1.9], 52], [0.23, [0.51, 0.77, 0.47], [0, 0.55, -1.9], 52],
-  [0.265, [0.9, 0.9, 1.58], [0, 0.55, -1.9], 54], [0.3, [0.91, 0.9, 1.6], [0.02, 0.56, -1.9], 54],   // the set and both chairs
-  [0.36, [0.92, 0.9, 1.6], [-0.86, 1.56, 0.88], 54],             // turning to the window: the sun in the eyes
-  [0.41, [0.92, 0.9, 1.6], [-1.95, 1.3, 0.92], 54],              // past it, to the sky and treetops
-  [0.47, [0.92, 0.91, 1.59], [-1.95, 1.33, 0.86], 54],           // watching the light and the dust
-  [0.52, [0.85, 1.22, 1.55], [-1.9, 0.95, 0.9], 54],             // getting up: the view dips
-  [0.57, [0.78, 1.6, 1.5], [-1.95, 1.4, 0.8], 52],               // up
-  [0.63, [-0.3, 1.58, 1.62], [-1.87, 0.92, 0.9], 50],            // walking over, a glance at the car
+  [0, null, SC, 40], [0.04, null, SC, 40], [0.09, null, SC, 44],                                       // face right at the screen, hunched
+  [0.13, [0.05, 0.9, -0.95], [0, 0.56, -1.9], 50], [0.17, [0.06, 0.9, -0.93], [0, 0.56, -1.9], 50],     // sitting back up straight, then a pause
+  [0.2, [0.35, 0.9, -0.1], [0, 0.56, -1.9], 52], [0.235, [0.36, 0.9, -0.08], [0, 0.56, -1.9], 52],      // first scoot back, pause
+  [0.265, [0.62, 0.9, 0.75], [0, 0.56, -1.9], 53], [0.3, [0.63, 0.9, 0.77], [0, 0.56, -1.9], 53],       // second, pause
+  [0.33, [0.9, 0.9, 1.58], [0, 0.56, -1.9], 54], [0.37, [0.91, 0.9, 1.6], [0.02, 0.56, -1.9], 54],      // third: the set and both chairs
+  [0.42, [0.92, 0.9, 1.6], [-0.86, 1.56, 0.88], 54],             // turning to the window: the sun in the eyes
+  [0.46, [0.92, 0.9, 1.6], [-1.95, 1.3, 0.92], 54],              // past it, to the sky and treetops
+  [0.51, [0.92, 0.91, 1.59], [-1.95, 1.33, 0.86], 54],           // watching the light and the dust
+  [0.55, [0.85, 1.22, 1.55], [-1.9, 0.95, 0.9], 54],             // getting up: the view dips
+  [0.59, [0.78, 1.6, 1.5], [-1.95, 1.4, 0.8], 52],               // up
+  [0.64, [-0.3, 1.58, 1.62], [-1.87, 0.92, 0.9], 50],            // walking over, a glance at the car
   [0.68, [-0.62, 1.56, 1.05], [-1.95, 1.25, 0.72], 50],          // eyes back to the window
-  [0.73, [-0.7, 1.55, 0.62], [-1.95, 1.38, 0.6], 50],            // square to it
-  [0.8, [-0.72, 1.55, 0.6], [-1.95, 1.35, 0.6], 50],             // looking out
-  [0.86, [-0.95, 1.5, 0.6], [-2.4, 1.2, 0.6], 50],               // a step closer, the sash going up (see OPEN)
-  [0.9, [-0.98, 1.45, 0.6], [-2.8, 1.1, 0.6], 50],               // a breath
-  [0.94, [-1.95, 1.12, 0.6], [-3.2, 1.05, 0.6], 52],             // through the opening
-  [0.955, [-2.35, 1.1, 0.6], [-3.6, 1.0, 0.6], 52],              // outside
+  [0.72, [-0.7, 1.55, 0.62], [-1.95, 1.38, 0.6], 50],            // square to it
+  [0.79, [-0.72, 1.55, 0.6], [-1.95, 1.35, 0.6], 50],            // looking out
+  [0.85, [-0.95, 1.5, 0.6], [-2.4, 1.2, 0.6], 50],               // a step closer, the sash going up (see OPEN)
+  [0.89, [-0.98, 1.45, 0.6], [-2.8, 1.1, 0.6], 50],              // a breath
+  [0.93, [-1.95, 1.12, 0.6], [-3.2, 1.05, 0.6], 52],             // through the opening
+  [0.945, [-2.35, 1.1, 0.6], [-3.6, 1.0, 0.6], 52],              // outside
   [0.985, [-2.37, 1.1, 0.62], [-3.6, 1.0, 0.58], 52],            // a long look at it all, before the white
   [1, [-2.38, 1.1, 0.62], [-3.6, 1.0, 0.58], 52],
 ];
-// The scoots' dips: the look drops as each push begins and comes back level by its end
-const SCOOTS = [[0.09, 0.125], [0.16, 0.195], [0.23, 0.265]];
+// The scoots' dips: the look drops a little as each push begins and comes back level by its end
+const SCOOTS = [[0.17, 0.2], [0.235, 0.265], [0.3, 0.33]];
 const KEYS = BEATS.map((b) => b[0]), FOV = BEATS.map((b) => b[3]), LOOK = BEATS.map((b) => b[2]);
 // The sash starts a little up and goes the rest of the way as the camera steps closer
-const OPEN = [[0.8, 0.3], [0.86, 1]];
+const OPEN = [[0.79, 0.3], [0.85, 1]];
 // Getting up tilts the view (counterclockwise, in radians), and the walk bobs with each step
-const ROLL = [[0.47, 0], [0.515, 0.07], [0.55, -0.015], [0.575, 0]];
-const WALK = [0.57, 0.73], STEPS = 7;
+const ROLL = [[0.51, 0], [0.55, 0.07], [0.58, -0.015], [0.6, 0]];
+const WALK = [0.59, 0.72], STEPS = 7;
 // The lighting, screen, and grade below were timed on an earlier, shorter walk; this maps progress
 // onto that timeline (the room appearing, the window coming into view, the white-out)
-const LEGACY = [[0, 0], [0.09, 0.28], [0.16, 0.4], [0.27, 0.6], [0.62, 0.82], [0.9, 0.94], [0.985, 0.95], [1, 1]];
+const LEGACY = [[0, 0], [0.09, 0.28], [0.17, 0.4], [0.33, 0.6], [0.64, 0.82], [0.89, 0.94], [0.985, 0.95], [1, 1]];
 function linear(p, pts) {
   if (p <= pts[0][0]) return pts[0][1];
   for (let i = 1; i < pts.length; i++) if (p <= pts[i][0]) { const [a, x] = pts[i - 1], [b, y] = pts[i]; return x + ((y - x) * (p - a)) / (b - a); }
@@ -561,7 +560,7 @@ export function createScene({ onLost, onSound = () => {} }) {
     // Camera: curve, portrait widening and pull-back, a little handheld sway, and the room's walls
     // (only until the camera goes out through the window)
     posCurve.getPoint(u, P); lookCurve.getPoint(u, L);
-    for (const [a, b] of SCOOTS) if (pr > a && pr < b) { const t = (pr - a) / (b - a); L.y -= Math.max(0, Math.sin(Math.min(1, t * 1.6) * Math.PI)) ** 0.7 * 0.45 * (1 - t * 0.4); }
+    for (const [a, b] of SCOOTS) if (pr > a && pr < b) { const t = (pr - a) / (b - a); L.y -= Math.max(0, Math.sin(Math.min(1, t * 1.6) * Math.PI)) ** 0.7 * 0.12 * (1 - t * 0.4); }
     let fov = ramp(pr, KEYS.map((k, i) => [k, FOV[i]]));
     const wide = T.MathUtils.radToDeg(2 * Math.atan(Math.tan(T.MathUtils.degToRad(19)) / aspect));
     fov += (Math.max(fov, wide) - fov) * ramp(p, [[0.28, 0], [0.45, 1]]);
