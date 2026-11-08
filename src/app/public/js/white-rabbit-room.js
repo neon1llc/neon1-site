@@ -515,18 +515,22 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
   const outerX = -2.03, innerX = -1.99, meet = mid + 0.018;
   const sash = (x, bottom, top, topRail, bottomRail, into) => {
     const h = top - bottom, cy = (bottom + top) / 2, frame = into ? into.frame : sashes, glass = into ? into.pane : panes;
-    frame.push(box(deep, topRail, win.w - 0.02, [x, top - topRail / 2, win.z]), box(deep, bottomRail, win.w - 0.02, [x, bottom + bottomRail / 2, win.z]),
-      box(deep, h, sw2, [x, cy, z0 + 0.01 + sw2 / 2]), box(deep, h, sw2, [x, cy, z1 - 0.01 - sw2 / 2]));
+    // Each sash sits clear of the jamb liners and beads (a few millimeters), so no faces share a plane
+    frame.push(box(deep, topRail, win.w - 0.028, [x, top - topRail / 2, win.z]), box(deep, bottomRail, win.w - 0.028, [x, bottom + bottomRail / 2, win.z]),
+      box(deep, h, sw2, [x, cy, z0 + 0.014 + sw2 / 2]), box(deep, h, sw2, [x, cy, z1 - 0.014 - sw2 / 2]));
     const ph = h - topRail - bottomRail;
-    glass.push(place(new T.PlaneGeometry(win.w - 0.02 - 2 * sw2, ph), { p: [x, bottom + bottomRail + ph / 2, win.z], r: [0, Math.PI / 2, 0] }));
+    glass.push(place(new T.PlaneGeometry(win.w - 0.028 - 2 * sw2, ph), { p: [x, bottom + bottomRail + ph / 2, win.z], r: [0, Math.PI / 2, 0] }));
   };
   sash(outerX, meet - 0.03, y1, sw2, 0.03);                        // upper sash, fixed
   sash(innerX, y0 + 0.028, meet, 0.05, 0.075, moving);             // lower sash, built closed
-  // Parting beads between the tracks and stops on the room side, up both jambs and across the head
-  for (const z of [z0 + 0.006, z1 - 0.006]) {
-    sashes.push(box(0.008, win.h, 0.012, [-2.01, win.y, z]), box(0.014, win.h, 0.014, [-1.966, win.y, z + (z < win.z ? 0.001 : -0.001)]));
+  // A parting bead between the tracks, beside the upper sash only (below it the opening reads clear when
+  // the lower sash is up), and slim stops on the room side up both jambs and across the head; each sits
+  // in the gap between its neighbors without touching them
+  const upperH = y1 - (meet - 0.03);
+  for (const z of [z0 + 0.0065, z1 - 0.0065]) {
+    sashes.push(box(0.005, upperH, 0.011, [-2.0102, (y1 + meet - 0.03) / 2, z]), box(0.01, win.h, 0.012, [-1.9665, win.y, z]));
   }
-  sashes.push(box(0.008, 0.012, win.w, [-2.01, y1 - 0.006, win.z]), box(0.014, 0.014, win.w, [-1.966, y1 - 0.007, win.z]));
+  sashes.push(box(0.005, 0.012, win.w - 0.002, [-2.0102, y1 - 0.0065, win.z]), box(0.01, 0.012, win.w - 0.002, [-1.9665, y1 - 0.0065, win.z]));
   // A lift lip along the lower sash's bottom rail, on its room face
   moving.frame.push(box(0.012, 0.01, win.w * 0.5, [innerX + deep / 2 + 0.006, y0 + 0.028 + 0.05, win.z]));
   add(merged([...trim, ...sashes], shiny(0.35, { color: WINDOW_TRIM, roughness: 0.5 })));
