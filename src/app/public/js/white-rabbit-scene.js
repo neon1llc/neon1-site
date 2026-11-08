@@ -33,10 +33,11 @@ const WINDOW = { z: 0.6, y: 1.45, w: 1.2, h: 1.3 };
 // first three positions are filled in from the picture's fit. Pauses are pairs of beats a hair apart
 const BEATS = [
   [0, null, SC, 40], [0.04, null, SC, 40], [0.09, null, SC, 44],                                       // face right at the screen, hunched
-  [0.13, [0.05, 0.9, -0.95], [0, 0.56, -1.9], 50], [0.17, [0.06, 0.9, -0.93], [0, 0.56, -1.9], 50],     // sitting back up straight, then a pause
-  [0.2, [0.35, 0.9, -0.1], [0, 0.56, -1.9], 52], [0.235, [0.36, 0.9, -0.08], [0, 0.56, -1.9], 52],      // first scoot back, pause
-  [0.265, [0.62, 0.9, 0.75], [0, 0.56, -1.9], 53], [0.3, [0.63, 0.9, 0.77], [0, 0.56, -1.9], 53],       // second, pause
-  [0.33, [0.9, 0.9, 1.58], [0, 0.56, -1.9], 54], [0.37, [0.91, 0.9, 1.6], [0.02, 0.56, -1.9], 54],      // third: the set and both chairs
+  [0.13, [0.03, 0.9, -1.32], [0, 0.56, -1.9], 48], [0.16, [0.04, 0.9, -1.3], [0, 0.56, -1.9], 48],     // sitting back up straight, still close to the set, then a pause
+  [0.19, [0.24, 0.9, -0.58], [0, 0.56, -1.9], 50], [0.215, [0.25, 0.9, -0.56], [0, 0.56, -1.9], 50],    // first scoot back, pause
+  [0.24, [0.47, 0.9, 0.16], [0, 0.56, -1.9], 52], [0.265, [0.48, 0.9, 0.18], [0, 0.56, -1.9], 52],      // second, pause
+  [0.29, [0.69, 0.9, 0.9], [0, 0.56, -1.9], 53], [0.315, [0.7, 0.9, 0.92], [0, 0.56, -1.9], 53],        // third, pause
+  [0.345, [0.9, 0.9, 1.58], [0, 0.56, -1.9], 54], [0.37, [0.91, 0.9, 1.6], [0.02, 0.56, -1.9], 54],     // fourth: the set and both chairs
   [0.42, [0.92, 0.9, 1.6], [-0.86, 1.56, 0.88], 54],             // turning to the window: the sun in the eyes
   [0.46, [0.92, 0.9, 1.6], [-1.95, 1.3, 0.92], 54],              // past it, to the sky and treetops
   [0.51, [0.92, 0.91, 1.59], [-1.95, 1.33, 0.86], 54],           // watching the light and the dust
@@ -54,7 +55,7 @@ const BEATS = [
   [1, [-2.38, 1.1, 0.62], [-3.6, 1.0, 0.58], 52],
 ];
 // The scoots' dips: the look drops a little as each push begins and comes back level by its end
-const SCOOTS = [[0.17, 0.2], [0.235, 0.265], [0.3, 0.33]];
+const SCOOTS = [[0.16, 0.19], [0.215, 0.24], [0.265, 0.29], [0.315, 0.345]];
 const KEYS = BEATS.map((b) => b[0]), FOV = BEATS.map((b) => b[3]), LOOK = BEATS.map((b) => b[2]);
 // The sash starts a little up and goes the rest of the way as the camera steps closer
 const OPEN = [[0.79, 0.3], [0.85, 1]];
@@ -64,6 +65,29 @@ const WALK = [0.59, 0.72], STEPS = 7;
 // The lighting, screen, and grade below were timed on an earlier, shorter walk; this maps progress
 // onto that timeline (the room appearing, the window coming into view, the white-out)
 const LEGACY = [[0, 0], [0.09, 0.28], [0.17, 0.4], [0.33, 0.6], [0.64, 0.82], [0.89, 0.94], [0.985, 0.95], [1, 1]];
+// The scroll's whole span (q) holds the walk above (its progress, pr) for most of its length, then, once
+// outside, a long look: a pan right to the sidewalk and the cross street, a pan left to the neighbor's,
+// back to center, and down over the deck rail to the lawn, to touch the grass, before the white
+const WALKED = 0.64, LOOKED = 0.975;
+function progress(q) {
+  if (q <= WALKED) return (q / WALKED) * 0.945;
+  if (q <= LOOKED) return 0.945 + ((q - WALKED) / (LOOKED - WALKED)) * 0.04;
+  return 0.985 + ((q - LOOKED) / (1 - LOOKED)) * 0.015;
+}
+const GROUND_Y = -4.3;
+const OUTSIDE = [
+  [WALKED, [-2.35, 1.1, 0.6], [-3.6, 1.0, 0.6], 52],
+  [0.68, [-2.37, 1.1, 0.62], [-3.6, 1.0, 0.58], 52],                 // a look straight out
+  [0.735, [-2.9, 1.1, 0.5], [-4.1, 0.75, -0.75], 56],                // panning right: the sidewalk and the cross street
+  [0.77, [-2.9, 1.1, 0.49], [-4.1, 0.74, -0.78], 56],
+  [0.835, [-2.9, 1.1, 0.75], [-4.1, 0.75, 2.0], 56],                 // and left: the neighbor's
+  [0.87, [-2.9, 1.1, 0.76], [-4.1, 0.74, 2.03], 56],
+  [0.9, [-3.2, 0.6, 1.6], [-5.0, -0.6, 2.6], 56],                    // out, over the deck
+  [0.93, [-8.6, -1.6, 6.8], [-11.5, -3.3, 7.4], 56],
+  [0.955, [-12.8, GROUND_Y + 0.75, 7.6], [-15.8, GROUND_Y + 0.2, 5.4], 58], // down to the lawn
+  [LOOKED, [-13.3, GROUND_Y + 0.42, 7.2], [-16.4, GROUND_Y + 0.05, 4.6], 60], // in the grass, the garden ahead
+  [1, [-13.32, GROUND_Y + 0.41, 7.2], [-16.4, GROUND_Y + 0.05, 4.6], 60],
+];
 function linear(p, pts) {
   if (p <= pts[0][0]) return pts[0][1];
   for (let i = 1; i < pts.length; i++) if (p <= pts[i][0]) { const [a, x] = pts[i - 1], [b, y] = pts[i]; return x + ((y - x) * (p - a)) / (b - a); }
@@ -552,8 +576,12 @@ export function createScene({ onLost, onSound = () => {} }) {
   // ---- One frame ----
   const P = new T.Vector3(), L = new T.Vector3(), D = new T.Vector3(), sunAt = new T.Vector3(), stirV = new T.Vector3(), lastCam = new T.Vector3();
   let frames = 0, spent = 0, lastFrame = 0, prev = 0, facing = 1, beat = 0, open = 0;
-  function render(pr, { speed = 0, still = false } = {}) {
+  const outPos = new T.CatmullRomCurve3(OUTSIDE.map((b) => new T.Vector3(...b[1])), false, "centripetal");
+  const outLook = new T.CatmullRomCurve3(OUTSIDE.map((b) => new T.Vector3(...b[2])), false, "centripetal");
+  const OUTKEYS = OUTSIDE.map((b) => b[0]);
+  function render(q, { speed = 0, still = false } = {}) {
     if (disposed || !posCurve) return;
+    const pr = progress(q);
     const now = performance.now(), time = now / 1000, dt = prev ? (now - prev) / 1000 : 0;
     prev = now;
     // pr is the walk's progress; p is the same moment on the lighting's timeline (see LEGACY)
@@ -585,6 +613,14 @@ export function createScene({ onLost, onSound = () => {} }) {
       P.y -= (0.5 - 0.5 * Math.cos(ph)) * 0.028 * fade; P.z += Math.sin(ph / 2) * 0.012 * fade;
     }
     if (pr < 0.9) P.set(T.MathUtils.clamp(P.x, -1.85, 3.05), T.MathUtils.clamp(P.y, 0.2, 2.4), T.MathUtils.clamp(P.z, -2.35, 2.35));
+    // Outside, the long look takes over the camera
+    if (q > WALKED) {
+      let i = 0; while (i < OUTKEYS.length - 2 && q > OUTKEYS[i + 1]) i++;
+      const t = Math.min(1, (q - OUTKEYS[i]) / (OUTKEYS[i + 1] - OUTKEYS[i])), ts = t * t * (3 - 2 * t), u2 = (i + ts) / (OUTKEYS.length - 1);
+      outPos.getPoint(u2, P); outLook.getPoint(u2, L);
+      fov = OUTSIDE[i][3] + (OUTSIDE[i + 1][3] - OUTSIDE[i][3]) * ts;
+      fov = Math.min(Math.max(fov, wide), across);
+    }
     camera.position.copy(P); camera.lookAt(L);
     camera.rotateZ(ramp(pr, ROLL));
     camera.fov = fov; camera.aspect = aspect; camera.updateProjectionMatrix();
