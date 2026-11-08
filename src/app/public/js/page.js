@@ -2,6 +2,7 @@
 
 import { rain, controls, TEXT } from "/shared/rain.js";
 import { whiteRabbit } from "/js/white-rabbit.js";
+import { chat } from "/shared/chat.js";
 {
   // Footer year
   document.getElementById("yr").textContent = new Date().getFullYear();
@@ -28,6 +29,9 @@ import { whiteRabbit } from "/js/white-rabbit.js";
   const ctl = document.querySelector(".rainctl");
   controls(ctl, r);
   egg = whiteRabbit({ rain: r, root: document.getElementById("whiteRabbit") });
+
+  // The "ask neon1" window, answered from this page's own copy
+  chat();
 
   // Waking up: rain and its controls fade as the light content takes over
   const veil = document.querySelector(".veil");
