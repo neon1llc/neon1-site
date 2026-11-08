@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.23.0
+
+- An "ask neon1" button, bottom left, opens a small window that answers questions from this page and neon1's public project pages, and points everything else to a call or hello@neon1.tech. It runs on neon1-chat, at /chat/api on this domain, so the page's strict content security policy is unchanged. Nothing typed into it is stored.
+
 ## v0.22.0
 
 - The white rabbit's walk scrolls in a third of the time, 16 screen heights in all.
