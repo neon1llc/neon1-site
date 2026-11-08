@@ -2,6 +2,16 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.21.0
+
+- The white rabbit's walk scrolls about 2.6 times longer, 48 screen heights in all.
+- Sitting up from the screen stays close to the set, then four even scoots back.
+- Outside, the view now looks straight out, pans right to the sidewalk and cross street, then left to the neighbor's, and drops over the deck rail to the lawn, low in the grass with the garden ahead, before the white.
+- The swing cushion is one piece for the seat and one for the back, each stitched into three places with a fabric button tufted into the middle of each. The fabric is sun-faded, most of all on the seat.
+- The concrete is a slab about an inch above the soil around it.
+- More trees line the cross street and the far side of the back street, and about a third of all trees wear mixed autumn leaves in slightly different hues.
+- Dandelions and fallen leaves on the lawn are round and leaf-shaped instead of square.
+
 ## v0.20.6
 
 - The swing frame's diagonal braces join the legs at the bottom and the top bar at the top, two at each end, instead of floating free.
