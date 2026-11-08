@@ -2,6 +2,13 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.17.2
+
+- The walk starts hunched at the TV's height and scoots back three times, the view dipping as each push begins and leveling as it carries back, sitting up straighter each time.
+- The room is wider, so the window is farther off from where you sit.
+- The dust stirs more gently in the gusts and more quickly when you move through it.
+- Outside the window, the view holds on the yard for a long look before the white.
+
 ## v0.17.1
 
 - The window looks down from a true second story.
