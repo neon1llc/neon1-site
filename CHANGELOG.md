@@ -2,6 +2,12 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.28.2
+
+- The stone bed is one backward C again, with no straight run that made it read as a question mark. It keeps the C's first shape, starting 1.5 m past the deck's front and ending where it always has.
+- The deck was still there but hidden: at its true 3.56 m it sits right under the window, below the sill. Now the last view, out through the opening, looks down over the deck's railing and front stairs to the yard, the trees, and the water, like the photo from this window. It opens to a wider view there so everything fits.
+- The leans to each side sit farther back and higher, so the frame stays in view while they look out to the far trees and the water.
+
 ## v0.28.1
 
 - The lawn is a deeper, living green instead of a dry, sun-bleached one, and the worn path across it is gone.

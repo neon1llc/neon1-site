@@ -50,12 +50,12 @@ const BEATS = [
   // the concrete, the greenhouse, and the right fence; across to the right, looking left and down at the lawn,
   // the left border, and the stockade; and back to center, square to the window, gliding in until the frame is
   // gone and only the yard is ahead, held there before the white
-  [0.875, [-1.5, 1.12, 1.0], [-5.5, 0.05, -2.0], 54], [0.885, [-1.51, 1.12, 1.0], [-5.5, 0.04, -2.03], 54],   // low, under the raised sash, looking out over the yard to the far trees and the water, both sides of the frame in view
-  [0.915, [-1.5, 1.12, 0.2], [-5.5, 0.05, 3.3], 54], [0.925, [-1.51, 1.12, 0.2], [-5.5, 0.04, 3.33], 54],
+  [0.875, [-1.4, 1.4, 0.95], [-5.0, -0.35, -1.2], 62], [0.885, [-1.41, 1.4, 0.95], [-5.0, -0.36, -1.23], 62],   // back from the opening and up a little, so both sides of the frame stay in view, looking out over the deck and yard to the far trees and the water
+  [0.915, [-1.4, 1.4, 0.25], [-5.0, -0.35, 2.4], 62], [0.925, [-1.41, 1.4, 0.25], [-5.0, -0.36, 2.43], 62],
   [0.945, [-1.55, 1.3, 0.6], [-3.1, 1.02, 0.6], 52],
-  [0.97, [-2.37, 1.1, 0.62], [-3.6, 1.0, 0.6], 52],             // through the opening: the yard straight on
-  [0.985, [-2.37, 1.1, 0.62], [-3.6, 1.0, 0.6], 52],            // held, before the white
-  [1, [-2.37, 1.1, 0.62], [-3.6, 1.0, 0.6], 52],
+  [0.97, [-2.37, 1.1, 0.62], [-3.6, 0.55, 0.6], 64],             // through the opening, looking down over the deck to the yard, the trees, and the water, as in the photo from this window
+  [0.985, [-2.37, 1.1, 0.62], [-3.6, 0.55, 0.6], 64],            // held, before the white
+  [1, [-2.37, 1.1, 0.62], [-3.6, 0.55, 0.6], 64],
 ];
 const KEYS = BEATS.map((b) => b[0]), FOV = BEATS.map((b) => b[3]), LOOK = BEATS.map((b) => b[2]);
 // The sash starts a little up and goes the rest of the way as the camera steps closer
@@ -578,8 +578,10 @@ export function createScene({ onLost, onSound = () => {} }) {
     const wide = T.MathUtils.radToDeg(2 * Math.atan(Math.tan(T.MathUtils.degToRad(19)) / aspect));
     fov += (Math.max(fov, wide) - fov) * ramp(p, [[0.28, 0], [0.45, 1]]);
     // Wide screens: the view across is held to about 72 degrees, past which a flat picture stretches
-    // whatever sits near its sides, like looking through a fishbowl
-    const across = T.MathUtils.radToDeg(2 * Math.atan(Math.tan(T.MathUtils.degToRad(36)) / aspect));
+    // whatever sits near its sides, like looking through a fishbowl. Out through the opening it opens to about
+    // 90 degrees, like the wide phone photo from this window, so the deck below and the water beyond both fit
+    const half = 36 + 9 * ramp(pr, [[0.945, 0], [0.97, 1]]);
+    const across = T.MathUtils.radToDeg(2 * Math.atan(Math.tan(T.MathUtils.degToRad(half)) / aspect));
     fov += (Math.min(fov, across) - fov) * ramp(p, [[0.12, 0], [0.28, 1]]);
     const back = Math.max(0, 0.9 / aspect - 0.9) * ramp(p, [[0.3, 0], [0.5, 1]]) * ramp(pr, [[0.84, 1], [0.94, 0]]);
     D.subVectors(P, L).normalize();

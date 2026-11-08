@@ -45,7 +45,8 @@ const DECK_FRONT = -2.05 - (16 * 0.16 + 1.0);   // the deck's front edge (see DE
 // stone (CURVE, plan points [x, z] from the foot of the deck's front stairs out toward the back); soil
 // borders run along the right fence and the back fence (SOIL wide); a circle is cut from the concrete for
 // a pear tree and its mint; the greenhouse stands square in the back-right corner of the concrete
-const CURVE = [[DECK_FRONT - 0.45, 2.75], [-9.4, 2.75], [-12.9, 2.7], [-15.6, 0.9], [-19.0, -0.5], [-22.2, -0.6], [-24.6, 0.4], [-26.2, 1.6]];   // runs straight out from the deck's front, 1.5 m right of its front stairs, then curves
+const C_SHAPE = [[-12.9, 2.7], [-15.6, 0.9], [-19.0, -0.5], [-22.2, -0.6], [-24.6, 0.4], [-26.2, 1.6]];   // the backward C as first fitted to the photos (it began 1.5 m past a 9.35 m deck)
+const CURVE = C_SHAPE.map(([x, z]) => [DECK_FRONT - 1.5 + (x + 12.9) * (-26.2 - (DECK_FRONT - 1.5)) / (-26.2 + 12.9), z]);   // the same C, stretched out along x to start 1.5 m past the deck's front and end where it always did; no straight lead, so it never reads as a question mark
 const SOIL = 1.8;
 // Edges are never ruled straight: every soil, concrete, and mulch boundary wanders by a few centimeters
 const WOB = (s) => 0.07 * Math.sin(s * 1.13 + 0.7) + 0.045 * Math.sin(s * 2.71 + 2.1) + 0.025 * Math.sin(s * 6.3 + 4.0);
