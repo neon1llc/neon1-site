@@ -2,6 +2,13 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.15.0
+
+- The white rabbit becomes a walk: out of the TV, sitting back, turning in the chair to the window, standing, walking over at an angle to see the car, stepping square to the window, raising the sash with the scroll, and going out through it into the white.
+- Below the second-story window is a lakefront: a fenced lawn with a swing set and sunflowers, autumn trees, a sidewalk, a two-way road, another sidewalk, a pebble shore, and a wide lake with the sun glittering on it, all moving in the same wind.
+- Facing the sun brings a real glare: a hot core, a soft glow, a faint streak, and lens ghosts, in place of the hazy wash.
+- Dust drifts in groups on the room's air, sparkling in the sunbeams: larger and softer up close, finer far off, some as tiny fibres, and stirred by gusts through the open window.
+
 ## v0.14.6
 
 - Wide screens no longer stretch the chairs at the sides of the view.
