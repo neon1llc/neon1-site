@@ -1,8 +1,8 @@
 // src/app/public/js/white-rabbit-world.js - The lakefront below the white rabbit's window.
 // Usage: const world = createWorld({ scene, touch }); await world.ready; world.update(time, wind, phase, sun)
 //
-// Imported by white-rabbit-scene.js. The room is a second story, so the ground is 3 m below its floor
-// (y -3). Out from the house (toward -x): a fenced back lawn with a swing set and a bed of sunflowers,
+// Imported by white-rabbit-scene.js. The room is a full second story over a raised first floor, so the
+// ground is 4.3 m below its floor (y -4.3). Out from the house (toward -x): a fenced back lawn with a swing set and a bed of sunflowers,
 // a row of autumn trees on the verge, a sidewalk, a two-way road, another sidewalk, and a neighborhood
 // park around an old quarry pond: a skewed closed loop of water with a stone rim, a gravel walkway all
 // the way around, trees beyond it, and a few ducks paddling about, with a wooded rise and hazy hills
@@ -17,7 +17,7 @@ import * as T from "/js/vendor/three-0.187.0.rabbit.min.js";
 
 
 // The ground's height, the sun's direction as painted in the sky, and the haze far things fade into
-const GROUND = -3, LAKE = -3.3;
+const GROUND = -4.3, LAKE = -4.6;
 export const SUNDIR = new T.Vector3(-30.2, 11.3, -12.4).normalize();
 const HAZE = new T.Color(0.74, 0.81, 0.9);
 
@@ -40,7 +40,7 @@ const BED = [-19.7, -18.3, -6.5, 11.5];   // the garden along the back fence: x0
 // The yard: the back fence, and the side fences from the house to it (the right side, toward -z, meets
 // a cross street; the left, toward +z, a neighbor's house), and the deck below the window
 const YARD = { back: -20, right: -10, left: 12.5 };
-const DECK = { x0: -8.6, x1: -2.05, z0: -9.4, z1: -1.0, y: GROUND + 0.75 };
+const DECK = { x0: -11.4, x1: -2.05, z0: -2.3, z1: 10.5, y: GROUND + 0.8 };   // out from the house on the left, its right side at z0
 const CROSS = { walk1: [-10.6, -12.6], road: [-12.6, -19.6], walk2: [-19.6, -21.6] };
 
 // The atlas cells: u0, v0, u1, v1, and width over height (from blender/world.py), and each kind's height in meters
@@ -111,7 +111,7 @@ const GROUND_FRAG = /* glsl */`
       grass *= mix(0.7, 1.0, smoothstep(0.0, 0.7, max(x - uBed.y, 0.0) + step(x, uBed.x) * 9.0));
       grass = mix(grass, vec3(0.12, 0.25, 0.08), smoothstep(-19.0, -19.9, x) * 0.6);
       float wear = smoothstep(1.7, 0.4, distance(vW.xz, vec2(-11.0, -4.0)) + noise(vW.xz * 3.0) * 0.6);
-      vec2 a = vec2(-2.2, 1.0), b = vec2(-18.0, 6.0), ab = b - a;
+      vec2 a = vec2(-12.6, 2.8), b = vec2(-18.0, 6.5), ab = b - a;
       float t = clamp(dot(vW.xz - a, ab) / dot(ab, ab), 0.0, 1.0);
       float path = smoothstep(0.55, 0.15, distance(vW.xz, a + ab * t) + (noise(vW.xz * 2.0) - 0.5) * 0.5) * 0.55;
       grass = mix(grass, vec3(0.36, 0.3, 0.2) * (0.8 + 0.4 * hash(floor(vW.xz * 25.0))), max(wear * 0.85, path));
@@ -264,7 +264,7 @@ const SOLID_FRAG = /* glsl */`
   void main() {
     // Weathering: paint greys and greens toward the ground, where rain splashes and mower clippings land;
     // bare wood (uGrain) shows streaky grain and silvering
-    vec3 c = uColor * vTint * mix(vec3(0.72, 0.76, 0.66), vec3(1.0), smoothstep(-3.0, -2.55, vW.y));
+    vec3 c = uColor * vTint * mix(vec3(0.72, 0.76, 0.66), vec3(1.0), smoothstep(${GROUND.toFixed(1)}, ${(GROUND + 0.45).toFixed(2)}, vW.y));
     c *= 1.0 - uGrain * (0.18 * noise(vec2(vW.z * 1.3 + vW.x * 30.0, vW.y * 40.0 + vW.x * 7.0)) + 0.08 * noise(vW.xz * 23.0));
     gl_FragColor = vec4(outdoor(c, normalize(vN), vW), 1.0);
   }`;
@@ -282,7 +282,7 @@ export function createWorld({ scene, touch }) {
   // 0.6) so the lake shows between them, and a few in the yard's corners
   const trees = [];
   for (let z = -46; z < 46; z += 6 + rnd() * 4) if ((Math.abs(z - 0.6) > 9 || rnd() < 0.2) && (z > -10 || z < -22.5)) trees.push([-20.9 - rnd() * 0.5, z, rnd(), 1]);
-  trees.push([-16.2, -8.4, rnd(), 0.8], [-4.2, 10.6, rnd(), 0.7]);
+  trees.push([-16.2, -8.4, rnd(), 0.8], [-14.6, 10.9, rnd(), 0.7]);
   // In the park on the near bank, behind the walkway, spaced so the water shows between them; the far
   // banks, a kilometer off, get a continuous wooded line instead (below)
   for (let a = -0.4; a < 0.4 && trees.length < 48; a += 0.025 + rnd() * 0.03) {
@@ -437,62 +437,75 @@ export function createWorld({ scene, touch }) {
   const spout = keep(new T.Mesh(new T.BoxGeometry(0.07, HOUSE.h, 0.07), solid("#E8E6E0")));
   spout.position.set(HOUSE.x1 + 0.05, GROUND + HOUSE.h / 2, HOUSE.z0 + 0.4);
 
-  // The deck below the window: weathered boards running along the house, a rim board, posts, and railings
-  // round the outside with balusters, a gate left ajar at the top of the steps down into the yard, and a
-  // second flight down at the right end. Boards differ in tone and sit a hair uneven
+  // The deck: off the back of the house on the left, built heavy. Floor boards are 2x4s running left to
+  // right, laid in three staggered lengths over a deep rim joist on 6x6 posts. The railing has a flat 2x4
+  // cap and a bottom rail, turned spindles evenly spaced between 4x4 posts with caps, at every corner and
+  // stair. One wide flight goes down off the front toward the garden; a second goes down off the right
+  // side. All of it is painted a deep mahogany, a little worn where feet and hands go
   {
-    const wood = solid("#8A7A66", 1), boards = Math.floor((DECK.x1 - DECK.x0) / 0.145), L = DECK.z1 - DECK.z0;
-    const planks = keep(new T.InstancedMesh(new T.BoxGeometry(0.135, 0.032, 1), wood, boards * 2));
+    const paint = solid("#56221A", 1), worn = new T.Color(), H = DECK.y;
+    const D = DECK.x1 - DECK.x0, L = DECK.z1 - DECK.z0, rows = Math.floor(D / 0.095);
+    const planks = keep(new T.InstancedMesh(new T.BoxGeometry(0.089, 0.038, 1), paint, rows * 3));
     let k = 0;
-    for (let i = 0; i < boards; i++) {
-      const x = DECK.x0 + 0.075 + i * 0.145, split = 0.25 + rnd() * 0.5;   // each row in two lengths, joints staggered
-      for (const [a, b] of [[0, split], [split, 1]]) {
-        const len = (b - a) * L - 0.006, z = DECK.z0 + ((a + b) / 2) * L;
-        e.set(0, 0, (rnd() - 0.5) * 0.02);
-        planks.setMatrixAt(k, m.compose(at0.set(x, DECK.y + (rnd() - 0.5) * 0.004, z), qq.setFromEuler(e), sc0.set(1, 1, len)));
-        const w = 0.78 + rnd() * 0.3; planks.setColorAt(k++, tint.setRGB(w, w * (0.95 + rnd() * 0.05), w * (0.9 + rnd() * 0.08)));
+    for (let i = 0; i < rows; i++) {
+      const x = DECK.x0 + 0.05 + i * 0.095, a = 0.2 + rnd() * 0.25, b = a + 0.3 + rnd() * 0.2;
+      for (const [u, v] of [[0, a], [a, b], [b, 1]]) {
+        const len = (v - u) * L - 0.005;
+        planks.setMatrixAt(k, m.compose(at0.set(x, H + (rnd() - 0.5) * 0.003, DECK.z0 + ((u + v) / 2) * L), qq.identity(), sc0.set(1, 1, len)));
+        const w = 0.86 + rnd() * 0.22, scuff = rnd() < 0.08 ? 1.25 : 1;
+        planks.setColorAt(k++, worn.setRGB(w * scuff, w * (0.96 + rnd() * 0.06) * scuff, w * scuff));
       }
     }
-    const piece = (w, h, d, x, y, z, rotY = 0, rotZ = 0) => { const o = keep(new T.Mesh(new T.BoxGeometry(w, h, d), wood)); o.position.set(x, y, z); o.rotation.set(0, rotY, rotZ); return o; };
-    // Rim boards and posts down to the ground
-    piece(0.04, 0.2, L, DECK.x0, DECK.y - 0.1, (DECK.z0 + DECK.z1) / 2);
-    piece(DECK.x1 - DECK.x0, 0.2, 0.04, (DECK.x0 + DECK.x1) / 2, DECK.y - 0.1, DECK.z0);
-    piece(DECK.x1 - DECK.x0, 0.2, 0.04, (DECK.x0 + DECK.x1) / 2, DECK.y - 0.1, DECK.z1);
-    for (const z of [DECK.z0 + 0.1, -5.9, DECK.z1 - 0.1]) for (const x of [DECK.x0 + 0.1, -6.4, -4.2]) piece(0.1, DECK.y - GROUND, 0.1, x, (DECK.y + GROUND) / 2, z);
-    // A railing between two points on the deck edge: top and bottom rails, posts at the ends, balusters between
-    const railing = (x0, z0, x1, z1, y0 = DECK.y, y1 = DECK.y) => {
-      const len = Math.hypot(x1 - x0, z1 - z0), turn = Math.atan2(x1 - x0, z1 - z0), mx = (x0 + x1) / 2, mz = (z0 + z1) / 2, my = (y0 + y1) / 2, tilt = Math.atan2(y1 - y0, len);
-      const top = piece(0.13, 0.04, Math.hypot(len, y1 - y0), mx, my + 0.95, mz, turn); top.rotation.x = -tilt;
-      const bot = piece(0.06, 0.05, Math.hypot(len, y1 - y0), mx, my + 0.1, mz, turn); bot.rotation.x = -tilt;
-      for (const [x, z, y] of [[x0, z0, y0], [x1, z1, y1]]) piece(0.09, 1.02, 0.09, x, y + 0.48, z);
-      for (let d = 0.12; d < len - 0.06; d += 0.125) {
-        const t = d / len, b = piece(0.035, 0.84, 0.035, x0 + (x1 - x0) * t, y0 + (y1 - y0) * t + 0.53, z0 + (z1 - z0) * t);
-        b.rotation.z = (rnd() - 0.5) * 0.02;
+    planks.count = k;
+    const piece = (w, h, d, x, y, z, ry = 0) => { const o = keep(new T.Mesh(new T.BoxGeometry(w, h, d), paint)); o.position.set(x, y, z); o.rotation.y = ry; return o; };
+    // Rim joists (2x10) round the open sides, 6x6 posts under them to the ground
+    piece(0.05, 0.24, L, DECK.x0, H - 0.14, (DECK.z0 + DECK.z1) / 2);
+    piece(D, 0.24, 0.05, (DECK.x0 + DECK.x1) / 2, H - 0.14, DECK.z0);
+    for (let z = DECK.z0 + 0.08; z < DECK.z1; z += 2.4) piece(0.14, H - GROUND, 0.14, DECK.x0 + 0.1, (H + GROUND) / 2, z);
+    for (let x = DECK.x0 + 0.1; x < DECK.x1 - 0.5; x += 2.4) piece(0.14, H - GROUND, 0.14, x, (H + GROUND) / 2, DECK.z0 + 0.08);
+    // Turned spindles: a lathe profile with beads and a slim waist, instanced along every railing
+    const prof = [[0.001, 0], [0.019, 0], [0.019, 0.07], [0.014, 0.09], [0.022, 0.13], [0.012, 0.2], [0.01, 0.45], [0.016, 0.55], [0.01, 0.6], [0.012, 0.66], [0.02, 0.69], [0.019, 0.76], [0.001, 0.76]];
+    const spindle = new T.LatheGeometry(prof.map(([r, y]) => new T.Vector2(r, y)), 10);
+    const spindles = keep(new T.InstancedMesh(spindle, paint, 900)); let ns = 0;
+    const post = (x, y, z, h = 1.05) => { piece(0.089, h, 0.089, x, y + h / 2, z); piece(0.13, 0.03, 0.13, x, y + h + 0.015, z); piece(0.1, 0.025, 0.1, x, y + h + 0.042, z); };
+    // A railing from (x0, y0, z0) to (x1, y1, z1): posts at both ends, a flat 2x4 cap and a bottom rail, spindles between
+    const railing = (x0, y0, z0, x1, y1, z1, ends = [true, true]) => {
+      const run = Math.hypot(x1 - x0, z1 - z0), turn = Math.atan2(x1 - x0, z1 - z0), slope = Math.atan2(y1 - y0, run), len = Math.hypot(run, y1 - y0);
+      const mx = (x0 + x1) / 2, my = (y0 + y1) / 2, mz = (z0 + z1) / 2;
+      const cap = piece(0.089, 0.038, len, mx, my + 0.9, mz, turn); cap.rotation.order = "YXZ"; cap.rotation.x = -slope;
+      const bot = piece(0.06, 0.06, len, mx, my + 0.08, mz, turn); bot.rotation.order = "YXZ"; bot.rotation.x = -slope;
+      if (ends[0]) post(x0, y0, z0); if (ends[1]) post(x1, y1, z1);
+      const n = Math.max(1, Math.round(run / 0.115));
+      for (let i = 1; i < n; i++) {
+        const t = i / n, sy = (0.9 - 0.1) / 0.76;
+        spindles.setMatrixAt(ns++, m.compose(at0.set(x0 + (x1 - x0) * t, y0 + (y1 - y0) * t + 0.11, z0 + (z1 - z0) * t), qq.identity(), sc0.set(1, sy, 1)));
       }
     };
-    const G0 = -3.6, G1 = -4.7, S0 = -5.4, S1 = -6.5;        // the gate opening on the outer edge, the stair opening on the right end
-    railing(DECK.x0, DECK.z1, DECK.x0, G0); railing(DECK.x0, G1, DECK.x0, DECK.z0);
-    railing(DECK.x0, DECK.z0, S1, DECK.z0); railing(S0, DECK.z0, DECK.x1, DECK.z0);
-    railing(DECK.x1, DECK.z1, DECK.x0, DECK.z1);
-    // Steps: four down from each opening, on two stringers, with a handrail each side
-    const steps = (x, z, dx, dz, w, along) => {
-      for (let i = 0; i < 4; i++) {
-        const y = DECK.y - 0.1875 * (i + 1) + 0.016, d = 0.28 * (i + 0.5);
-        const s = keep(new T.Mesh(new T.BoxGeometry(along ? w : 0.3, 0.032, along ? 0.3 : w), wood));
-        s.position.set(x + dx * d, y, z + dz * d); s.rotation.y = (rnd() - 0.5) * 0.015;
+    // The front edge, with the stair opening toward the garden, and the right side, with its own stair opening
+    const F0 = 2.0, F1 = 3.6, R0 = -8.0, R1 = -9.3;
+    railing(DECK.x0, H, DECK.z1, DECK.x0, H, F1); railing(DECK.x0, H, F0, DECK.x0, H, DECK.z0);
+    railing(DECK.x0, H, DECK.z0, R1, H, DECK.z0, [false, true]); railing(R0, H, DECK.z0, DECK.x1, H, DECK.z0);
+    // Stairs: open risers of 2x12 treads on three stringers, five rises to the grass, a railing each side
+    const stairs = (x, z, dx, dz, width) => {
+      const rise = (H - GROUND) / 5, n = 5, tread = 0.28, along = dz !== 0, run = tread * (n - 0.3);
+      for (let i = 0; i < n - 1 + 1; i++) {
+        const y = H - rise * (i + 1) + 0.02, d = tread * (i + 0.5);
+        if (y < GROUND + 0.05) break;
+        piece(along ? width : tread + 0.02, 0.038, along ? tread + 0.02 : width, x + dx * d, y, z + dz * d);
       }
-      const ex = x + dx * 1.12, ez = z + dz * 1.12;
-      for (const o of [-w / 2, w / 2]) {
+      for (const o of [-width / 2 + 0.03, 0, width / 2 - 0.03]) {
+        const sx = along ? o : 0, sz = along ? 0 : o, sl = Math.hypot(run, H - GROUND);
+        const st = piece(0.045, 0.28, sl, x + dx * run / 2 + sx, (H + GROUND) / 2 - 0.1, z + dz * run / 2 + sz, Math.atan2(dx, dz));
+        st.rotation.order = "YXZ"; st.rotation.x = Math.atan2(H - GROUND, run);
+      }
+      for (const o of [-width / 2, width / 2]) {
         const sx = along ? o : 0, sz = along ? 0 : o;
-        railing(x + sx, z + sz, ex + sx, ez + sz, DECK.y, GROUND);
+        railing(x + sx, H, z + sz, x + dx * run + sx, GROUND + 0.05, z + dz * run + sz);
       }
     };
-    steps(DECK.x0, (G0 + G1) / 2, -1, 0, G0 - G1, false);
-    steps((S0 + S1) / 2, DECK.z0, 0, -1, S0 - S1, true);
-    // The gate, swung a little open on its hinge at the outer post
-    const gate = new T.Group(); gate.position.set(DECK.x0, DECK.y, G0); gate.rotation.y = -0.45; keep(gate);
-    for (const y of [0.15, 0.85]) { const r = new T.Mesh(new T.BoxGeometry(0.05, 0.06, G0 - G1 - 0.06), wood); r.position.set(0, y, -(G0 - G1) / 2); gate.add(r); }
-    for (let d = 0.08; d < G0 - G1 - 0.05; d += 0.12) { const b = new T.Mesh(new T.BoxGeometry(0.035, 0.78, 0.035), wood); b.position.set(0, 0.5, -d); gate.add(b); }
+    stairs(DECK.x0, (F0 + F1) / 2, -1, 0, F1 - F0);
+    stairs((R0 + R1) / 2, DECK.z0, 0, -1, R0 - R1);
+    spindles.count = ns;
   }
 
   // The porch swing and the garden: rendered in Blender (planning folder, blender/yard.blend) from the way
@@ -527,7 +540,7 @@ export function createWorld({ scene, touch }) {
     if (toward) mesh.rotation.y = Math.atan2(toward[0], toward[2]);
     return mesh;
   };
-  const SWING = [-11, GROUND, -4], SWING_TO = [9.05, 0, 4.6], SW = 2.98, SH = 2.96, PIVOT = 0.765 * SH;
+  const SWING = [-13.5, GROUND, -5.2], SWING_TO = [9.05, 0, 4.6], SW = 2.98, SH = 2.96, PIVOT = 0.765 * SH;
   sprite("/media/white-rabbit/yard-swing.webp", SW, SH, SWING, SWING_TO);
   const hinge = new T.Group(); hinge.position.set(SWING[0], SWING[1] + PIVOT, SWING[2]); hinge.rotation.y = Math.atan2(SWING_TO[0], SWING_TO[2]); keep(hinge);
   const seat = new T.Group(); hinge.add(seat);
