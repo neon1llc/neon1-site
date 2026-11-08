@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.20.1
+
+- The stone bed's stones vary in length only within 80 to 120 percent of a common size. Their colors vary across the bed in dark burgundy, light grey, and dark grey, with dark green moss grown into many of the joints.
+
 ## v0.20.0
 
 - The porch swing is built in 3D instead of drawn on cards, so from any angle its top bar runs parallel to the right fence and its seat faces left. It keeps the black frame with dark rust at the feet and the puffy three-seat leaf-print cushion, and it swings about the bar.
