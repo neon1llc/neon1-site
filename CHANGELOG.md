@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.19.9
+
+- The greenhouse's gable frame bars follow the roof line instead of jutting out in a V above each end.
+
 ## v0.19.8
 
 - The porch swing's cushion is thick and puffy, stitched into three seats and three backs, in a cream fabric printed with green and light orange leaves on curling stems.
