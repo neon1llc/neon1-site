@@ -509,7 +509,7 @@ export function createWorld({ scene, touch }) {
   sprite("/media/white-rabbit/yard-swing-seat.webp", SW, SH, [0, -PIVOT, 0.01], null, 0, seat);
   // The garden's card lies along its row (the back fence), widened by the slant it was rendered at, so its
   // two ends stay at their true depths
-  sprite("/media/white-rabbit/yard-garden.webp", 16.67 / Math.cos(Math.atan2(6.4, 17.05)), 4.25, [(BED[0] + BED[1]) / 2, GROUND, (BED[2] + BED[3]) / 2], [1, 0, 0], 1);
+  sprite("/media/white-rabbit/yard-garden.webp", 16.51 / Math.cos(Math.atan2(6.4, 17.05)), 4.5, [(BED[0] + BED[1]) / 2, GROUND, (BED[2] + BED[3]) / 2], [1, 0, 0], 1);
 
   // Ducks: a few mallards and one white duck, each paddling a slow loop of its own near the near bank
   const ducks = [], drake = solid("#5A4632"), hen = solid("#7A6046"), green = solid("#1F4F2E"), white = solid("#F2F0E8"), bill = solid("#E0A028");
