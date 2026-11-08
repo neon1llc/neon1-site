@@ -10,7 +10,7 @@ export { WebGLRenderer, WebGLRenderTarget, Scene, PerspectiveCamera, CanvasTextu
   MathUtils, SRGBColorSpace, LinearFilter, AdditiveBlending, HalfFloatType, Vector4, Points, BufferGeometry,
   Float32BufferAttribute, DoubleSide, BackSide, Shape, ShapeGeometry, ExtrudeGeometry, LatheGeometry, SphereGeometry,
   RepeatWrapping, PCFSoftShadowMap, MeshPhysicalMaterial, PMREMGenerator, Raycaster, TextureLoader,
-  InstancedBufferGeometry, InstancedBufferAttribute, InstancedMesh, Matrix4, Quaternion, Euler } from "three";
+  InstancedBufferGeometry, InstancedBufferAttribute, InstancedMesh, Matrix4, Quaternion, Euler, ConeGeometry } from "three";
 
 // Add-ons: postprocessing, the rounded cabinet, merging the furniture into a few draws, and glTF models
 export { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";

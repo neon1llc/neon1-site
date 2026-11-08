@@ -12,7 +12,11 @@ squash on "Crookneck Squash" by vtIndigenousCommunityGarden
 (https://sketchfab.com/vtIndigenousCommunityGarden), both licensed CC BY 4.0. Modified: posed in
 beds and cages, stretched and recolored, and rendered as a picture.
 
-Trees (tree_small_02, jacaranda_tree), grass clumps (grass_medium_01), dandelions (dandelion_01), and the leather, walnut, carpet, plaster, and floor
+Rose bushes based on "Rose bush" by RosticOstafi (https://sketchfab.com/RosticOstafi), licensed
+CC BY 4.0. Modified: recolored and rendered as a picture.
+
+Trees (tree_small_02, jacaranda_tree), nettle, gazania, and periwinkle plants (nettle_plant,
+flower_gazania, periwinkle_plant), grass clumps (grass_medium_01), dandelions (dandelion_01), and the leather, walnut, carpet, plaster, and floor
 wood planks, and leafy grass textures are from Poly Haven (https://polyhaven.com), CC0.
 
 The V8 recording is the site owner's own.
