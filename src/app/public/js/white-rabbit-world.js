@@ -36,7 +36,12 @@ const SHAPE_GLSL = /* glsl */`
     vec2 q = (xz - vec2(${POND.x.toFixed(1)}, ${POND.z.toFixed(1)})) / vec2(${POND.ax.toFixed(1)}, ${POND.az.toFixed(1)});
     return (length(q) - shape(atan(q.y, q.x))) * ${((POND.ax + POND.az) / 2).toFixed(1)};
   }`;
-const BED = [-19.7, -18.3, 2.5, 12.5];    // the sunflower bed: x0, x1, z0, z1
+const BED = [-19.7, -18.3, -6.5, 11.5];   // the garden along the back fence: x0, x1, z0, z1
+// The yard: the back fence, and the side fences from the house to it (the right side, toward -z, meets
+// a cross street; the left, toward +z, a neighbor's house), and the deck below the window
+const YARD = { back: -20, right: -10, left: 12.5 };
+const DECK = { x0: -8.6, x1: -2.05, z0: -9.4, z1: -1.0, y: GROUND + 0.75 };
+const CROSS = { walk1: [-10.6, -12.6], road: [-12.6, -19.6], walk2: [-19.6, -21.6] };
 
 // The atlas cells: u0, v0, u1, v1, and width over height (from blender/world.py), and each kind's height in meters
 const CELLS = [[0.0306, 0.5, 0.3021, 1.0, 0.652], [0.3333, 0.5, 0.6667, 0.8125, 1.28], [0.6667, 0.5, 1.0, 0.8453, 1.158],
@@ -117,6 +122,19 @@ const GROUND_FRAG = /* glsl */`
       col = mix(tar, vec3(0.85, 0.66, 0.12), yellow);
       col = mix(col, vec3(0.86), white);
     }
+    // The cross street off to the right, running out from beside the house to the road, with its sidewalks
+    if (x > ${STRIP.road[1].toFixed(1)}) {
+      if ((z < ${CROSS.walk1[0].toFixed(1)} && z > ${CROSS.walk1[1].toFixed(1)}) || (z < ${CROSS.walk2[0].toFixed(1)} && z > ${CROSS.walk2[1].toFixed(1)})) if (x > ${STRIP.sidewalk1[0].toFixed(1)})
+        col = vec3(0.66, 0.64, 0.6) * (0.9 + 0.12 * noise(vW.xz * 7.0)) * (1.0 - 0.35 * smoothstep(0.03, 0.0, abs(fract(x / 1.5) - 0.5) - 0.47));
+      if (z < ${CROSS.road[0].toFixed(1)} && z > ${CROSS.road[1].toFixed(1)}) {
+        float mz = ${((CROSS.road[0] + CROSS.road[1]) / 2).toFixed(2)};
+        col = vec3(0.14, 0.14, 0.15) * (0.85 + 0.3 * noise(vW.xz * 9.0)) * (0.9 + 0.15 * noise(vW.xz * 0.5));
+        col = mix(col, vec3(0.85, 0.66, 0.12), smoothstep(0.07, 0.05, abs(abs(z - mz) - 0.12)) * step(${STRIP.road[0].toFixed(1)}, x));
+        col = mix(col, vec3(0.1), 0.25 * smoothstep(0.6, 0.0, noise(vW.xz * 0.8)));   // patched cracks and oil
+      }
+    }
+    // Deep shade under the deck
+    if (x > ${DECK.x0.toFixed(2)} - 0.3 && x < ${DECK.x1.toFixed(2)} && z > ${DECK.z0.toFixed(2)} - 0.3 && z < ${DECK.z1.toFixed(2)} + 0.3) col *= 0.45;
     // Around the pond: a rim of quarry stone at the water, a strip of grass, then the gravel walkway
     if (e < 0.9) col = vec3(0.52, 0.5, 0.46) * (0.7 + 0.45 * hash(floor(vW.xz * 6.0)));
     else if (e > 2.2 && e < 4.2) col = vec3(0.7, 0.66, 0.58) * (0.85 + 0.25 * hash(floor(vW.xz * 30.0))) * (1.0 - 0.15 * smoothstep(0.3, 0.0, min(e - 2.2, 4.2 - e)));
@@ -218,11 +236,15 @@ const SOLID_VERT = /* glsl */`
   }`;
 const SOLID_FRAG = /* glsl */`
   ${COMMON}
+  ${hash}
   uniform vec3 uColor;
+  uniform float uGrain;
   varying vec3 vW, vN, vTint;
   void main() {
-    // Weathering: paint greys and greens toward the ground, where rain splashes and mower clippings land
+    // Weathering: paint greys and greens toward the ground, where rain splashes and mower clippings land;
+    // bare wood (uGrain) shows streaky grain and silvering
     vec3 c = uColor * vTint * mix(vec3(0.72, 0.76, 0.66), vec3(1.0), smoothstep(-3.0, -2.55, vW.y));
+    c *= 1.0 - uGrain * (0.18 * noise(vec2(vW.z * 1.3 + vW.x * 30.0, vW.y * 40.0 + vW.x * 7.0)) + 0.08 * noise(vW.xz * 23.0));
     gl_FragColor = vec4(outdoor(c, normalize(vN), vW), 1.0);
   }`;
 
@@ -238,8 +260,8 @@ export function createWorld({ scene, touch }) {
   // Trees: on the verge past the fence and along the shore, thinned where the window looks out (z near
   // 0.6) so the lake shows between them, and a few in the yard's corners
   const trees = [];
-  for (let z = -46; z < 46; z += 6 + rnd() * 4) if (Math.abs(z - 0.6) > 9 || rnd() < 0.2) trees.push([-20.9 - rnd() * 0.5, z, rnd(), 1]);
-  trees.push([-15.5, -13.5, rnd(), 1], [-5.5, 15, rnd(), 1], [-17, 16.5, rnd(), 1]);
+  for (let z = -46; z < 46; z += 6 + rnd() * 4) if ((Math.abs(z - 0.6) > 9 || rnd() < 0.2) && (z > -10 || z < -22.5)) trees.push([-20.9 - rnd() * 0.5, z, rnd(), 1]);
+  trees.push([-16.2, -8.4, rnd(), 0.8], [-4.2, 10.6, rnd(), 0.7]);
   // In the park on the near bank, behind the walkway, spaced so the water shows between them; the far
   // banks, a kilometer off, get a continuous wooded line instead (below)
   for (let a = -0.4; a < 0.4 && trees.length < 48; a += 0.025 + rnd() * 0.03) {
@@ -305,57 +327,189 @@ export function createWorld({ scene, touch }) {
   })));
   hills.rotation.y = Math.PI / 2; hills.position.set(-2600, GROUND + 70, 0);
 
-  // The fence: white pickets on two rails between posts every 2.4 m, years old. Pickets differ a little in
-  // height and lean, some sections sag, the paint has weathered unevenly and gone grey and green near the
-  // ground, a few pickets lean hard, and here and there one is missing
-  const solid = (color) => new T.ShaderMaterial({ uniforms: { ...common, uColor: { value: new T.Color(color) } }, vertexShader: SOLID_VERT, fragmentShader: SOLID_FRAG });
-  const n = Math.floor(120 / 0.16), pickets = keep(new T.InstancedMesh(new T.BoxGeometry(0.02, 1.1, 0.09), solid("#FFFFFF"), n));
+  // The fence: white pickets 1.5 m tall on two rails between posts every 2.4 m, around the back and both
+  // sides of the yard, years old. Pickets differ a little in height and lean, sections sag, the paint has
+  // weathered unevenly and gone grey and green near the ground, a few pickets lean hard, and here and there
+  // one is missing
+  const solid = (color, grain = 0) => new T.ShaderMaterial({ uniforms: { ...common, uColor: { value: new T.Color(color) }, uGrain: { value: grain } }, vertexShader: SOLID_VERT, fragmentShader: SOLID_FRAG });
   const m = new T.Matrix4(), qq = new T.Quaternion(), e = new T.Euler(), at0 = new T.Vector3(), sc0 = new T.Vector3(), tint = new T.Color();
-  const sag = (z) => 0.035 * Math.sin(((z + 60) / 2.4) * Math.PI) ** 2 * (0.4 + 0.6 * Math.abs(Math.sin(z * 0.37)));
-  for (let i = 0; i < n; i++) {
-    const z = -60 + i * 0.16 + (rnd() - 0.5) * 0.015, hard = rnd() < 0.015, gone = rnd() < 0.008;
-    const h = 1 + (rnd() - 0.5) * 0.06;
-    e.set((rnd() - 0.5) * 0.04 + (hard ? (rnd() - 0.5) * 0.5 : 0), 0, (rnd() - 0.5) * 0.05 + (hard ? 0.18 : 0));
-    at0.set(STRIP.fence + (rnd() - 0.5) * 0.01, GROUND + 0.55 * h - sag(z), z); sc0.set(1, gone ? 0.0001 : h, 1);
-    pickets.setMatrixAt(i, m.compose(at0, qq.setFromEuler(e), sc0));
-    const w = 0.82 + rnd() * 0.18;
-    pickets.setColorAt(i, tint.setRGB(0.93 * w, 0.92 * w, 0.88 * w - rnd() * 0.04));
+  const PICKET = 1.5, runs = [[YARD.back, YARD.right, YARD.back, YARD.left], [-2.1, YARD.right, YARD.back, YARD.right], [-2.1, YARD.left, YARD.back, YARD.left]];
+  const lens = runs.map(([x0, z0, x1, z1]) => Math.hypot(x1 - x0, z1 - z0)), total = lens.reduce((a, b) => a + b, 0);
+  const pickets = keep(new T.InstancedMesh(new T.BoxGeometry(0.02, PICKET, 0.09), solid("#FFFFFF"), Math.ceil(total / 0.16) + 3));
+  const posts = keep(new T.InstancedMesh(new T.BoxGeometry(0.09, PICKET + 0.12, 0.09), solid("#D8D4C8"), Math.ceil(total / 2.4) + 6));
+  let np = 0, nq = 0;
+  runs.forEach(([x0, z0, x1, z1], r) => {
+    const len = lens[r], turn = Math.atan2(x1 - x0, z1 - z0), sag = (d) => 0.035 * Math.sin((d / 2.4) * Math.PI) ** 2 * (0.4 + 0.6 * Math.abs(Math.sin(d * 0.37 + r)));
+    const at = (d) => [x0 + ((x1 - x0) * d) / len, z0 + ((z1 - z0) * d) / len];
+    for (let d = 0.08; d < len; d += 0.16) {
+      const hard = rnd() < 0.015, gone = rnd() < 0.008, h = 1 + (rnd() - 0.5) * 0.05, [x, z] = at(d + (rnd() - 0.5) * 0.015);
+      e.set((rnd() - 0.5) * 0.04 + (hard ? (rnd() - 0.5) * 0.4 : 0), turn, (rnd() - 0.5) * 0.04 + (hard ? 0.16 : 0), "YXZ");
+      at0.set(x + (rnd() - 0.5) * 0.01, GROUND + (PICKET / 2) * h - sag(d), z); sc0.set(1, gone ? 0.0001 : h, 1);
+      pickets.setMatrixAt(np, m.compose(at0, qq.setFromEuler(e), sc0));
+      const w = 0.82 + rnd() * 0.18;
+      pickets.setColorAt(np++, tint.setRGB(0.93 * w, 0.92 * w, 0.88 * w - rnd() * 0.04));
+    }
+    for (let d = 0; d <= len + 0.01; d += 2.4) {
+      const [x, z] = at(Math.min(d, len));
+      e.set((rnd() - 0.5) * 0.05, turn, (rnd() - 0.5) * 0.06, "YXZ");
+      posts.setMatrixAt(nq++, m.compose(at0.set(x, GROUND + (PICKET + 0.12) / 2 - 0.02, z), qq.setFromEuler(e), sc0.set(1, 1, 1)));
+    }
+    for (const y of [0.35, PICKET - 0.3]) {
+      const rail = keep(new T.Mesh(new T.BoxGeometry(0.04, 0.08, len, 1, 1, Math.ceil(len * 3)), solid("#DAD6CA")));
+      const pos = rail.geometry.attributes.position;
+      for (let i = 0; i < pos.count; i++) pos.setY(i, pos.getY(i) - sag(pos.getZ(i) + len / 2));
+      rail.geometry.computeVertexNormals();
+      const [cx, cz] = at(len / 2); rail.position.set(cx, GROUND + y, cz); rail.rotation.y = turn;
+    }
+  });
+  pickets.count = np; posts.count = nq;
+
+  // The neighbor's house past the left fence: two stories of pale clapboard under a dark shingle gable, with
+  // white-trimmed windows (a few lit warm, a couple with blinds half down), a back door and step, and a
+  // downspout, weathered a little where the rain runs
+  const HOUSE = { x0: -18.5, x1: -7.5, z0: 14, z1: 24, h: 6.2, ridge: 9.0 };
+  const siding = new T.ShaderMaterial({
+    uniforms: { ...common }, vertexShader: SOLID_VERT,
+    fragmentShader: `${COMMON}\n${hash}\nvarying vec3 vW, vN, vTint;
+      void main() {
+        vec3 n = normalize(vN), c = vec3(0.7, 0.74, 0.76);
+        float y = vW.y - ${GROUND.toFixed(1)};
+        c *= 0.86 + 0.14 * smoothstep(0.0, 0.03, fract(y / 0.2));                 // clapboard shadow lines
+        c *= 0.92 + 0.08 * noise(vW.xz * 0.7 + y * 0.3);
+        c = mix(c * 0.8, c, smoothstep(0.0, 0.6, y));                               // splash grime at the foot
+        vec2 f = abs(n.z) > 0.5 ? vec2(vW.x, y) : vec2(vW.z, y);
+        // Windows: two rows, set unevenly along the wall, each a white frame round dark glass
+        for (int r = 0; r < 2; r++) {
+          float wy = r == 0 ? 1.0 : 4.1;
+          for (int k = 0; k < 4; k++) {
+            float wx = (abs(n.z) > 0.5 ? -16.9 : 15.2) + float(k) * 2.9 + (r == 1 && k == 2 ? 0.4 : 0.0);
+            vec2 d = abs(f - vec2(wx, wy + 0.75)) - vec2(0.48, 0.72);
+            float frame = step(max(d.x, d.y), 0.08), glass = step(max(d.x, d.y), 0.0);
+            float blind = step(wy + 0.75 + 0.72 - (hash(vec2(float(k), float(r))) > 0.6 ? 0.6 : 0.0), y);
+            vec3 g = mix(vec3(0.08, 0.1, 0.12), vec3(0.85, 0.7, 0.45), step(0.85, hash(vec2(float(k) + 3.0, float(r)))) * 0.6);
+            g = mix(g, vec3(0.8, 0.78, 0.7), blind * glass);
+            c = mix(c, vec3(0.93), frame); c = mix(c, g, glass);
+          }
+        }
+        gl_FragColor = vec4(outdoor(c, n, vW), 1.0);
+      }`,
+  });
+  const walls = keep(new T.Mesh(new T.BoxGeometry(HOUSE.x1 - HOUSE.x0, HOUSE.h, HOUSE.z1 - HOUSE.z0), siding));
+  walls.position.set((HOUSE.x0 + HOUSE.x1) / 2, GROUND + HOUSE.h / 2, (HOUSE.z0 + HOUSE.z1) / 2);
+  // The gable roof, ridge running along x, with a little overhang and a dark shingle texture
+  {
+    const ox = 0.35, x0 = HOUSE.x0 - ox, x1 = HOUSE.x1 + ox, z0 = HOUSE.z0 - ox, z1 = HOUSE.z1 + ox, zm = (HOUSE.z0 + HOUSE.z1) / 2, y0 = GROUND + HOUSE.h - 0.25, y1 = GROUND + HOUSE.ridge;
+    const v = [x0, y0, z0, x1, y0, z0, x1, y1, zm, x0, y0, z0, x1, y1, zm, x0, y1, zm, x1, y0, z1, x0, y0, z1, x0, y1, zm, x1, y0, z1, x0, y1, zm, x1, y1, zm,
+      x0, y0, z0, x0, y1, zm, x0, y0, z1, x1, y0, z1, x1, y1, zm, x1, y0, z0];
+    const g = new T.BufferGeometry(); g.setAttribute("position", new T.Float32BufferAttribute(v, 3)); g.computeVertexNormals();
+    keep(new T.Mesh(g, new T.ShaderMaterial({
+      uniforms: { ...common }, vertexShader: SOLID_VERT, side: T.DoubleSide,
+      fragmentShader: `${COMMON}\n${hash}\nvarying vec3 vW, vN, vTint;
+        void main() { vec3 n = normalize(vN); float row = floor((vW.y) / 0.14);
+          vec3 c = vec3(0.2, 0.19, 0.18) * (0.8 + 0.35 * hash(vec2(floor(vW.x / 0.33 + row * 0.5), row)));
+          if (abs(n.x) > 0.9) c = vec3(0.72, 0.75, 0.77);                    // the gable ends are sided
+          gl_FragColor = vec4(outdoor(c, n, vW), 1.0); }`,
+    })));
   }
-  const posts = keep(new T.InstancedMesh(new T.BoxGeometry(0.09, 1.25, 0.09), solid("#D8D4C8"), 50));
-  for (let i = 0; i < 50; i++) {
-    e.set((rnd() - 0.5) * 0.05, 0, (rnd() - 0.5) * 0.06);
-    posts.setMatrixAt(i, m.compose(at0.set(STRIP.fence + 0.06, GROUND + 0.6, -60 + i * 2.4), qq.setFromEuler(e), sc0.set(1, 1, 1)));
-  }
-  for (const y of [0.3, 0.85]) {
-    const rail = keep(new T.Mesh(new T.BoxGeometry(0.04, 0.08, 120, 1, 1, 300), solid("#DAD6CA")));
-    const pos = rail.geometry.attributes.position;
-    for (let i = 0; i < pos.count; i++) pos.setY(i, pos.getY(i) - sag(pos.getZ(i)));
-    rail.geometry.computeVertexNormals();
-    rail.position.set(STRIP.fence + 0.03, GROUND + y, 0);
+  const spout = keep(new T.Mesh(new T.BoxGeometry(0.07, HOUSE.h, 0.07), solid("#E8E6E0")));
+  spout.position.set(HOUSE.x1 + 0.05, GROUND + HOUSE.h / 2, HOUSE.z0 + 0.4);
+
+  // The deck below the window: weathered boards running along the house, a rim board, posts, and railings
+  // round the outside with balusters, a gate left ajar at the top of the steps down into the yard, and a
+  // second flight down at the right end. Boards differ in tone and sit a hair uneven
+  {
+    const wood = solid("#8A7A66", 1), boards = Math.floor((DECK.x1 - DECK.x0) / 0.145), L = DECK.z1 - DECK.z0;
+    const planks = keep(new T.InstancedMesh(new T.BoxGeometry(0.135, 0.032, 1), wood, boards * 2));
+    let k = 0;
+    for (let i = 0; i < boards; i++) {
+      const x = DECK.x0 + 0.075 + i * 0.145, split = 0.25 + rnd() * 0.5;   // each row in two lengths, joints staggered
+      for (const [a, b] of [[0, split], [split, 1]]) {
+        const len = (b - a) * L - 0.006, z = DECK.z0 + ((a + b) / 2) * L;
+        e.set(0, 0, (rnd() - 0.5) * 0.02);
+        planks.setMatrixAt(k, m.compose(at0.set(x, DECK.y + (rnd() - 0.5) * 0.004, z), qq.setFromEuler(e), sc0.set(1, 1, len)));
+        const w = 0.78 + rnd() * 0.3; planks.setColorAt(k++, tint.setRGB(w, w * (0.95 + rnd() * 0.05), w * (0.9 + rnd() * 0.08)));
+      }
+    }
+    const piece = (w, h, d, x, y, z, rotY = 0, rotZ = 0) => { const o = keep(new T.Mesh(new T.BoxGeometry(w, h, d), wood)); o.position.set(x, y, z); o.rotation.set(0, rotY, rotZ); return o; };
+    // Rim boards and posts down to the ground
+    piece(0.04, 0.2, L, DECK.x0, DECK.y - 0.1, (DECK.z0 + DECK.z1) / 2);
+    piece(DECK.x1 - DECK.x0, 0.2, 0.04, (DECK.x0 + DECK.x1) / 2, DECK.y - 0.1, DECK.z0);
+    piece(DECK.x1 - DECK.x0, 0.2, 0.04, (DECK.x0 + DECK.x1) / 2, DECK.y - 0.1, DECK.z1);
+    for (const z of [DECK.z0 + 0.1, -5.9, DECK.z1 - 0.1]) for (const x of [DECK.x0 + 0.1, -6.4, -4.2]) piece(0.1, DECK.y - GROUND, 0.1, x, (DECK.y + GROUND) / 2, z);
+    // A railing between two points on the deck edge: top and bottom rails, posts at the ends, balusters between
+    const railing = (x0, z0, x1, z1, y0 = DECK.y, y1 = DECK.y) => {
+      const len = Math.hypot(x1 - x0, z1 - z0), turn = Math.atan2(x1 - x0, z1 - z0), mx = (x0 + x1) / 2, mz = (z0 + z1) / 2, my = (y0 + y1) / 2, tilt = Math.atan2(y1 - y0, len);
+      const top = piece(0.13, 0.04, Math.hypot(len, y1 - y0), mx, my + 0.95, mz, turn); top.rotation.x = -tilt;
+      const bot = piece(0.06, 0.05, Math.hypot(len, y1 - y0), mx, my + 0.1, mz, turn); bot.rotation.x = -tilt;
+      for (const [x, z, y] of [[x0, z0, y0], [x1, z1, y1]]) piece(0.09, 1.02, 0.09, x, y + 0.48, z);
+      for (let d = 0.12; d < len - 0.06; d += 0.125) {
+        const t = d / len, b = piece(0.035, 0.84, 0.035, x0 + (x1 - x0) * t, y0 + (y1 - y0) * t + 0.53, z0 + (z1 - z0) * t);
+        b.rotation.z = (rnd() - 0.5) * 0.02;
+      }
+    };
+    const G0 = -3.6, G1 = -4.7, S0 = -5.4, S1 = -6.5;        // the gate opening on the outer edge, the stair opening on the right end
+    railing(DECK.x0, DECK.z1, DECK.x0, G0); railing(DECK.x0, G1, DECK.x0, DECK.z0);
+    railing(DECK.x0, DECK.z0, S1, DECK.z0); railing(S0, DECK.z0, DECK.x1, DECK.z0);
+    railing(DECK.x1, DECK.z1, DECK.x0, DECK.z1);
+    // Steps: four down from each opening, on two stringers, with a handrail each side
+    const steps = (x, z, dx, dz, w, along) => {
+      for (let i = 0; i < 4; i++) {
+        const y = DECK.y - 0.1875 * (i + 1) + 0.016, d = 0.28 * (i + 0.5);
+        const s = keep(new T.Mesh(new T.BoxGeometry(along ? w : 0.3, 0.032, along ? 0.3 : w), wood));
+        s.position.set(x + dx * d, y, z + dz * d); s.rotation.y = (rnd() - 0.5) * 0.015;
+      }
+      const ex = x + dx * 1.12, ez = z + dz * 1.12;
+      for (const o of [-w / 2, w / 2]) {
+        const sx = along ? o : 0, sz = along ? 0 : o;
+        railing(x + sx, z + sz, ex + sx, ez + sz, DECK.y, GROUND);
+      }
+    };
+    steps(DECK.x0, (G0 + G1) / 2, -1, 0, G0 - G1, false);
+    steps((S0 + S1) / 2, DECK.z0, 0, -1, S0 - S1, true);
+    // The gate, swung a little open on its hinge at the outer post
+    const gate = new T.Group(); gate.position.set(DECK.x0, DECK.y, G0); gate.rotation.y = -0.45; keep(gate);
+    for (const y of [0.15, 0.85]) { const r = new T.Mesh(new T.BoxGeometry(0.05, 0.06, G0 - G1 - 0.06), wood); r.position.set(0, y, -(G0 - G1) / 2); gate.add(r); }
+    for (let d = 0.08; d < G0 - G1 - 0.05; d += 0.12) { const b = new T.Mesh(new T.BoxGeometry(0.035, 0.78, 0.035), wood); b.position.set(0, 0.5, -d); gate.add(b); }
   }
 
-  // The swing set and the sunflower bed: rendered in Blender (planning folder, blender/yard.blend) from
-  // the way the window looks at them, with their own shadows, so each stands as one card facing the house.
-  // The swing set is an old rusted one (Sketchfab, by main1896, CC BY 4.0); the sunflowers (Sketchfab, by
-  // zvanstone, CC BY 4.0) lean, nod, and turn every which way, late in the season, among weeds and grass
-  // clumps (Poly Haven, CC0)
-  const sprite = (url, w, h, at, toward) => {
+  // The swing set and the garden: rendered in Blender (planning folder, blender/yard.blend) from the way the
+  // window looks at them, with their own shadows, so each stands as a card facing the house. The swing set
+  // is an old rusted one (Sketchfab, by main1896, CC BY 4.0); its chains and seat are a second card hung
+  // from the bar, swinging a little in the wind. The garden runs along the back fence: sunflowers (Sketchfab,
+  // by zvanstone, CC BY 4.0), late in the season and wilting, among weeds and grass clumps (Poly Haven, CC0);
+  // a long raised bed with two leaning lattice trellises, squash vines climbing them and running on along
+  // the fence with big leaves, yellow flowers, and long squash hanging (the fruit from a scan by
+  // vtIndigenousCommunityGarden, Sketchfab, CC BY 4.0); and a bed of cherry tomatoes in wire cages (Sketchfab,
+  // by zvanstone, CC BY 4.0). The plants sway with the wind, more toward their tops
+  const sprite = (url, w, h, at, toward, sway = 0, parent = group) => {
     const map = { value: null };
     loader.load(url, (t) => { t.colorSpace = T.SRGBColorSpace; map.value = t; textures.push(t); });
-    const card = new T.PlaneGeometry(w, h); card.translate(0, h / 2, 0);
-    const mesh = keep(new T.Mesh(card, new T.ShaderMaterial({
-      uniforms: { ...common, uMap: map }, vertexShader: GROUND_VERT, transparent: true, depthWrite: false,
+    const card = new T.PlaneGeometry(w, h, 24, 4); card.translate(0, h / 2, 0);
+    const mesh = new T.Mesh(card, new T.ShaderMaterial({
+      uniforms: { ...common, ...timed, uMap: map, uSway: { value: sway } }, transparent: true, depthWrite: false, side: T.DoubleSide,
+      vertexShader: `uniform float uPhase, uWind, uSway; varying vec3 vW; varying vec2 vUv;
+        void main() { vUv = uv; vec3 p = position;
+          float k = uv.y * uv.y * uSway;
+          p.x += (sin(uPhase * 1.1 + uv.x * 23.0) * 0.05 + sin(uPhase * 2.7 + uv.x * 61.0) * 0.015) * (1.0 + 2.0 * uWind) * k + uWind * 0.07 * k;
+          vec4 w = modelMatrix * vec4(p, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`,
       fragmentShader: `${COMMON}\nuniform sampler2D uMap; varying vec3 vW; varying vec2 vUv;
         void main() { vec4 c = texture2D(uMap, vUv); if (c.a < 0.02) discard;
           float d = distance(vW, cameraPosition);
           gl_FragColor = vec4(mix(c.rgb * (0.78 + 0.22 * uSun), uHaze, 1.0 - exp(-d / 1100.0)), c.a); }`,
-    })));
-    mesh.position.set(at[0], GROUND, at[2]);
-    mesh.rotation.y = Math.atan2(toward[0], toward[2]);
+    }));
+    parent.add(mesh);
+    mesh.position.set(at[0], at[1], at[2]);
+    if (toward) mesh.rotation.y = Math.atan2(toward[0], toward[2]);
     return mesh;
   };
-  sprite("/media/white-rabbit/yard-swing.webp", 2.9, 3.97, [-11, 0, -4], [9.05, 0, 4.6]);
-  sprite("/media/white-rabbit/yard-bed.webp", 10.74, 4.0, [(BED[0] + BED[1]) / 2, 0, (BED[2] + BED[3]) / 2], [17.05, 0, -6.9]);
+  const SWING = [-11, GROUND, -4], SWING_TO = [9.05, 0, 4.6], SW = 2.9, SH = 3.81, PIVOT = 0.644 * SH;
+  sprite("/media/white-rabbit/yard-swing.webp", SW, SH, SWING, SWING_TO);
+  const hinge = new T.Group(); hinge.position.set(SWING[0], SWING[1] + PIVOT, SWING[2]); hinge.rotation.y = Math.atan2(SWING_TO[0], SWING_TO[2]); keep(hinge);
+  const seat = new T.Group(); hinge.add(seat);
+  sprite("/media/white-rabbit/yard-swing-seat.webp", SW, SH, [0, -PIVOT, 0.01], null, 0, seat);
+  // The garden's card lies along its row (the back fence), widened by the slant it was rendered at, so its
+  // two ends stay at their true depths
+  sprite("/media/white-rabbit/yard-garden.webp", 16.67 / Math.cos(Math.atan2(6.4, 17.05)), 4.25, [(BED[0] + BED[1]) / 2, GROUND, (BED[2] + BED[3]) / 2], [1, 0, 0], 1);
 
   // Ducks: a few mallards and one white duck, each paddling a slow loop of its own near the near bank
   const ducks = [], drake = solid("#5A4632"), hen = solid("#7A6046"), green = solid("#1F4F2E"), white = solid("#F2F0E8"), bill = solid("#E0A028");
@@ -377,6 +531,8 @@ export function createWorld({ scene, touch }) {
     }
     common.uSun.value = sunShare;
     timed.uTime.value = time; timed.uPhase.value = phase; timed.uWind.value = wind;
+    // The swing drifts on its chains, further in the gusts
+    seat.rotation.x = Math.sin(phase * 0.85) * (0.05 + 0.2 * wind) + Math.sin(phase * 2.3 + 1) * 0.015 + wind * 0.08;
   }
 
   // Frees what the world made
