@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.20.3
+
+- Trees no longer sway as a whole: trunks stay still, and the crowns move in patches, each its own way, more at the thin outer and upper twigs. Wind stirs them harder instead of pushing everything one way. Bushes and border plants move the same way.
+
 ## v0.20.2
 
 - The pear tree stands centered in its mint circle, with about twice the branches. They jut and turn at angles instead of simply tapering, under a fuller canopy.
