@@ -2,6 +2,12 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.17.0
+
+- The swing set is now a three-seat porch swing on a matte black A-frame, with silver bolts, a little rust, and a one-piece seat-and-back cushion, swaying on its springs.
+- The sunflowers are spread out, and their stalks arc and droop, some hanging their heads.
+- The walk: scooting back from the TV in three shoves until both chairs are in view, turning slowly to the window through a moment of sun in the eyes, a pause, getting up with a dip and tilt, walking over with each step's bob and a glance at the car, squaring up to a window already a little open, a step closer as it opens the rest of the way, and out. The pauses are longer.
+
 ## v0.16.2
 
 - The lawn is built from a photographed grass texture, with thicker and thinner clumps, gentle rolls in the ground that catch the sun, softer mowing stripes, and darker grass in the shade of the fence and beds.
