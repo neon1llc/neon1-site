@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.20.5
+
+- The soil, in the borders and the stone bed, is a darker, richer brown.
+- The left border is covered in red bark mulch, thinning to bare soil in patches and around the base of each plant and the dog house.
+
 ## v0.20.4
 
 - Leaves move the most: a fine, quick tremble on top of the crown's slow breathing, and a faint flicker as they turn in the light, stronger in gusts.
