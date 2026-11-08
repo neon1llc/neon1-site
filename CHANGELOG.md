@@ -2,6 +2,14 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.14.1
+
+- Catching the white rabbit no longer washes the landing brown or pushes the hero down, on phones in either orientation and on desktops.
+- The car's ignition is a third shorter, and its idle no longer loops audibly: it drifts and lopes like a real engine.
+- The sound comes back after you leave the browser and return.
+- The trees toss harder when the wind gusts.
+- Each chair's side is one wooden piece with its carved front post, and the rug has a thick, fuzzy pile that dents under every leg.
+
 ## v0.14.0
 
 - The white rabbit is a full room: a rendered sky, clouds, and trees moving in the wind past a double-hung sash window, baked light, and photographed leather, walnut, rug, and plaster.
