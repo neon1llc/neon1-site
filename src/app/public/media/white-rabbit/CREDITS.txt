@@ -4,9 +4,6 @@ Car model based on "2019 Chevrolet Camaro" by IsaacOldton (https://sketchfab.com
 licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified: unbranded,
 recolored, stripped of hidden parts, and optimized.
 
-Swing set based on "Japan Swing Set" by main1896 (https://sketchfab.com/main1896), licensed
-CC BY 4.0. Modified: the mat and rail removed, scaled, and rendered as a picture.
-
 Sunflowers based on "Sunflower" by zvanstone (https://sketchfab.com/zvanstone), licensed
 CC BY 4.0. Modified: weathered, posed in a bed, and rendered as a picture.
 

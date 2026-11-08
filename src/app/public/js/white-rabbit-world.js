@@ -495,10 +495,12 @@ export function createWorld({ scene, touch }) {
     for (let d = 0.08; d < G0 - G1 - 0.05; d += 0.12) { const b = new T.Mesh(new T.BoxGeometry(0.035, 0.78, 0.035), wood); b.position.set(0, 0.5, -d); gate.add(b); }
   }
 
-  // The swing set and the garden: rendered in Blender (planning folder, blender/yard.blend) from the way the
-  // window looks at them, with their own shadows, so each stands as a card facing the house. The swing set
-  // is an old rusted one (Sketchfab, by main1896, CC BY 4.0); its chains and seat are a second card hung
-  // from the bar, swinging a little in the wind. The garden runs along the back fence: sunflowers (Sketchfab,
+  // The porch swing and the garden: rendered in Blender (planning folder, blender/yard.blend) from the way
+  // the window looks at them, with their own shadows, so each stands as a card facing the house. The swing
+  // is a three-seat porch swing on an A-frame of matte black tube, modeled after the owner's own: rounded
+  // shoulders into the top bar, braces and stretchers, silver bolts at the joints, and rust coming through
+  // at the feet. Its seat, hung on springs, carries a one-piece seat-and-back cushion, and is a second card
+  // hung from the bar, swinging a little in the wind. The garden runs along the back fence: sunflowers (Sketchfab,
   // by zvanstone, CC BY 4.0), late in the season and wilting, among weeds and grass clumps (Poly Haven, CC0);
   // a long raised bed with two leaning lattice trellises, squash vines climbing them and running on along
   // the fence with big leaves, yellow flowers, and long squash hanging (the fruit from a scan by
@@ -525,14 +527,14 @@ export function createWorld({ scene, touch }) {
     if (toward) mesh.rotation.y = Math.atan2(toward[0], toward[2]);
     return mesh;
   };
-  const SWING = [-11, GROUND, -4], SWING_TO = [9.05, 0, 4.6], SW = 2.9, SH = 3.81, PIVOT = 0.644 * SH;
+  const SWING = [-11, GROUND, -4], SWING_TO = [9.05, 0, 4.6], SW = 2.98, SH = 2.96, PIVOT = 0.765 * SH;
   sprite("/media/white-rabbit/yard-swing.webp", SW, SH, SWING, SWING_TO);
   const hinge = new T.Group(); hinge.position.set(SWING[0], SWING[1] + PIVOT, SWING[2]); hinge.rotation.y = Math.atan2(SWING_TO[0], SWING_TO[2]); keep(hinge);
   const seat = new T.Group(); hinge.add(seat);
   sprite("/media/white-rabbit/yard-swing-seat.webp", SW, SH, [0, -PIVOT, 0.01], null, 0, seat);
   // The garden was rendered square on to its row and lies along it (the back fence), so both its ends
   // stand at their true depths from any view
-  sprite("/media/white-rabbit/yard-garden.webp", 17.28, 3.25, [(BED[0] + BED[1]) / 2, GROUND, (BED[2] + BED[3]) / 2 + 0.29], [1, 0, 0], 1);
+  sprite("/media/white-rabbit/yard-garden.webp", 17.06, 3.18, [(BED[0] + BED[1]) / 2, GROUND, (BED[2] + BED[3]) / 2 + 0.19], [1, 0, 0], 1);
 
   // Ducks: a few mallards and one white duck, each paddling a slow loop of its own near the near bank
   const ducks = [], drake = solid("#5A4632"), hen = solid("#7A6046"), green = solid("#1F4F2E"), white = solid("#F2F0E8"), bill = solid("#E0A028");
