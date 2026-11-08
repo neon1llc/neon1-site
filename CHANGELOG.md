@@ -2,6 +2,14 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.14.6
+
+- Wide screens no longer stretch the chairs at the sides of the view.
+- The chairs' carved front posts are wider and start at the cushion's edge, centered on the head and leg, in darker, aged walnut.
+- The window's lower sash slides, with its lock on top of the meeting rail and the keeper on top of the upper sash's rail, and the glass is clear.
+- The glitch after the catch crackles with electric zaps instead of beeps.
+- Coming back to the browser, the first touch rebuilds the sound if it went quiet.
+
 ## v0.14.5
 
 - The number reads (424) 32-neon1, in the brand's lowercase.
