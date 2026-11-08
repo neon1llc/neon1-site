@@ -1,54 +1,113 @@
-/* src/app/public/shared/chat.css - The "ask neon1" window, shared by the site and 1NEON. It
- * keeps its own dark surface, so it reads the same over the rain and over the light pages. */
+/* src/app/public/shared/chat.css - Neo, neon1's assistant window, shared by the site and 1NEON.
+ * Dark over the rain, light ("awake") over the light pages, switched by .n1chat-light. */
 
-/* The launcher sits bottom-left, clear of the rain controls on the right */
-.n1chat-launch { position: fixed; left: 16px; bottom: 16px; z-index: 10; font: 500 13px var(--mono); letter-spacing: .02em;
-  color: var(--void); background: var(--neon); border: 1px solid var(--neon); border-radius: var(--glass-r);
-  padding: 8px 14px; cursor: pointer; box-shadow: 0 0 18px rgba(108, 255, 168, .3); }
-.n1chat-launch:hover { box-shadow: 0 0 30px rgba(0, 230, 118, .5); }
-.n1chat-launch:focus-visible, .n1chat button:focus-visible, .n1chat-input:focus-visible { outline: 2px solid var(--glow); outline-offset: 2px; }
+/* ---- The launcher: a round mark, styled like "book a call", that stretches to "ask Neo" ---- */
+.n1chat-launch { position: fixed; left: 16px; bottom: 16px; z-index: 10; display: inline-flex; align-items: center;
+  height: 48px; min-width: 48px; padding: 0 12px; border-radius: 24px; cursor: pointer;
+  font: 500 13px var(--mono); letter-spacing: .02em; color: var(--neon); background: transparent;
+  border: 1px solid var(--neon); transition: background-color .25s, color .25s, border-color .25s, box-shadow .25s; }
+.n1chat-launch:hover { background: rgba(0, 230, 118, .08); }
+.n1chat-launch .n1chat-mark { width: 22px; height: 22px; flex: none; }
+.n1chat-label { max-width: 0; opacity: 0; margin-left: 0; overflow: hidden; white-space: nowrap;
+  transition: max-width .35s ease, opacity .25s ease, margin-left .35s ease; }
+.n1chat-launch:hover .n1chat-label, .n1chat-launch:focus-visible .n1chat-label, .n1chat-launch.n1chat-peek .n1chat-label {
+  max-width: 80px; opacity: 1; margin-left: 8px; }
+.n1chat-launch.n1chat-light { color: var(--brand); background: var(--paper); border-color: var(--brand); }
+.n1chat-launch.n1chat-light:hover { background: #fff; }
 .n1chat-hidden { display: none; }
 
-/* The window: a dark pane with a neon edge, full width on small screens */
-.n1chat { position: fixed; left: 16px; bottom: 16px; z-index: 10; width: min(380px, calc(100vw - 32px));
-  height: min(520px, calc(100dvh - 96px)); display: flex; flex-direction: column;
-  background: rgba(13, 2, 8, .96); color: #d8f5e1; border: 1px solid rgba(0, 230, 118, .45);
-  border-radius: var(--glass-r); box-shadow: 0 12px 40px rgba(0, 0, 0, .45); font: 14px/1.55 var(--sans); }
+/* ---- The window: colors are variables, so the light look only swaps the palette ---- */
+.n1chat { --bg: rgba(13, 2, 8, .96); --fg: #d8f5e1; --line: rgba(0, 230, 118, .45); --soft: rgba(0, 230, 118, .2);
+  --bot: rgba(0, 59, 0, .45); --you: rgba(108, 255, 168, .14); --muted: #84a98c; --accent: var(--neon);
+  --accent-ink: var(--void); --field: rgba(255, 255, 255, .04); --link: var(--neon);
+  position: fixed; left: 16px; bottom: 16px; z-index: 10; width: min(380px, calc(100vw - 32px));
+  height: min(540px, calc(100dvh - 96px)); display: flex; flex-direction: column;
+  background: var(--bg); color: var(--fg); border: 1px solid var(--line); border-radius: var(--glass-r);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, .35); font: 14px/1.55 var(--sans);
+  transition: background-color .3s, color .3s, border-color .3s; }
+.n1chat.n1chat-light { --bg: var(--paper); --fg: var(--ink); --line: rgba(3, 87, 4, .35); --soft: rgba(3, 87, 4, .14);
+  --bot: #fff; --you: rgba(3, 87, 4, .08); --muted: #56665c; --accent: var(--brand); --accent-ink: #fff;
+  --field: #fff; --link: var(--brand); box-shadow: 0 12px 40px rgba(18, 36, 26, .18); }
 .n1chat[hidden] { display: none; }
 
-.n1chat-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px;
-  border-bottom: 1px solid rgba(0, 230, 118, .2); font: 500 13px var(--mono); color: var(--neon); }
-.n1chat-close { font: 12px var(--mono); color: #84a98c; background: transparent; border: 1px solid rgba(0, 255, 65, .16);
-  border-radius: var(--glass-r); padding: 4px 10px; cursor: pointer; }
-.n1chat-close:hover { color: var(--glow); border-color: rgba(0, 230, 118, .45); }
-
-/* The conversation: visitor on the right, answers on the left */
-.n1chat-log { flex: 1; overflow-y: auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; overscroll-behavior: contain; }
-.n1chat-msg { margin: 0; padding: 8px 11px; border-radius: var(--glass-r); max-width: 88%; white-space: pre-wrap; overflow-wrap: anywhere; }
-.n1chat-bot { align-self: flex-start; background: rgba(0, 59, 0, .45); }
-.n1chat-you { align-self: flex-end; background: rgba(108, 255, 168, .14); }
-.n1chat-wait { color: #84a98c; font-style: italic; }
-.n1chat-link { color: var(--neon); font-weight: 600; text-decoration: none; }
-.n1chat-link:hover { text-decoration: underline; }
-
-/* The question box and send button */
-.n1chat-form { display: flex; gap: 8px; padding: 10px 14px 6px; border-top: 1px solid rgba(0, 230, 118, .2); }
-.n1chat-input { flex: 1; resize: none; font: 14px/1.4 var(--sans); color: #eafff0; background: rgba(255, 255, 255, .04);
-  border: 1px solid rgba(0, 230, 118, .25); border-radius: var(--glass-r); padding: 8px 10px; }
-.n1chat-send { font: 500 13px var(--mono); color: var(--void); background: var(--neon); border: 0; border-radius: var(--glass-r);
-  padding: 0 14px; cursor: pointer; }
-.n1chat-send:disabled { opacity: .5; cursor: wait; }
+.n1chat-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--soft); }
+.n1chat-title { display: inline-flex; align-items: center; gap: 8px; font: 600 14px var(--mono); color: var(--accent); }
+.n1chat-title .n1chat-mark { width: 18px; height: 18px; }
 .n1chat-tools { display: flex; gap: 6px; }
+.n1chat-tool { font: 12px var(--mono); color: var(--muted); background: transparent; border: 1px solid var(--soft);
+  border-radius: var(--glass-r); padding: 4px 10px; cursor: pointer; }
+.n1chat-tool:hover { color: var(--accent); border-color: var(--line); }
+
+/* ---- The conversation: visitor on the right, Neo on the left ---- */
+.n1chat-log { flex: 1; overflow-y: auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; overscroll-behavior: contain; }
+.n1chat-msg { padding: 9px 12px; border-radius: var(--glass-r); max-width: 88%; overflow-wrap: anywhere; }
+.n1chat-msg p, .n1chat-msg ul { margin: 0; }
+.n1chat-msg p + p, .n1chat-msg p + ul, .n1chat-msg ul + p, .n1chat-msg ul + ul { margin-top: 8px; }
+.n1chat-msg ul { padding-left: 18px; }
+.n1chat-msg li + li { margin-top: 4px; }
+.n1chat-bot { align-self: flex-start; background: var(--bot); }
+.n1chat-light .n1chat-bot { border: 1px solid var(--soft); }
+.n1chat-you { align-self: flex-end; background: var(--you); white-space: pre-wrap; }
+
+/* Links in replies match the site's: bold, brand colored, with the northeast arrow */
+.n1chat-link { color: var(--link); font-weight: 600; text-decoration: none; }
+.n1chat-link::after { content: "↗"; display: inline-block; font-size: .8em; margin-left: 2px; transition: transform .15s ease; }
+.n1chat-link:hover::after, .n1chat-link:focus-visible::after { transform: translate(1px, -1px); }
 
 /* Suggested questions: small outlined buttons that wrap */
 .n1chat-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .n1chat-chips[hidden] { display: none; }
-.n1chat-chip { font: 12px var(--sans); color: var(--neon); background: transparent; border: 1px solid rgba(0, 230, 118, .35);
+.n1chat-chip { font: 12px var(--sans); color: var(--accent); background: transparent; border: 1px solid var(--line);
   border-radius: 999px; padding: 5px 10px; cursor: pointer; text-align: left; }
-.n1chat-chip:hover { background: rgba(0, 230, 118, .1); }
+.n1chat-chip:hover { background: var(--you); }
+
+/* Three dots while Neo writes */
+.n1chat-typing { display: inline-flex; gap: 5px; padding: 12px 14px; }
+.n1chat-typing span { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: n1chat-dot 1.2s infinite ease-in-out both; }
+.n1chat-typing span:nth-child(2) { animation-delay: .15s; }
+.n1chat-typing span:nth-child(3) { animation-delay: .3s; }
+
+/* ---- The question box, send, and the route to a person ---- */
+.n1chat-form { display: flex; gap: 8px; padding: 10px 14px 6px; border-top: 1px solid var(--soft); }
+.n1chat-input { flex: 1; resize: none; font: 14px/1.4 var(--sans); color: var(--fg); background: var(--field);
+  border: 1px solid var(--soft); border-radius: var(--glass-r); padding: 8px 10px; }
+.n1chat-input::placeholder { color: var(--muted); }
+.n1chat-send { font: 500 13px var(--mono); color: var(--accent-ink); background: var(--accent); border: 0;
+  border-radius: var(--glass-r); padding: 0 14px; cursor: pointer; }
+.n1chat-send:disabled { opacity: .5; cursor: wait; }
+.n1chat-human { margin: 0; padding: 2px 14px 10px; font-size: 12px; color: var(--muted); }
+.n1chat-plain { color: var(--link); font-weight: 600; text-decoration: none; }
+.n1chat-plain:hover { text-decoration: underline; }
+
+.n1chat-launch:focus-visible, .n1chat button:focus-visible, .n1chat a:focus-visible, .n1chat-input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.n1chat-launch.n1chat-light:focus-visible { outline-color: var(--brand); }
+
+/* ---- Motion: the window grows up out of the launcher's circle and folds back into it;
+ * messages slide up into place ---- */
+.n1chat-grow { animation: n1chat-grow .38s cubic-bezier(.2, .8, .2, 1) both; }
+.n1chat-fold { animation: n1chat-grow .26s cubic-bezier(.4, 0, .8, .4) reverse both; }
+.n1chat-in { animation: n1chat-rise .24s ease-out both; }
+@keyframes n1chat-grow {
+  from { clip-path: inset(calc(100% - 48px) calc(100% - 48px) 0 0 round 24px); }
+  to { clip-path: inset(0 0 0 0 round var(--glass-r)); }
+}
+/* Anchored bottom-right (1NEON, clear of its side rail): the same motion from the other corner */
+.n1chat-launch.n1chat-right, .n1chat.n1chat-right { left: auto; right: 16px; }
+.n1chat-right.n1chat-grow { animation-name: n1chat-grow-right; }
+.n1chat-right.n1chat-fold { animation-name: n1chat-grow-right; }
+@keyframes n1chat-grow-right {
+  from { clip-path: inset(calc(100% - 48px) 0 0 calc(100% - 48px) round 24px); }
+  to { clip-path: inset(0 0 0 0 round var(--glass-r)); }
+}
+@keyframes n1chat-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes n1chat-dot { 0%, 80%, 100% { opacity: .3; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+@media (prefers-reduced-motion: reduce) {
+  .n1chat-grow, .n1chat-fold, .n1chat-in, .n1chat-typing span { animation: none; }
+  .n1chat-label, .n1chat-launch, .n1chat { transition: none; }
+}
 
 /* Short or zoomed screens: the window fills the height and scrolls as one, so the box, send,
-   close, and the disclosure are always reachable */
+   close, and the contact links are always reachable */
 @media (max-height: 480px) {
   .n1chat { top: 8px; bottom: 8px; left: 8px; width: min(380px, calc(100vw - 16px)); height: auto; overflow-y: auto; overscroll-behavior: contain; }
   .n1chat-log { flex: 0 0 auto; overflow: visible; }
@@ -56,8 +115,3 @@
 
 /* The menu, a case study, or the white rabbit owns the screen; the chat steps aside until it closes */
 body.menu-open .n1chat, body.menu-open .n1chat-launch, body.case-open .n1chat, body.case-open .n1chat-launch, body.white-rabbit-on .n1chat, body.white-rabbit-on .n1chat-launch { display: none; }
-
-/* The route to a person, then the disclosure */
-.n1chat-human { margin: 0; padding: 2px 14px 4px; font-size: 12px; color: #b9d8c2; }
-.n1chat-note { margin: 0; padding: 0 14px 10px; font-size: 11px; color: #84a98c; }
-

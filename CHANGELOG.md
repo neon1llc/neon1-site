@@ -2,6 +2,13 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.26.0
+
+- The assistant is now Neo. Its launcher is a round neon1 mark that stretches to "ask Neo", and the window grows up out of it and folds back into it.
+- Neo follows the page: dark over the rain, and light like the header's "book a call" once the page wakes, even while it's open.
+- Replies show typing dots, slide up into place, and use real paragraphs, bullet lists, and site-style links with the northeast arrow.
+- The footer offers book, email, or call, and the greeting says Neo is automated, in place of the old disclaimer.
+
 ## v0.25.1
 
 - The case study Previous and Next buttons work with reduced motion turned on, or when the animation library doesn't load, and jump instead of gliding when motion is reduced.

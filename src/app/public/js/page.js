@@ -82,7 +82,7 @@ import { whiteRabbit } from "/js/white-rabbit.js";
 
   // ---- The "ask neon1" window: optional, so it loads last and a failure leaves the page working ----
   // The contact section and its email and booking links stay the way to reach a person
-  import("/shared/chat.js").then(({ chat }) => chat()).catch(() => { /* chat unavailable: contact links remain */ });
+  import("/shared/chat.js").then(({ chat }) => chat({ light: () => document.querySelector("header")?.classList.contains("light"), watch: [document.querySelector("header")] })).catch(() => { /* chat unavailable: contact links remain */ });
 
   // ---- Wordmark decode: each letter cycles glyphs, then locks in, left to right ----
   if (!reduce.matches) {
