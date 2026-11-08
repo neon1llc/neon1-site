@@ -779,11 +779,9 @@ export function createWorld({ scene, touch }) {
       const k = Math.floor(rnd() * 4), inst = sets[k];
       e.set((rnd() - 0.5) * 0.08, yaw + (rnd() - 0.5) * 0.1, (rnd() - 0.5) * 0.08, "YXZ");
       inst.setMatrixAt(used[k], m.compose(at0.set(x, y, z), qq.setFromEuler(e), sc0.set(sx, sy, sz)));
-      // Every stone its own colour: dark burgundy, light grey, or dark grey, each shade varied
-      const r = rnd(), w = 0.82 + rnd() * 0.36;
-      const pal = r < 0.36 ? [[0.1, 0.035, 0.04], [0.14, 0.05, 0.055], [0.08, 0.03, 0.035]] : r < 0.7 ? [[0.3, 0.29, 0.275], [0.36, 0.35, 0.33]] : [[0.085, 0.085, 0.085], [0.12, 0.12, 0.125]];
-      tint.setRGB(...pal[Math.floor(rnd() * pal.length)]);
-      inst.setColorAt(used[k]++, tint.multiplyScalar(w));
+      // Every stone its own grey, anywhere between a medium dark grey and a darker one
+      const g = 0.075 + rnd() * 0.075, warm = 0.98 + rnd() * 0.04;
+      inst.setColorAt(used[k]++, tint.setRGB(g * warm, g, g / warm));
     };
     // Dark green moss grown into the joints: tufts in the gaps between stones and runs along the course line
     const moss = keep(new T.InstancedMesh(rough(4), mossMat, cap * 2)); let km = 0;
