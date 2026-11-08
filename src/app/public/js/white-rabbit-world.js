@@ -659,7 +659,9 @@ export function createWorld({ scene, touch }) {
       tube(rust, 0.021, [x, 0.03, -0.25], [x, 0.03, 0.2]);
       tube(black, 0.016, [x, 0.95, -0.42], [x, 0.95, 0.42]);                                     // the stretcher
       const inward = x < 0 ? 1 : -1;
-      tube(black, 0.016, [x, BAR - 0.55, 0.28], [x + inward * 0.42, BAR, 0]);                   // braces into the bar
+      // braces from partway down each leg up into the bar, joined at both ends
+      const t = 0.55 / (BAR - 0.03);
+      for (const z of [-FOOT, FOOT]) tube(black, 0.016, [x, BAR - 0.55, z * t], [x + inward * 0.42, BAR, 0]);
     }
     // The seat on its springs, its frame black, chains in a V to each end
     seat.position.set(SWING[0], SWING[1] + BAR, SWING[2]); seat.rotation.y = 0.03; keep(seat);
