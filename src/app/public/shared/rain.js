@@ -97,6 +97,8 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
   let grid = saved.grid !== false;
   let set = Math.max(0, SETS.findIndex((s) => s.name === saved.set));
   let running = !saved.paused && !reduce.matches;
+  // Reduced motion switched on mid-visit stops the rain, like on load; the saved choice is untouched
+  reduce.addEventListener?.("change", (e) => { if (e.matches && running) { running = false; emit(); } });
   // The live rabbit, the step count, and a halt that is not saved as a pause
   const bunny = rabbit && { rate: 0.005, hold: 60, ok: () => true, avoid: () => [], ...rabbit };
   // The canvas's own size in CSS pixels, set on resize

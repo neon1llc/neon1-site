@@ -49,6 +49,8 @@ header.light .links a:not(.btn):hover { color: var(--brand); }
 /* Full-screen menu */
 .menu { position: fixed; inset: 0; z-index: 7; display: grid; place-items: center; background: rgba(13,2,8,.94); backdrop-filter: blur(6px); }
 .menu[hidden] { display: none; }
+/* Short or zoomed screens: the list scrolls inside the overlay, below the header and its close button */
+@media (max-height: 520px) { .menu { place-items: start center; overflow-y: auto; overscroll-behavior: contain; padding: 80px 16px 24px; } }
 .menu ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 18px; text-align: center; }
 /* Menu links in the logo's neon, glowing brighter under a finger or focus */
 .menu a { font: 500 clamp(24px, 4vw, 40px) var(--mono); color: var(--neon); text-shadow: 0 0 8px rgba(108,255,168,.3); text-decoration: none; transition: color .2s, text-shadow .2s; }
@@ -428,7 +430,8 @@ body.white-rabbit-scene > :not(.white-rabbit) { visibility: hidden; }
 .white-rabbit-sky { background: url("/media/white-rabbit/sky.webp") 62% 58% / 260% auto; filter: saturate(1.9) hue-rotate(-6deg) brightness(.95); }
 .white-rabbit-clouds { background-image: url("/media/white-rabbit/clouds.webp"); background-size: 300% auto; background-position: 55% 30%; filter: brightness(1.3) contrast(.9); }
 .white-rabbit-far { background-image: url("/media/white-rabbit/trees-far.webp"); background-size: 360% auto; background-position: 48% 100%; top: 26%; }
-.white-rabbit-near { background-image: url("/media/white-rabbit/trees-near.webp"); background-size: 300% auto; background-position: 52% 100%; top: 58%; }
+/* The near row reuses the far trees, larger and darker, so the fallback ships no extra image */
+.white-rabbit-near { background-image: url("/media/white-rabbit/trees-far.webp"); background-size: 300% auto; background-position: 52% 100%; top: 58%; filter: brightness(.72) saturate(1.1); }
 
 /* "go touch grass" rises from behind the treetops into the sky of the upper sash, a small move, mostly a fade */
 .white-rabbit-window > .white-rabbit-rise { inset: auto 0 69% 0; text-align: center; font: 500 clamp(18px, 3.2vw, 26px)/1.3 var(--mono);

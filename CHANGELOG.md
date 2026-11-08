@@ -2,6 +2,17 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.25.1
+
+- The case study Previous and Next buttons work with reduced motion turned on, or when the animation library doesn't load, and jump instead of gliding when motion is reduced.
+- The "ask neon1" window scrolls its own conversation with the wheel, trackpad, or touch, without moving the page. On short or zoomed screens the whole window scrolls, so the question box, send, close, and the note under it are always reachable. It steps aside while the menu, a case study, or the white rabbit is open.
+- The chat loads after the rest of the page, so if it ever fails to load, the menu, rain controls, and contact links still work.
+- The full-screen menu scrolls on short or zoomed screens, so every link stays reachable.
+- Turning on reduced motion mid-visit stops the rain.
+- The near row of trees in the simple white rabbit view shows again; it had pointed at an image that was never shipped.
+- The social preview's description matches the card.
+- Deploy checks fail when a page download is cut off or incomplete, and an unchanged security.txt no longer counts as a change.
+
 ## v0.25.0
 
 - The deck matches the photo from the window: 6 m out from the house and 9 m across, in a deeper brownish burgundy, with 5/4 x 6 boards running left to right in staggered lengths with thin gaps.

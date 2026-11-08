@@ -14,9 +14,20 @@
 
 (() => {
   "use strict";
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+
+  // ---- Cards: previous and next buttons ----
+  // Wired before the Motion check, so they work with reduced motion or without Motion too.
+  // Each press moves one card width plus the gap; reduced motion jumps instead of gliding
+  const rail = document.getElementById("cases");
+  if (rail) {
+    const step = () => rail.querySelector(".case").getBoundingClientRect().width + 20;
+    document.querySelectorAll("[data-rail]").forEach((b) =>
+      b.addEventListener("click", () => rail.scrollBy({ left: step() * +b.dataset.rail, behavior: reduce.matches ? "auto" : "smooth" })));
+  }
+
   // Native scrolling stays in charge without Motion or with reduced motion
   const M = window.Motion;
-  const reduce = matchMedia("(prefers-reduced-motion: reduce)");
   if (!M || reduce.matches) return;
   const { animate, stagger } = M;
 
@@ -40,6 +51,8 @@
   const menu = document.getElementById("menu");
   let off = false; // reduced motion turned on mid-visit
   const paused = () => off || !menu.hidden || document.body.classList.contains("case-open") || document.body.classList.contains("white-rabbit-on");
+  // The ask neon1 window scrolls on its own; page steering never takes its wheel, touch, or keys
+  const inChat = (node) => node instanceof Element && !!node.closest(".n1chat");
 
   // ---- Layout: where each view starts and how far it scrolls inside ----
   const vh = () => (window.visualViewport ? visualViewport.height : innerHeight);
@@ -183,9 +196,8 @@
 
   // ---- Wheel and trackpad ----
   // Line and page deltas are converted to pixels
-  const rail = document.getElementById("cases");
   addEventListener("wheel", (e) => {
-    if (e.ctrlKey || paused()) return; // pinch zoom, open menu or case study
+    if (e.ctrlKey || paused() || inChat(e.target)) return; // pinch zoom, open menu or case study, the chat
     if (rail && rail.contains(e.target) && (Math.abs(e.deltaX) > Math.abs(e.deltaY) || e.shiftKey)) return; // sideways through the cards
     e.preventDefault();
     const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? vh() : 1;
@@ -195,14 +207,16 @@
   // ---- Touch ----
   // The last touch point, the locked axis, and vertical velocity in px per ms
   let tY = 0, tX = 0, axis = null, vel = 0, tLast = 0;
+  let chatTouch = false;
   addEventListener("touchstart", (e) => {
+    chatTouch = inChat(e.target);
     if (e.touches.length !== 1) return;
     tY = e.touches[0].clientY; tX = e.touches[0].clientX; axis = null; vel = 0; tLast = performance.now();
   }, { passive: true });
 
   // The first 6px pick the axis; vertical drags drive the views
   addEventListener("touchmove", (e) => {
-    if (e.touches.length !== 1 || paused()) return;
+    if (e.touches.length !== 1 || paused() || chatTouch) return;
     const cy = e.touches[0].clientY, cx = e.touches[0].clientX;
     const dy = tY - cy, dx = tX - cx;
     if (!axis) {
@@ -219,7 +233,7 @@
 
   // Lifting the finger springs back a pull, or lets a flick glide
   addEventListener("touchend", () => {
-    if (axis !== "y" || settling) return;
+    if (axis !== "y" || settling || chatTouch) return;
     if (pullDir) { release(); return; }
     // A flick inside a tall view keeps gliding, and stops at the view's edge
     if (Math.abs(vel) > 0.3) {
@@ -233,7 +247,7 @@
   // Arrows and paging scroll inside a tall view, then move on at its edge
   // Form fields keep their keys, and Space still presses buttons and links
   addEventListener("keydown", (e) => {
-    if (e.altKey || e.ctrlKey || e.metaKey || paused() || settling) return;
+    if (e.altKey || e.ctrlKey || e.metaKey || paused() || settling || inChat(document.activeElement)) return;
     const tag = document.activeElement.tagName;
     if (/^(INPUT|TEXTAREA|SELECT)$/.test(tag)) return;
     if (e.key === " " && /^(BUTTON|A|SUMMARY)$/.test(tag)) return;
@@ -267,14 +281,6 @@
     history.replaceState(null, "", a.dataset.view ? "/" : a.getAttribute("href"));
     goTo(i, { link: true });
   });
-
-  // ---- Cards: previous and next buttons ----
-  // Each press moves one card width plus the gap
-  if (rail) {
-    const step = () => rail.querySelector(".case").getBoundingClientRect().width + 20;
-    document.querySelectorAll("[data-rail]").forEach((b) =>
-      b.addEventListener("click", () => rail.scrollBy({ left: step() * +b.dataset.rail, behavior: "smooth" })));
-  }
 
   // ---- Keep in step with scrolls the page didn't start (focus, find in page) ----
   function sync() {

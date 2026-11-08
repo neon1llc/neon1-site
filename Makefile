@@ -107,16 +107,17 @@ invalidate: ## Invalidate CloudFront after a deploy that changed files (FORCE=1 
 	aws cloudfront wait invalidation-completed --distribution-id "$(DISTRIBUTION)" --id "$$id"; \
 	rm -f $(CHANGES)
 
-# Retries for about a minute while the CDN picks up the new version
+# Retries for about a minute while the CDN picks up the new version. curl's own exit status is
+# checked before the version (a cut-off transfer fails), and the page must arrive whole
 verify: ## Check that each live URL returns 200 and serves the local version
 	@version=$$(sed -n 's/.*<meta name="version" content="\([^"]*\)".*/\1/p' $(SITE_DIR)/index.html); \
 	test -n "$$version" || { echo "verify: no version meta in index.html"; exit 1; }; \
 	for url in $(VERIFY_URLS); do \
 		ok=; \
 		for try in 1 2 3 4 5 6; do \
-			if curl -fsSL --max-time 15 "$$url" | grep -F "name=\"version\" content=\"$$version\"" >/dev/null; then \
-				ok=1; break; \
-			fi; \
+			body=$$(curl -fsSL --max-time 15 "$$url") && \
+			printf '%s' "$$body" | grep -qF "name=\"version\" content=\"$$version\"" && \
+			printf '%s' "$$body" | grep -qi "</html>" && { ok=1; break; }; \
 			sleep 10; \
 		done; \
 		test -n "$$ok" || { echo "verify: $$url is not serving version $$version"; exit 1; }; \

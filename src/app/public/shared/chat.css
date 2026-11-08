@@ -47,6 +47,16 @@
   border-radius: 999px; padding: 5px 10px; cursor: pointer; text-align: left; }
 .n1chat-chip:hover { background: rgba(0, 230, 118, .1); }
 
+/* Short or zoomed screens: the window fills the height and scrolls as one, so the box, send,
+   close, and the disclosure are always reachable */
+@media (max-height: 480px) {
+  .n1chat { top: 8px; bottom: 8px; left: 8px; width: min(380px, calc(100vw - 16px)); height: auto; overflow-y: auto; overscroll-behavior: contain; }
+  .n1chat-log { flex: 0 0 auto; overflow: visible; }
+}
+
+/* The menu, a case study, or the white rabbit owns the screen; the chat steps aside until it closes */
+body.menu-open .n1chat, body.menu-open .n1chat-launch, body.case-open .n1chat, body.case-open .n1chat-launch, body.white-rabbit-on .n1chat, body.white-rabbit-on .n1chat-launch { display: none; }
+
 /* The route to a person, then the disclosure */
 .n1chat-human { margin: 0; padding: 2px 14px 4px; font-size: 12px; color: #b9d8c2; }
 .n1chat-note { margin: 0; padding: 0 14px 10px; font-size: 11px; color: #84a98c; }

@@ -28,6 +28,14 @@ def local_files(root):
     return files
 
 
+def synced(key):
+    """True for keys the sync manages: no dot segments, except a top-level .well-known/ like local_files."""
+    parts = key.split("/")
+    if parts[0] == ".well-known":
+        parts = parts[1:]
+    return not any(part.startswith(".") for part in parts)
+
+
 def main():
     if len(sys.argv) != 2:
         sys.exit("Usage: changes.py SITE_DIR < objects.json")
@@ -37,11 +45,7 @@ def main():
         objects = json.load(sys.stdin) or []
     except ValueError:
         sys.exit("changes.py: could not read the bucket listing")
-    remote = {
-        key: etag.strip('"')
-        for key, etag in objects
-        if not any(part.startswith(".") for part in key.split("/"))
-    }
+    remote = {key: etag.strip('"') for key, etag in objects if synced(key)}
     local = local_files(sys.argv[1])
 
     for key in sorted(local):
