@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.15.4
+
+- The yard looks lived in: an old rusted swing set and a late-season sunflower bed, leaning and nodding among weeds, rendered from real models; a fence that sags, leans, weathers, and misses a picket here and there; and a lawn with drier and lusher patches, clover, a worn path, bare earth under the swing, dandelions, and fallen leaves.
+
 ## v0.15.3
 
 - The window's sashes no longer clip against the frame at their edges, and below the raised sash the opening is clear to the outside.
