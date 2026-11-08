@@ -384,7 +384,7 @@ export function whiteRabbit({ rain, root }) {
     scene.render(q, { speed: Math.abs(v) });
     if (sound) sound.update(scene.beat, scene.facing, scene.wind, scene.open);
     root.dataset.progress = q.toFixed(3);
-    grass.parentElement.style.opacity = smooth(0.97, 1, q).toFixed(3);
+    grass.parentElement.style.opacity = smooth(0.993, 1, q).toFixed(3);
     if (q > 0.995) announce(true);
     if (state !== "done" && target >= 1 && p > 0.999 && Math.abs(v) < 0.01) set("done");
     if ((state === "reversing" || escape) && target <= 0 && p < 0.002 && Math.abs(v) < 0.02) { p = v = 0; exit(); }

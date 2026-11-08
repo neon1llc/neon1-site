@@ -16,7 +16,9 @@ const WALNUT = "#8A5A34", DARK_WOOD = "#6A4426", LEG_WOOD = "#4A2D1A", BAKELITE 
 const BRASS = "#A8834E", LEATHER = "#62291D";
 
 // The room's inside faces, the height of the wainscot, and where the chairs sit (x, z, turn)
-const ROOM = { x: 1.95, z: 2.45, h: 2.6 };
+// The room: its right wall stands well back (x 3.2), so the window wall is far enough off to take in
+const ROOM = { x: 1.95, xr: 3.15, z: 2.45, h: 2.6 };
+const RW = 3.2, RC = (RW - 2.0) / 2, RWIDE = RW + 2.0;   // right wall, the room's middle across, and its width
 const RAIL = 0.66, BASE = 0.13; // low enough that the window and its sill sit clear above the rail
 const CHAIRS = [[-1.12, -1.46, 0.48], [1.29, -1.54, -0.57]]; // set down by hand, not mirrored
 const CHAIR_LEGS = [[-0.365, 0.38], [0.365, 0.38], [-0.39, -0.385], [0.39, -0.385]]; // front pair under the carved posts
@@ -485,12 +487,12 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
   const z0 = win.z - win.w / 2, z1 = win.z + win.w / 2, y0 = win.y - win.h / 2, y1 = win.y + win.h / 2;
   const box = (w, h, d, p, uv = [1, 1]) => place(new T.BoxGeometry(w, h, d), { p, uv });
   add(merged([
-    box(4, 2.6, 0.1, [0, 1.3, -2.5], [4, 2.6]), box(0.1, 2.6, 5, [2.0, 1.3, 0], [5, 2.6]), box(4, 2.6, 0.1, [0, 1.3, 2.5], [4, 2.6]),
+    box(RWIDE, 2.6, 0.1, [RC, 1.3, -2.5], [RWIDE, 2.6]), box(0.1, 2.6, 5, [RW, 1.3, 0], [5, 2.6]), box(RWIDE, 2.6, 0.1, [RC, 1.3, 2.5], [RWIDE, 2.6]),
     box(0.1, y0, 5, [-2.0, y0 / 2, 0], [5, y0]), box(0.1, 2.6 - y1, 5, [-2.0, (2.6 + y1) / 2, 0], [5, 2.6 - y1]),
     box(0.1, win.h, z0 + 2.5, [-2.0, win.y, (z0 - 2.5) / 2], [z0 + 2.5, win.h]), box(0.1, win.h, 2.5 - z1, [-2.0, win.y, (z1 + 2.5) / 2], [2.5 - z1, win.h]),
   ], lambert({ color: WALL, map: plaster(), normalMap: photo("plaster-normal", [1, 1]), normalScale: new T.Vector2(0.35, 0.35) })));
-  add(merged([box(4, 0.02, 5, [0, 2.61, 0])], lambert({ color: CEILING })));
-  add(merged([place(new T.PlaneGeometry(4, 5), { r: [-Math.PI / 2, 0, 0], uv: [4 / 2.4, 5 / 0.6] })], lambert({ map: photo("floor-color", [1.2, 0.3], true), normalMap: photo("floor-normal", [1.2, 0.3]) })));
+  add(merged([box(RWIDE, 0.02, 5, [RC, 2.61, 0])], lambert({ color: CEILING })));
+  add(merged([place(new T.PlaneGeometry(RWIDE, 5), { p: [RC, 0, 0], r: [-Math.PI / 2, 0, 0], uv: [RWIDE / 2.4, 5 / 0.6] })], lambert({ map: photo("floor-color", [1.2, 0.3], true), normalMap: photo("floor-normal", [1.2, 0.3]) })));
 
   // ---- The window: an inset double-hung sash window, its casing, and a sill shaped like a Doric capital ----
   // Jamb liners line the opening; the casing frames it on the room side with a capped head
@@ -568,7 +570,7 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
   // Each run is [length, center x, center z, turn]; the panels face into the room. Every wall
   // gets a whole number of equal panels, so each starts and ends with a full one, and the
   // raised fields are real geometry, so each wall shades from the light it actually gets
-  const runs = [[3.9, 0, -ROOM.z, 0], [4.9, ROOM.x, 0, -Math.PI / 2], [4.9, -ROOM.x, 0, Math.PI / 2], [3.9, 0, ROOM.z, Math.PI]];
+  const runs = [[RWIDE - 0.1, RC, -ROOM.z, 0], [4.9, ROOM.xr, 0, -Math.PI / 2], [4.9, -ROOM.x, 0, Math.PI / 2], [RWIDE - 0.1, RC, ROOM.z, Math.PI]];
   const inward = (x, z, t, d) => [x + Math.sin(t) * d, z + Math.cos(t) * d];
   const panels = [], dark = [], light = [];
   for (const [len, x, z, t] of runs) {
