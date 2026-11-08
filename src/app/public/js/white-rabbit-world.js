@@ -268,24 +268,41 @@ const TREE_VERT = /* glsl */`
   varying vec2 vUv;
   varying vec3 vW;
   varying float vSeed;
+  varying vec4 vCell;
   void main() {
     vec3 toCam = cameraPosition - aBase; toCam.y = 0.0;
     vec3 right = normalize(cross(vec3(0.0, 1.0, 0.0), normalize(toCam)));
     float top = position.y * position.y;
-    float sway = (sin(uPhase * 0.8 + aSeed * 6.3) * 0.012 + sin(uPhase * 2.1 + aSeed * 13.0) * 0.004) * (1.0 + 2.2 * uWind) + uWind * 0.02;
+    // The card itself never moves, so the trunk stays put; the branches move in the fragment shader (BREATHE)
+    float sway = 0.0;
     vec3 w = aBase + right * (position.x * aSize.x + sway * aSize.y * top) + vec3(0.0, position.y * aSize.y, 0.0);
     vUv = mix(aCell.xy, aCell.zw, position.xy + vec2(0.5, 0.0));
-    vW = w; vSeed = aSeed;
+    vW = w; vSeed = aSeed; vCell = aCell;
     gl_Position = projectionMatrix * viewMatrix * vec4(w, 1.0);
+  }`;
+// Trees breathe: the trunk holds still, and the crown moves in patches, each its own way at once, more toward
+// the outside and the top where the twigs are thin; a gust stirs it all harder rather than pushing it one way
+const BREATHE = /* glsl */`
+  uniform float uPhase, uWind;
+  varying vec4 vCell;
+  vec2 breathe(vec2 uv, float seed, float amount) {
+    vec2 span = vCell.zw - vCell.xy, L = (uv - vCell.xy) / span;
+    float reach = smoothstep(0.18, 0.75, L.y) * (0.35 + 1.3 * abs(L.x - 0.5) * 2.0 + 0.6 * smoothstep(0.6, 1.0, L.y));
+    float t = uPhase, g = 1.0 + 2.6 * uWind;
+    vec2 q = L * vec2(5.0, 6.5) + seed * 17.0;
+    vec2 d = vec2(sin(q.y * 1.7 + t * 1.25 + sin(q.x * 2.3 + t * 0.7)), cos(q.x * 1.9 - t * 1.05 + sin(q.y * 1.3 - t * 0.85)));
+    d += 0.55 * vec2(sin(q.x * 4.3 + q.y * 1.1 + t * 2.4), cos(q.y * 3.9 - q.x * 0.7 - t * 2.7));
+    return uv + d * reach * amount * g * span;
   }`;
 const TREE_FRAG = /* glsl */`
   ${COMMON}
+  ${BREATHE}
   uniform sampler2D uMap;
   varying vec2 vUv;
   varying vec3 vW;
   varying float vSeed;
   void main() {
-    vec4 c = texture2D(uMap, vUv);
+    vec4 c = texture2D(uMap, breathe(vUv, vSeed, 0.006));
     if (c.a < 0.45) discard;
     gl_FragColor = vec4(outdoor(c.rgb * (0.92 + 0.16 * vSeed) * 1.25, normalize(vec3(0.3, 0.7, 0.2)), vW), 1.0);
   }`;
@@ -794,8 +811,8 @@ export function createWorld({ scene, touch }) {
       vertexShader: TREE_VERT.replace("attribute float aSeed;", "attribute float aSeed;\n  attribute float aPink;\n  varying float vPink;")
         .replace("vec3 w = aBase + right * (position.x * aSize.x", "float flip = fract(aSeed * 7.31) > 0.5 ? 1.0 : -1.0, lean = (fract(aSeed * 13.7) - 0.5) * 0.35, stretch = 0.8 + 0.4 * fract(aSeed * 3.9);\n    vec3 w = aBase + right * (position.x * aSize.x * stretch * flip + lean * aSize.y * top")
         .replace("vW = w; vSeed = aSeed;", "vW = w; vSeed = aSeed; vPink = aPink;"),
-      fragmentShader: `${COMMON}\n${hash}\nuniform sampler2D uMap; varying vec2 vUv; varying vec3 vW; varying float vSeed, vPink;
-        void main() { vec4 c = texture2D(uMap, vUv); if (c.a < 0.45) discard;
+      fragmentShader: `${COMMON}\n${hash}\n${BREATHE}\nuniform sampler2D uMap; varying vec2 vUv; varying vec3 vW; varying float vSeed, vPink;
+        void main() { vec4 c = texture2D(uMap, breathe(vUv, vSeed, 0.005)); if (c.a < 0.45) discard;
           vec3 k = c.rgb * (0.92 + 0.16 * vSeed) * 1.2;
           // The crepe myrtle's crown in pink bloom, flecked through the green; the roses lifted from near black to deep red
           if (vPink > 0.5 && vPink < 1.5) k = mix(k, vec3(0.95, 0.42, 0.66) * (0.7 + 0.5 * hash(floor(vUv * 400.0))), 0.7 * step(0.35, hash(floor(vUv * 260.0))) * smoothstep(0.2, 0.5, (vUv.y - ${(0.0).toFixed(1)}) * 2.0));
