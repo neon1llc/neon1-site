@@ -167,8 +167,23 @@ const GROUND_FRAG = /* glsl */`
       bool soil = z < ${(YARD.right + SOIL).toFixed(2)} || x < ${(YARD.back + SOIL).toFixed(2)} || (z > ${(YARD.left - SOIL).toFixed(2)} && x < ${(DECK.x0 - 0.2).toFixed(2)})
         || (x > ${PATCH.x0.toFixed(2)} && x < ${PATCH.x1.toFixed(2)} && z > ${PATCH.z0.toFixed(2)} && z < ${PATCH.z1.toFixed(2)});
       if (soil) {
-        col = vec3(0.17, 0.11, 0.07) * (0.75 + 0.45 * noise(vW.xz * 6.0)) * (0.85 + 0.3 * hash(floor(vW.xz * 30.0)));
+        // Dark, rich soil
+        col = vec3(0.1, 0.058, 0.03) * (0.75 + 0.45 * noise(vW.xz * 6.0)) * (0.85 + 0.3 * hash(floor(vW.xz * 30.0)));
         col = mix(col, vec3(0.3, 0.42, 0.12), 0.25 * step(0.8, noise(vW.xz * 2.3)));          // a weed or two
+        // The left border is mulched in red bark chips, thinning to bare soil in patches and around the
+        // base of each plant (the andromeda, the branchy bush, the rose, and the dog house)
+        if (z > ${(YARD.left - SOIL).toFixed(2)}) {
+          vec2 cp = vW.xz * 26.0; vec2 cell = floor(cp + 0.5 * vec2(hash(floor(cp.yx)), 0.0));
+          float chip = hash(cell), edge = smoothstep(0.42, 0.5, max(abs(fract(cp.x + 0.5 * hash(floor(cp.yx))) - 0.5), abs(fract(cp.y) - 0.5)));
+          vec3 mulch = mix(vec3(0.17, 0.04, 0.022), vec3(0.27, 0.065, 0.032), chip) * (0.8 + 0.35 * noise(vW.xz * 3.0)) * (1.0 - 0.45 * edge);
+          float bare = 0.0;
+          ${[[-25.4, YARD.left - 1.1, 0.75], [-21.6, YARD.left - 0.85, 0.55], [-18.4, YARD.left - 0.8, 0.5], [YARD.back + 1.15, YARD.left - 1.25, 1.0]].map(([px, pz, r]) => `bare = max(bare, smoothstep(${(r * 1.1).toFixed(2)}, ${(r * 0.35).toFixed(2)}, distance(vW.xz, vec2(${px.toFixed(2)}, ${pz.toFixed(2)}))) * 0.9);`).join("\n          ")}
+          bare = max(bare, smoothstep(0.6, 0.75, noise(vW.xz * 1.7 + 5.0)) * 0.7);
+          bare = max(bare, step(0.93, hash(floor(vW.xz * 9.0))) * 0.5);
+          // the mulch's ragged edge where it meets the lawn
+          float lip = smoothstep(${(YARD.left - SOIL).toFixed(2)}, ${(YARD.left - SOIL + 0.2).toFixed(2)}, z + 0.12 * noise(vW.xz * 4.0));
+          col = mix(col, mulch, (1.0 - bare) * lip);
+        }
         paved = 1.0;
       } else if (z < zb - 0.75) {
         // One old pour, medium dark grey and rough, cracked in wandering lines over the years, and patched here
@@ -708,7 +723,7 @@ export function createWorld({ scene, touch }) {
   {
     const path = new T.CatmullRomCurve3(CURVE.map(([x, z]) => new T.Vector3(x, 0, z)), false, "centripetal");
     const len = path.getLength(), W = 1.43, Hb = 0.55, n = Math.ceil(len / 0.3);
-    const stone = solid("#FFFFFF", 0.6), dirt = solid("#3B2818", 1), mossMat = solid("#FFFFFF", 1);
+    const stone = solid("#FFFFFF", 0.6), dirt = solid("#26170C", 1), mossMat = solid("#FFFFFF", 1);
     // Four rough stone shapes: a subdivided box with every corner pushed about (shared corners move
     // together, so the faces stay closed), chipped and lumpy; each placement also stretches and turns its own
     const rough = (k) => {
