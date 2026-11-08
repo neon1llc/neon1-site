@@ -2,6 +2,14 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.14.2
+
+- The window's lower sash is raised about 40%, so the opening below it looks straight out at the trees.
+- The glitch sounds play again as soon as the rabbit is caught; the room's sounds still wait for the scroll.
+- On phones, the first touch after coming back to the browser brings the sound back, engine included.
+- The rug is a thin shag that eases down to the floor at its edges, and its strands lie flat and splay under every leg.
+- The TV's glass reflects the window as a soft, curved highlight that moves with the view.
+
 ## v0.14.1
 
 - Catching the white rabbit no longer washes the landing brown or pushes the hero down, on phones in either orientation and on desktops.
