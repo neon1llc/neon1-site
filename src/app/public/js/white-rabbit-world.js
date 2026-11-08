@@ -595,13 +595,82 @@ export function createWorld({ scene, touch }) {
     if (toward) mesh.rotation.y = Math.atan2(toward[0], toward[2]);
     return mesh;
   };
-  // On the concrete in line with the greenhouse and the trellis square, just past the square toward the
-  // house, with its riders facing left (rendered turned around, frame and seat together); it swings left and right
-  const SWING = [-14.5, GROUND, (GREEN.z0 + GREEN.z1) / 2 + 0.6], SWING_TO = [14.8, 0, 8.0], SW = 2.48 * 1.04, SH = 3.02, PIVOT = 0.812 * SH;
-  sprite("/media/white-rabbit/yard-swing.webp", SW, SH, SWING, SWING_TO);
-  const hinge = new T.Group(); hinge.position.set(SWING[0], SWING[1] + PIVOT, SWING[2]); hinge.rotation.y = Math.atan2(SWING_TO[0], SWING_TO[2]); keep(hinge);
-  const seat = new T.Group(); hinge.add(seat);
-  sprite("/media/white-rabbit/yard-swing-seat.webp", SW, SH, [0, -PIVOT, 0.01], null, 0, seat);
+  // The porch swing, built in 3D: parallel to the right fence (its top bar runs along x), on the concrete in
+  // line with the greenhouse and the trellis square, just past the square toward the house. Matte black A-frame
+  // with a little dark rust at the feet; the seat hangs from springs on the bar, facing left (+z), with a thick
+  // cushion stitched into three seats and three backs in a cream fabric printed with green and light orange
+  // leaves. It swings left and right, about the bar
+  const SWING = [-14.5, GROUND, (GREEN.z0 + GREEN.z1) / 2 + 0.6];
+  const seat = new T.Group();
+  {
+    const sw = new T.Group(); sw.position.set(SWING[0], SWING[1], SWING[2]); sw.rotation.y = 0.03; keep(sw);
+    const black = solid("#141414", 0.3), rust = solid("#2E1A10", 0.8), steel = solid("#A8ACB0");
+    const BAR = 2.05, HALF = 1.18, FOOT = 0.78;
+    // A tube from a to b
+    const tube = (mat, r, a, b, parent = sw) => {
+      const A = new T.Vector3(...a), B = new T.Vector3(...b), d = B.clone().sub(A);
+      const o = new T.Mesh(new T.CylinderGeometry(r, r, d.length(), 8), mat);
+      o.position.copy(A).add(B).multiplyScalar(0.5); o.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), d.normalize()); parent.add(o); return o;
+    };
+    tube(black, 0.03, [-HALF - 0.04, BAR, 0], [HALF + 0.04, BAR, 0]);                             // the top bar
+    for (const x of [-HALF, HALF]) {
+      for (const z of [-FOOT, FOOT]) { tube(black, 0.024, [x, BAR, 0], [x, 0.03, z]); tube(rust, 0.025, [x, 0.0, z], [x, 0.16, z * 0.93]); }
+      tube(black, 0.02, [x, 0.03, -FOOT - 0.02], [x, 0.03, FOOT + 0.02]);                       // the foot bar
+      tube(rust, 0.021, [x, 0.03, -0.25], [x, 0.03, 0.2]);
+      tube(black, 0.016, [x, 0.95, -0.42], [x, 0.95, 0.42]);                                     // the stretcher
+      const inward = x < 0 ? 1 : -1;
+      tube(black, 0.016, [x, BAR - 0.55, 0.28], [x + inward * 0.42, BAR, 0]);                   // braces into the bar
+    }
+    // The seat on its springs, its frame black, chains in a V to each end
+    seat.position.set(SWING[0], SWING[1] + BAR, SWING[2]); seat.rotation.y = 0.03; keep(seat);
+    const SY = 0.48 - BAR, SL = 1.86, SD = 0.62;
+    for (const x of [-0.9, 0.9]) {
+      tube(steel, 0.018, [x, -0.02, 0], [x, -0.17, 0], seat);
+      for (const z of [-SD / 2, SD / 2]) tube(black, 0.007, [x, -0.17, 0], [x * 1.02, SY + 0.05, z], seat);
+    }
+    for (const z of [-SD / 2, SD / 2]) tube(black, 0.018, [-SL / 2, SY, z], [SL / 2, SY, z], seat);
+    for (const x of [-SL / 2, SL / 2]) { tube(black, 0.018, [x, SY, -SD / 2], [x, SY, SD / 2], seat); tube(black, 0.016, [x, SY + 0.22, SD / 2], [x, SY + 0.22, -SD / 2 + 0.05], seat); tube(black, 0.016, [x, SY, SD / 2], [x, SY + 0.22, SD / 2], seat); tube(black, 0.016, [x, SY, -SD / 2], [x, SY + 0.62, -SD / 2 - 0.2], seat); }
+    tube(black, 0.016, [-SL / 2, SY + 0.62, -SD / 2 - 0.2], [SL / 2, SY + 0.62, -SD / 2 - 0.2], seat);
+    // The fabric: cream, scattered with pointed leaves in greens and light orange on thin curling stems
+    const fc = document.createElement("canvas"); fc.width = fc.height = 256; const f = fc.getContext("2d");
+    f.fillStyle = "#E3DCC8"; f.fillRect(0, 0, 256, 256);
+    f.strokeStyle = "#5E7A44"; f.lineWidth = 1.2;
+    for (let i = 0; i < 9; i++) { f.beginPath(); let x = rnd() * 256, y = rnd() * 256; f.moveTo(x, y); for (let k = 0; k < 6; k++) { const nx = x + (rnd() - 0.5) * 70, ny = y + (rnd() - 0.5) * 70; f.quadraticCurveTo(x + (rnd() - 0.5) * 60, y + (rnd() - 0.5) * 60, nx, ny); x = nx; y = ny; } f.stroke(); }
+    const leafCols = ["#3F6B2A", "#57803A", "#6E9445", "#E9A262", "#F0B47A", "#4C7533"];
+    for (let i = 0; i < 70; i++) {
+      const x = rnd() * 256, y = rnd() * 256, a = rnd() * 6.28, l = 9 + rnd() * 9, w = l * (0.32 + rnd() * 0.15);
+      f.save(); f.translate(x, y); f.rotate(a); f.fillStyle = leafCols[Math.floor(rnd() * leafCols.length)];
+      f.beginPath(); f.moveTo(-l, 0); f.quadraticCurveTo(0, -w * 2, l, 0); f.quadraticCurveTo(0, w * 2, -l, 0); f.fill();
+      f.strokeStyle = "rgba(40,50,25,0.35)"; f.lineWidth = 0.6; f.beginPath(); f.moveTo(-l * 0.9, 0); f.lineTo(l * 0.9, 0); f.stroke(); f.restore();
+    }
+    const fabTex = new T.CanvasTexture(fc); fabTex.colorSpace = T.SRGBColorSpace; fabTex.wrapS = fabTex.wrapT = T.RepeatWrapping; textures.push(fabTex);
+    const fabric = new T.ShaderMaterial({
+      uniforms: { ...common, uMap: { value: fabTex } },
+      vertexShader: `varying vec3 vW, vN; varying vec2 vUv; void main() { vUv = uv; vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; vN = normalize(mat3(modelMatrix) * normal); gl_Position = projectionMatrix * viewMatrix * w; }`,
+      fragmentShader: `${COMMON}\nuniform sampler2D uMap; varying vec3 vW, vN; varying vec2 vUv;
+        void main() { vec3 c = texture2D(uMap, vUv).rgb * 0.82; gl_FragColor = vec4(outdoor(c, normalize(vN), vW), 1.0); }`,
+    });
+    // Each section a soft pillow: a subdivided box swelled in the middle, its edges rounded down where it is stitched
+    const puff = (w, h, d, thick) => {
+      const g = new T.BoxGeometry(w, h, d, 8, 6, 8), pos = g.attributes.position, uvs = g.attributes.uv;
+      const half = [w / 2, h / 2, d / 2];
+      for (let i = 0; i < pos.count; i++) {
+        const v = [pos.getX(i), pos.getY(i), pos.getZ(i)], q = v.map((c, k) => c / half[k]);
+        const others = [0, 1, 2].filter((k) => k !== thick), bulge = (1 - q[others[0]] ** 2) * (1 - q[others[1]] ** 2);
+        v[thick] *= 1 + 1.1 * bulge;
+        // round the corners in
+        for (const k of others) v[k] *= 1 - 0.12 * Math.abs(q[thick]) ** 2;
+        pos.setXYZ(i, v[0], v[1], v[2]); uvs.setXY(i, (v[0] + v[2]) * 1.6, (v[1] + v[2] * 0.5) * 1.6);
+      }
+      g.computeVertexNormals(); return new T.Mesh(g, fabric);
+    };
+    const cw = SL / 3 - 0.015;
+    for (let i = 0; i < 3; i++) {
+      const x = -SL / 2 + (i + 0.5) * SL / 3;
+      const c = puff(cw, 0.13, SD - 0.04, 1); c.position.set(x, SY + 0.11, 0.03); c.rotation.z = (rnd() - 0.5) * 0.02; seat.add(c);
+      const bk = puff(cw, 0.52, 0.12, 2); bk.position.set(x, SY + 0.44, -SD / 2 - 0.02); bk.rotation.x = -0.32; seat.add(bk);
+    }
+  }
   // The garden was rendered square on to its row and lies along it (the back fence), so both its ends
   // stand at their true depths from any view
   sprite("/media/white-rabbit/yard-garden.webp", 17.04, 2.99, [(BED[0] + BED[1]) / 2, GROUND - 0.32, (BED[2] + BED[3]) / 2 + 0.17], [1, 0, 0], 1);   // set into the soil
@@ -862,7 +931,7 @@ export function createWorld({ scene, touch }) {
     common.uSun.value = sunShare;
     timed.uTime.value = time; timed.uPhase.value = phase; timed.uWind.value = wind;
     // The swing drifts on its chains, further in the gusts
-    seat.rotation.z = Math.sin(phase * 0.85) * (0.04 + 0.16 * wind) + Math.sin(phase * 2.3 + 1) * 0.012 + wind * 0.05;
+    seat.rotation.x = Math.sin(phase * 0.85) * (0.04 + 0.16 * wind) + Math.sin(phase * 2.3 + 1) * 0.012 + wind * 0.05;
   }
 
   // Frees what the world made
