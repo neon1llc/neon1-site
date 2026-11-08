@@ -4,7 +4,13 @@ Car model based on "2019 Chevrolet Camaro" by IsaacOldton (https://sketchfab.com
 licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Modified: unbranded,
 recolored, stripped of hidden parts, and optimized.
 
-Trees (tree_small_02, jacaranda_tree) and the leather, walnut, carpet, plaster, and floor
+Swing set based on "Japan Swing Set" by main1896 (https://sketchfab.com/main1896), licensed
+CC BY 4.0. Modified: the mat and rail removed, scaled, and rendered as a picture.
+
+Sunflowers based on "Sunflower" by zvanstone (https://sketchfab.com/zvanstone), licensed
+CC BY 4.0. Modified: weathered, posed in a bed, and rendered as a picture.
+
+Trees (tree_small_02, jacaranda_tree), grass clumps (grass_medium_01), dandelions (dandelion_01), and the leather, walnut, carpet, plaster, and floor
 textures are from Poly Haven (https://polyhaven.com), CC0.
 
 The V8 recording is the site owner's own.
