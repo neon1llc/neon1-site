@@ -2,6 +2,15 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.19.0
+
+- The stone bed is 2.3 times as wide and sits further right, leaving more lawn on the left and a walkable gap beside the pear tree.
+- The concrete is one old rough pour, medium dark grey, cracked in places and patched with lighter quick-set cement that has cracked too.
+- The pear tree stands straight with a rounded, see-through crown of round leaves and dark red pears, in a smaller circle overrun with mint.
+- The greenhouse is bigger, with black door handles, a wooden workbench and swivel chair at the back, a folding table on the left, and a twin bed on the right; the Japanese andromeda stands behind it.
+- A square of soil before the greenhouse holds an arched squash trellis, covered in leaves, yellow flowers, and hanging squash.
+- The back garden sits down in its soil.
+
 ## v0.18.2
 
 - No two plants in the beds and borders stand the same: each is mirrored or not, leans its own way, and grows a little wider or narrower.
