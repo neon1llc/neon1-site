@@ -24,8 +24,10 @@ const HAZE = new T.Color(0.74, 0.81, 0.9);
 // Strips out from the house, as x where each ends (meters; the house wall is at x -2.05)
 const STRIP = { fence: -20, sidewalk1: [-21.6, -23.4], road: [-23.4, -30.6], sidewalk2: [-30.6, -32.4] };
 // The pond: its center, its half-widths across (x) and along (z), and the outline as a radius that
-// wanders with the angle, so it is a skewed loop, not a circle (the same in JS and GLSL)
-const POND = { x: -60, z: 3, ax: 21, az: 33 };
+// wanders with the angle, so it is a skewed loop, not a circle (the same in JS and GLSL). It is a big
+// old quarry: about 0.9 by 1.3 km, so the walkway around it is near 3 km (1.85 miles), with its near
+// bank 50 m out, past the road and a strip of park
+const POND = { x: -504, z: 3, ax: 380, az: 560 };
 const SHAPE = (a) => 1 + 0.16 * Math.sin(2 * a + 0.7) + 0.09 * Math.sin(3 * a + 2.1) + 0.05 * Math.sin(5 * a + 0.3);
 const SHAPE_GLSL = /* glsl */`
   float shape(float a) { return 1.0 + 0.16 * sin(2.0 * a + 0.7) + 0.09 * sin(3.0 * a + 2.1) + 0.05 * sin(5.0 * a + 0.3); }
@@ -49,7 +51,7 @@ const COMMON = /* glsl */`
     float lam = max(dot(n, uSunDir), 0.0);
     vec3 lit = albedo * (vec3(0.42, 0.47, 0.56) + vec3(1.05, 0.95, 0.8) * lam * (0.35 + 0.65 * uSun));
     float d = distance(world, cameraPosition);
-    return mix(lit, uHaze, 1.0 - exp(-d / 420.0));
+    return mix(lit, uHaze, 1.0 - exp(-d / 1100.0));
   }`;
 const hash = /* glsl */`
   float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
@@ -140,7 +142,7 @@ const WATER_FRAG = /* glsl */`
     col += vec3(1.0, 0.92, 0.75) * (pow(toSun, 60.0) * 0.6 + pow(toSun, 900.0) * 30.0) * uSun;
     // Darker right at the stone rim, where the bank shades the water
     col *= 0.75 + 0.25 * smoothstep(-0.2, -2.0, edge);
-    gl_FragColor = vec4(mix(col, uHaze, 1.0 - exp(-d / 520.0)), 1.0);
+    gl_FragColor = vec4(mix(col, uHaze, 1.0 - exp(-d / 1400.0)), 1.0);
   }`;
 
 // ---- Trees: sprites standing on the ground, turned to the camera about their trunks, swaying at the top ----
@@ -245,12 +247,12 @@ export function createWorld({ scene, touch }) {
   const trees = [];
   for (let z = -46; z < 46; z += 6 + rnd() * 4) if (Math.abs(z - 0.6) > 9 || rnd() < 0.2) trees.push([-20.9 - rnd() * 0.5, z, rnd(), 1]);
   trees.push([-15.5, -13.5, rnd(), 1], [-5.5, 15, rnd(), 1], [-17, 16.5, rnd(), 1]);
-  // Around the pond, beyond the walkway, thinner on the near side so the water shows
-  for (let a = 0; a < Math.PI * 2 && trees.length < 48; a += 0.32 + rnd() * 0.25) {
-    const near = Math.cos(a) > 0.55;
-    if (near && rnd() < 0.75) continue;
-    const r = SHAPE(a) + (6 + rnd() * 5) / ((POND.ax + POND.az) / 2);
-    trees.push([POND.x + Math.cos(a) * POND.ax * r, POND.z + Math.sin(a) * POND.az * r, rnd(), near ? 0.7 : 0.95]);
+  // In the park on the near bank, behind the walkway, spaced so the water shows between them; the far
+  // banks, a kilometer off, get a continuous wooded line instead (below)
+  for (let a = -0.4; a < 0.4 && trees.length < 48; a += 0.025 + rnd() * 0.03) {
+    if (rnd() < 0.3) continue;
+    const r = SHAPE(a) + (7 + rnd() * 6) / POND.ax;
+    trees.push([POND.x + Math.cos(a) * POND.ax * r, POND.z + Math.sin(a) * POND.az * r, rnd(), 0.9]);
   }
   const base = [], size = [], cell = [], seed = [], shade = [];
   for (const [x, z, r, scale] of trees) {
@@ -276,31 +278,39 @@ export function createWorld({ scene, touch }) {
   }, undefined, () => done()));
 
   // The ground, from the house out past the pond
-  const ground = keep(new T.Mesh(new T.PlaneGeometry(130, 180), new T.ShaderMaterial({
+  const ground = keep(new T.Mesh(new T.PlaneGeometry(1100, 1800), new T.ShaderMaterial({
     uniforms: { ...common, uTrees: { value: shade }, uBed: { value: new T.Vector4(...BED) } }, vertexShader: GROUND_VERT, fragmentShader: GROUND_FRAG,
   })));
-  ground.rotation.x = -Math.PI / 2; ground.position.set(-2.0 - 65, GROUND, 0);
+  ground.rotation.x = -Math.PI / 2; ground.position.set(-2.0 - 550, GROUND, 0);
 
   // The pond's water, cut to its outline in the shader
   const water = keep(new T.Mesh(new T.PlaneGeometry(POND.ax * 2.8, POND.az * 2.8), new T.ShaderMaterial({ uniforms: { ...common, ...timed }, vertexShader: GROUND_VERT, fragmentShader: WATER_FRAG })));
   water.rotation.x = -Math.PI / 2; water.position.set(POND.x, LAKE, POND.z);
 
-  // Beyond the park: the old far tree row as a wooded rise, repeated, with hazy hills behind
+  // The far banks: the old far tree row as a wooded line around the far side of the pond, in segments
+  // facing across the water, with hazy hills behind
   const shoreTex = loader.load("/media/white-rabbit/trees-far.webp", (t) => { t.colorSpace = T.SRGBColorSpace; });
   shoreTex.wrapS = T.RepeatWrapping; textures.push(shoreTex);
-  const bank = keep(new T.Mesh(new T.PlaneGeometry(900, 40), new T.ShaderMaterial({
-    uniforms: { ...common, uMap: { value: shoreTex } }, vertexShader: GROUND_VERT,
+  const bankMat = new T.ShaderMaterial({
+    uniforms: { ...common, uMap: { value: shoreTex } }, vertexShader: GROUND_VERT, side: T.DoubleSide,
     fragmentShader: `${COMMON}\nuniform sampler2D uMap; varying vec3 vW; varying vec2 vUv;
-      void main() { vec4 c = texture2D(uMap, vUv * vec2(6.0, 1.0)); if (c.a < 0.4) discard; vec3 k = c.rgb * vec3(0.78, 0.66, 0.5); gl_FragColor = vec4(outdoor(k, vec3(0.3, 0.8, 0.2), vW), 1.0); }`,
-  })));
-  bank.rotation.y = Math.PI / 2; bank.position.set(-131, GROUND + 9, 0); bank.scale.set(0.3, 0.5, 1);
-  const hills = keep(new T.Mesh(new T.PlaneGeometry(2400, 160), new T.ShaderMaterial({
+      void main() { vec4 c = texture2D(uMap, vUv * vec2(3.0, 1.0)); if (c.a < 0.4) discard; vec3 k = c.rgb * vec3(0.78, 0.66, 0.5); gl_FragColor = vec4(outdoor(k, vec3(0.3, 0.8, 0.2), vW), 1.0); }`,
+  });
+  for (let i = 0; i < 12; i++) {
+    const a0 = 1.2 + (i / 12) * 3.9, a1 = 1.2 + ((i + 1) / 12) * 3.9, out = 60 / POND.ax;
+    const p0 = new T.Vector3(POND.x + Math.cos(a0) * POND.ax * (SHAPE(a0) + out), 0, POND.z + Math.sin(a0) * POND.az * (SHAPE(a0) + out));
+    const p1 = new T.Vector3(POND.x + Math.cos(a1) * POND.ax * (SHAPE(a1) + out), 0, POND.z + Math.sin(a1) * POND.az * (SHAPE(a1) + out));
+    const len = p0.distanceTo(p1) * 1.08, bank = keep(new T.Mesh(new T.PlaneGeometry(len, 22), bankMat));
+    bank.position.set((p0.x + p1.x) / 2, GROUND + 9, (p0.z + p1.z) / 2);
+    bank.rotation.y = -Math.atan2(p1.z - p0.z, p1.x - p0.x);
+  }
+  const hills = keep(new T.Mesh(new T.PlaneGeometry(7000, 200), new T.ShaderMaterial({
     uniforms: { ...common }, vertexShader: GROUND_VERT,
     fragmentShader: `${COMMON}\n${hash}\nvarying vec3 vW; varying vec2 vUv;
       void main() { float h = 0.25 + 0.18 * noise(vec2(vUv.x * 9.0, 0.0)) + 0.1 * noise(vec2(vUv.x * 31.0, 0.0)); if (vUv.y > h) discard;
         gl_FragColor = vec4(mix(vec3(0.36, 0.42, 0.4), uHaze, 0.72), 1.0); }`,
   })));
-  hills.rotation.y = Math.PI / 2; hills.position.set(-900, GROUND + 30, 0);
+  hills.rotation.y = Math.PI / 2; hills.position.set(-2600, GROUND + 70, 0);
 
   // The fence: white pickets on two rails across the yard's end
   const solid = (color) => new T.ShaderMaterial({ uniforms: { ...common, uColor: { value: new T.Color(color) } }, vertexShader: SOLID_VERT, fragmentShader: SOLID_FRAG });
@@ -341,14 +351,14 @@ export function createWorld({ scene, touch }) {
     flowers.setMatrixAt(i, m.compose(at, q, sc));
   }
 
-  // Ducks: a few mallards and one white duck, each paddling a slow loop of its own on the pond
+  // Ducks: a few mallards and one white duck, each paddling a slow loop of its own near the near bank
   const ducks = [], drake = solid("#5A4632"), hen = solid("#7A6046"), green = solid("#1F4F2E"), white = solid("#F2F0E8"), bill = solid("#E0A028");
   for (let i = 0; i < 5; i++) {
     const duck = new T.Group(), kind = i === 2 ? white : i % 2 ? hen : drake;
     const body = new T.Mesh(new T.SphereGeometry(0.16, 10, 8), kind); body.scale.set(1.9, 0.9, 1.1); duck.add(body);
     const head = new T.Mesh(new T.SphereGeometry(0.075, 8, 6), i === 2 ? white : i % 2 ? hen : green); head.position.set(0.24, 0.14, 0); duck.add(head);
     const beak = new T.Mesh(new T.BoxGeometry(0.08, 0.02, 0.04), bill); beak.position.set(0.32, 0.13, 0); duck.add(beak);
-    duck.userData = { r: 2.5 + rnd() * 6, a: rnd() * 6.28, speed: (0.05 + rnd() * 0.05) * (rnd() < 0.5 ? -1 : 1), cx: POND.x + (rnd() - 0.5) * 12, cz: POND.z + (rnd() - 0.5) * 20 };
+    duck.userData = { r: 2.5 + rnd() * 6, a: rnd() * 6.28, speed: (0.05 + rnd() * 0.05) * (rnd() < 0.5 ? -1 : 1), cx: -60 - rnd() * 14, cz: POND.z + (rnd() - 0.5) * 40 };
     keep(duck); ducks.push(duck);
   }
 
