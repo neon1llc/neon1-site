@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.20.4
+
+- Leaves move the most: a fine, quick tremble on top of the crown's slow breathing, and a faint flicker as they turn in the light, stronger in gusts.
+
 ## v0.20.3
 
 - Trees no longer sway as a whole: trunks stay still, and the crowns move in patches, each its own way, more at the thin outer and upper twigs. Wind stirs them harder instead of pushing everything one way. Bushes and border plants move the same way.
