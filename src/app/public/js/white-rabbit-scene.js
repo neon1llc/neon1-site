@@ -20,32 +20,42 @@ const SW = 0.48, SH = 0.36;                  // screen size
 const SC = new T.Vector3(0, 0.51, -1.775);  // screen center
 const WINDOW = { z: 0.6, y: 1.45, w: 1.2, h: 1.3 };
 
-// Beats, as a person would take them: out of the TV, sitting back from it, turning in the chair toward
-// the window and pondering it, standing, walking over at an angle to the car on the sill, a pause there,
-// stepping square to the window, a pause looking out, raising the sash, a breath, then out through the
-// opening into the white. Each is [progress, camera position, look target, vertical fov]; the first
-// three positions are filled in from the picture's fit
+// Beats, as a person would take them: out of the TV, then scooting back across the floor in three
+// shoves with a pause after each, until the set and both chairs are in view; still sitting, turning slowly
+// toward the window (through the sun, for a moment, right in the eyes) and settling on the sky and treetops;
+// a pondering pause; getting up (the view dips and tilts, then rights itself); walking over with the bob
+// of each step, glancing down at the car on the sill on the way, then squaring up to the window; a pause
+// looking out; a step closer as the sash, already a little up, goes the rest of the way; a breath; and out
+// through the opening into the white. Each is [progress, camera position, look target, vertical fov]; the
+// first three positions are filled in from the picture's fit. Pauses are pairs of beats a hair apart
 const BEATS = [
-  [0, null, SC, 40], [0.06, null, SC, 40], [0.14, null, SC, 44],
-  [0.2, [0, 0.62, -0.9], [0, 0.5, -1.8], 50],                   // pulling back from the set
-  [0.26, [0.15, 0.95, 0.35], [0, 0.55, -1.9], 54],              // sat back between the chairs
-  [0.32, [0.2, 0.95, 0.42], [-1.95, 1.4, 0.7], 54],             // turning toward the window
-  [0.4, [0.19, 0.96, 0.44], [-1.95, 1.48, 0.66], 53],           // pondering it, still seated
-  [0.48, [0.05, 1.58, 0.62], [-1.95, 1.42, 0.72], 52],          // standing up
-  [0.58, [-0.95, 1.55, 1.75], [-1.87, 0.94, 0.9], 50],          // walked over, at an angle to the car
-  [0.64, [-0.99, 1.54, 1.71], [-1.87, 0.96, 0.88], 49],         // a pause on the car
-  [0.72, [-0.65, 1.55, 0.62], [-1.95, 1.38, 0.6], 50],          // square to the window
-  [0.8, [-0.69, 1.55, 0.6], [-1.95, 1.34, 0.6], 50],            // looking out
-  [0.88, [-0.85, 1.5, 0.6], [-2.4, 1.2, 0.6], 50],              // raising the sash (see OPEN)
-  [0.92, [-0.9, 1.45, 0.6], [-2.8, 1.1, 0.6], 50],              // a breath
-  [0.97, [-1.95, 1.12, 0.6], [-3.2, 1.1, 0.6], 52],             // through the opening
-  [1, [-2.35, 1.1, 0.6], [-3.6, 1.1, 0.6], 52],                 // outside, into the white
+  [0, null, SC, 40], [0.04, null, SC, 40], [0.09, null, SC, 44],
+  [0.13, [0, 0.72, -0.75], [0, 0.55, -1.9], 50], [0.165, [0.01, 0.72, -0.73], [0, 0.55, -1.9], 50],     // first shove back, and stop
+  [0.2, [0.08, 0.82, 0.2], [0, 0.55, -1.9], 52], [0.235, [0.09, 0.82, 0.22], [0, 0.55, -1.9], 52],       // second
+  [0.27, [0.18, 0.9, 1.22], [0, 0.55, -1.9], 54], [0.3, [0.19, 0.9, 1.24], [0.02, 0.56, -1.9], 54],      // third: the set and both chairs
+  [0.36, [0.2, 0.9, 1.25], [-1.56, 1.56, 0.58], 54],             // turning to the window: the sun in the eyes
+  [0.41, [0.2, 0.9, 1.25], [-1.95, 1.3, 0.78], 54],              // past it, to the sky and treetops
+  [0.47, [0.2, 0.91, 1.24], [-1.95, 1.33, 0.74], 54],            // pondering
+  [0.52, [0.13, 1.22, 1.2], [-1.9, 0.95, 0.85], 54],             // getting up: the view dips
+  [0.57, [0.08, 1.6, 1.15], [-1.95, 1.4, 0.76], 52],             // up
+  [0.63, [-0.48, 1.58, 1.42], [-1.87, 0.92, 0.9], 50],           // walking over, a glance at the car
+  [0.68, [-0.72, 1.56, 1.05], [-1.95, 1.25, 0.72], 50],          // eyes back to the window
+  [0.73, [-0.7, 1.55, 0.62], [-1.95, 1.38, 0.6], 50],            // square to it
+  [0.8, [-0.72, 1.55, 0.6], [-1.95, 1.35, 0.6], 50],             // looking out
+  [0.87, [-0.95, 1.5, 0.6], [-2.4, 1.2, 0.6], 50],               // a step closer, the sash going up (see OPEN)
+  [0.92, [-0.98, 1.45, 0.6], [-2.8, 1.1, 0.6], 50],              // a breath
+  [0.97, [-1.95, 1.12, 0.6], [-3.2, 1.1, 0.6], 52],              // through the opening
+  [1, [-2.35, 1.1, 0.6], [-3.6, 1.1, 0.6], 52],                  // outside, into the white
 ];
 const KEYS = BEATS.map((b) => b[0]), FOV = BEATS.map((b) => b[3]), LOOK = BEATS.map((b) => b[2]);
-const OPEN = [[0.8, 0], [0.88, 1]];
+// The sash starts a little up and goes the rest of the way as the camera steps closer
+const OPEN = [[0.8, 0.3], [0.87, 1]];
+// Getting up tilts the view (counterclockwise, in radians), and the walk bobs with each step
+const ROLL = [[0.47, 0], [0.515, 0.07], [0.55, -0.015], [0.575, 0]];
+const WALK = [0.57, 0.73], STEPS = 7;
 // The lighting, screen, and grade below were timed on an earlier, shorter walk; this maps progress
 // onto that timeline (the room appearing, the window coming into view, the white-out)
-const LEGACY = [[0, 0], [0.14, 0.28], [0.24, 0.4], [0.34, 0.6], [0.62, 0.82], [0.93, 0.94], [1, 1]];
+const LEGACY = [[0, 0], [0.09, 0.28], [0.16, 0.4], [0.27, 0.6], [0.62, 0.82], [0.93, 0.94], [1, 1]];
 function linear(p, pts) {
   if (p <= pts[0][0]) return pts[0][1];
   for (let i = 1; i < pts.length; i++) if (p <= pts[i][0]) { const [a, x] = pts[i - 1], [b, y] = pts[i]; return x + ((y - x) * (p - a)) / (b - a); }
@@ -560,8 +570,14 @@ export function createScene({ onLost, onSound = () => {} }) {
       P.x += Math.sin(time * 1.3) * 0.003 * sway; P.y += Math.sin(time * 0.9 + 1) * 0.002 * sway;
       L.x += Math.sin(time * 0.7) * 0.0026 * P.distanceTo(L) * sway;
     }
+    // The walk's bob: down at each footfall, with a little sway side to side, in step with the scroll
+    if (pr > WALK[0] && pr < WALK[1]) {
+      const w = (pr - WALK[0]) / (WALK[1] - WALK[0]), fade = Math.sin(w * Math.PI), ph = w * STEPS * Math.PI * 2;
+      P.y -= (0.5 - 0.5 * Math.cos(ph)) * 0.028 * fade; P.z += Math.sin(ph / 2) * 0.012 * fade;
+    }
     if (pr < 0.9) P.set(T.MathUtils.clamp(P.x, -1.85, 1.85), T.MathUtils.clamp(P.y, 0.2, 2.4), T.MathUtils.clamp(P.z, -2.35, 2.35));
     camera.position.copy(P); camera.lookAt(L);
+    camera.rotateZ(ramp(pr, ROLL));
     camera.fov = fov; camera.aspect = aspect; camera.updateProjectionMatrix();
     // How squarely and closely the camera faces the set, for the sound of its hum
     camera.getWorldDirection(D);
