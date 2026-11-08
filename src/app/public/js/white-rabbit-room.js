@@ -698,9 +698,10 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
     rb(0.64, 0.1, 0.72, 2, 0.03, { p: [0, 0.4, 0.0] }),
     rb(0.64, 0.14, 0.16, 2, 0.04, { p: [0, 0.44, -0.27] }),
     sag(rb(0.6, 0.12, 0.6, 3, 0.05, { p: [0, 0.45, 0.07] })),
-    rb(0.13, 0.2, 0.66, 3, 0.05, { p: [-0.36, 0.48, -0.01] }), rb(0.13, 0.2, 0.66, 3, 0.05, { p: [0.36, 0.48, -0.01] }),
-    place(new T.CylinderGeometry(0.082, 0.082, 0.64, 14), { p: [-0.365, 0.6, -0.01], r: [Math.PI / 2, 0, 0] }),
-    place(new T.CylinderGeometry(0.082, 0.082, 0.64, 14), { p: [0.365, 0.6, -0.01], r: [Math.PI / 2, 0, 0] }));
+    // The arms' upholstery stays inside the wooden side boards (outer face x 0.4125)
+    rb(0.11, 0.2, 0.66, 3, 0.05, { p: [-0.345, 0.48, -0.01] }), rb(0.11, 0.2, 0.66, 3, 0.05, { p: [0.345, 0.48, -0.01] }),
+    place(new T.CylinderGeometry(0.072, 0.072, 0.64, 14), { p: [-0.355, 0.61, -0.01], r: [Math.PI / 2, 0, 0] }),
+    place(new T.CylinderGeometry(0.072, 0.072, 0.64, 14), { p: [0.355, 0.61, -0.01], r: [Math.PI / 2, 0, 0] }));
   // Wood below each arm, as on the real chair: the panther's head at the front of the armrest,
   // its neck curving down and out into the front post and on into a bulbous turned leg, and a
   // squared back leg that kicks back a little. The post's straight stretch, between the head and the
