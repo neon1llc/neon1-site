@@ -19,7 +19,7 @@ const BRASS = "#A8834E", LEATHER = "#62291D";
 const ROOM = { x: 1.95, z: 2.45, h: 2.6 };
 const RAIL = 0.66, BASE = 0.13; // low enough that the window and its sill sit clear above the rail
 const CHAIRS = [[-1.12, -1.46, 0.48], [1.29, -1.54, -0.57]]; // set down by hand, not mirrored
-const CHAIR_LEGS = [[-0.39, 0.38], [0.39, 0.38], [-0.405, -0.385], [0.405, -0.385]]; // front pair under the carved posts
+const CHAIR_LEGS = [[-0.365, 0.38], [0.365, 0.38], [-0.39, -0.385], [0.39, -0.385]]; // front pair under the carved posts
 
 // A small seeded random, so the textures look the same on every visit
 function seeded(n) { return () => ((n = (n * 16807) % 2147483647) - 1) / 2147483646; }
@@ -504,37 +504,50 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
   // The sill: a squat Doric capital half sunk in the wall, its slab running back to the sash
   trim.push(place(capital(DORIC, { x: -1.95, za: z0 - NECK, zb: z1 + NECK, y: y0, back: 0.1 })));
 
-  // A double-hung window, raised about 40%. The upper sash sits in the outer track; the lower sash sits
-  // in the inner track, a sash's depth nearer the room, and is the one that slides. Its top rail is the
-  // meeting rail, with the lock on it; raised, it rides up in front of the upper sash's glass, and the
-  // upper sash's bottom rail, with the lock's keeper, shows through the lower glass where the meeting rail
-  // sat closed. Its bottom rail is deeper, with a lift lip and brass lifts, and below it the opening is
-  // clear to the trees. A parting bead runs between the tracks, and stops hold the lower sash in from the room side
-  const mid = y0 + win.h / 2, sw2 = 0.045, deep = 0.034, sashes = [], panes = [];
-  const LIFT = 0.26;                                            // how far the lower sash is raised (0.4 of its height)
-  const outerX = -2.03, innerX = -1.99;
-  const sash = (x, bottom, top, topRail, bottomRail) => {
-    const h = top - bottom, cy = (bottom + top) / 2;
-    sashes.push(box(deep, topRail, win.w - 0.02, [x, top - topRail / 2, win.z]), box(deep, bottomRail, win.w - 0.02, [x, bottom + bottomRail / 2, win.z]),
+  // A double-hung window. The upper sash sits in the outer track and stays put; the lower sash sits in
+  // the inner track, a sash's depth nearer the room, and slides up (openWindow, 0 closed to 1 fully
+  // open). Closed, the top of the lower sash's top rail (the meeting rail) is flush with the top of the
+  // upper sash's bottom rail, and the lock on the one sits beside its keeper on the other, both on top
+  // of their rails; raised, the lock rides up with the sash and the keeper stays behind on the upper
+  // sash. The lower sash's bottom rail is deeper, with a lift lip and brass lifts. A parting bead runs
+  // between the tracks, and stops hold the lower sash in from the room side
+  const mid = y0 + win.h / 2, sw2 = 0.045, deep = 0.034, sashes = [], panes = [], moving = { frame: [], pane: [], brass: [] };
+  const outerX = -2.03, innerX = -1.99, meet = mid + 0.018;
+  const sash = (x, bottom, top, topRail, bottomRail, into) => {
+    const h = top - bottom, cy = (bottom + top) / 2, frame = into ? into.frame : sashes, glass = into ? into.pane : panes;
+    frame.push(box(deep, topRail, win.w - 0.02, [x, top - topRail / 2, win.z]), box(deep, bottomRail, win.w - 0.02, [x, bottom + bottomRail / 2, win.z]),
       box(deep, h, sw2, [x, cy, z0 + 0.01 + sw2 / 2]), box(deep, h, sw2, [x, cy, z1 - 0.01 - sw2 / 2]));
     const ph = h - topRail - bottomRail;
-    panes.push(place(new T.PlaneGeometry(win.w - 0.02 - 2 * sw2, ph), { p: [x, bottom + bottomRail + ph / 2, win.z], r: [0, Math.PI / 2, 0] }));
+    glass.push(place(new T.PlaneGeometry(win.w - 0.02 - 2 * sw2, ph), { p: [x, bottom + bottomRail + ph / 2, win.z], r: [0, Math.PI / 2, 0] }));
   };
-  sash(outerX, mid - 0.012, y1, sw2, 0.03);                     // upper sash: its bottom rail tucks behind the meeting rail
-  sash(innerX, y0 + 0.028 + LIFT, mid + 0.026 + LIFT, 0.05, 0.075); // lower sash: meeting rail on top, deep bottom rail, raised
+  sash(outerX, meet - 0.03, y1, sw2, 0.03);                        // upper sash, fixed
+  sash(innerX, y0 + 0.028, meet, 0.05, 0.075, moving);             // lower sash, built closed
   // Parting beads between the tracks and stops on the room side, up both jambs and across the head
   for (const z of [z0 + 0.006, z1 - 0.006]) {
     sashes.push(box(0.008, win.h, 0.012, [-2.01, win.y, z]), box(0.014, win.h, 0.014, [-1.966, win.y, z + (z < win.z ? 0.001 : -0.001)]));
   }
   sashes.push(box(0.008, 0.012, win.w, [-2.01, y1 - 0.006, win.z]), box(0.014, 0.014, win.w, [-1.966, y1 - 0.007, win.z]));
-  // A lift lip along the bottom rail's face, so the lower sash can be raised
-  sashes.push(box(0.012, 0.01, win.w * 0.5, [innerX + deep / 2 + 0.006, y0 + 0.028 + LIFT + 0.05, win.z]));
+  // A lift lip along the lower sash's bottom rail, on its room face
+  moving.frame.push(box(0.012, 0.01, win.w * 0.5, [innerX + deep / 2 + 0.006, y0 + 0.028 + 0.05, win.z]));
   add(merged([...trim, ...sashes], shiny(0.35, { color: WINDOW_TRIM, roughness: 0.5 })));
-  add(merged(panes, standard({ color: "#DCEBF2", roughness: 0.05, transparent: true, opacity: 0.08, depthWrite: false })));
-  // Brass: the sash lock on the meeting rail, and two lifts on the bottom rail
-  add(merged([box(0.016, 0.01, 0.06, [innerX + deep / 2 - 0.004, mid + 0.031 + LIFT, win.z]), box(0.006, 0.012, 0.022, [outerX + deep / 2 + 0.003, mid + 0.003, win.z + 0.03]),
-    box(0.014, 0.02, 0.012, [innerX + deep / 2 + 0.007, y0 + 0.07 + LIFT, win.z - 0.3]), box(0.014, 0.02, 0.012, [innerX + deep / 2 + 0.007, y0 + 0.07 + LIFT, win.z + 0.3])],
-    shiny(1, { color: BRASS, metalness: 0.7, roughness: 0.3 })));
+  const clear = () => standard({ color: "#F4F8FA", roughness: 0.02, transparent: true, opacity: 0.035, depthWrite: false });
+  add(merged(panes, clear()));
+  // Brass: the keeper on top of the upper sash's bottom rail (fixed); the lock on top of the meeting rail
+  // and two lifts on the bottom rail's face move with the lower sash
+  add(merged([box(0.016, 0.01, 0.026, [outerX + 0.004, meet + 0.005, win.z + 0.032])], shiny(1, { color: BRASS, metalness: 0.7, roughness: 0.3 })));
+  moving.brass.push(box(0.024, 0.01, 0.05, [innerX, meet + 0.005, win.z - 0.006]), box(0.008, 0.006, 0.02, [innerX - 0.012, meet + 0.012, win.z + 0.022]),
+    box(0.014, 0.02, 0.012, [innerX + deep / 2 + 0.007, y0 + 0.07, win.z - 0.3]), box(0.014, 0.02, 0.012, [innerX + deep / 2 + 0.007, y0 + 0.07, win.z + 0.3]));
+  // The lower sash as one group that slides; it isn't baked, and casts and takes the live shadows
+  const lower = new T.Group();
+  for (const [parts, mat] of [[moving.frame, shiny(0.35, { color: WINDOW_TRIM, roughness: 0.5 })], [moving.pane, clear()], [moving.brass, shiny(1, { color: BRASS, metalness: 0.7, roughness: 0.3 })]]) {
+    const m = merged(parts, mat);
+    m.castShadow = m.receiveShadow = !mat.transparent;
+    m.userData.room = true;
+    lower.add(m);
+  }
+  scene.add(lower);
+  const RISE = meet - (y0 + 0.028) - 0.07;                           // fully open, the bottom rail sits just under the meeting rail of the upper sash
+  const openWindow = (f) => { const y = Math.min(1, Math.max(0, f)) * RISE; const moved = y !== lower.position.y; lower.position.y = y; return moved; };
 
   // ---- The carved sign above the window, hung a hair off level ----
   const sw3 = 0.78, sh3 = 0.2, plaque = new T.Shape();
@@ -675,13 +688,13 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
     rb(0.15, 0.48, 0.36, 3, 0.06, { p: [-0.37, 0.9, -0.17], r: [0, 0.22, 0], uv: [0.5, 0.7] }),
     rb(0.15, 0.48, 0.36, 3, 0.06, { p: [0.37, 0.9, -0.17], r: [0, -0.22, 0], uv: [0.5, 0.7] }));
   chair.plain.push(
-    rb(0.84, 0.22, 0.78, 2, 0.04, { p: [0, 0.28, 0] }),
+    rb(0.8, 0.22, 0.78, 2, 0.04, { p: [0, 0.28, 0] }),
     rb(0.64, 0.1, 0.72, 2, 0.03, { p: [0, 0.4, 0.0] }),
     rb(0.64, 0.14, 0.16, 2, 0.04, { p: [0, 0.44, -0.27] }),
     sag(rb(0.6, 0.12, 0.6, 3, 0.05, { p: [0, 0.45, 0.07] })),
     rb(0.13, 0.2, 0.66, 3, 0.05, { p: [-0.36, 0.48, -0.01] }), rb(0.13, 0.2, 0.66, 3, 0.05, { p: [0.36, 0.48, -0.01] }),
-    place(new T.CylinderGeometry(0.075, 0.075, 0.64, 14), { p: [-0.37, 0.6, -0.01], r: [Math.PI / 2, 0, 0] }),
-    place(new T.CylinderGeometry(0.075, 0.075, 0.64, 14), { p: [0.37, 0.6, -0.01], r: [Math.PI / 2, 0, 0] }));
+    place(new T.CylinderGeometry(0.082, 0.082, 0.64, 14), { p: [-0.365, 0.6, -0.01], r: [Math.PI / 2, 0, 0] }),
+    place(new T.CylinderGeometry(0.082, 0.082, 0.64, 14), { p: [0.365, 0.6, -0.01], r: [Math.PI / 2, 0, 0] }));
   // Wood below each arm, as on the real chair: the panther's head at the front of the armrest,
   // its neck curving down and out into the front post and on into a bulbous turned leg, and a
   // squared back leg that kicks back a little. The post's straight stretch, between the head and the
@@ -690,15 +703,18 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
   const leg = [[0.022, 0], [0.026, 0.014], [0.02, 0.034], [0.037, 0.074], [0.031, 0.11], [0.037, 0.14], [0.034, 0.17], [0, 0.17]];
   for (const k of [-1, 1]) {
     const [fx, fz] = CHAIR_LEGS[k < 0 ? 0 : 1], [bx, bz] = CHAIR_LEGS[k < 0 ? 2 : 3];
-    chair.wood.push(place(turned(leg, 14), { p: [fx, 0, fz] }),
+    // The front piece starts at the seat cushion's edge (x 0.3175) and is a little wider than before; the
+    // head, the post, and the leg below share one center line, x 0.365, and the side board is flush with
+    // the post's outer face (x 0.4125), as is the back leg
+    chair.wood.push(place(turned(leg, 16), { p: [fx, 0, fz], s: [1.18, 1, 1.18] }),
       swept([[bx, 0.17, bz + 0.035], [bx, 0.09, bz + 0.012], [bx, 0, bz]], [0.044, 0.044], [0.032, 0.032], 8, 16),
-      swept([[k * 0.372, 0.58, 0.38], [k * 0.384, 0.53, 0.405], [k * 0.39, 0.42, 0.412], [k * 0.39, 0.28, 0.4], [fx, 0.165, fz]], [0.074, 0.07], [0.068, 0.062]),
-      rb(0.082, 0.03, 0.078, 1, 0.006, { p: [fx, 0.185, fz] }),
-      rb(0.026, 0.365, 0.79, 1, 0.006, { p: [k * 0.414, 0.3525, 0.005] }),
-      place(turned([[0, 0], [0.081, 0], [0.084, 0.02], [0.08, 0.05], [0.066, 0.075], [0, 0.078]], 20), { p: [k * 0.37, 0.6, 0.3], r: [Math.PI / 2, 0, 0] }),
-      place(panther(touch ? 36 : 56), { p: [k * 0.37, 0.6, 0.4] }));
+      swept([[k * 0.362, 0.58, 0.38], [k * 0.364, 0.53, 0.405], [k * 0.365, 0.42, 0.412], [k * 0.365, 0.28, 0.4], [fx, 0.165, fz]], [0.095, 0.075], [0.088, 0.066]),
+      rb(0.1, 0.03, 0.085, 1, 0.006, { p: [fx, 0.185, fz] }),
+      rb(0.026, 0.365, 0.79, 1, 0.006, { p: [k * 0.3995, 0.3525, 0.005] }),
+      place(turned([[0, 0], [0.081, 0], [0.084, 0.02], [0.08, 0.05], [0.066, 0.075], [0, 0.078]], 20), { p: [k * 0.365, 0.6, 0.3], r: [Math.PI / 2, 0, 0], s: [1.12, 1, 1.12] }),
+      place(panther(touch ? 36 : 56), { p: [k * 0.365, 0.6, 0.4], s: [1.12, 1.12, 1.12] }));
     const { face, sides } = raised(0.58, 0.24, 0.022, 0.01);
-    for (const g of [face, sides]) chair.wood.push(place(g, { p: [k * 0.427, 0.35, -0.02], r: [0, k * Math.PI / 2, 0] }));
+    for (const g of [face, sides]) chair.wood.push(place(g, { p: [k * 0.4125, 0.35, -0.02], r: [0, k * Math.PI / 2, 0] }));
   }
   // Each chair takes its own leather: the left one redder, the right darker and duller toward the top,
   // both mottled where years of hands and sun have worked at them
@@ -719,7 +735,9 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
   add(merged(both(chair.tufted, true), shiny(0.3, { ...leather, map: tuft.color, normalMap: tuft.normal, normalScale: new T.Vector2(0.9, 0.9) })));
   add(merged(both(chair.plain, true), shiny(0.3, { ...leather, map: photo("leather-detail", [2.5, 2.5], true), normalMap: photo("leather-normal", [2.5, 2.5]), normalScale: new T.Vector2(0.8, 0.8) })));
   chair.wood.forEach((g) => { if (!g.attributes.color) g.setAttribute("color", new T.Float32BufferAttribute(new Float32Array(g.attributes.position.count * 3).fill(1), 3)); });
-  add(merged(both(chair.wood), shiny(0.7, { color: "#7A563C", map: photo("walnut-color", [2, 2], true), normalMap: photo("walnut-normal", [2, 2]), roughness: 0.38, vertexColors: true })));
+  // The wood as on the film's chairs: old walnut gone dark and greyed, with a satin, almost pewter sheen
+  // where hands have polished it
+  add(merged(both(chair.wood), shiny(0.9, { color: "#5C4A3E", map: photo("walnut-color", [2, 2], true), normalMap: photo("walnut-normal", [2, 2]), roughness: 0.42, metalness: 0.12, vertexColors: true })));
   Object.values(chair).flat().forEach((g) => g.dispose());
 
   // ---- The pile ----
@@ -787,5 +805,5 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
     mesh.userData.room = true;
     scene.add(mesh);
   }
-  return { glossy, ready: Promise.all(loads), pile };
+  return { glossy, ready: Promise.all(loads), pile, openWindow };
 }

@@ -96,6 +96,8 @@ export function whiteRabbit({ rain, root }) {
     if (audio || !AC || !wanted()) return;
     const ctx = (audio = new AC());
     ctx.resume();
+    // Phones unlock output only for sound started inside the gesture: a silent sample does it at once
+    try { const b = ctx.createBufferSource(); b.buffer = ctx.createBuffer(1, 1, 22050); b.connect(ctx.destination); b.start(0); } catch { /* nothing to unlock */ }
     // The device interrupted while the page is still showing (a call, another app's audio): try again
     ctx.onstatechange = () => { if (ctx === audio && ctx.state !== "running") setTimeout(wake, 300); };
     import(SOUND).then((m) => {
@@ -119,21 +121,28 @@ export function whiteRabbit({ rain, root }) {
   // (inside that gesture, which phones require), picking the car's idle back up if it was running
   const coarse = matchMedia("(pointer: coarse)");
   let stale = false;
+  const away = () => { if (audio) stale = true; };
   document.addEventListener("visibilitychange", () => {
     if (!audio) return;
     if (document.hidden) { stale = true; audio.suspend().catch(() => {}); } else wake();
   });
+  addEventListener("blur", away);
+  addEventListener("pagehide", away);
   function wake(e) {
     if (!audio || document.hidden) return;
-    if (stale && e && e.isTrusted && /^(pointerup|touchend|keydown)$/.test(e.type) && (coarse.matches || audio.state !== "running")) {
+    const gesture = e && e.isTrusted && /^(pointerup|touchend|click|keydown)$/.test(e.type);
+    if (gesture && ((stale && coarse.matches) || audio.state !== "running")) {
       stale = false;
-      const idling = !!(scene && scene.carRunning);
-      closeAudio(); openAudio(idling);
+      const idling = !!(scene && scene.carRunning), old = audio, oldSound = sound;
+      // The old device goes at once, without its fade, so the new one isn't held behind it
+      audio = sound = null;
+      if (oldSound) oldSound.close(true); else old.close().catch(() => {});
+      openAudio(idling);
       return;
     }
     if (audio.state !== "running" && audio.state !== "closed") audio.resume().catch(() => {});
   }
-  for (const type of ["pointerup", "touchend", "keydown"]) addEventListener(type, wake, { capture: true, passive: true });
+  for (const type of ["pointerup", "touchend", "click", "keydown"]) addEventListener(type, wake, { capture: true, passive: true });
   addEventListener("pageshow", wake);
   addEventListener("focus", wake);
 
