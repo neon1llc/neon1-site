@@ -4,7 +4,7 @@
 
 // Core: renderer, scene graph, geometry, materials, lights, math, picking, a generated environment map, and
 // instancing for the lakefront outside
-export { WebGLRenderer, WebGLRenderTarget, Scene, PerspectiveCamera, CanvasTexture, Mesh, Group, BoxGeometry,
+export { DefaultLoadingManager, WebGLRenderer, WebGLRenderTarget, Scene, PerspectiveCamera, CanvasTexture, Mesh, Group, BoxGeometry,
   PlaneGeometry, CylinderGeometry, ShaderMaterial, MeshStandardMaterial, MeshLambertMaterial, MeshBasicMaterial,
   DirectionalLight, HemisphereLight, PointLight, CatmullRomCurve3, Vector3, Vector2, Color,
   MathUtils, SRGBColorSpace, LinearFilter, AdditiveBlending, HalfFloatType, Vector4, Points, BufferGeometry,
