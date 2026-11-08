@@ -641,7 +641,11 @@ export function createWorld({ scene, touch }) {
     loader.load("/media/white-rabbit/flora-atlas.webp", (t) => { t.colorSpace = T.SRGBColorSpace; flora.value = t; textures.push(t); });
     const fm = keep(new T.Mesh(fq, new T.ShaderMaterial({
       uniforms: { ...common, ...timed, uMap: flora }, side: T.DoubleSide,
-      vertexShader: TREE_VERT.replace("attribute float aSeed;", "attribute float aSeed;\n  attribute float aPink;\n  varying float vPink;").replace("vW = w; vSeed = aSeed;", "vW = w; vSeed = aSeed; vPink = aPink;"),
+      // Each plant is mirrored or not, leans its own way, and is a little wider or narrower than the last,
+      // so repeats of the same plant never match: the flowers stay true, the growth doesn't
+      vertexShader: TREE_VERT.replace("attribute float aSeed;", "attribute float aSeed;\n  attribute float aPink;\n  varying float vPink;")
+        .replace("vec3 w = aBase + right * (position.x * aSize.x", "float flip = fract(aSeed * 7.31) > 0.5 ? 1.0 : -1.0, lean = (fract(aSeed * 13.7) - 0.5) * 0.35, stretch = 0.8 + 0.4 * fract(aSeed * 3.9);\n    vec3 w = aBase + right * (position.x * aSize.x * stretch * flip + lean * aSize.y * top")
+        .replace("vW = w; vSeed = aSeed;", "vW = w; vSeed = aSeed; vPink = aPink;"),
       fragmentShader: `${COMMON}\n${hash}\nuniform sampler2D uMap; varying vec2 vUv; varying vec3 vW; varying float vSeed, vPink;
         void main() { vec4 c = texture2D(uMap, vUv); if (c.a < 0.45) discard;
           vec3 k = c.rgb * (0.92 + 0.16 * vSeed) * 1.2;
