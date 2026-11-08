@@ -2,6 +2,14 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.27.1
+
+- The stone bed is back to its earlier backward-C shape, starting 1.5 m right of the deck's front stairs, so the concrete on the right is its earlier size again.
+- The deck is back to its earlier size (9.35 m out from the house, 12.8 m across), keeping the new railing, posts, spindles, and boards. It is a darker, cooler brownish burgundy, with 1 cm gaps so each board reads.
+- At the window, the leans to each side come low and close to the opening, under the raised sash, so they look through the window and down into the yard instead of at the sill.
+- The peach tree stands in the left border just past the deck's front-left corner.
+- The big andromeda in the back-left corner no longer pokes through the stockade.
+
 ## v0.27.0
 
 - Services has a short chooser: pick where it hurts and what's going on, and it points to the right service, a similar case study, and a free call. It's plain radio buttons, so it works without scripts, and nothing is saved.

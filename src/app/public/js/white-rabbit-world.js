@@ -44,7 +44,7 @@ const YARD = { back: -30, right: -10, left: 12.5 };
 // stone (CURVE, plan points [x, z] from the foot of the deck's front stairs out toward the back); soil
 // borders run along the right fence and the back fence (SOIL wide); a circle is cut from the concrete for
 // a pear tree and its mint; the greenhouse stands square in the back-right corner of the concrete
-const CURVE = [[-8.45, 4.0], [-10.7, 3.6], [-12.9, 2.7], [-15.6, 0.9], [-19.0, -0.5], [-22.2, -0.6], [-24.6, 0.4], [-26.2, 1.6]];   // starts at the deck's front, right of its front stairs
+const CURVE = [[-12.9, 2.7], [-15.6, 0.9], [-19.0, -0.5], [-22.2, -0.6], [-24.6, 0.4], [-26.2, 1.6]];   // starts at the deck's front, 1.5 m right of its front stairs
 const SOIL = 1.8;
 // Edges are never ruled straight: every soil, concrete, and mulch boundary wanders by a few centimeters
 const WOB = (s) => 0.07 * Math.sin(s * 1.13 + 0.7) + 0.045 * Math.sin(s * 2.71 + 2.1) + 0.025 * Math.sin(s * 6.3 + 4.0);
@@ -53,7 +53,7 @@ const MINT = [-24.0, -2.55, 0.85];
 const GREEN = { x0: -28.2, x1: -23.0, z0: -8.2, z1: -4.9, eave: 2.05, ridge: 2.75 };   // about 1.4 times the 8 x 12 ft kit
 // The square of soil in front of the greenhouse, a foot from its door, where the squash trellis stands
 const PATCH = { x0: GREEN.x1 + 0.3, x1: GREEN.x1 + 0.3 + (GREEN.x1 - GREEN.x0), z0: GREEN.z0, z1: GREEN.z1 };
-const DECK = { x0: -8.05, x1: -2.05, z0: 1.5, z1: 10.5, y: GROUND + 0.8 };   // 6 m out from the house and 9 m across, its left side by the left border, its right side at z0
+const DECK = { x0: -11.4, x1: -2.05, z0: -2.3, z1: 10.5, y: GROUND + 0.8 };   // out from the house on the left, its left side by the left border, its right side at z0
 const CROSS = { walk1: [-10.6, -12.6], road: [-12.6, -19.6], walk2: [-19.6, -21.6] };
 
 // The atlas cells: u0, v0, u1, v1, and width over height (from blender/world.py), and each kind's height in meters
@@ -125,7 +125,7 @@ const GROUND_FRAG = /* glsl */`
       grass *= mix(0.7, 1.0, smoothstep(0.0, 0.7, max(x - uBed.y, 0.0) + step(x, uBed.x) * 9.0));
       grass = mix(grass, vec3(0.12, 0.25, 0.08), smoothstep(-19.0, -19.9, x) * 0.6);
       float wear = smoothstep(1.7, 0.4, distance(vW.xz, vec2(-11.0, -4.0)) + noise(vW.xz * 3.0) * 0.6);
-      vec2 a = vec2(-8.3, 6.5), b = vec2(-18.0, 6.5), ab = b - a;
+      vec2 a = vec2(-11.6, 4.8), b = vec2(-18.0, 6.5), ab = b - a;
       float t = clamp(dot(vW.xz - a, ab) / dot(ab, ab), 0.0, 1.0);
       float path = smoothstep(0.55, 0.15, distance(vW.xz, a + ab * t) + (noise(vW.xz * 2.0) - 0.5) * 0.5) * 0.55;
       grass = mix(grass, vec3(0.36, 0.3, 0.2) * (0.8 + 0.4 * hash(floor(vW.xz * 25.0))), max(wear * 0.85, path));
@@ -656,7 +656,7 @@ export function createWorld({ scene, touch }) {
   const spout = keep(new T.Mesh(new T.BoxGeometry(0.07, HOUSE.h, 0.07), solid("#E8E6E0")));
   spout.position.set(HOUSE.x1 + 0.05, GROUND + HOUSE.h / 2, HOUSE.z0 + 0.4);
 
-  // The deck, as in the photo from the window: 6 m out from the house and 9 m across, painted a deep brownish
+  // The deck, as in the photo from the window: 9.35 m out from the house and 12.8 m across, painted a deep brownish
   // burgundy, a little worn where feet go. 5/4 x 6 decking boards run left to right with thin gaps, in staggered
   // lengths, over a rim joist on 6x6 posts. The railing has a wide, flat 2x6 cap over turned spindles 14 cm apart
   // and a bottom rail; big square posts stand at every corner and stair, rising above the cap under their own
@@ -664,12 +664,12 @@ export function createWorld({ scene, touch }) {
   // center, to the lawn, and off the right side, 7 spindles from the front corner, to the concrete; the left side
   // runs railed all the way back to the house
   {
-    const paint = solid("#3F2420", 1), worn = new T.Color(), H = DECK.y, OC = 0.14, PS = 0.12, CAP = 0.92;
-    const D = DECK.x1 - DECK.x0, L = DECK.z1 - DECK.z0, BW = 0.14, rows = Math.floor(D / (BW + 0.006));
+    const paint = solid("#34201F", 1), worn = new T.Color(), H = DECK.y, OC = 0.14, PS = 0.12, CAP = 0.92;
+    const D = DECK.x1 - DECK.x0, L = DECK.z1 - DECK.z0, BW = 0.14, rows = Math.floor(D / (BW + 0.01));
     const planks = keep(new T.InstancedMesh(new T.BoxGeometry(BW, 0.025, 1), paint, rows * 6));
     let k = 0;
     for (let i = 0; i < rows; i++) {
-      const x = DECK.x0 + BW / 2 + 0.01 + i * (BW + 0.006);
+      const x = DECK.x0 + BW / 2 + 0.01 + i * (BW + 0.01);   // a 1 cm gap between boards, dark below
       let u = -rnd() * 2.4;                                               // butt joints staggered row to row
       while (u < L) {
         const len = 2.4 + Math.floor(rnd() * 3) * 0.6, a = Math.max(0, u), b = Math.min(L, u + len);
@@ -715,7 +715,7 @@ export function createWorld({ scene, touch }) {
       }
     };
     // Openings: the front stairs (F0 to F1, left of center) and the right stairs (R0 to R1, 7 spindles in from the front corner)
-    const F0 = 6.0, F1 = 7.0, R0 = DECK.x0 + 8 * OC, R1 = R0 + 1.0;
+    const F0 = 4.2, F1 = 5.4, R0 = DECK.x0 + 8 * OC, R1 = R0 + 1.0;
     railing(DECK.x0, H, DECK.z1, DECK.x0, H, F1); railing(DECK.x0, H, F0, DECK.x0, H, DECK.z0);
     railing(DECK.x0, H, DECK.z0, R0, H, DECK.z0, [false, true]); railing(R1, H, DECK.z0, DECK.x1, H, DECK.z0);
     railing(DECK.x0, H, DECK.z1, DECK.x1, H, DECK.z1, [false, true]);
@@ -945,7 +945,7 @@ export function createWorld({ scene, touch }) {
     }
     // The plants, standing in the bed and turning to the camera like the trees
     const FLORA = { bush: [0.0, 0.5, 0.25, 0.8145, 1.3, 0.85], mint: [0.0, 0.5, 0.25, 0.8145, 1.0, 0.78], flowersA: [0.25, 0.5, 0.5, 0.9219, 0.75, 0.55], flowersB: [0.5, 0.5, 0.75, 0.8906, 0.85, 0.6],
-      rose: [0.7964, 0.5, 0.9531, 1.0, 1.0, 1.45], andromeda: [0.2788, 0.0, 0.4707, 0.5, 3.0, 2.6], andromedaXL: [0.2788, 0.0, 0.4707, 0.5, 4.6, 4.4],
+      rose: [0.7964, 0.5, 0.9531, 1.0, 1.0, 1.45], andromeda: [0.2788, 0.0, 0.4707, 0.5, 3.0, 2.6], andromedaXL: [0.2788, 0.0, 0.4707, 0.5, 3.3, 4.2],
       mintLow: [0.0, 0.5, 0.25, 0.8145, 1.45, 0.42], branchy: [0.5259, 0.0, 0.7241, 0.5, 2.0, 2.7],
       pinkrose: [0.7964, 0.5, 0.9531, 1.0, 1.3, 2.1], daylily: [0.0, 0.0, 0.25, 0.2627, 1.25, 0.62], crepe: [0.2788, 0.0, 0.4707, 0.5, 4.4, 5.8], pear: [0.5054, 0.0, 0.7437, 0.5, 5.25, 5.5] };
     // As the photos have it: spiky daylily leaves at the house end, then cosmos and marigolds crowding the
@@ -959,10 +959,12 @@ export function createWorld({ scene, touch }) {
     // house (built below), a huge Japanese andromeda, a smaller bush on long thick branches with its leaves
     // up top, and a tall pink rose
     items.push(["andromeda", YARD.back + 0.95, GROUND, (GREEN.z0 + GREEN.z1) / 2, 3]);
-    items.push(["andromedaXL", -25.4, GROUND - 1.2, YARD.left - 1.1, 3], ["branchy", -21.6, GROUND, YARD.left - 0.85, 0], ["pinkrose", -18.4, GROUND, YARD.left - 0.8, 4]);
+    items.push(["andromedaXL", -25.4, GROUND - 1.2, YARD.left - 1.75, 3], ["branchy", -21.6, GROUND, YARD.left - 1.05, 0], ["pinkrose", -18.4, GROUND, YARD.left - 0.8, 4]);
     // and nearer the deck, as in the photos: low rounded shrubs and leafy clumps along the stockade, mulch between
-    items.push(["bush", -9.2, GROUND, YARD.left - 0.7, 0], ["mintLow", -10.4, GROUND, YARD.left - 1.25, 0], ["bush", -11.6, GROUND, YARD.left - 0.75, 0], ["bush", -13.5, GROUND, YARD.left - 0.6, 0],
-      ["mintLow", -14.6, GROUND, YARD.left - 1.3, 0], ["andromeda", -15.9, GROUND - 1.1, YARD.left - 0.8, 3], ["mintLow", -17.2, GROUND, YARD.left - 1.2, 0], ["bush", -19.8, GROUND, YARD.left - 0.7, 0]);
+    // The peach tree, in the left border just past the deck's front-left corner
+    items.push(["pear", -12.4, GROUND, YARD.left - 1.0, 0]);
+    items.push(["mintLow", -13.1, GROUND, YARD.left - 1.25, 0], ["bush", -14.1, GROUND, YARD.left - 0.75, 0], ["bush", -15.3, GROUND, YARD.left - 0.6, 0],
+      ["mintLow", -16.2, GROUND, YARD.left - 1.3, 0], ["andromeda", -17.0, GROUND - 1.1, YARD.left - 0.8, 3], ["mintLow", -19.6, GROUND, YARD.left - 1.2, 0], ["bush", -20.4, GROUND, YARD.left - 0.7, 0]);
     // Mint, a dark crowd of it filling the pear's circle and over the edge: the clumps in the middle stand up,
     // and the ones around the outside are shoved over, low and sprawling
     for (let i = 0; i < 70; i++) {
