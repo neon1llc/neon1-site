@@ -75,11 +75,34 @@ const GROUND_FRAG = /* glsl */`
     float x = vW.x, z = vW.z;
     float e = pondEdge(vW.xz);
     if (e < -0.2) discard;                       // the water shows through here
-    // Grass: two scales of mottling, mown stripes on the lawn, and fine blades
-    float blades = hash(floor(vW.xz * 60.0)) * 0.18;
-    float mott = noise(vW.xz * 0.35) * 0.5 + noise(vW.xz * 2.1) * 0.3;
-    vec3 grass = mix(vec3(0.16, 0.32, 0.08), vec3(0.32, 0.5, 0.14), mott) * (0.9 + blades);
-    if (x > ${STRIP.fence.toFixed(1)}) grass *= 0.94 + 0.08 * step(0.5, fract(z / 1.6));
+    // Grass: never one green. Patches of lusher and drier turf, clover in darker clumps, yellowing where it
+    // is thin, mowing stripes that wander and fade, longer darker grass where the mower can't reach along
+    // the fence, the odd dandelion, bare earth worn under the swing and along the way from the back door to
+    // the garden, and autumn leaves scattered under and downwind of the trees
+    float blades = hash(floor(vW.xz * 60.0)) * 0.16;
+    float mott = noise(vW.xz * 0.21) * 0.45 + noise(vW.xz * 0.9) * 0.3 + noise(vW.xz * 3.7) * 0.25;
+    float dry = smoothstep(0.55, 0.85, noise(vW.xz * 0.12 + 7.0));
+    vec3 grass = mix(vec3(0.15, 0.3, 0.07), vec3(0.3, 0.46, 0.13), mott);
+    grass = mix(grass, vec3(0.45, 0.45, 0.2), dry * 0.55);
+    grass = mix(grass, vec3(0.1, 0.24, 0.07), smoothstep(0.62, 0.75, noise(vW.xz * 1.6 + 3.0)) * 0.6);
+    grass *= 0.9 + blades;
+    if (x > ${STRIP.fence.toFixed(1)}) {
+      float wander = z + sin(x * 0.4) * 0.5 + noise(vec2(x * 0.3, 0.0)) * 0.8;
+      grass *= 0.95 + 0.07 * step(0.5, fract(wander / 1.6)) * (0.4 + 0.6 * noise(vW.xz * 0.15));
+      grass = mix(grass, vec3(0.12, 0.25, 0.08), smoothstep(-19.0, -19.9, x) * 0.6);
+      float wear = smoothstep(1.7, 0.4, distance(vW.xz, vec2(-11.0, -4.0)) + noise(vW.xz * 3.0) * 0.6);
+      vec2 a = vec2(-2.2, 1.0), b = vec2(-18.0, 6.0), ab = b - a;
+      float t = clamp(dot(vW.xz - a, ab) / dot(ab, ab), 0.0, 1.0);
+      float path = smoothstep(0.55, 0.15, distance(vW.xz, a + ab * t) + (noise(vW.xz * 2.0) - 0.5) * 0.5) * 0.55;
+      grass = mix(grass, vec3(0.36, 0.3, 0.2) * (0.8 + 0.4 * hash(floor(vW.xz * 25.0))), max(wear * 0.85, path));
+    }
+    float dande = step(0.9965, hash(floor(vW.xz * 7.0))) * step(0.4, noise(vW.xz * 0.5));
+    grass = mix(grass, vec3(0.92, 0.75, 0.12), dande);
+    float leaves = 0.0;
+    for (int i = 0; i < 48; i++) leaves = max(leaves, smoothstep(uTrees[i].z * 1.1, uTrees[i].z * 0.2, distance(vW.xz, uTrees[i].xy + vec2(2.0, 1.0))));
+    float leaf = step(1.0 - leaves * 0.35, hash(floor(vW.xz * 18.0)));
+    vec3 leafCol = mix(vec3(0.62, 0.28, 0.06), vec3(0.78, 0.55, 0.12), hash(floor(vW.xz * 18.0) + 1.7));
+    grass = mix(grass, leafCol, leaf);
     vec3 col = grass;
     // Sidewalks: pale concrete with joints every 1.5 m
     float walk = ((x < ${STRIP.sidewalk1[0].toFixed(1)} && x > ${STRIP.sidewalk1[1].toFixed(1)}) || (x < ${STRIP.sidewalk2[0].toFixed(1)} && x > ${STRIP.sidewalk2[1].toFixed(1)})) ? 1.0 : 0.0;
@@ -97,8 +120,8 @@ const GROUND_FRAG = /* glsl */`
     // Around the pond: a rim of quarry stone at the water, a strip of grass, then the gravel walkway
     if (e < 0.9) col = vec3(0.52, 0.5, 0.46) * (0.7 + 0.45 * hash(floor(vW.xz * 6.0)));
     else if (e > 2.2 && e < 4.2) col = vec3(0.7, 0.66, 0.58) * (0.85 + 0.25 * hash(floor(vW.xz * 30.0))) * (1.0 - 0.15 * smoothstep(0.3, 0.0, min(e - 2.2, 4.2 - e)));
-    // The flower bed: dark turned soil
-    if (x > uBed.x && x < uBed.y && z > uBed.z && z < uBed.w) col = vec3(0.2, 0.13, 0.08) * (0.8 + 0.4 * noise(vW.xz * 12.0));
+    // The flower bed: patchy, half grown over (its plants and weeds are in the bed's picture)
+    if (x > uBed.x && x < uBed.y && z > uBed.z && z < uBed.w) col = mix(col, vec3(0.24, 0.17, 0.1), 0.35 * noise(vW.xz * 3.0));
     // Soft shade under every tree, offset away from the sun
     float shade = 0.0;
     for (int i = 0; i < 48; i++) {
@@ -179,11 +202,15 @@ const TREE_FRAG = /* glsl */`
 
 // ---- Plain lit things: fence, swing set (instanced or not) ----
 const SOLID_VERT = /* glsl */`
-  varying vec3 vW, vN;
+  varying vec3 vW, vN, vTint;
   void main() {
     mat4 m = modelMatrix;
+    vTint = vec3(1.0);
     #ifdef USE_INSTANCING
       m = modelMatrix * instanceMatrix;
+    #endif
+    #ifdef USE_INSTANCING_COLOR
+      vTint = instanceColor;
     #endif
     vec4 w = m * vec4(position, 1.0);
     vW = w.xyz; vN = normalize(mat3(m) * normal);
@@ -192,46 +219,12 @@ const SOLID_VERT = /* glsl */`
 const SOLID_FRAG = /* glsl */`
   ${COMMON}
   uniform vec3 uColor;
-  varying vec3 vW, vN;
-  void main() { gl_FragColor = vec4(outdoor(uColor, normalize(vN), vW), 1.0); }`;
-
-// ---- Sunflowers: crossed cards with a painted plant, nodding in the wind ----
-const FLOWER_VERT = /* glsl */`
-  uniform float uPhase, uWind;
-  varying vec2 vUv;
-  varying vec3 vW;
+  varying vec3 vW, vN, vTint;
   void main() {
-    vUv = uv;
-    vec4 w = modelMatrix * instanceMatrix * vec4(position, 1.0);
-    float seed = instanceMatrix[3].x * 3.1 + instanceMatrix[3].z * 1.7;
-    w.x += (sin(uPhase * 1.3 + seed) * 0.03 + uWind * 0.06) * uv.y * uv.y;
-    vW = w.xyz;
-    gl_Position = projectionMatrix * viewMatrix * w;
+    // Weathering: paint greys and greens toward the ground, where rain splashes and mower clippings land
+    vec3 c = uColor * vTint * mix(vec3(0.72, 0.76, 0.66), vec3(1.0), smoothstep(-3.0, -2.55, vW.y));
+    gl_FragColor = vec4(outdoor(c, normalize(vN), vW), 1.0);
   }`;
-const FLOWER_FRAG = /* glsl */`
-  ${COMMON}
-  uniform sampler2D uMap;
-  varying vec2 vUv;
-  varying vec3 vW;
-  void main() {
-    vec4 c = texture2D(uMap, vUv);
-    if (c.a < 0.5) discard;
-    gl_FragColor = vec4(outdoor(c.rgb, vec3(0.2, 0.8, 0.3), vW), 1.0);
-  }`;
-
-// A sunflower plant painted once: a stem with leaves and a head of petals around a dark disc
-function sunflower() {
-  const c = document.createElement("canvas"); c.width = 128; c.height = 256;
-  const g = c.getContext("2d");
-  g.strokeStyle = "#3f6a1f"; g.lineWidth = 6; g.beginPath(); g.moveTo(64, 256); g.quadraticCurveTo(58, 150, 66, 60); g.stroke();
-  g.fillStyle = "#4b7a26";
-  for (const [y, s] of [[200, 1], [160, -1], [120, 1]]) { g.beginPath(); g.ellipse(64 + s * 22, y, 22, 9, s * 0.5, 0, Math.PI * 2); g.fill(); }
-  g.fillStyle = "#f2b81c";
-  for (let i = 0; i < 18; i++) { const a = (i / 18) * Math.PI * 2; g.beginPath(); g.ellipse(66 + Math.cos(a) * 22, 46 + Math.sin(a) * 22, 13, 5, a, 0, Math.PI * 2); g.fill(); }
-  g.fillStyle = "#4a2a10"; g.beginPath(); g.arc(66, 46, 17, 0, Math.PI * 2); g.fill();
-  const t = new T.CanvasTexture(c); t.colorSpace = T.SRGBColorSpace;
-  return t;
-}
 
 /** Builds the lakefront into scene; ready resolves when the tree atlas is in */
 export function createWorld({ scene, touch }) {
@@ -312,44 +305,57 @@ export function createWorld({ scene, touch }) {
   })));
   hills.rotation.y = Math.PI / 2; hills.position.set(-2600, GROUND + 70, 0);
 
-  // The fence: white pickets on two rails across the yard's end
+  // The fence: white pickets on two rails between posts every 2.4 m, years old. Pickets differ a little in
+  // height and lean, some sections sag, the paint has weathered unevenly and gone grey and green near the
+  // ground, a few pickets lean hard, and here and there one is missing
   const solid = (color) => new T.ShaderMaterial({ uniforms: { ...common, uColor: { value: new T.Color(color) } }, vertexShader: SOLID_VERT, fragmentShader: SOLID_FRAG });
-  const n = Math.floor(120 / 0.16), pickets = keep(new T.InstancedMesh(new T.BoxGeometry(0.02, 1.1, 0.09), solid("#ECEAE2"), n));
-  const m = new T.Matrix4();
-  for (let i = 0; i < n; i++) pickets.setMatrixAt(i, m.makeTranslation(STRIP.fence, GROUND + 0.55, -60 + i * 0.16));
-  for (const y of [0.3, 0.85]) { const rail = keep(new T.Mesh(new T.BoxGeometry(0.04, 0.08, 120), solid("#E2DFD6"))); rail.position.set(STRIP.fence + 0.03, GROUND + y, 0); }
+  const n = Math.floor(120 / 0.16), pickets = keep(new T.InstancedMesh(new T.BoxGeometry(0.02, 1.1, 0.09), solid("#FFFFFF"), n));
+  const m = new T.Matrix4(), qq = new T.Quaternion(), e = new T.Euler(), at0 = new T.Vector3(), sc0 = new T.Vector3(), tint = new T.Color();
+  const sag = (z) => 0.035 * Math.sin(((z + 60) / 2.4) * Math.PI) ** 2 * (0.4 + 0.6 * Math.abs(Math.sin(z * 0.37)));
+  for (let i = 0; i < n; i++) {
+    const z = -60 + i * 0.16 + (rnd() - 0.5) * 0.015, hard = rnd() < 0.015, gone = rnd() < 0.008;
+    const h = 1 + (rnd() - 0.5) * 0.06;
+    e.set((rnd() - 0.5) * 0.04 + (hard ? (rnd() - 0.5) * 0.5 : 0), 0, (rnd() - 0.5) * 0.05 + (hard ? 0.18 : 0));
+    at0.set(STRIP.fence + (rnd() - 0.5) * 0.01, GROUND + 0.55 * h - sag(z), z); sc0.set(1, gone ? 0.0001 : h, 1);
+    pickets.setMatrixAt(i, m.compose(at0, qq.setFromEuler(e), sc0));
+    const w = 0.82 + rnd() * 0.18;
+    pickets.setColorAt(i, tint.setRGB(0.93 * w, 0.92 * w, 0.88 * w - rnd() * 0.04));
+  }
+  const posts = keep(new T.InstancedMesh(new T.BoxGeometry(0.09, 1.25, 0.09), solid("#D8D4C8"), 50));
+  for (let i = 0; i < 50; i++) {
+    e.set((rnd() - 0.5) * 0.05, 0, (rnd() - 0.5) * 0.06);
+    posts.setMatrixAt(i, m.compose(at0.set(STRIP.fence + 0.06, GROUND + 0.6, -60 + i * 2.4), qq.setFromEuler(e), sc0.set(1, 1, 1)));
+  }
+  for (const y of [0.3, 0.85]) {
+    const rail = keep(new T.Mesh(new T.BoxGeometry(0.04, 0.08, 120, 1, 1, 300), solid("#DAD6CA")));
+    const pos = rail.geometry.attributes.position;
+    for (let i = 0; i < pos.count; i++) pos.setY(i, pos.getY(i) - sag(pos.getZ(i)));
+    rail.geometry.computeVertexNormals();
+    rail.position.set(STRIP.fence + 0.03, GROUND + y, 0);
+  }
 
-  // The swing set: two A-frames of faded red tube, a top bar, and two swings hanging from it
-  const swing = new T.Group(), tube = solid("#A8463A"), seatMat = solid("#2E4E7A"), chainMat = solid("#9A9A9A");
-  for (const z of [-1.3, 1.3]) for (const s of [-1, 1]) {
-    const leg = new T.Mesh(new T.CylinderGeometry(0.04, 0.04, 2.5, 8), tube);
-    leg.position.set(s * 0.3, 1.2, z); leg.rotation.x = 0; leg.rotation.z = s * 0.24; swing.add(leg);
-  }
-  const bar = new T.Mesh(new T.CylinderGeometry(0.045, 0.045, 2.8, 8), tube); bar.rotation.x = Math.PI / 2; bar.position.y = 2.42; swing.add(bar);
-  const seats = [];
-  for (const z of [-0.6, 0.6]) {
-    const pivot = new T.Group(); pivot.position.set(0, 2.4, z);
-    for (const dz of [-0.2, 0.2]) { const chain = new T.Mesh(new T.CylinderGeometry(0.008, 0.008, 1.9, 4), chainMat); chain.position.set(0, -0.95, dz); pivot.add(chain); }
-    const seat = new T.Mesh(new T.BoxGeometry(0.2, 0.03, 0.46), seatMat); seat.position.y = -1.9; pivot.add(seat);
-    swing.add(pivot); seats.push(pivot);
-  }
-  swing.position.set(-11, GROUND, -4); swing.rotation.y = 0.3;
-  keep(swing);
-
-  // Sunflowers in their bed
-  const card = new T.PlaneGeometry(0.7, 1.9); card.translate(0, 0.95, 0);
-  const cross = T.mergeGeometries([card, card.clone().rotateY(Math.PI / 2)]);
-  card.dispose();
-  const flowerTex = sunflower(); textures.push(flowerTex);
-  const count = touch ? 22 : 34, flowers = keep(new T.InstancedMesh(cross, new T.ShaderMaterial({
-    uniforms: { ...common, ...timed, uMap: { value: flowerTex } }, vertexShader: FLOWER_VERT, fragmentShader: FLOWER_FRAG, side: T.DoubleSide,
-  }), count));
-  const q = new T.Quaternion(), sc = new T.Vector3(), at = new T.Vector3(), up = new T.Vector3(0, 1, 0);
-  for (let i = 0; i < count; i++) {
-    at.set(BED[0] + 0.2 + rnd() * (BED[1] - BED[0] - 0.4), GROUND, BED[2] + 0.3 + rnd() * (BED[3] - BED[2] - 0.6));
-    q.setFromAxisAngle(up, rnd() * Math.PI); const k = 0.85 + rnd() * 0.35; sc.set(k, k, k);
-    flowers.setMatrixAt(i, m.compose(at, q, sc));
-  }
+  // The swing set and the sunflower bed: rendered in Blender (planning folder, blender/yard.blend) from
+  // the way the window looks at them, with their own shadows, so each stands as one card facing the house.
+  // The swing set is an old rusted one (Sketchfab, by main1896, CC BY 4.0); the sunflowers (Sketchfab, by
+  // zvanstone, CC BY 4.0) lean, nod, and turn every which way, late in the season, among weeds and grass
+  // clumps (Poly Haven, CC0)
+  const sprite = (url, w, h, at, toward) => {
+    const map = { value: null };
+    loader.load(url, (t) => { t.colorSpace = T.SRGBColorSpace; map.value = t; textures.push(t); });
+    const card = new T.PlaneGeometry(w, h); card.translate(0, h / 2, 0);
+    const mesh = keep(new T.Mesh(card, new T.ShaderMaterial({
+      uniforms: { ...common, uMap: map }, vertexShader: GROUND_VERT, transparent: true, depthWrite: false,
+      fragmentShader: `${COMMON}\nuniform sampler2D uMap; varying vec3 vW; varying vec2 vUv;
+        void main() { vec4 c = texture2D(uMap, vUv); if (c.a < 0.02) discard;
+          float d = distance(vW, cameraPosition);
+          gl_FragColor = vec4(mix(c.rgb * (0.78 + 0.22 * uSun), uHaze, 1.0 - exp(-d / 1100.0)), c.a); }`,
+    })));
+    mesh.position.set(at[0], GROUND, at[2]);
+    mesh.rotation.y = Math.atan2(toward[0], toward[2]);
+    return mesh;
+  };
+  sprite("/media/white-rabbit/yard-swing.webp", 2.9, 3.97, [-11, 0, -4], [9.05, 0, 4.6]);
+  sprite("/media/white-rabbit/yard-bed.webp", 10.74, 4.0, [(BED[0] + BED[1]) / 2, 0, (BED[2] + BED[3]) / 2], [17.05, 0, -6.9]);
 
   // Ducks: a few mallards and one white duck, each paddling a slow loop of its own near the near bank
   const ducks = [], drake = solid("#5A4632"), hen = solid("#7A6046"), green = solid("#1F4F2E"), white = solid("#F2F0E8"), bill = solid("#E0A028");
@@ -371,7 +377,6 @@ export function createWorld({ scene, touch }) {
     }
     common.uSun.value = sunShare;
     timed.uTime.value = time; timed.uPhase.value = phase; timed.uWind.value = wind;
-    seats.forEach((p, i) => { p.rotation.z = Math.sin(phase * 0.9 + i * 1.7) * (0.04 + 0.22 * wind) + wind * 0.06; });
   }
 
   // Frees what the world made
