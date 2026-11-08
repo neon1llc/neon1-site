@@ -683,7 +683,7 @@ export function createWorld({ scene, touch }) {
   {
     const path = new T.CatmullRomCurve3(CURVE.map(([x, z]) => new T.Vector3(x, 0, z)), false, "centripetal");
     const len = path.getLength(), W = 1.43, Hb = 0.55, n = Math.ceil(len / 0.3);
-    const stone = solid("#8A857C", 0.6), dirt = solid("#3B2818", 1);
+    const stone = solid("#FFFFFF", 0.6), dirt = solid("#3B2818", 1), mossMat = solid("#FFFFFF", 1);
     // Four rough stone shapes: a subdivided box with every corner pushed about (shared corners move
     // together, so the faces stay closed), chipped and lumpy; each placement also stretches and turns its own
     const rough = (k) => {
@@ -702,18 +702,32 @@ export function createWorld({ scene, touch }) {
       const k = Math.floor(rnd() * 4), inst = sets[k];
       e.set((rnd() - 0.5) * 0.08, yaw + (rnd() - 0.5) * 0.1, (rnd() - 0.5) * 0.08, "YXZ");
       inst.setMatrixAt(used[k], m.compose(at0.set(x, y, z), qq.setFromEuler(e), sc0.set(sx, sy, sz)));
-      // Grey granite, or a reddish sandstone, each a shade of its own
-      const w = 0.7 + rnd() * 0.45, red = rnd() < 0.45;
-      inst.setColorAt(used[k]++, red ? tint.setRGB(w * (1.05 + rnd() * 0.15), w * (0.68 + rnd() * 0.08), w * (0.55 + rnd() * 0.08)) : tint.setRGB(w, w * (0.97 + rnd() * 0.05), w * (0.92 + rnd() * 0.08)));
+      // Every stone its own colour: dark burgundy, light grey, or dark grey, each shade varied
+      const r = rnd(), w = 0.82 + rnd() * 0.36;
+      const pal = r < 0.36 ? [[0.1, 0.035, 0.04], [0.14, 0.05, 0.055], [0.08, 0.03, 0.035]] : r < 0.7 ? [[0.3, 0.29, 0.275], [0.36, 0.35, 0.33]] : [[0.085, 0.085, 0.085], [0.12, 0.12, 0.125]];
+      tint.setRGB(...pal[Math.floor(rnd() * pal.length)]);
+      inst.setColorAt(used[k]++, tint.multiplyScalar(w));
+    };
+    // Dark green moss grown into the joints: tufts in the gaps between stones and runs along the course line
+    const moss = keep(new T.InstancedMesh(rough(4), mossMat, cap * 2)); let km = 0;
+    const tuft = (x, y, z, yaw, sx, sy, sz) => {
+      if (km >= cap * 2) return;
+      e.set(0, yaw + (rnd() - 0.5) * 0.3, (rnd() - 0.5) * 0.3, "YXZ");
+      moss.setMatrixAt(km, m.compose(at0.set(x, y, z), qq.setFromEuler(e), sc0.set(sx, sy, sz)));
+      const g = 0.7 + rnd() * 0.5; moss.setColorAt(km++, tint.setRGB(0.045 * g, 0.1 * g, 0.032 * g));
     };
     // Both faces: each course walks the curve laying stones of its own lengths, so the joints never line up
     for (const side of [-1, 1]) for (const [y0, h0] of [[0.0, 0.27], [0.25, 0.27]]) {
       let s0 = rnd() * 0.3;
       while (s0 < len - 0.05) {
-        const L = Math.min(0.5 + rnd() * 0.5, len - s0), u = (s0 + L / 2) / len;
+        const L = Math.min(0.7 * (0.8 + rnd() * 0.4), len - s0), u = (s0 + L / 2) / len;
         path.getPointAt(Math.min(u, 1), p); path.getTangentAt(Math.min(u, 1), tng); nrm.set(-tng.z, 0, tng.x);
         const th = 0.15 + rnd() * 0.16, h = h0 + (rnd() - 0.35) * 0.14, inset = W / 2 - th / 2 + (rnd() - 0.5) * 0.04;
-        lay(p.x + nrm.x * side * inset, GROUND + y0 + h / 2, p.z + nrm.z * side * inset, Math.atan2(tng.x, tng.z), th, h, L + 0.04);
+        const yaw = Math.atan2(tng.x, tng.z), face = inset + th / 2 - 0.01;
+        lay(p.x + nrm.x * side * inset, GROUND + y0 + h / 2, p.z + nrm.z * side * inset, yaw, th, h, L + 0.04);
+        // moss in the joint at this stone's end, and along the course line under the upper stones
+        if (rnd() < 0.6) { const ex = tng.x * L / 2, ez = tng.z * L / 2; tuft(p.x + nrm.x * side * face + ex, GROUND + y0 + h * (0.3 + rnd() * 0.4), p.z + nrm.z * side * face + ez, yaw, 0.05, h * (0.4 + rnd() * 0.5), 0.045 + rnd() * 0.03); }
+        if (y0 > 0.1 && rnd() < 0.5) { const o = (rnd() - 0.5) * L * 0.5; tuft(p.x + nrm.x * side * face + tng.x * o, GROUND + y0 + 0.005, p.z + nrm.z * side * face + tng.z * o, yaw, 0.045, 0.035 + rnd() * 0.02, L * (0.25 + rnd() * 0.4)); }
         s0 += L + (rnd() - 0.5) * 0.04;
       }
     }
@@ -724,13 +738,14 @@ export function createWorld({ scene, touch }) {
       for (const [y0, h0] of [[0.0, 0.27], [0.25, 0.27]]) {
         let w0 = -W / 2 + rnd() * 0.15;
         while (w0 < W / 2 - 0.05) {
-          const L = Math.min(0.45 + rnd() * 0.4, W / 2 + 0.05 - w0), c = w0 + L / 2, th = 0.18 + rnd() * 0.08, h = h0 + (rnd() - 0.3) * 0.08;
+          const L = Math.min(0.62 * (0.8 + rnd() * 0.4), W / 2 + 0.05 - w0), c = w0 + L / 2, th = 0.18 + rnd() * 0.08, h = h0 + (rnd() - 0.3) * 0.08;
           lay(p.x + nrm.x * c + tng.x * back * th / 2, GROUND + y0 + h / 2, p.z + nrm.z * c + tng.z * back * th / 2, yaw, th, h, L + 0.03);
           w0 += L;
         }
       }
     }
     for (let k = 0; k < 4; k++) sets[k].count = used[k];
+    moss.count = km;
     // The dirt inside, a little below the stones' tops, clumped and uneven
     for (let i = 0; i < n; i++) {
       const u = (i + 0.5) / n; path.getPointAt(u, p); path.getTangentAt(u, tng);
