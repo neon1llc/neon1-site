@@ -46,7 +46,7 @@ const YARD = { back: -30, right: -10, left: 12.5 };
 // a pear tree and its mint; the greenhouse stands square in the back-right corner of the concrete
 const CURVE = [[-12.9, 2.7], [-15.6, 0.9], [-19.0, -0.5], [-22.2, -0.6], [-24.6, 0.4], [-26.2, 1.6]];   // starts 1.5 m right of the front stairs
 const SOIL = 1.8;
-const MINT = [-23.4, -2.85, 1.0];
+const MINT = [-24.0, -2.55, 0.85];
 const GREEN = { x0: -28.2, x1: -23.0, z0: -8.2, z1: -4.9, eave: 2.05, ridge: 2.75 };   // about 1.4 times the 8 x 12 ft kit
 // The square of soil in front of the greenhouse, a foot from its door, where the squash trellis stands
 const PATCH = { x0: GREEN.x1 + 0.3, x1: GREEN.x1 + 0.3 + (GREEN.x1 - GREEN.x0), z0: GREEN.z0, z1: GREEN.z1 };
