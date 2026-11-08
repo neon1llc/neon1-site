@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.18.1
+
+- A soil border runs down the left fence too: an old worn dog house in the back corner, then a big Japanese andromeda, a smaller bush on long bare branches, and a tall pink rose nearer the house.
+- The concrete is a shade darker.
+
 ## v0.18.0
 
 - The yard runs back further, and its right side is concrete, parted from the lawn by a curving raised bed of mortared stone planted with a bushy plant, flowers, roses, and daylilies.
