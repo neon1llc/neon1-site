@@ -315,7 +315,7 @@ export function createScene({ onLost, onSound = () => {} }) {
 
   // ---- The room, the TV around its screen, the table, and the chairs ----
   const env = environment(renderer);
-  const { glossy, ready: photos } = furnish(scene, { win: WINDOW, sc: SC, sw: SW, sh: SH, env, touch });
+  const { glossy, ready: photos, pile } = furnish(scene, { win: WINDOW, sc: SC, sw: SW, sh: SH, env, touch });
 
   // Baked light: the room's lit meshes take geometry with a second UV map from room.glb and a baked
   // occlusion map on it (made by blender/room.py from this same build); the painted stand-in
@@ -348,7 +348,7 @@ export function createScene({ onLost, onSound = () => {} }) {
       for (let i = 0; i < n; i++) col.setXYZ(i, col.getX(i) * ao[i] / 255, col.getY(i) * ao[i] / 255, col.getZ(i) * ao[i] / 255);
       col.needsUpdate = true;
     }).catch(() => {}))).then(done);
-  }, undefined, () => done()));
+  }, undefined, () => done())).then(pile);
 
   // The model car on the sill, nose turned a little toward the room, kept inside the glass
   const carEnv = outdoors(renderer);
