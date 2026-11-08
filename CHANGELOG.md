@@ -2,6 +2,15 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.18.0
+
+- The yard runs back further, and its right side is concrete, parted from the lawn by a curving raised bed of mortared stone planted with a bushy plant, flowers, roses, and daylilies.
+- Soil borders run along the right and back fences, where the sunflowers, squash, and cherry tomatoes grow, with a pink crepe myrtle in the back corner.
+- An 8 by 12 foot greenhouse stands in the back-right corner of the concrete, its door facing the house, and a tall pear tree rises from a circle of mint cut from the concrete.
+- The porch swing sits along the right fence, facing left and swinging side to side.
+- The fence is in better repair, with taller 4x4 posts under pyramid caps at the corners and along each run.
+- The deck's front stairs are further left, and the street trees stand outside the yard.
+
 ## v0.17.2
 
 - The walk starts hunched at the TV's height and scoots back three times, the view dipping as each push begins and leveling as it carries back, sitting up straighter each time.
