@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.15.1
+
+- Past the road is a neighborhood park around an old quarry pond: a skewed loop of water with a stone rim and a gravel walkway around it, trees beyond, a few ducks paddling about, and the sun reflected in the water.
+
 ## v0.15.0
 
 - The white rabbit becomes a walk: out of the TV, sitting back, turning in the chair to the window, standing, walking over at an angle to see the car, stepping square to the window, raising the sash with the scroll, and going out through it into the white.
