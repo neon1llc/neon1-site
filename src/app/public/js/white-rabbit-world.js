@@ -3,11 +3,13 @@
 //
 // Imported by white-rabbit-scene.js. The room is a second story, so the ground is 3 m below its floor
 // (y -3). Out from the house (toward -x): a fenced back lawn with a swing set and a bed of sunflowers,
-// a row of autumn trees on the verge, a sidewalk, a two-way road, another sidewalk, more trees, a
-// pebble shore, and a wide lake out to a far wooded shore under the sky. Everything is cheap: the
-// ground is one plane whose shader paints each strip, the trees are sprites from one atlas (rendered
-// in Blender by blender/world.py) that turn to face the camera, and the water is one plane with
-// moving ripples, the sky in them, and the sun's glitter. All of it is lit by the same sun, dimmed
+// a row of autumn trees on the verge, a sidewalk, a two-way road, another sidewalk, and a neighborhood
+// park around an old quarry pond: a skewed closed loop of water with a stone rim, a gravel walkway all
+// the way around, trees beyond it, and a few ducks paddling about, with a wooded rise and hazy hills
+// behind. Everything is cheap: the ground is one plane whose shader paints each strip and the pond's
+// rings, the trees are sprites from one atlas (rendered in Blender by blender/world.py) that turn to
+// face the camera, and the water is one plane cut to the pond's outline, with moving ripples, the sky
+// in them, and the sun's reflection and glitter. All of it is lit by the same sun, dimmed
 // as clouds cover it, and fades into the haze with distance. The trees, swings, and flowers move with
 // the wind the sound and the room share.
 
@@ -15,12 +17,23 @@ import * as T from "/js/vendor/three-0.187.0.rabbit.min.js";
 
 
 // The ground's height, the sun's direction as painted in the sky, and the haze far things fade into
-const GROUND = -3, LAKE = -3.25;
+const GROUND = -3, LAKE = -3.3;
 export const SUNDIR = new T.Vector3(-30.2, 11.3, -12.4).normalize();
 const HAZE = new T.Color(0.74, 0.81, 0.9);
 
 // Strips out from the house, as x where each ends (meters; the house wall is at x -2.05)
-const STRIP = { fence: -20, sidewalk1: [-21.6, -23.4], road: [-23.4, -30.6], sidewalk2: [-30.6, -32.4], shore: -36.2, lake: -37.2 };
+const STRIP = { fence: -20, sidewalk1: [-21.6, -23.4], road: [-23.4, -30.6], sidewalk2: [-30.6, -32.4] };
+// The pond: its center, its half-widths across (x) and along (z), and the outline as a radius that
+// wanders with the angle, so it is a skewed loop, not a circle (the same in JS and GLSL)
+const POND = { x: -60, z: 3, ax: 21, az: 33 };
+const SHAPE = (a) => 1 + 0.16 * Math.sin(2 * a + 0.7) + 0.09 * Math.sin(3 * a + 2.1) + 0.05 * Math.sin(5 * a + 0.3);
+const SHAPE_GLSL = /* glsl */`
+  float shape(float a) { return 1.0 + 0.16 * sin(2.0 * a + 0.7) + 0.09 * sin(3.0 * a + 2.1) + 0.05 * sin(5.0 * a + 0.3); }
+  // Meters outside the pond's edge (negative inside), roughly
+  float pondEdge(vec2 xz) {
+    vec2 q = (xz - vec2(${POND.x.toFixed(1)}, ${POND.z.toFixed(1)})) / vec2(${POND.ax.toFixed(1)}, ${POND.az.toFixed(1)});
+    return (length(q) - shape(atan(q.y, q.x))) * ${((POND.ax + POND.az) / 2).toFixed(1)};
+  }`;
 const BED = [-19.7, -18.3, 2.5, 12.5];    // the sunflower bed: x0, x1, z0, z1
 
 // The atlas cells: u0, v0, u1, v1, and width over height (from blender/world.py), and each kind's height in meters
@@ -52,11 +65,14 @@ const GROUND_VERT = /* glsl */`
 const GROUND_FRAG = /* glsl */`
   ${COMMON}
   ${hash}
-  uniform vec3 uTrees[40];
+  ${SHAPE_GLSL}
+  uniform vec3 uTrees[48];
   uniform vec4 uBed;
   varying vec3 vW;
   void main() {
     float x = vW.x, z = vW.z;
+    float e = pondEdge(vW.xz);
+    if (e < -0.2) discard;                       // the water shows through here
     // Grass: two scales of mottling, mown stripes on the lawn, and fine blades
     float blades = hash(floor(vW.xz * 60.0)) * 0.18;
     float mott = noise(vW.xz * 0.35) * 0.5 + noise(vW.xz * 2.1) * 0.3;
@@ -76,13 +92,14 @@ const GROUND_FRAG = /* glsl */`
       col = mix(tar, vec3(0.85, 0.66, 0.12), yellow);
       col = mix(col, vec3(0.86), white);
     }
-    // The shore: sand and pebbles
-    if (x < ${STRIP.shore.toFixed(1)}) col = vec3(0.6, 0.55, 0.45) * (0.8 + 0.35 * hash(floor(vW.xz * 22.0)));
+    // Around the pond: a rim of quarry stone at the water, a strip of grass, then the gravel walkway
+    if (e < 0.9) col = vec3(0.52, 0.5, 0.46) * (0.7 + 0.45 * hash(floor(vW.xz * 6.0)));
+    else if (e > 2.2 && e < 4.2) col = vec3(0.7, 0.66, 0.58) * (0.85 + 0.25 * hash(floor(vW.xz * 30.0))) * (1.0 - 0.15 * smoothstep(0.3, 0.0, min(e - 2.2, 4.2 - e)));
     // The flower bed: dark turned soil
     if (x > uBed.x && x < uBed.y && z > uBed.z && z < uBed.w) col = vec3(0.2, 0.13, 0.08) * (0.8 + 0.4 * noise(vW.xz * 12.0));
     // Soft shade under every tree, offset away from the sun
     float shade = 0.0;
-    for (int i = 0; i < 40; i++) {
+    for (int i = 0; i < 48; i++) {
       vec2 c = uTrees[i].xy - uSunDir.xz / uSunDir.y * uTrees[i].z * 0.45;
       shade = max(shade, smoothstep(uTrees[i].z * 0.42, uTrees[i].z * 0.12, distance(vW.xz, c)));
     }
@@ -93,9 +110,12 @@ const GROUND_FRAG = /* glsl */`
 // ---- Water ----
 const WATER_FRAG = /* glsl */`
   ${COMMON}
+  ${SHAPE_GLSL}
   uniform float uTime, uWind;
   varying vec3 vW;
   void main() {
+    float edge = pondEdge(vW.xz);
+    if (edge > 0.0) discard;
     // Ripples: a few moving wave trains, rougher in the wind
     vec2 p = vW.xz;
     // Far off, the ripples blur together (and would shimmer if drawn), so they fade with distance
@@ -115,7 +135,11 @@ const WATER_FRAG = /* glsl */`
     vec3 deep = vec3(0.05, 0.14, 0.2);
     vec3 col = mix(deep, sky, fres);
     // Glitter: the sun on the ripples
-    col += vec3(1.0, 0.9, 0.7) * pow(max(dot(r, uSunDir), 0.0), 700.0) * 30.0 * uSun;
+    // The sun in the water: a soft broad reflection, and the sharp glitter of it on each ripple
+    float toSun = max(dot(r, uSunDir), 0.0);
+    col += vec3(1.0, 0.92, 0.75) * (pow(toSun, 60.0) * 0.6 + pow(toSun, 900.0) * 30.0) * uSun;
+    // Darker right at the stone rim, where the bank shades the water
+    col *= 0.75 + 0.25 * smoothstep(-0.2, -2.0, edge);
     gl_FragColor = vec4(mix(col, uHaze, 1.0 - exp(-d / 520.0)), 1.0);
   }`;
 
@@ -221,14 +245,20 @@ export function createWorld({ scene, touch }) {
   const trees = [];
   for (let z = -46; z < 46; z += 6 + rnd() * 4) if (Math.abs(z - 0.6) > 9 || rnd() < 0.2) trees.push([-20.9 - rnd() * 0.5, z, rnd(), 1]);
   trees.push([-15.5, -13.5, rnd(), 1], [-5.5, 15, rnd(), 1], [-17, 16.5, rnd(), 1]);
-  for (let z = -60; z < 60 && trees.length < 40; z += 5 + rnd() * 5) if (Math.abs(z - 0.6) > 6 || rnd() < 0.35) trees.push([-34.2 - rnd() * 1.4, z, rnd(), 0.62]);
+  // Around the pond, beyond the walkway, thinner on the near side so the water shows
+  for (let a = 0; a < Math.PI * 2 && trees.length < 48; a += 0.32 + rnd() * 0.25) {
+    const near = Math.cos(a) > 0.55;
+    if (near && rnd() < 0.75) continue;
+    const r = SHAPE(a) + (6 + rnd() * 5) / ((POND.ax + POND.az) / 2);
+    trees.push([POND.x + Math.cos(a) * POND.ax * r, POND.z + Math.sin(a) * POND.az * r, rnd(), near ? 0.7 : 0.95]);
+  }
   const base = [], size = [], cell = [], seed = [], shade = [];
   for (const [x, z, r, scale] of trees) {
     const k = Math.floor(r * 6) % 6, h = TALL[k] * scale * (0.85 + rnd() * 0.3), c = CELLS[k];
     base.push(x, GROUND, z); size.push(h * c[4], h); cell.push(c[0], c[1], c[2], c[3]); seed.push(rnd());
     shade.push(new T.Vector3(x, z, h * c[4]));
   }
-  while (shade.length < 40) shade.push(new T.Vector3(999, 999, 0));
+  while (shade.length < 48) shade.push(new T.Vector3(999, 999, 0));
   const quad = new T.InstancedBufferGeometry();
   quad.setAttribute("position", new T.Float32BufferAttribute([-0.5, 0, 0, 0.5, 0, 0, 0.5, 1, 0, -0.5, 1, 0], 3));
   quad.setIndex([0, 1, 2, 0, 2, 3]);
@@ -245,32 +275,32 @@ export function createWorld({ scene, touch }) {
     t.colorSpace = T.SRGBColorSpace; atlas.value = t; textures.push(t); done();
   }, undefined, () => done()));
 
-  // The ground, from the house out past the shore
-  const ground = keep(new T.Mesh(new T.PlaneGeometry(36, 140), new T.ShaderMaterial({
+  // The ground, from the house out past the pond
+  const ground = keep(new T.Mesh(new T.PlaneGeometry(130, 180), new T.ShaderMaterial({
     uniforms: { ...common, uTrees: { value: shade }, uBed: { value: new T.Vector4(...BED) } }, vertexShader: GROUND_VERT, fragmentShader: GROUND_FRAG,
   })));
-  ground.rotation.x = -Math.PI / 2; ground.position.set(-2.0 - 18, GROUND, 0);
+  ground.rotation.x = -Math.PI / 2; ground.position.set(-2.0 - 65, GROUND, 0);
 
-  // The lake, out to the far shore
-  const water = keep(new T.Mesh(new T.PlaneGeometry(800, 900), new T.ShaderMaterial({ uniforms: { ...common, ...timed }, vertexShader: GROUND_VERT, fragmentShader: WATER_FRAG })));
-  water.rotation.x = -Math.PI / 2; water.position.set(STRIP.lake + 0.4 - 400, LAKE, 0);
+  // The pond's water, cut to its outline in the shader
+  const water = keep(new T.Mesh(new T.PlaneGeometry(POND.ax * 2.8, POND.az * 2.8), new T.ShaderMaterial({ uniforms: { ...common, ...timed }, vertexShader: GROUND_VERT, fragmentShader: WATER_FRAG })));
+  water.rotation.x = -Math.PI / 2; water.position.set(POND.x, LAKE, POND.z);
 
-  // The far shore: the old far tree row, repeated along a low wooded bank, with hazy hills behind
+  // Beyond the park: the old far tree row as a wooded rise, repeated, with hazy hills behind
   const shoreTex = loader.load("/media/white-rabbit/trees-far.webp", (t) => { t.colorSpace = T.SRGBColorSpace; });
   shoreTex.wrapS = T.RepeatWrapping; textures.push(shoreTex);
   const bank = keep(new T.Mesh(new T.PlaneGeometry(900, 40), new T.ShaderMaterial({
     uniforms: { ...common, uMap: { value: shoreTex } }, vertexShader: GROUND_VERT,
     fragmentShader: `${COMMON}\nuniform sampler2D uMap; varying vec3 vW; varying vec2 vUv;
-      void main() { vec4 c = texture2D(uMap, vUv * vec2(6.0, 1.0)); if (c.a < 0.4) discard; gl_FragColor = vec4(outdoor(c.rgb, vec3(0.3, 0.8, 0.2), vW), 1.0); }`,
+      void main() { vec4 c = texture2D(uMap, vUv * vec2(6.0, 1.0)); if (c.a < 0.4) discard; vec3 k = c.rgb * vec3(0.78, 0.66, 0.5); gl_FragColor = vec4(outdoor(k, vec3(0.3, 0.8, 0.2), vW), 1.0); }`,
   })));
-  bank.rotation.y = Math.PI / 2; bank.position.set(-760, LAKE + 14, 0);
+  bank.rotation.y = Math.PI / 2; bank.position.set(-131, GROUND + 9, 0); bank.scale.set(0.3, 0.5, 1);
   const hills = keep(new T.Mesh(new T.PlaneGeometry(2400, 160), new T.ShaderMaterial({
     uniforms: { ...common }, vertexShader: GROUND_VERT,
     fragmentShader: `${COMMON}\n${hash}\nvarying vec3 vW; varying vec2 vUv;
       void main() { float h = 0.25 + 0.18 * noise(vec2(vUv.x * 9.0, 0.0)) + 0.1 * noise(vec2(vUv.x * 31.0, 0.0)); if (vUv.y > h) discard;
         gl_FragColor = vec4(mix(vec3(0.36, 0.42, 0.4), uHaze, 0.72), 1.0); }`,
   })));
-  hills.rotation.y = Math.PI / 2; hills.position.set(-1500, LAKE + 60, 0);
+  hills.rotation.y = Math.PI / 2; hills.position.set(-900, GROUND + 30, 0);
 
   // The fence: white pickets on two rails across the yard's end
   const solid = (color) => new T.ShaderMaterial({ uniforms: { ...common, uColor: { value: new T.Color(color) } }, vertexShader: SOLID_VERT, fragmentShader: SOLID_FRAG });
@@ -311,8 +341,24 @@ export function createWorld({ scene, touch }) {
     flowers.setMatrixAt(i, m.compose(at, q, sc));
   }
 
+  // Ducks: a few mallards and one white duck, each paddling a slow loop of its own on the pond
+  const ducks = [], drake = solid("#5A4632"), hen = solid("#7A6046"), green = solid("#1F4F2E"), white = solid("#F2F0E8"), bill = solid("#E0A028");
+  for (let i = 0; i < 5; i++) {
+    const duck = new T.Group(), kind = i === 2 ? white : i % 2 ? hen : drake;
+    const body = new T.Mesh(new T.SphereGeometry(0.16, 10, 8), kind); body.scale.set(1.9, 0.9, 1.1); duck.add(body);
+    const head = new T.Mesh(new T.SphereGeometry(0.075, 8, 6), i === 2 ? white : i % 2 ? hen : green); head.position.set(0.24, 0.14, 0); duck.add(head);
+    const beak = new T.Mesh(new T.BoxGeometry(0.08, 0.02, 0.04), bill); beak.position.set(0.32, 0.13, 0); duck.add(beak);
+    duck.userData = { r: 2.5 + rnd() * 6, a: rnd() * 6.28, speed: (0.05 + rnd() * 0.05) * (rnd() < 0.5 ? -1 : 1), cx: POND.x + (rnd() - 0.5) * 12, cz: POND.z + (rnd() - 0.5) * 20 };
+    keep(duck); ducks.push(duck);
+  }
+
   // Each frame: the clock and the wind for the moving things, and the sun's share by the clouds
   function update(time, wind, phase, sunShare) {
+    for (const d of ducks) {
+      const u = d.userData, a = u.a + time * u.speed;
+      d.position.set(u.cx + Math.cos(a) * u.r * 0.7, LAKE + 0.02 + Math.sin(time * 1.7 + u.a) * 0.01, u.cz + Math.sin(a) * u.r);
+      d.rotation.y = -Math.atan2(Math.cos(a) * u.r * Math.sign(u.speed), -Math.sin(a) * u.r * 0.7 * Math.sign(u.speed));
+    }
     common.uSun.value = sunShare;
     timed.uTime.value = time; timed.uPhase.value = phase; timed.uWind.value = wind;
     seats.forEach((p, i) => { p.rotation.z = Math.sin(phase * 0.9 + i * 1.7) * (0.04 + 0.22 * wind) + wind * 0.06; });
