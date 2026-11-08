@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.15.2
+
+- The quarry pond is at its true size: about 0.9 by 1.3 km, so the walkway around it runs near 1.85 miles, with the near bank past a strip of park and the wooded far shore a kilometer off.
+
 ## v0.15.1
 
 - Past the road is a neighborhood park around an old quarry pond: a skewed loop of water with a stone rim and a gravel walkway around it, trees beyond, a few ducks paddling about, and the sun reflected in the water.
