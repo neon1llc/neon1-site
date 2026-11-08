@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.20.2
+
+- The pear tree stands centered in its mint circle, with about twice the branches. They jut and turn at angles instead of simply tapering, under a fuller canopy.
+- The steady breeze and creek hiss is gone, so no white noise comes in as the view turns to the window. Only the leaves rustling in gusts and the birds remain outside.
+
 ## v0.20.1
 
 - The stone bed's stones vary in length only within 80 to 120 percent of a common size. Their colors vary across the bed in dark burgundy, light grey, and dark grey, with dark green moss grown into many of the joints.
