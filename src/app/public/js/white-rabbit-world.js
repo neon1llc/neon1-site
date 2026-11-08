@@ -292,7 +292,15 @@ const BREATHE = /* glsl */`
     vec2 q = L * vec2(5.0, 6.5) + seed * 17.0;
     vec2 d = vec2(sin(q.y * 1.7 + t * 1.25 + sin(q.x * 2.3 + t * 0.7)), cos(q.x * 1.9 - t * 1.05 + sin(q.y * 1.3 - t * 0.85)));
     d += 0.55 * vec2(sin(q.x * 4.3 + q.y * 1.1 + t * 2.4), cos(q.y * 3.9 - q.x * 0.7 - t * 2.7));
+    // and the leaves themselves flutter: a fine, quick tremble on top of the slow patches
+    vec2 f = L * vec2(38.0, 44.0) + seed * 29.0;
+    d += 0.35 * vec2(sin(f.x + t * 7.3 + sin(f.y * 0.7)), cos(f.y - t * 8.1 + sin(f.x * 0.6))) * (0.5 + uWind);
     return uv + d * reach * amount * g * span;
+  }
+  // Leaves turning in the wind catch the light: a small, quick flicker of brightness, patch by patch
+  float shimmer(vec2 uv, float seed) {
+    vec2 L = (uv - vCell.xy) / (vCell.zw - vCell.xy), f = L * vec2(30.0, 34.0) + seed * 11.0;
+    return 1.0 + (0.05 + 0.07 * uWind) * sin(f.x * 1.3 + f.y + uPhase * 6.0 + 3.0 * sin(f.y * 0.4 - uPhase * 1.7)) * smoothstep(0.2, 0.6, L.y);
   }`;
 const TREE_FRAG = /* glsl */`
   ${COMMON}
@@ -304,7 +312,7 @@ const TREE_FRAG = /* glsl */`
   void main() {
     vec4 c = texture2D(uMap, breathe(vUv, vSeed, 0.006));
     if (c.a < 0.45) discard;
-    gl_FragColor = vec4(outdoor(c.rgb * (0.92 + 0.16 * vSeed) * 1.25, normalize(vec3(0.3, 0.7, 0.2)), vW), 1.0);
+    gl_FragColor = vec4(outdoor(c.rgb * (0.92 + 0.16 * vSeed) * 1.25 * shimmer(vUv, vSeed), normalize(vec3(0.3, 0.7, 0.2)), vW), 1.0);
   }`;
 
 // ---- Plain lit things: fence, swing set (instanced or not) ----
@@ -813,7 +821,7 @@ export function createWorld({ scene, touch }) {
         .replace("vW = w; vSeed = aSeed;", "vW = w; vSeed = aSeed; vPink = aPink;"),
       fragmentShader: `${COMMON}\n${hash}\n${BREATHE}\nuniform sampler2D uMap; varying vec2 vUv; varying vec3 vW; varying float vSeed, vPink;
         void main() { vec4 c = texture2D(uMap, breathe(vUv, vSeed, 0.005)); if (c.a < 0.45) discard;
-          vec3 k = c.rgb * (0.92 + 0.16 * vSeed) * 1.2;
+          vec3 k = c.rgb * (0.92 + 0.16 * vSeed) * 1.2 * shimmer(vUv, vSeed);
           // The crepe myrtle's crown in pink bloom, flecked through the green; the roses lifted from near black to deep red
           if (vPink > 0.5 && vPink < 1.5) k = mix(k, vec3(0.95, 0.42, 0.66) * (0.7 + 0.5 * hash(floor(vUv * 400.0))), 0.7 * step(0.35, hash(floor(vUv * 260.0))) * smoothstep(0.2, 0.5, (vUv.y - ${(0.0).toFixed(1)}) * 2.0));
           if (vPink > 1.5 && vPink < 2.5) k = k * vec3(2.4, 1.6, 1.6) + vec3(0.06, 0.0, 0.01);
