@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.19.7
+
+- The porch swing's frame is black, with only a little rust in a much darker orange-brown.
+
 ## v0.19.6
 
 - The porch swing is rendered turned around, so the frame and the seat agree and the riders face left, instead of a mirrored image.
