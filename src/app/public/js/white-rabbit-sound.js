@@ -173,7 +173,7 @@ export function createSound(ctx) {
 
   // Follows the scene: the tube's low hum fades as the camera turns from the set, static comes with the
   // snow on the screen, and the outdoors comes in with the room and opens up toward the window
-  function update(p, tv, wind = 0) {
+  function update(p, tv, wind = 0, open = 0) {
     if (mode !== "scene") return;
     // Silent at the landing; the sound fades in as the scroll out of the TV begins, and out on the way back
     heard = p >= 0.002;
@@ -183,7 +183,8 @@ export function createSound(ctx) {
     glide(fizz.gain, 0.06 * ramp(p, [[0.36, 0], [0.4, 1], [0.46, 0]]));
     glide(muffle.frequency, ramp(p, [[0, 7000], [0.28, 4000], [0.45, 1400], [0.7, 900]]));
     glide(air.gain, ramp(p, [[0.3, 0.01], [0.5, 0.04], [0.9, 0.05]]));
-    outdoors(ramp(p, [[0.38, 0], [0.55, 0.45], [0.85, 1]]), ramp(p, [[0.6, 0], [0.88, 1]]), wind);
+    // The raised sash lets the outdoors straight in: louder and unmuffled
+    outdoors(ramp(p, [[0.38, 0], [0.55, 0.45], [0.85, 1]]) * (1 + 0.7 * open), Math.max(ramp(p, [[0.6, 0], [0.88, 1]]) * 0.75, open), wind);
   }
 
   // ---- The glitch as the rain stops ----
