@@ -33,25 +33,26 @@ const WINDOW = { z: 0.6, y: 1.45, w: 1.2, h: 1.3 };
 // first two positions are filled in from the picture's fit. Pauses are pairs of beats a hair apart
 const BEATS = [
   [0, null, SC, 40], [0.09, null, SC, 44],                                                               // face right at the screen, hunched
-  // then one steady glide back across the floor, still sitting the whole way, until the set and both chairs are in view
-  [0.13, [0.03, 0.9, -1.32], [0, 0.56, -1.9], 48], [0.25, [0.47, 0.9, 0.14], [0.01, 0.56, -1.9], 51],
-  [0.37, [0.91, 0.9, 1.6], [0.02, 0.56, -1.9], 54],
-  [0.42, [0.92, 0.9, 1.6], [-0.86, 1.56, 0.88], 54],             // turning to the window: the sun in the eyes
-  [0.46, [0.92, 0.9, 1.6], [-1.95, 1.3, 0.92], 54],              // past it, to the sky and treetops
-  [0.51, [0.92, 0.91, 1.59], [-1.95, 1.33, 0.86], 54],           // watching the light and the dust
-  [0.55, [0.85, 1.22, 1.55], [-1.9, 0.95, 0.9], 54],             // getting up: the view dips
+  // then straight back out of the set, as it first was: low on the floor at the screen's own height and looking level at
+  // it the whole way (no rising, no tilting down), until the set and both chairs are in view
+  [0.13, [0.03, 0.53, -1.32], [0, 0.53, -1.9], 48], [0.25, [0.47, 0.55, 0.14], [0.01, 0.55, -1.9], 51],
+  [0.37, [0.91, 0.56, 1.6], [0.02, 0.56, -1.9], 54],
+  [0.42, [0.92, 0.56, 1.6], [-0.86, 1.56, 0.88], 54],            // still on the floor, turning to the window: the sun in the eyes
+  [0.46, [0.92, 0.56, 1.6], [-1.95, 1.3, 0.92], 54],             // past it, to the sky and treetops
+  [0.51, [0.92, 0.57, 1.59], [-1.95, 1.33, 0.86], 54],           // watching the light and the dust
+  [0.55, [0.85, 1.05, 1.55], [-1.9, 0.95, 0.9], 54],             // getting up: the view dips
   [0.59, [0.78, 1.6, 1.5], [-1.95, 1.4, 0.8], 52],               // up
   [0.64, [-0.3, 1.58, 1.62], [-1.87, 0.92, 0.9], 50],            // walking over, a glance at the car
   [0.68, [-0.62, 1.56, 1.05], [-1.95, 1.25, 0.72], 50],          // eyes back to the window
-  [0.72, [-0.7, 1.55, 0.62], [-1.95, 1.38, 0.6], 50],            // square to it
-  [0.79, [-0.72, 1.55, 0.6], [-1.95, 1.35, 0.6], 50],            // looking out
-  [0.85, [-0.95, 1.5, 0.6], [-2.4, 1.2, 0.6], 50],               // a step closer, the sash going up (see OPEN)
+  [0.72, [-0.7, 1.55, 0.62], [-1.95, 1.2, 0.6], 62],             // square to it, the whole window in view
+  [0.79, [-0.72, 1.55, 0.6], [-1.95, 1.18, 0.6], 62],            // looking out and down through it to the lawn, the bed, and the back fence, as in the photo
+  [0.85, [-0.95, 1.5, 0.6], [-2.4, 1.0, 0.6], 62],               // a step closer, the sash going up (see OPEN)
   // then, with the sash all the way up: leaning left toward the car, looking right and down through the opening to
   // the concrete, the greenhouse, and the right fence; across to the right, looking left and down at the lawn,
   // the left border, and the stockade; and back to center, square to the window, gliding in until the frame is
   // gone and only the yard is ahead, held there before the white
-  [0.875, [-0.95, 1.32, 0.95], [-5.0, 0.45, -0.37], 54], [0.885, [-0.96, 1.32, 0.95], [-5.0, 0.44, -0.39], 54],   // a step back from the opening, so both sides of the frame stay in view, looking right and a little down, out to the far trees and the water
-  [0.915, [-0.95, 1.32, 0.25], [-5.0, 0.45, 1.57], 54], [0.925, [-0.96, 1.32, 0.25], [-5.0, 0.44, 1.59], 54],   // and the same looking left
+  [0.875, [-0.95, 1.32, 0.95], [-5.0, 0.45, -0.37], 60], [0.885, [-0.96, 1.32, 0.95], [-5.0, 0.44, -0.39], 60],   // a step back from the opening, so both sides of the frame stay in view, looking right and a little down, out to the far trees and the water
+  [0.915, [-0.95, 1.32, 0.25], [-5.0, 0.45, 1.57], 60], [0.925, [-0.96, 1.32, 0.25], [-5.0, 0.44, 1.59], 60],   // and the same looking left
   [0.945, [-1.55, 1.3, 0.6], [-3.1, 1.02, 0.6], 52],
   [0.97, [-2.2, 1.35, 0.62], [-3.6, 0.47, 0.6], 64],             // through the opening, looking down over the deck to the yard, the trees, and the water, as in the photo from this window
   [0.985, [-2.2, 1.35, 0.62], [-3.6, 0.47, 0.6], 64],            // held, before the white
@@ -578,9 +579,10 @@ export function createScene({ onLost, onSound = () => {} }) {
     const wide = T.MathUtils.radToDeg(2 * Math.atan(Math.tan(T.MathUtils.degToRad(19)) / aspect));
     fov += (Math.max(fov, wide) - fov) * ramp(p, [[0.28, 0], [0.45, 1]]);
     // Wide screens: the view across is held to about 72 degrees, past which a flat picture stretches
-    // whatever sits near its sides, like looking through a fishbowl. Out through the opening it opens to about
+    // whatever sits near its sides, like looking through a fishbowl. At the window it opens to about 92 degrees, as
+    // the phone photo of it shows the whole window and more of the yard through it; out through the opening, about
     // 100 degrees, like the wide phone photo from this window, so the deck below and the water beyond both fit
-    const half = 36 + 14 * ramp(pr, [[0.945, 0], [0.97, 1]]);
+    const half = 36 + 10 * ramp(pr, [[0.62, 0], [0.72, 1]]) + 4 * ramp(pr, [[0.945, 0], [0.97, 1]]);
     const across = T.MathUtils.radToDeg(2 * Math.atan(Math.tan(T.MathUtils.degToRad(half)) / aspect));
     fov += (Math.min(fov, across) - fov) * ramp(p, [[0.12, 0], [0.28, 1]]);
     const back = Math.max(0, 0.9 / aspect - 0.9) * ramp(p, [[0.3, 0], [0.5, 1]]) * ramp(pr, [[0.84, 1], [0.94, 0]]);

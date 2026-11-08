@@ -2,6 +2,14 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.30.1
+
+- Out of the TV, the view goes straight back as it first did: low on the floor at the screen's height, looking level at the set the whole way, with no rising and no tilting down. It stays low through the turn to the window, then gets up.
+- The yard is back to the layout fitted to the photos after the question-mark fix: the C bed starts just past the deck's front, right of its stairs, with the lawn, concrete, greenhouse, and pear where they were. The deck keeps its true 3.56 m depth (7 spindles, the stairs, then 7 more), and the yard behind it moves in with it.
+- The deck is 6.6 m wide and centered on the window, as in the photo. From the opening you see its left rail, with mulch and the peach tree beyond it, and its right side and stairs, with the concrete beyond those.
+- Head on at the window, the view is wider, like the phone photo of it. It shows the whole window and looks down through the opening to the lawn, the bed, and the back fence.
+- The leans to each side also see a little wider, with both sides of the frame in view.
+
 ## v0.30.0
 
 - The sample project lives in 1NEON now, at /1NEON/example, in the portal's own frame. The old tour page sends visitors there.

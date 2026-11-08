@@ -40,18 +40,19 @@ const BED = [-29.7, -28.3, -6.5, 11.5];   // the garden along the back fence: x0
 // The yard: the back fence, and the side fences from the house to it (the right side, toward -z, meets
 // a cross street; the left, toward +z, a neighbor's house), and the deck below the window
 const YARD = { back: -30, right: -10, left: 12.5 };
-// The yard is laid out in its own plan, then drawn SHIFT over from it: 14 m toward the house, so the back fence
-// is about 14 m from the house as in the photo from the window (the near part of the plan sits under the house,
-// out of sight), and 3.5 m to the right, so the deck is centered on the window as in that photo. Every shader
+// The yard is laid out in its own plan (the layout fitted to the photos, when the deck reached 11.4 m out), then drawn
+// SHIFT over from it: toward the house by as much as the deck shrank to its true 3.56 m, so the bed, the lawn, and the
+// concrete keep their places against the deck's front; and 2.8 m to the right, so the deck is centered on the window
+// as in the photo from it. Every shader
 // works in plan coordinates (see shaderMat); only where things land on screen moves
-const SHIFT = new T.Vector3(14, 0, -3.5), HOUSE_X = -2.05 - SHIFT.x;   // the house wall, in plan coordinates
+const SHIFT = new T.Vector3(11.4 - 2.05 - (16 * 0.16 + 1.0), 0, -2.8), HOUSE_X = -2.05 - SHIFT.x;   // the house wall, in plan coordinates
 const DECK_FRONT = HOUSE_X - (16 * 0.16 + 1.0);   // the deck's front edge (see DECK)
 // The right side of the yard is concrete, parted from the lawn on the left by a curving raised bed of
 // stone (CURVE, plan points [x, z] from the foot of the deck's front stairs out toward the back); soil
 // borders run along the right fence and the back fence (SOIL wide); a circle is cut from the concrete for
 // a pear tree and its mint; the greenhouse stands square in the back-right corner of the concrete
 const C_SHAPE = [[-12.9, 2.7], [-15.6, 0.9], [-19.0, -0.5], [-22.2, -0.6], [-24.6, 0.4], [-26.2, 1.6]];   // the backward C as first fitted to the photos (it began 1.5 m past a 9.35 m deck)
-const CURVE = C_SHAPE.map(([x, z]) => [DECK_FRONT - 0.6 + (x + 12.9) * (-27.4 - (DECK_FRONT - 0.6)) / (-26.2 + 12.9), z]);   // the same C, fitted between just past the deck's front and the greenhouse; no straight lead, so it never reads as a question mark
+const CURVE = C_SHAPE;   // starting 1.5 m past the deck's front, right of its front stairs; no straight lead, so it never reads as a question mark
 const SOIL = 1.8;
 // Edges are never ruled straight: every soil, concrete, and mulch boundary wanders by a few centimeters
 const WOB = (s) => 0.07 * Math.sin(s * 1.13 + 0.7) + 0.045 * Math.sin(s * 2.71 + 2.1) + 0.025 * Math.sin(s * 6.3 + 4.0);
@@ -59,10 +60,10 @@ const WOB_GLSL = "float wob(float s) { return 0.07 * sin(s * 1.13 + 0.7) + 0.045
 const MINT = [-24.0, -2.55, 0.85];
 const GREEN = { x0: -28.2, x1: -23.0, z0: -8.2, z1: -4.9, eave: 2.05, ridge: 2.75 };   // about 1.4 times the 8 x 12 ft kit
 // The square of soil in front of the greenhouse, a foot from its door, where the squash trellis stands
-const PATCH = { x0: GREEN.x1 + 0.3, x1: GREEN.x1 + 0.3 + 2.6, z0: GREEN.z0, z1: GREEN.z1 };   // half the greenhouse's length, so the swing fits before the deck
+const PATCH = { x0: GREEN.x1 + 0.3, x1: GREEN.x1 + 0.3 + (GREEN.x1 - GREEN.x0), z0: GREEN.z0, z1: GREEN.z1 };
 // Its depth is the right side's own count: 7 spindles from the front corner to the right stairs, the stairs (1 m),
 // and 7 more back to the house, at 16 cm apart
-const DECK = { x0: DECK_FRONT, x1: HOUSE_X, z0: -2.3, z1: 10.5, y: GROUND + 0.8 };   // out from the house on the left, its left side by the left border, its right side at z0
+const DECK = { x0: DECK_FRONT, x1: HOUSE_X, z0: 0.1, z1: 6.7, y: GROUND + 0.8 };   // out from the house on the left, its left side by the left border, its right side at z0
 const CROSS = { walk1: [-10.6, -12.6], road: [-12.6, -19.6], walk2: [-19.6, -21.6] };
 
 // The atlas cells: u0, v0, u1, v1, and width over height (from blender/world.py), and each kind's height in meters
@@ -175,7 +176,7 @@ const GROUND_FRAG = /* glsl */`
     if (yard) {
       float zb = ${CURVE[0][1].toFixed(2)};
       ${CURVE.slice(1).map((p, i) => `if (x < ${CURVE[i][0].toFixed(2)}) zb = mix(${CURVE[i][1].toFixed(2)}, ${p[1].toFixed(2)}, clamp((x - (${CURVE[i][0].toFixed(2)})) / (${(p[0] - CURVE[i][0]).toFixed(2)}), 0.0, 1.0));`).join("\n      ")}
-      bool soil = z < ${(YARD.right + SOIL).toFixed(2)} + wob(x) || x < ${(YARD.back + SOIL).toFixed(2)} + 0.25 * wob(z + 3.0) || (z > ${(YARD.left - SOIL).toFixed(2)} + 0.25 * wob(x + 7.0) && x < ${(DECK.x0 - 0.2).toFixed(2)})
+      bool soil = z < ${(YARD.right + SOIL).toFixed(2)} + wob(x) || x < ${(YARD.back + SOIL).toFixed(2)} + 0.25 * wob(z + 3.0) || (z > ${(YARD.left - SOIL).toFixed(2)} + 0.25 * wob(x + 7.0)) || (z > ${(DECK.z1 + 0.35).toFixed(2)} + 0.25 * wob(x + 5.0) && x > ${(DECK.x0 - 0.6).toFixed(2)} + 0.25 * wob(z + 9.0))
         || (x > ${PATCH.x0.toFixed(2)} + wob(z + 11.0) && x < ${PATCH.x1.toFixed(2)} + wob(z + 13.0) && z > ${PATCH.z0.toFixed(2)} && z < ${PATCH.z1.toFixed(2)} + 0.25 * wob(x + 19.0));
       if (soil) {
         // Dark, rich soil
@@ -602,7 +603,8 @@ export function createWorld({ scene, touch }) {
     sh.lineTo(0, 0);
     const geo = new T.ExtrudeGeometry(sh, { depth: 0.05, bevelEnabled: true, bevelSize: 0.004, bevelThickness: 0.004, bevelSegments: 1, curveSegments: 6 }).translate(-BL / 2, 0, -0.025);
     const edges = [
-      [(d) => [d, YARD.left - SOIL + 0.25 * WOB(d + 7) + 0.04], YARD.back + SOIL + 0.1, DECK.x0 - 0.3],     // the left mulch border, along x
+      [(d) => [d, YARD.left - SOIL + 0.25 * WOB(d + 7) + 0.04], YARD.back + SOIL + 0.1, DECK.x0 - 0.6],     // the left mulch border, along x
+      [(d) => [DECK.x0 - 0.6 + 0.25 * WOB(d + 9) - 0.04, d], DECK.z1 + 0.35, YARD.left - SOIL],                  // where it widens beside the deck, to its left rail
       [(d) => [YARD.back + SOIL + 0.25 * WOB(d + 3) - 0.04, d], CURVE[CURVE.length - 1][1] + 0.75, YARD.left - SOIL],   // the back border, along z
       [(d) => [d, PATCH.z1 + 0.25 * WOB(d + 19) - 0.04], PATCH.x0, PATCH.x1],                              // the trellis square's lawn-side edge
     ];
@@ -671,7 +673,7 @@ export function createWorld({ scene, touch }) {
   const spout = keep(new T.Mesh(new T.BoxGeometry(0.07, HOUSE.h, 0.07), solid("#E8E6E0")));
   spout.position.set(HOUSE.x1 + 0.05, GROUND + HOUSE.h / 2, HOUSE.z0 + 0.4);
 
-  // The deck, as in the photo from the window: 3.56 m out from the house and 12.8 m across, painted a deep brownish
+  // The deck, as in the photo from the window: 3.56 m out from the house and 6.6 m across, centered on the window, painted a deep brownish
   // burgundy, a little worn where feet go. 5/4 x 6 decking boards run left to right with thin gaps, in staggered
   // lengths, over a rim joist on 6x6 posts. The railing has a wide, flat 2x6 cap over turned spindles 16 cm apart
   // and a bottom rail; big square posts stand at every corner and stair, rising above the cap under their own
@@ -794,7 +796,7 @@ export function createWorld({ scene, touch }) {
   // with a little dark rust at the feet; the seat hangs from springs on the bar, facing left (+z), with a thick
   // cushion stitched into three seats and three backs in a cream fabric printed with green and light orange
   // leaves. It swings left and right, about the bar
-  const SWING = [PATCH.x1 + 1.3, GROUND, (GREEN.z0 + GREEN.z1) / 2 + 0.6];
+  const SWING = [-14.5, GROUND, (GREEN.z0 + GREEN.z1) / 2 + 0.6];
   const seat = new T.Group();
   {
     const sw = new T.Group(); sw.position.set(SWING[0], SWING[1], SWING[2]); sw.rotation.y = 0.03; keep(sw);
@@ -977,7 +979,8 @@ export function createWorld({ scene, touch }) {
     items.push(["andromedaXL", -25.4, GROUND - 1.2, YARD.left - 1.75, 3], ["branchy", -21.6, GROUND, YARD.left - 1.05, 0], ["pinkrose", -18.4, GROUND, YARD.left - 0.8, 4]);
     // and nearer the deck, as in the photos: low rounded shrubs and leafy clumps along the stockade, mulch between
     // The peach tree, in the left border just past the deck's front-left corner
-    items.push(["pear", DECK_FRONT - 1.0, GROUND, YARD.left - 1.0, 0]);
+    items.push(["pear", DECK_FRONT + 0.5, GROUND, DECK.z1 + 1.5, 0]);   // the peach, behind the deck's left rail
+    items.push(["bush", -9.2, GROUND, YARD.left - 0.7, 0], ["mintLow", -10.6, GROUND, YARD.left - 1.25, 0]);
     // low shrubs and leafy clumps in the stretch of border beside the deck's front
     items.push(["mintLow", -13.1, GROUND, YARD.left - 1.25, 0], ["bush", -14.1, GROUND, YARD.left - 0.75, 0], ["bush", -15.3, GROUND, YARD.left - 0.6, 0],
       ["mintLow", -16.2, GROUND, YARD.left - 1.3, 0], ["andromeda", -17.0, GROUND - 1.1, YARD.left - 0.8, 3], ["mintLow", -19.6, GROUND, YARD.left - 1.2, 0], ["bush", -20.4, GROUND, YARD.left - 0.7, 0]);
