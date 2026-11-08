@@ -4,7 +4,7 @@
 // Imported by white-rabbit.js after a catch, with an AudioContext made in that same click
 // or tap. Apart from the glitch as the rain stops, it is silent until the scroll out of the TV begins. The tube's low mains hum and
 // faint whine, static while the screen shows snow, the room's quiet air, the
-// outdoors (a breeze, leaves rustling in gusts, birds now and then, a faint creek), and the
+// outdoors (leaves rustling in gusts and birds now and then), and the
 // glitch as the rain stops are built from oscillators, noise, and filters. The car's
 // ignition is a real V8 recording, fetched only after the car is first clicked, played
 // slower and deeper, then held on its idle, rebuilt from overlapping slices of the recording
@@ -77,7 +77,7 @@ export function createSound(ctx) {
   const air = gain();
   sources.push(hiss(filter("lowpass", 240, 0.4, air)));
 
-  // ---- Outside, through the window: a soft breeze, leaves in gusts, birds, and a faint creek ----
+  // ---- Outside, through the window: leaves in gusts and birds ----
   // Everything outside runs through one level and one lowpass, so it is muffled while the window is
   // behind the camera and opens up as the camera turns to it
   const outside = gain();
@@ -89,14 +89,8 @@ export function createSound(ctx) {
   const feed = gain(0.28, echo);
   echo.connect(damp); echo2.connect(damp); damp.connect(feed); feed.connect(echo2);
   const birdsSend = gain(0.22, echo);
-  // The breeze bed: a low, slow-moving whisper that never quite stops
-  const bed = gain(0.012, through);
-  const bedTone = filter("lowpass", 420, 0.4, bed);
-  sources.push(hiss(bedTone));
-  // A faint creek far off: babbling noise whose band wanders
-  const creek = gain(0.0035, through);
-  const creekTone = filter("bandpass", 900, 0.8, creek);
-  sources.push(hiss(creekTone));
+  // No steady breeze or creek bed: as the window opened they read as plain white noise, so the outdoors
+  // is only the rustle of leaves in the gusts and the birds
 
   // A one-shot noise grain: a leaf ticking against others, short, bright, and placed left or right
   function grain(level) {
@@ -156,11 +150,8 @@ export function createSound(ctx) {
     glide(outside.gain, level, 0.4);
     glide(through.frequency, 700 + 8000 * openness * openness, 0.3);
     if (level < 0.01) return;
-    glide(bed.gain, 0.01 + 0.012 * g, 0.5);
-    glide(bedTone.frequency, 380 + 260 * g, 0.5);
     for (let n = dt * (6 + 140 * g); n > 0; n--) if (Math.random() < n) grain(0.02 + 0.05 * g * Math.random());
     if (t > nextBird) { bird(songs[Math.random() * songs.length | 0](), Math.random()); nextBird = t + 4 + Math.random() * 11; }
-    glide(creekTone.frequency, 800 + 250 * Math.sin(t * 0.7) + 120 * Math.sin(t * 2.3), 0.1);
   }
 
   let mode = null, heard = false;
