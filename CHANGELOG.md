@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.38.0
+
+- The How I work shelf now leads with the two main standards, Writing and Development, followed by new standards for version control, versioning and releases, code style, testing and review, and documentation. From neon1-corpus v0.19.0.
+- Each release of the site is now tagged automatically once it's live, so every version in this changelog from here on has a matching tag.
+
 ## v0.37.0
 
 - New policy in the knowledge center: How I use AI. It covers where AI tools help in neon1's own work (research, understanding needs, and reviewing writing and code), what stays my responsibility, and how client information is kept out of them. From neon1-corpus v0.18.0.

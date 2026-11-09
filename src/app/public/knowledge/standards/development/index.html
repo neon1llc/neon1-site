@@ -4,15 +4,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.37.0" />
+  <meta name="version" content="0.38.0" />
   <title>Development · neon1 knowledge center</title>
-  <meta name="description" content="How neon1 writes, reviews, tests, and ships code, and how the code is handed over to you." />
+  <meta name="description" content="The main development standard for neon1: the principles in priority order, what each word means, how work moves from idea to release, and where the detailed rules live." />
   <meta name="theme-color" content="#F2F4F2" />
   <link rel="canonical" href="https://neon1.tech/knowledge/standards/development/" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="neon1" />
   <meta property="og:title" content="Development · neon1 knowledge center" />
-  <meta property="og:description" content="How neon1 writes, reviews, tests, and ships code, and how the code is handed over to you." />
+  <meta property="og:description" content="The main development standard for neon1: the principles in priority order, what each word means, how work moves from idea to release, and where the detailed rules live." />
   <meta property="og:url" content="https://neon1.tech/knowledge/standards/development/" />
   <meta property="og:image" content="https://neon1.tech/media/og-card-1.png" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -77,7 +77,7 @@
       <header class="kc-doc-head">
         <nav class="kc-crumbs" aria-label="Breadcrumb"><a href="/knowledge/">Knowledge center</a><span aria-hidden="true">/</span><a href="/knowledge/#standards">How I work</a></nav>
         <h1>Development</h1>
-        <p class="kc-summary">How neon1 writes, reviews, tests, and ships code, and how the code is handed over to you.</p>
+        <p class="kc-summary">The main development standard for neon1: the principles in priority order, what each word means, how work moves from idea to release, and where the detailed rules live.</p>
         <dl class="kc-facts">
           <div><dt>Type</dt><dd>Standard</dd></div>
           <div><dt>Edition</dt><dd>1.0</dd></div>
@@ -90,34 +90,41 @@
       </header>
 
       <div class="kc-text">
-<p>Most of what I deliver isn't code. When it is, another developer should be able to pick it up and work on it without me. These are the habits behind every repository I touch, including neon1's own, which are public on <a class="ext" href="https://github.com/neon1llc" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="write-for-the-next-person">Write for the next person</h2>
-<ul><li>Plain names, small functions, and comments that explain why rather than what.</li><li>Every file starts with a line saying what it's for.</li><li>The README says what it is, who it's for, how to run it, how to deploy it, what's missing, and the license.</li><li>No clever tricks where an ordinary approach works.</li></ul>
-<h2 id="fewer-moving-parts">Fewer moving parts</h2>
-<ul><li>Use the platform's built-in features before adding a library, and a library before writing a framework.</li><li>Every dependency is a long-term commitment, so each one has to earn its place. Several neon1 tools run on Node with no dependencies at all.</li><li>Pin versions, including CI actions, and update them on purpose rather than by accident.</li></ul>
-<h2 id="version-control">Version control</h2>
-<ul><li>Every change lives on a named branch that says what it does, such as <code>fix/office-hours</code>.</li><li>Commit messages follow <a class="ext" href="https://www.conventionalcommits.org/" target="_blank" rel="noopener">Conventional Commits</a>: <code>feat</code>, <code>fix</code>, <code>docs</code>, <code>refactor</code>, <code>chore</code>, or <code>test</code>, with a plain subject.</li><li>Each commit makes sense on its own and passes the checks.</li><li>History on the main branch is never rewritten. Releases are tagged and listed in a changelog written in plain language.</li></ul>
-<h2 id="tests-that-match-the-promise">Tests that match the promise</h2>
-<p>Tests check what the client was promised: a request arrives once, permissions hold, a retry doesn't duplicate work, and a failure leaves a visible, recoverable state. A green test suite that skips those is weak evidence. When a bug is found, a test that would have caught it comes first.</p>
-<p>Checks run the same way locally and in CI, from one command. If a check is too slow or needs a browser, it says so instead of quietly being skipped.</p>
-<h2 id="security-as-a-habit">Security as a habit</h2>
-<ul><li>Secrets never go in code, issues, or chat. Repositories are scanned for leaked secrets on every push.</li><li>Untrusted input is validated where it arrives. Permissions are checked on the server, never only in the interface.</li><li>Content Security Policy, HTTPS everywhere, and least-privilege cloud roles are the default.</li><li>See <a href="/knowledge/standards/security-and-data/">Security and data</a> for the full baseline.</li></ul>
-<h2 id="infrastructure-as-code">Infrastructure as code</h2>
-<p>Cloud resources are described in code (usually Terraform), reviewed like code, and applied from CI with short-lived credentials. Nobody clicks around a console to change production. When a resource has to be created by hand in an emergency, it's imported into code afterward.</p>
-<h2 id="deploys-you-can-undo">Deploys you can undo</h2>
-<ul><li>Every deploy says which version it shipped and checks that the live site serves it.</li><li>A rollback is a known command, not an improvisation.</li><li>Static assets that never change are cached for a long time. Pages that do change are always revalidated.</li></ul>
+<p>This is the main development standard for neon1. It covers every project neon1 builds, for itself or for a client: websites, tools, infrastructure, automations, and AI features. It sets the principles and the order of work. The detailed rules live in the standards linked at the end, and each of them follows this one.</p>
+<h2 id="principles-in-priority-order">Principles, in priority order</h2>
+<p>When two principles pull in different directions, the higher one wins. Most of the time they agree.</p>
+<table><thead><tr><th>#</th><th>Principle</th><th>What it means here</th></tr></thead><tbody><tr><td>1</td><td><strong>Safety</strong></td><td>Nobody is harmed, no data is lost or exposed, and nothing irreversible happens by accident. Covers security, privacy, and data integrity</td></tr><tr><td>2</td><td><strong>Correctness</strong></td><td>It does what it says, including in the failure cases that matter</td></tr><tr><td>3</td><td><strong>Value</strong></td><td>It solves a real need someone has today. Work that isn't needed isn't done, however interesting</td></tr><tr><td>4</td><td><strong>Usability</strong></td><td>The intended person can do the task without help, on their device, including with assistive technology</td></tr><tr><td>5</td><td><strong>Simplicity</strong></td><td>The fewest parts, dependencies, and concepts that meet the need. Easy to explain in a few sentences</td></tr><tr><td>6</td><td><strong>Robustness</strong></td><td>It degrades visibly instead of silently, recovers from failure, and can be undone</td></tr><tr><td>7</td><td><strong>Maintainability</strong></td><td>Someone else can read it, change it, and run it without the author</td></tr><tr><td>8</td><td><strong>Efficiency</strong></td><td>It uses time, money, and computing in proportion to its value. Fast enough, cheap enough, measured before optimized</td></tr><tr><td>9</td><td><strong>Consistency</strong></td><td>It follows the conventions of its project and of neon1, so nothing has to be relearned</td></tr></tbody></table>
+<p>A few consequences of the order:</p>
+<ul><li>A simpler design that leaves a security gap loses. A faster design that's harder to use loses unless speed is the need.</li><li>Efficiency matters, but it comes after people can use and maintain the thing. Optimize what's measured, not what's guessed.</li><li>Consistency is last because a convention should give way when it would make something unsafe, wrong, or unusable. When that happens, the convention gets updated rather than quietly broken.</li></ul>
+<h2 id="words-neon1-uses-defined">Words neon1 uses, defined</h2>
+<p>These words come up often. Each one means something specific here.</p>
+<table><thead><tr><th>Word</th><th>Meaning</th></tr></thead><tbody><tr><td><strong>Mature</strong></td><td>Complete for its stated purpose, dependable in its intended workflows, documented, and recoverable. Not the same as old or large</td></tr><tr><td><strong>Ready</strong></td><td>Tested in conditions like real use, with known limits written down and a way back</td></tr><tr><td><strong>Done</strong></td><td>Built, tested, documented, reviewed, released, and handed over. Merged alone isn't done</td></tr><tr><td><strong>Robust</strong></td><td>Survives bad input, outages, and retries without corrupting anything, and says when it fails</td></tr><tr><td><strong>Simple</strong></td><td>Few parts and few concepts. Not the same as quick to write</td></tr><tr><td><strong>Usable</strong></td><td>The intended person finishes the task without help</td></tr><tr><td><strong>Valuable</strong></td><td>Someone would notice and mind if it were gone</td></tr><tr><td><strong>Efficient</strong></td><td>Proportionate in time, cost, and resources to what it delivers</td></tr><tr><td><strong>Secure</strong></td><td>Meets the agreed baseline for its data and risks, with evidence. Never a blanket claim</td></tr></tbody></table>
+<h2 id="how-work-moves">How work moves</h2>
+<p>Every piece of work follows the same order, at whatever size fits:</p>
+<ol><li><strong>Reproduce.</strong> Start from something that works: an existing tool, a known pattern, or the current behavior, with a baseline measured.</li><li><strong>Integrate.</strong> Connect it into the complete path a person actually uses, end to end.</li><li><strong>Enhance.</strong> Improve what real use shows is missing or weak.</li><li><strong>Unify.</strong> Once several pieces work, share their common parts and make them consistent.</li></ol>
+<p>Reuse comes before building. Existing tools and well-maintained open-source projects come first, checked under the <a href="/knowledge/standards/technology-decisions/">technology decisions</a> standard. Custom code covers only what nothing else does.</p>
+<p>For a bug, the order is: reproduce it, find the cause, fix it narrowly, add a test that would have caught it, and check the behavior around it.</p>
+<h2 id="maturity-and-version-1-0-0">Maturity and version 1.0.0</h2>
+<p>Before <code>v1.0.0</code>, a project is under initial development, and its versions say so. <code>v1.0.0</code> is reserved for the first complete, dependable release of the whole intended scope, shown to work for the people it's for. Passing tests or finishing one feature doesn't make a project 1.0.0. The <a href="/knowledge/standards/versioning/">versioning standard</a> defines every version number in detail.</p>
+<h2 id="the-detailed-standards">The detailed standards</h2>
+<table><thead><tr><th>Standard</th><th>Covers</th></tr></thead><tbody><tr><td><a href="/knowledge/standards/writing/">Writing</a></td><td>Every word neon1 writes, including code comments and commit messages</td></tr><tr><td><a href="/knowledge/standards/version-control/">Version control</a></td><td>Branches, commits, merges, protection, and history</td></tr><tr><td><a href="/knowledge/standards/versioning/">Versioning and releases</a></td><td>Version numbers, tags, changelogs, and when each number goes up</td></tr><tr><td><a href="/knowledge/standards/code-style/">Code style</a></td><td>Names, comments, file headers, formatting, and layout</td></tr><tr><td><a href="/knowledge/standards/testing-and-review/">Testing and review</a></td><td>What gets tested, how changes are reviewed, and the definition of done</td></tr><tr><td><a href="/knowledge/standards/documentation/">Documentation</a></td><td>READMEs, changelogs, decision records, and runbooks</td></tr><tr><td><a href="/knowledge/standards/security-and-data/">Security and data</a></td><td>The security baseline and data handling</td></tr><tr><td><a href="/knowledge/standards/design-and-accessibility/">Design and accessibility</a></td><td>Interfaces and documents anyone can use</td></tr><tr><td><a href="/knowledge/standards/technology-decisions/">Technology decisions</a></td><td>Choosing tools and architecture, and counting the full cost</td></tr><tr><td><a href="/knowledge/standards/reliability-and-recovery/">Reliability and recovery</a></td><td>Service targets, backups, and incidents</td></tr><tr><td><a href="/knowledge/standards/ai-quality/">AI quality and oversight</a></td><td>AI features inside what neon1 builds</td></tr></tbody></table>
 <h2 id="your-code-is-yours">Your code is yours</h2>
-<p>Code written for you lives in a repository you own, under the license we agree on. The handover includes how to build, test, deploy, and roll back without me. If I reuse open-source work, its license and notices stay intact, and I'll tell you what each one allows.</p>
+<p>Code written for a client lives in a repository the client owns, under the license agreed. The handover includes how to build, test, deploy, and roll back without me. Reused open-source code keeps its license and notices, and I explain what each license allows.</p>
 <h2 id="review-tools">Review tools</h2>
 <p>I use AI tools to review code for bugs, security issues, and missing tests, alongside automated checks. I review and take responsibility for every change that ships. See <a href="/knowledge/policies/ai-use/">How I use AI</a>.</p>
+<h2 id="sources">Sources</h2>
+<ul><li><a class="ext" href="https://semver.org/" target="_blank" rel="noopener">Semantic Versioning 2.0.0</a></li><li><a class="ext" href="https://www.conventionalcommits.org/en/v1.0.0/" target="_blank" rel="noopener">Conventional Commits 1.0.0</a></li><li><a class="ext" href="https://12factor.net/" target="_blank" rel="noopener">The Twelve-Factor App</a></li><li><a class="ext" href="https://csrc.nist.gov/pubs/sp/800/218/final" target="_blank" rel="noopener">NIST Secure Software Development Framework</a></li></ul>
       </div>
 
       <aside class="kc-next" aria-labelledby="kc-next-h">
         <h2 id="kc-next-h">Read next</h2>
         <ul>
-          <li><a href="/knowledge/standards/security-and-data/"><span class="kc-kicker">How I work</span><span class="kc-card-title">Security and data</span></a></li>
-          <li><a href="/knowledge/standards/technology-decisions/"><span class="kc-kicker">How I work</span><span class="kc-card-title">Technology decisions</span></a></li>
-          <li><a href="/knowledge/standards/design-and-accessibility/"><span class="kc-kicker">How I work</span><span class="kc-card-title">Design and accessibility</span></a></li>
+          <li><a href="/knowledge/standards/writing/"><span class="kc-kicker">How I work</span><span class="kc-card-title">Writing</span></a></li>
+          <li><a href="/knowledge/standards/version-control/"><span class="kc-kicker">How I work</span><span class="kc-card-title">Version control</span></a></li>
+          <li><a href="/knowledge/standards/versioning/"><span class="kc-kicker">How I work</span><span class="kc-card-title">Versioning and releases</span></a></li>
+          <li><a href="/knowledge/standards/code-style/"><span class="kc-kicker">How I work</span><span class="kc-card-title">Code style</span></a></li>
+          <li><a href="/knowledge/standards/testing-and-review/"><span class="kc-kicker">How I work</span><span class="kc-card-title">Testing and review</span></a></li>
+          <li><a href="/knowledge/standards/documentation/"><span class="kc-kicker">How I work</span><span class="kc-card-title">Documentation</span></a></li>
           <li><a href="/knowledge/policies/ai-use/"><span class="kc-kicker">Policies</span><span class="kc-card-title">How I use AI</span></a></li>
         </ul>
       </aside>
@@ -158,7 +165,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>No ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.37.0</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.38.0</a>
       </span>
     </div>
   </footer>
