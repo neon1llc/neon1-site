@@ -106,7 +106,10 @@ ${main}
 // A document as a small card: shelf, title, summary, and whether it has a PDF
 function card(d, { shelf = false } = {}) {
   const tags = [TYPE_LABELS[d.type] ?? d.type, d.pdf ? "PDF" : null].filter(Boolean)
-  const words = [d.title, d.summary, TYPE_LABELS[d.type], d.data.audience].filter(Boolean).join(" ").toLowerCase()
+  // Search reads the title, summary, type, audience, and every section heading
+  const headings = d.sections.map((x) => x.heading).filter(Boolean)
+  const words = [d.title, d.summary, TYPE_LABELS[d.type], d.data.audience, corpus.manifest.shelves[d.section].label, ...headings]
+    .filter(Boolean).join(" ").replace(/[*_`]/g, "").toLowerCase()
   return `        <li class="kc-card" data-words="${esc(words)}">
           <a href="${d.url}">
             ${shelf ? `<span class="kc-kicker">${esc(corpus.manifest.shelves[d.section].label)}</span>` : ""}<span class="kc-card-title">${esc(d.title)}</span>
@@ -239,6 +242,13 @@ if (!sitemapNow.includes("<!-- knowledge -->")) throw new Error("sitemap.xml has
 // What the folder holds now, PDFs left out since the deploy job writes those
 const walk = (dir) => (existsSync(dir) ? readdirSync(dir).flatMap((f) => (statSync(join(dir, f)).isDirectory() ? walk(join(dir, f)) : [join(dir, f)])) : [])
 const have = walk(join(siteDir, "knowledge")).map((f) => relative(siteDir, f)).filter((f) => !f.endsWith(".pdf"))
+
+// Each page stays light: the text of one document plus the shared frame
+const PAGE_MAX = 120 * 1024
+for (const [path, html] of want) if (Buffer.byteLength(html) > PAGE_MAX) {
+  console.error(`knowledge: ${path} is ${Math.round(Buffer.byteLength(html) / 1024)} KB, over ${PAGE_MAX / 1024} KB`)
+  process.exit(1)
+}
 
 if (mode === "check") {
   const problems = []
