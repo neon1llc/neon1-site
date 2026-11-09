@@ -44,7 +44,7 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       id-token: write
 
     # Let a running deploy finish; the next one starts after it
@@ -85,3 +85,18 @@ jobs:
         run: make invalidate FORCE="$FORCE"
 
       - run: make verify
+
+      # Every released version gets an annotated tag on the commit that shipped it, once it's live
+      - name: Tag the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(sed -n 's/.*<meta name="version" content="\([^"]*\)".*/\1/p' src/app/public/index.html)
+          if git ls-remote --exit-code --tags origin "refs/tags/v$version" >/dev/null; then
+            echo "v$version is already tagged"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag -a "v$version" -m "v$version" "$GITHUB_SHA"
+            git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "v$version"
+          fi
