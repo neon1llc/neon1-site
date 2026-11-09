@@ -67,7 +67,7 @@ function stub(page) {
     const body = JSON.parse(route.request().postData() ?? "null");
     requests.push({ body, route, valid: valid(body) });
   });
-  const reply = (r, data, status = 200) => r.route.fulfill({ status, contentType: "application/json", body: JSON.stringify(data) }).catch(() => {});
+  const reply = (r, data, status = 200, headers = {}) => r.route.fulfill({ status, headers, contentType: "application/json", body: JSON.stringify(data) }).catch(() => {});
   const next = async (n) => {
     for (let i = 0; i < 400 && requests.length < n; i++) await page.waitForTimeout(10);
     assert.ok(requests.length >= n, `expected request ${n}`);
@@ -303,6 +303,27 @@ let base;
     await page.waitForFunction(() => document.querySelector(".n1chat-log").textContent.includes("keep your question under"));
     const text = await logText(page);
     assert.ok(text.indexOf("start fresh") < text.indexOf("keep your question under"));
+    await ctx.close();
+  });
+
+  await check("a cooldown rests the send button for as long as the API says, and nothing is sent meanwhile", async () => {
+    const { ctx, page, api } = await portal(browser);
+    await open(page);
+    await ask(page, "First");
+    await api.reply(await api.next(1), { error: "You're sending messages faster than Neo can answer well. Please wait for about 2 minutes, then try again.", code: "cooldown" }, 429, { "retry-after": "2" });
+    await page.waitForFunction(() => document.querySelector(".n1chat-log").textContent.includes("faster than Neo"));
+    assert.equal(await sendDisabled(page), true);
+    // Enter still submits the form, but while resting the question stays put and nothing goes up
+    await page.fill(sel.input, "Second");
+    await page.press(sel.input, "Enter");
+    await page.waitForFunction(() => document.querySelector(".n1chat-log").textContent.includes("still resting"));
+    assert.equal(await page.inputValue(sel.input), "Second");
+    assert.equal(api.requests.length, 1);
+    // Once the wait is over, Send works again
+    await page.waitForFunction(() => !document.querySelector(".n1chat-send").disabled, null, { timeout: 4000 });
+    await page.click(sel.send);
+    await api.reply(await api.next(2), { reply: "Synthetic two." });
+    await page.waitForFunction(() => document.querySelector(".n1chat-log").textContent.includes("Synthetic two."));
     await ctx.close();
   });
 
