@@ -103,48 +103,53 @@ ${main}
 }
 
 
-// A document as a small card: shelf, title, summary, and whether it has a PDF
-function card(d, { shelf = false } = {}) {
-  const tags = [TYPE_LABELS[d.type] ?? d.type, d.pdf ? "PDF" : null].filter(Boolean)
+// A document as a small card: title, summary, and whether it has a PDF. The shelf heading already
+// names the kind, so the card doesn't repeat it
+function card(d) {
+  const tags = d.pdf ? ["PDF"] : []
   // Search reads the title, summary, type, audience, and every section heading
   const headings = d.sections.map((x) => x.heading).filter(Boolean)
   const words = [d.title, d.summary, TYPE_LABELS[d.type], d.data.audience, corpus.manifest.shelves[d.section].label, ...headings]
     .filter(Boolean).join(" ").replace(/[*_`]/g, "").toLowerCase()
   return `        <li class="kc-card" data-words="${esc(words)}">
           <a href="${d.url}">
-            ${shelf ? `<span class="kc-kicker">${esc(corpus.manifest.shelves[d.section].label)}</span>` : ""}<span class="kc-card-title">${esc(d.title)}</span>
+            <span class="kc-card-title">${esc(d.title)}</span>
             <span class="kc-card-summary">${esc(d.summary)}</span>
-            <span class="kc-tags">${tags.map((t) => `<span>${esc(t)}</span>`).join("")}</span>
+            ${tags.length ? `<span class="kc-tags">${tags.map((t) => `<span>${esc(t)}</span>`).join("")}</span>` : ""}
           </a>
         </li>`
 }
 
 
-// The front door: what this is, a search box, a featured row, then the two groups and their shelves
+// The front door: what this is, a search box, then the two groups and their shelves. Featured documents
+// lead their shelf, and documents for developers sit in a closed fold at its end
+const DEVELOPERS = "Developers"
+const cardList = (docs) => `<ul class="kc-cards">
+${docs.map(card).join("\n")}
+        </ul>`
 function shelfSection(s) {
+  const lead = s.docs.filter((d) => d.data.featured)
+  const rest = s.docs.filter((d) => !d.data.featured && d.data.audience !== DEVELOPERS)
+  const dev = s.docs.filter((d) => !d.data.featured && d.data.audience === DEVELOPERS)
+  const fold = dev.length
+    ? `
+        <details class="kc-fold">
+          <summary>For developers <span>${dev.length}</span></summary>
+          ${cardList(dev)}
+        </details>`
+    : ""
   return `      <section class="kc-shelf" id="${s.key}" aria-labelledby="${s.key}-h">
         <div class="kc-shelf-head">
           <h3 id="${s.key}-h">${esc(s.label)}</h3>
           <p>${esc(s.description)}</p>
         </div>
-        <ul class="kc-cards">
-${s.docs.map((d) => card(d)).join("\n")}
-        </ul>
+        ${cardList([...lead, ...rest])}${fold}
       </section>`
 }
 
 function indexPage() {
   const count = corpus.docs.length
   const pdfs = corpus.docs.filter((d) => d.pdf).length
-  const featured = corpus.featured.length
-    ? `    <section class="kc-featured" aria-labelledby="kc-featured-h">
-      <h2 id="kc-featured-h">Start here</h2>
-      <ul class="kc-cards">
-${corpus.featured.map((d) => card(d, { shelf: true })).join("\n")}
-      </ul>
-    </section>
-`
-    : ""
   const groups = corpus.groups
     .map((g) => `    <section class="kc-group" id="${g.key}" aria-labelledby="${g.key}-h">
       <div class="kc-group-head">
@@ -178,7 +183,6 @@ ${nav}
     </nav>
 
     <div class="kc-body">
-${featured}
 ${groups}
 
     <p class="kc-colophon">These documents come from <a class="ext" href="https://github.com/neon1llc/neon1-corpus" target="_blank" rel="noopener">neon1-corpus</a> and are shared under CC BY-ND 4.0. Templates and examples are illustrations, not legal advice.</p>
