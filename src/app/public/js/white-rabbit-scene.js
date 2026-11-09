@@ -425,8 +425,9 @@ export function createScene({ onLost, onSound = () => {} }) {
   const { glossy, ready: photos, pile, openWindow } = furnish(scene, { win: WINDOW, sc: SC, sw: SW, sh: SH, env, touch });
 
   // Baked light: the room's lit meshes take geometry with a second UV map from room.glb and a baked
-  // occlusion map on it (made by blender/room.py from this same build); the painted stand-in
-  // contact shadows go once it is in. If it fails, the room simply stays as built
+  // occlusion map on it (baked from this same build in the owner's private planning folder; make models
+  // checks the match); the painted stand-in contact shadows go once it is in. If it fails, the room simply
+  // stays as built
   const bakedTextures = [];
   const baked = new Promise((done) => new T.GLTFLoader().load("/media/white-rabbit/room.glb", (gltf) => {
     // Arriving after dispose: free the model and make no textures for a scene that is gone

@@ -458,7 +458,8 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
   const wood = grain(1), lambert = (o) => new T.MeshLambertMaterial(o), standard = (o) => new T.MeshStandardMaterial(o);
   // Varnish, plastic, brass, and leather reflect the room, so highlights slide as the camera moves
   const glossy = [];
-  // Photographed maps from Poly Haven (CC0), prepared by blender/textures.py; ready resolves when all are in
+  // Photographed maps from Poly Haven (CC0), prepared in the owner's private planning folder (src/app/asset-manifest.json);
+  // ready resolves when all are in
   const loads = [], loader = new T.TextureLoader();
   const photo = (name, repeat, color = false) => {
     let t;
@@ -469,7 +470,7 @@ export function furnish(scene, { win, sc, sw, sh, env, touch = false }) {
   };
   const shiny = (k, o, Kind = T.MeshStandardMaterial) => { const m = new Kind({ ...o, envMap: env, envMapIntensity: 0 }); glossy.push([m, k]); return m; };
   // Lit meshes cast and take the window light's shadows; glass and the painted shadows don't
-  // Each mesh gets a stable name in build order, which the baked lighting is keyed to (blender/room.py);
+  // Each mesh gets a stable name in build order, which the baked lighting is keyed to (make models checks the match);
   // lit ones are marked for baking, and painted contact shadows as stand-ins that baking replaces
   let count = 0;
   const add = (mesh) => {

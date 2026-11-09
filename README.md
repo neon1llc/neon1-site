@@ -9,7 +9,7 @@ The neon1.tech website. It's a static page in `src/app/public/`, served from a p
 You need Python 3 and Node.js. Gitleaks is used if it's installed, otherwise the secret scan runs it in Docker.
 
 ```bash
-make check      # HTML validation, JS syntax, anchors and asset paths, the white rabbit's lifetime, release versions, asset manifest, size budget, secret scan
+make check      # HTML validation, JS syntax, anchors and asset paths, the white rabbit's lifetime, release versions, asset manifest, baked models, size budget, secret scan
 make serve      # http://localhost:8000
 make behavior   # the page driven in headless Chromium; needs Node's playwright package and its browser
 ```
@@ -39,7 +39,7 @@ Two query flags help with testing, and in production they only add rabbits:
 
 `make three` rebuilds the bundle from `scripts/three/entry.js` with pinned three.js and esbuild versions.
 
-The scene's models and images are in `media/white-rabbit/`, with their credits in `media/white-rabbit/CREDITS.txt`. The car model is based on "2019 Chevrolet Camaro" by IsaacOldton (CC BY 4.0), modified: unbranded, recolored, and optimized. The trees and photographed textures come from Poly Haven (CC0).
+The scene's models and images are in `media/white-rabbit/`, with their credits in `media/white-rabbit/CREDITS.txt`. `src/app/asset-manifest.json` records every shipped third-party or baked asset, fonts and vendored bundles included: its sha256, its source and license, how it was made, and which files load it. Where only a creator's profile or a library's home page is known, it says so. The Blender files, recipes, and photos behind the scene stay in the owner's private planning folder. `make models` builds the room in Node and fails if `room.glb`, its baked maps in `lm/`, or the car's material names no longer match the code, so a geometry change that would misplace the baked light fails loudly. The car model is based on "2019 Chevrolet Camaro" by IsaacOldton (CC BY 4.0), modified: unbranded, recolored, and optimized. The trees and photographed textures come from Poly Haven (CC0).
 
 ## Deploy
 

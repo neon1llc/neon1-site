@@ -32,12 +32,12 @@ WELL_KNOWN  := --include ".well-known/*"
 
 # Plain make shows the help
 .DEFAULT_GOAL := help
-.PHONY: help check html js links logic frame frame-check release manifest rehash budget secrets behavior serve three deploy invalidate verify
+.PHONY: help check html js links logic frame frame-check release manifest rehash models budget secrets behavior serve three deploy invalidate verify
 
 
 ##@ Checks
 
-check: html js links logic frame-check release manifest budget secrets ## Run every static check
+check: html js links logic frame-check release manifest models budget secrets ## Run every static check
 
 # Every page served as HTML, so each check covers the tour as well as the home page
 PAGES := $(SITE_DIR)/index.html $(SITE_DIR)/tour.html
@@ -74,11 +74,16 @@ release: ## Fail if the places that name the release disagree
 
 # Fonts and media are immutable once deployed: a path keeps its bytes for good (see README, Deploy)
 MANIFEST := src/app/asset-manifest.json
-manifest: ## Fail if a font or media file is unlisted, differs from its hash, or changed bytes at an old path
+manifest: ## Fail if a shipped asset is unlisted, differs from its hash, lacks its source, or changed bytes at an old path
 	@python3 scripts/manifest.py check $(SITE_DIR) $(MANIFEST)
 
 rehash: ## Refresh the hashes in the asset manifest after adding or renaming a file
 	@python3 scripts/manifest.py update $(SITE_DIR) $(MANIFEST)
+
+# Builds the room with three.js in Node and compares it with room.glb and its baked maps, then the car's materials
+models: ## Fail if the baked room or the car models no longer match the code that names their parts
+	@command -v node >/dev/null 2>&1 || { echo "models: install Node.js"; exit 1; }
+	@node scripts/models.cjs $(SITE_DIR)
 
 budget: ## Fail if the deployed files exceed BUDGET_KB
 	@kb=$$(find $(SITE_DIR) -type f ! -name '.*' -exec cat {} + | wc -c | awk '{print int($$1 / 1024)}'); \

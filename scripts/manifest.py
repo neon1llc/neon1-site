@@ -7,7 +7,9 @@
 # bytes: a browser that cached it never asks again, and a page left open from an older release
 # may still ask for it after a deploy.
 # check fails if
-#   - a file under fonts/ or media/ is missing from the manifest, or its sha256 differs from it;
+#   - a file under fonts/ or media/, or a vendored bundle, is missing from the manifest, or its sha256 differs;
+#   - a file names no asset, or an asset lacks what it is, how it was made, or a consumer that exists;
+#   - a third-party asset names no source, or a source lacks its author, license, or source_url;
 #   - a font or media path that exists in the base commit now holds different bytes. The base is
 #     $IMMUTABLE_BASE if set, else origin/main (HEAD^ when that is HEAD itself, as on a push to main).
 #     Without git history the comparison is skipped and says so.
@@ -20,8 +22,11 @@ import pathlib
 import subprocess
 import sys
 
-# Folders deployed with the immutable cache (Makefile LONG_CACHE)
+# Folders deployed with the immutable cache (Makefile LONG_CACHE), and vendored code that must be listed too
 IMMUTABLE = ("fonts/", "media/")
+VENDORED = ("js/vendor/*", "js/*.min.js")
+ORIGINS = ("first-party", "third-party", "unrecorded")
+SOURCE_FIELDS = ("title", "author", "source_url", "exactness", "license")
 
 
 def sha256(path):
@@ -37,6 +42,44 @@ def immutable_files(root):
             if p.is_file() and not any(part.startswith(".") for part in rel.split("/")):
                 out.append(rel)
     return out
+
+
+def vendored_files(root):
+    return sorted({p.relative_to(root).as_posix() for g in VENDORED for p in root.glob(g) if p.is_file()})
+
+
+def provenance(root, manifest):
+    """Problems with the asset and source records: every file has an asset, every third-party asset a full source."""
+    files, assets, sources = manifest.get("files", {}), manifest.get("assets", {}), manifest.get("sources", {})
+    problems = []
+    for rel, entry in files.items():
+        if entry.get("asset") not in assets:
+            problems.append(f"{rel}: names no asset in the manifest's assets (got {entry.get('asset')!r})")
+    for name, a in assets.items():
+        where = f"asset {name}"
+        if not a.get("title") or not a.get("made"):
+            problems.append(f"{where}: needs a title and how it was made (made)")
+        if a.get("origin") not in ORIGINS:
+            problems.append(f"{where}: origin must be one of {', '.join(ORIGINS)}")
+        if a.get("origin") == "third-party" and not a.get("sources"):
+            problems.append(f"{where}: third-party, but names no sources")
+        for src in a.get("sources", []):
+            if src not in sources:
+                problems.append(f"{where}: unknown source {src!r}")
+        for c in a.get("consumers", []):
+            if not (root / c).is_file():
+                problems.append(f"{where}: consumer {c} is not a file in the site")
+        if not any(e.get("asset") == name for e in files.values()):
+            problems.append(f"{where}: no file belongs to it")
+    for name, src in sources.items():
+        missing = [f for f in SOURCE_FIELDS if not src.get(f)]
+        if missing:
+            problems.append(f"source {name}: missing {', '.join(missing)}")
+        if not src.get("license_url") and not (src.get("license_file") and (root / src["license_file"]).is_file()):
+            problems.append(f"source {name}: needs a license_url or a license_file that ships with the site")
+        if not any(name in a.get("sources", []) for a in assets.values()):
+            problems.append(f"source {name}: no asset uses it")
+    return problems
 
 
 def git(*args, cwd):
@@ -90,7 +133,7 @@ def main():
 
     # update: fresh hashes for every listed file and every immutable one, in path order
     if mode == "update":
-        for rel in set(files) | set(immutable_files(root)):
+        for rel in set(files) | set(immutable_files(root)) | set(vendored_files(root)):
             if (root / rel).is_file():
                 files.setdefault(rel, {})["sha256"] = sha256(root / rel)
             else:
@@ -108,10 +151,15 @@ def main():
         elif sha256(root / rel) != entry.get("sha256"):
             problems.append(f"{rel}: sha256 differs from the manifest (run make rehash, then see the same-path rule)")
     problems += [f"{rel}: served as immutable but not in the manifest (run make rehash)" for rel in immutable_files(root) if rel not in files]
+    problems += [f"{rel}: vendored but not in the manifest (run make rehash)" for rel in vendored_files(root) if rel not in files]
+    problems += provenance(root, manifest)
     problems += rewritten(root)
     if problems:
         sys.exit("\n".join(problems))
-    print(f"manifest: {len(files)} files match their hashes")
+    assets = manifest.get("assets", {})
+    unrecorded = sorted(n for n, a in assets.items() if a.get("origin") == "unrecorded")
+    print(f"manifest: {len(files)} files match their hashes; {len(assets)} assets and {len(manifest.get('sources', {}))} sources are recorded"
+          + (f"; origin unrecorded: {', '.join(unrecorded)}" if unrecorded else ""))
 
 
 if __name__ == "__main__":
