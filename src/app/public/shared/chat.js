@@ -7,9 +7,15 @@
 
 const ENDPOINT = "/chat/api/chat";
 
-// Bounds that match the API, so a too-long message is caught before it's sent
-const MAX_CHARS = 1200;
-const MAX_TURNS = 11;
+// The conversation contract shared with the API (neon1-chat app/src/contract.mjs); change both
+// together, the API first. Turns alternate visitor and Neo, start and end with the visitor, and
+// number at most `turns`; each is at most `chars` characters after trimming, whoever wrote it;
+// together they hold at most `total`. Characters are string length, as maxlength counts them
+const LIMITS = { turns: 11, chars: 1200, total: 6000 };
+
+// How long one question may wait. The API gives up at 15 seconds with a clear message, so this
+// only fires when that message can't arrive (a dropped connection, say)
+const DEADLINE_MS = 25000;
 
 // Longest open and close animations, plus a margin: each completes on time even when the browser
 // never reports its end (cancelled, hidden by an overlay, motion turned off, or no stylesheet)
@@ -43,6 +49,42 @@ function mark() {
   path.setAttribute("d", "M6 6a24 24 0 0 1 24 24v30M6 18a12 12 0 0 1 12 12v30M34 6a24 24 0 0 1 24 24v30M34 18a12 12 0 0 1 12 12v30");
   svg.append(path);
   return svg;
+}
+
+// ---- The history: what goes up with each question ----
+
+// Markdown links and bare URLs: a cut inside one would leave a broken or wrong link
+const LINKISH = /\[[^\]]*\]\([^)\s]*\)|(?:https?:\/\/|mailto:|tel:)\S+/g;
+
+// The API's rule for a reply too long for the history (contract.mjs clip): cut at the last
+// sentence end, else the last space, never inside a link, with "…" marking a mid-sentence cut.
+// The API already keeps replies this short; this keeps the history valid if one isn't
+function clip(text, max) {
+  if (text.length <= max) return text;
+  const room = max - 1;
+  const spans = [...text.matchAll(LINKISH)].map((m) => [m.index, m.index + m[0].length]);
+  const free = (i) => !spans.some(([a, b]) => i > a && i < b);
+  let sentence = -1, space = -1;
+  for (let i = room; i > 0; i--) {
+    if (!free(i)) continue;
+    if (sentence < 0 && /[.!?]/.test(text[i - 1]) && (i === text.length || /\s/.test(text[i]))) sentence = i;
+    if (space < 0 && /\s/.test(text[i])) space = i;
+    if (sentence >= 0) break;
+  }
+  if (sentence >= room / 2) return text.slice(0, sentence).trimEnd();
+  let cut = space > 0 ? space : room;
+  if (/[\uD800-\uDBFF]/.test(text[cut - 1] ?? "")) cut--;
+  return `${text.slice(0, cut).trimEnd()}…`;
+}
+
+// The turns to send: the kept history plus the new question, dropping the oldest question and
+// answer together until the turn count and total fit. The history holds whole pairs and the
+// question fits on its own, so the newest question always goes up and the order stays valid
+function fit(history, question) {
+  const turns = [...history, { role: "user", content: question }];
+  const size = () => turns.reduce((n, t) => n + t.content.length, 0);
+  while (turns.length > LIMITS.turns || size() > LIMITS.total) turns.splice(0, 2);
+  return turns;
 }
 
 // ---- Reply rendering: inline links, then paragraphs and lists ----
@@ -95,6 +137,7 @@ function render(target, text) {
  * `className` lets a host page place the window; "n1chat-right" anchors it bottom-right.
  */
 export function chat({ root = document.body, endpoint = ENDPOINT, className = "", light = () => false, watch = [] } = {}) {
+  // Answered turns only, as whole question and answer pairs, each already within the contract
   const history = [];
 
   // ---- The launcher: a round mark that stretches to show "ask Neo" ----
@@ -128,7 +171,7 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
   log.append(hello, chips);
 
   const form = el("form", "n1chat-form");
-  const input = el("textarea", "n1chat-input", null, { rows: "2", maxlength: String(MAX_CHARS), "aria-label": "Your question", placeholder: "Ask Neo" });
+  const input = el("textarea", "n1chat-input", null, { rows: "2", maxlength: String(LIMITS.chars), "aria-label": "Your question", placeholder: "Ask Neo" });
   const send = el("button", "n1chat-send", "send", { type: "submit" });
   form.append(input, send);
 
@@ -233,8 +276,32 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
   // Turning motion off midway ends the animation at once rather than waiting out the timer
   motion.addEventListener?.("change", () => finish?.());
 
-  // A new conversation: the history and replies go, the greeting and suggestions come back
+  // ---- One request at a time, owned by one conversation ----
+
+  // "new" bumps the generation, so an answer or error for an earlier conversation is dropped
+  // instead of landing in this one. `active` is the request in flight, if any: its abort
+  // controller, its deadline timer, and its typing dots
+  let generation = 0;
+  let active = null;
+
+  // Hand the controls back, once, and only for the request that still owns them
+  function release(req) {
+    if (active !== req) return;
+    active = null;
+    clearTimeout(req.timer);
+    req.dots.remove();
+    send.disabled = false;
+  }
+
+  // A new conversation: the request in flight is cancelled, and the history, replies, and
+  // controls reset together; the greeting and suggestions come back
   fresh.addEventListener("click", () => {
+    generation++;
+    if (active) {
+      const req = active;
+      release(req);
+      req.controller.abort();
+    }
     history.length = 0;
     log.replaceChildren(hello, chips);
     chips.hidden = false;
@@ -271,42 +338,65 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
     return dots;
   }
 
+  // What to say when a question gets no answer. A long question and a long conversation are
+  // told apart: the first is the visitor's to shorten, the second the window fixes itself
+  function trouble(res, data, late) {
+    if (late) return "Neo is taking too long to answer. Please try again in a moment.";
+    if (!res) return "No connection right now. Please try again in a moment.";
+    if (data.code === "question_too_long") return `Please keep your question under ${LIMITS.chars.toLocaleString("en-US")} characters.`;
+    if (data.code === "conversation_too_long") return "This conversation got longer than Neo can follow, so Neo will start fresh from your next question.";
+    return data.error ?? "Neo couldn't answer just now. Please try again in a moment.";
+  }
+
   // ---- Ask: the recent turns go up, one reply comes back ----
   async function ask(q) {
-    if (!q || send.disabled) return;
+    q = q.trim();
+    if (!q || active) return;
+    // The box can't hold more than the limit, but a pasted or scripted question still gets words
+    if (q.length > LIMITS.chars) return void say(trouble({}, { code: "question_too_long" }), "bot");
 
     input.value = "";
     chips.hidden = true;
     say(q, "you");
-    history.push({ role: "user", content: q.slice(0, MAX_CHARS) });
-    while (history.length > MAX_TURNS) history.splice(0, 2);
+    const messages = fit(history, q);
 
+    // This request owns the controls until it settles, "new" cancels it, or its deadline passes
+    const req = { controller: new AbortController(), generation, dots: typing() };
+    req.timer = setTimeout(() => req.controller.abort(), DEADLINE_MS);
+    active = req;
     send.disabled = true;
-    const dots = typing();
 
+    let res = null, data = {};
     try {
-      const res = await fetch(endpoint, {
+      res = await fetch(endpoint, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ messages: history }),
+        body: JSON.stringify({ messages }),
+        signal: req.controller.signal,
       });
-      const data = await res.json().catch(() => ({}));
-      const text = data.reply ?? data.error ?? "Neo couldn't answer just now. Please try again in a moment.";
-
-      dots.remove();
-      say(text, "bot");
-
-      // Only real answers join the history; a failed turn is dropped so the next one is valid
-      if (res.ok && data.reply) history.push({ role: "assistant", content: data.reply });
-      else history.pop();
+      data = (await res.json().catch(() => null)) ?? {};
     } catch {
-      dots.remove();
-      say("No connection right now. Please try again in a moment.", "bot");
-      history.pop();
-    } finally {
-      send.disabled = false;
-      input.focus({ preventScroll: true });
+      res = null; // offline, refused, or aborted
     }
+
+    // A newer conversation owns the window now; this answer or error belongs to none
+    if (req.generation !== generation || active !== req) return;
+    const late = req.controller.signal.aborted;
+    release(req);
+
+    if (res?.ok && typeof data.reply === "string" && data.reply.trim()) {
+      say(data.reply, "bot");
+      // Only an answered question joins the history, with its answer kept within the contract
+      history.splice(0, history.length, ...messages, { role: "assistant", content: clip(data.reply.trim(), LIMITS.chars) });
+    } else {
+      // The history itself was refused, so it goes; the question waits in the box to send again,
+      // unless the visitor has already started typing another
+      if (data.code === "conversation_too_long") history.length = 0;
+      const back = !input.value;
+      if (back) input.value = q;
+      say(`${trouble(res, data, late)}${back ? " Your question is back in the box." : ""}`, "bot");
+    }
+    input.focus({ preventScroll: true });
   }
 
   return { open: () => open(true), close: () => open(false) };
