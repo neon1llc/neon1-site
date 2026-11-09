@@ -164,6 +164,8 @@ h2 .pr { display: inline-block; width: .7ex; height: 1ex; margin-right: .3em; ve
 /* Whole card opens its case study; the corner arrow opens it, the panel arrow closes it */
 .case { position: relative; cursor: pointer; transition: box-shadow .2s, border-color .2s; }
 .case:hover { border-color: rgba(3,87,4,.35); box-shadow: 0 8px 24px rgba(18,36,26,.08); }
+/* The card a case link (the service chooser's) landed on, so the eye finds it too (js/views.js) */
+.case.is-target { border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand) inset; }
 .open, .case-close { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; background: none; cursor: pointer; color: var(--brand); }
 .open svg, .case-close svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s; }
 .open { position: absolute; top: 10px; right: 10px; }

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // scripts/behavior.cjs - Browser checks for the home page's interactive contracts: the brief never
-// submits, and a case study owns the screen while open.
+// submits, a case study owns the screen while open, and chooser links land on their exact case.
 // Usage: node scripts/behavior.cjs [SITE_DIR]   (make behavior; needs Playwright and its Chromium)
 //
 // Everything runs against a loopback copy of SITE_DIR served with a CSP like production's; any request
@@ -214,6 +214,69 @@ check("browser", "case: closing settles after repeated input, cancelled animatio
     expect(!errors.length, "page errors", errors);
   } finally { await context.close(); }
 });
+
+
+// ---- SITE-09: chooser case links land on their exact card ----
+// Each outcome: the area and need to pick, and the card its link names
+const CHOOSER = [["biz", "retype", "dermatology"], ["biz", "connect", "dermatology"], ["cloud", "find", "accounting"],
+  ["cloud", "servers", "migration"], ["space", "wifi", "home"], ["space", "cameras", "home"], ["safe", "phish", "security"], ["safe", "audit", "security"]];
+
+// Resolves once the card is in view vertically, inside the row sideways, focused, and named in the URL
+const landed = (page, id) => page.waitForFunction((id) => {
+  const card = document.getElementById("case-" + id), rail = document.getElementById("cases");
+  const c = card.getBoundingClientRect(), r = rail.getBoundingClientRect();
+  return c.top >= 0 && c.top < innerHeight && c.left >= r.left - 2 && c.right <= r.right + 2 &&
+    document.activeElement === card.querySelector("[data-case]") && location.hash === "#case-" + id && card.classList.contains("is-target");
+}, id, { timeout: 5000 }).then(() => true, () => false);
+
+for (const [label, options, picks] of [
+  ["reduced motion, wide", { reducedMotion: "reduce" }, CHOOSER],
+  ["reduced motion, phone", { reducedMotion: "reduce", viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }, CHOOSER.filter((c, i) => i % 2 === 0)],
+  ["motion, wide", { reducedMotion: "no-preference" }, CHOOSER.filter((c, i) => i % 2 === 1)],
+  ["motion, phone", { reducedMotion: "no-preference", viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }, CHOOSER.filter((c, i) => i % 2 === 0)],
+]) {
+  check("browser", `chooser: every outcome lands on its card (${label})`, async () => {
+    const { page, context, errors } = await open(options);
+    try {
+      for (const [area, need, id] of picks) {
+        await page.goto(origin + "/#services", { waitUntil: "domcontentloaded" });
+        await page.waitForTimeout(300);
+        const chooser = page.locator(".choose");
+        if (!(await chooser.evaluate((d) => d.open))) await page.locator(".choose summary").click();
+        await page.locator(`label:has(#fit-${area})`).click();
+        await page.locator(`label:has(#fit-${need})`).click();
+        await page.locator(`.choose-result[data-need=${need}] a[href="#case-${id}"]`).click();
+        expect(await landed(page, id), `${area}/${need} did not land on case-${id}`, await page.evaluate(() => [location.hash, document.activeElement.outerHTML.slice(0, 80)]));
+      }
+      expect(!errors.length, "page errors", errors);
+    } finally { await context.close(); }
+  });
+}
+
+for (const motion of ["reduce", "no-preference"]) {
+  check("browser", `chooser: opening /#case-home, then Back and Forward (${motion === "reduce" ? "reduced motion" : "motion"})`, async () => {
+    const { page, context, errors } = await open({ reducedMotion: motion }, "/#case-home");
+    try {
+      expect(await landed(page, "home"), "opening /#case-home did not land on the card");
+      // From the chooser: Back returns to the chooser's spot, Forward to the card again
+      await page.goto(origin + "/#services", { waitUntil: "domcontentloaded" });
+      await page.waitForTimeout(400);
+      await page.locator(".choose summary").click();
+      await page.locator("label:has(#fit-cloud)").click();
+      await page.locator("label:has(#fit-servers)").click();
+      const link = page.locator('.choose-result[data-need=servers] a[href="#case-migration"]');
+      const at = await link.evaluate((a) => a.getBoundingClientRect().top + scrollY);
+      await link.click();
+      expect(await landed(page, "migration"), "the link did not land on case-migration");
+      await page.goBack();
+      const back = await page.waitForFunction((at) => location.hash !== "#case-migration" && Math.abs(scrollY + innerHeight / 2 - at) < innerHeight / 2, at, { timeout: 5000 }).then(() => true, () => false);
+      expect(back, "Back did not return to the chooser", await page.evaluate(() => [location.hash, scrollY]));
+      await page.goForward();
+      expect(await landed(page, "migration"), "Forward did not return to case-migration");
+      expect(!errors.length, "page errors", errors);
+    } finally { await context.close(); }
+  });
+}
 
 
 // ---- Run ----

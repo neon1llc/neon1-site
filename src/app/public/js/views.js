@@ -26,6 +26,57 @@
       b.addEventListener("click", () => rail.scrollBy({ left: step() * +b.dataset.rail, behavior: reduce.matches ? "auto" : "smooth" })));
   }
 
+  // ---- Case links: a link to one card lands on that card ----
+  // The service chooser's "see how a similar one went" links point at single cards (#case-home). Its
+  // section comes into view, the row slides sideways to the card, the card is marked, and focus goes
+  // to its open button, so keyboard and screen reader users arrive where the link said. Each case link
+  // is a history entry: Back returns to where the link was, and Forward comes back to the card. Opening
+  // the page at #case-... takes the same route. Wired before the Motion check, like the arrows; when
+  // Motion steers the page it swaps in its own eased moves for toView and toY below
+  const native = () => (reduce.matches ? "auto" : "smooth");
+  let toView = (view) => view.scrollIntoView({ block: "start", behavior: native() });
+  let toY = (y) => scrollTo({ top: y, behavior: native() });
+  const caseCard = (hash) => {
+    const el = /^#case-[\w-]+$/.test(hash) && document.getElementById(hash.slice(1));
+    return el && el.matches(".case") ? el : null;
+  };
+
+  // Sideways to the card, to the same place a snap would put it, then mark and focus it
+  function slide(card) {
+    const pad = parseFloat(getComputedStyle(rail).scrollPaddingInlineStart) || 0;
+    const left = rail.scrollLeft + card.getBoundingClientRect().left - rail.getBoundingClientRect().left - pad;
+    rail.scrollTo({ left, behavior: native() });
+    rail.querySelectorAll(".case.is-target").forEach((c) => c.classList.remove("is-target"));
+    card.classList.add("is-target");
+    card.querySelector("[data-case]").focus({ preventScroll: true });
+  }
+  const reveal = (card) => { toView(card.closest(".view")); slide(card); };
+
+  if (rail) {
+    document.addEventListener("click", (e) => {
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+      const a = e.target.closest('a[href^="#case-"]'), card = a && caseCard(a.getAttribute("href"));
+      if (!card) return;
+      e.preventDefault();
+      // The entry being left remembers where the page was, for Back
+      history.replaceState({ ...history.state, y: scrollY }, "");
+      history.pushState({ card: card.id }, "", "#" + card.id);
+      reveal(card);
+    });
+    // A frame later, so the browser's own scroll restoration for the entry has already run
+    addEventListener("popstate", (e) => requestAnimationFrame(() => {
+      const card = caseCard(location.hash);
+      if (card) reveal(card);
+      else if (e.state && typeof e.state.y === "number") toY(e.state.y);
+    }));
+  }
+
+  // Opened at #case-...: the slide and focus wait for load, because the browser's own jump to the
+  // fragment, which also scrolls the row, clears focus as the page finishes loading
+  const first = rail && caseCard(location.hash);
+  const arrive = () => slide(first);
+  if (first) { if (document.readyState === "complete") arrive(); else addEventListener("load", arrive, { once: true }); }
+
   // Native scrolling stays in charge without Motion or with reduced motion
   const M = window.Motion;
   if (!M || reduce.matches) return;
@@ -122,8 +173,9 @@
     i = Math.max(0, Math.min(views.length - 1, i));
     const from = pullDir ? pullIndex : indexAt(y);
     const [top, bottom] = range(i);
-    // Coming back up lands at the end of a tall view; End goes to the very bottom
-    const dest = opts.end ? bottom : !opts.link && i < from ? bottom : top;
+    // Coming back up lands at the end of a tall view; End goes to the very bottom; Back to a remembered
+    // spot (opts.y) lands there, kept inside the view
+    const dest = opts.y !== undefined ? Math.max(top, Math.min(bottom, opts.y)) : opts.end ? bottom : !opts.link && i < from ? bottom : top;
     if (settling) settling.stop();
     const fromView = views[from], toView = views[i];
     pull = 0; pullDir = 0;
@@ -268,7 +320,7 @@
   // In-page links settle at the top of their view, closing the menu first. A link with data-view
   // (the logo, a real link to neon1.tech) springs to that view instead of reloading
   document.addEventListener("click", (e) => {
-    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return; // case links route above
     const a = e.target.closest('a[href^="#"], a[data-view]');
     if (!a || off) return;
     const id = a.dataset.view || a.getAttribute("href").slice(1);
@@ -298,8 +350,14 @@
     target = y = Math.max(top, Math.min(bottom, target));
   });
 
-  // Opened with a section link: land on that view once fonts and layout settle
-  const start = views.indexOf(document.getElementById(location.hash.slice(1)));
+  // Case links settle like section links, and Back eases to the remembered spot; once reduced motion
+  // takes over mid-visit (off), the native moves above come back
+  const nativeView = toView, nativeY = toY;
+  toView = (view) => (off ? nativeView(view) : goTo(views.indexOf(view), { link: true }));
+  toY = (y) => (off ? nativeY(y) : goTo(indexAt(y), { y }));
+
+  // Opened with a section link, or a case link's card: land on that view once fonts and layout settle
+  const start = views.indexOf(first ? first.closest(".view") : document.getElementById(location.hash.slice(1)));
   history.scrollRestoration = "manual";
   // Fonts can change heights after the first paint, so land again until the visitor scrolls
   const land = () => { if (start > 0 && !lastInput && !settling) { scrollTo(0, range(start)[0]); sync(); } };
