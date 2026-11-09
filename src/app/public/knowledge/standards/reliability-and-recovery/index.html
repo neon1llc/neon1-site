@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.38.0" />
+  <meta name="version" content="0.39.0" />
   <title>Reliability and recovery · neon1 knowledge center</title>
   <meta name="description" content="How neon1 sets service targets, plans for failure, and tests that backups restore." />
   <meta name="theme-color" content="#F2F4F2" />
@@ -94,7 +94,7 @@
 <p>Reliability means you can do the task when you need to, and get back on your feet when something goes wrong. Targets come from how much interruption and data loss your business can actually tolerate, what the design can do, what it costs, and who's available to respond. I don't start by picking an uptime percentage.</p>
 <h2 id="define-the-service-first">Define the service first</h2>
 <p>A service profile names the task that matters, operating hours, users, normal volume, dependencies, data owner, support owner, and the manual fallback. "The website" is too vague when the real task is "a request reaches the right person." We describe normal, degraded, and failed states separately, because a form that accepts a request but sends the email late hasn't lost the request.</p>
-<p>Dependencies such as sign-in, DNS, email delivery, storage, payments, an AI provider, and your own internet connection are listed, along with which failures the design survives. A vendor's uptime figure doesn't describe your whole experience.</p>
+<p>Dependencies such as sign-in, email delivery, payments, and your own internet connection are listed, with which failures the design survives.</p>
 <h2 id="the-vocabulary">The vocabulary</h2>
 <table><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td><strong>SLI</strong> (service level indicator)</td><td>What we observe, such as the share of valid requests stored and acknowledged within a set time</td></tr><tr><td><strong>SLO</strong> (service level objective)</td><td>The target value for that indicator over a stated window</td></tr><tr><td><strong>SLA</strong> (service level agreement)</td><td>A contractual promise with consequences. An internal target isn't automatically one</td></tr><tr><td><strong>Response time</strong></td><td>Time to a real person's first useful reply, separate from time to fix</td></tr><tr><td><strong>RTO</strong> (recovery time objective)</td><td>The intended longest time to restore the service after a defined disruption</td></tr><tr><td><strong>RPO</strong> (recovery point objective)</td><td>How much recent data you can afford to lose, measured in time</td></tr></tbody></table>
 <p>Definitions follow <a class="ext" href="https://sre.google/sre-book/service-level-objectives/" target="_blank" rel="noopener">Google's SRE guidance</a> and <a class="ext" href="https://csrc.nist.gov/pubs/sp/800/34/r1/upd1/final" target="_blank" rel="noopener">NIST SP 800-34</a>.</p>
@@ -114,7 +114,7 @@
 <p>Restores are tested before handover, after a big change, and at an interval we agree on.</p>
 <h2 id="when-something-breaks">When something breaks</h2>
 <p>An incident disrupts or threatens normal work. A request asks for access, advice, or a change. Severity comes from the consequences to you. For each incident we name who coordinates, who can change the system, and your contact, and keep a timestamped log. Updates say what's affected, what's known, what isn't, what you can do meanwhile, and when the next update comes. Suspected security incidents follow your agreed route, keep the evidence intact, and bring in the right specialist or insurer.</p>
-<p>Afterward a short review covers impact, timeline, what helped, and what changes, focused on conditions rather than blame, with a few actions that get checked later.</p>
+<p>Afterward, a short review covers what happened and what changes, focused on conditions rather than blame.</p>
 <h2 id="what-ongoing-care-covers">What ongoing care covers</h2>
 <p>Ongoing care with neon1 is scheduled attention to a named workflow within an agreed allowance. It isn't a help desk, round-the-clock security monitoring, an unlimited repair fund, or insurance against vendor outages. If the work regularly outgrows the allowance, we change the scope or the price.</p>
       </div>
@@ -164,7 +164,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>No ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.38.0</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.39.0</a>
       </span>
     </div>
   </footer>
