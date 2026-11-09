@@ -11,3 +11,6 @@ node_modules/
 
 # neon1-corpus checkout and export, from make corpus
 .corpus/
+
+# Knowledge center PDFs, printed in the deploy job by make knowledge-pdf
+src/app/public/knowledge/**/*.pdf

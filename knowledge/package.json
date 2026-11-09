@@ -1,0 +1,9 @@
+{
+  "name": "neon1-site-knowledge",
+  "private": true,
+  "description": "Prints the knowledge center's PDFs. The site itself has no dependencies; only this printer does.",
+  "license": "SEE LICENSE IN ../LICENSE-CODE",
+  "dependencies": {
+    "playwright": "1.65.0"
+  }
+}
