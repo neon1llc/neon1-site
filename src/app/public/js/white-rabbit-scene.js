@@ -27,40 +27,45 @@ const SW = 0.48, SH = 0.36;                  // screen size
 const SC = new T.Vector3(0, 0.51, -1.775);  // screen center
 const WINDOW = { z: 0.6, y: 1.45, w: 1.2, h: 1.3 };
 
-// Beats, as a person would take them: out of the TV, then gliding back across the floor in one steady
-// move, sitting the whole way, until the set and both chairs are in view; still sitting, turning slowly
-// toward the window (through the sun, for a moment, right in the eyes) and settling on the sky and treetops;
-// a pondering pause; getting up (the view dips and tilts, then rights itself); walking over with the bob
-// of each step, glancing down at the car on the sill on the way, then squaring up to the window; a pause
-// looking out; a step closer as the sash, already a little up, goes the rest of the way; a breath; and out
-// through the opening into the white. Each is [progress, camera position, look target, vertical fov]; the
-// first two positions are filled in from the picture's fit. Pauses are pairs of beats a hair apart
+// Beats, as a person would take them: out of the TV, then straight out and back from the set, drifting a little
+// right, low on the floor and looking at it, until the set and both chairs are in view; still sitting, one smooth
+// turn left to the window, the gaze rising slowly at first and more toward the end, into the sun and the dust;
+// getting up (the view dips and tilts, then rights itself); walking slowly over with the bob of each step, a quick
+// glance at the car on the sill, then squaring up to the window; a step closer as the sash goes up; the head out
+// through the opening, looking right and down, then left and a little up to the middle of the lawn; and the white.
+// Each is [progress, camera position, look target, vertical fov]; the first two positions are filled in from the
+// picture's fit. Pauses are pairs of beats a hair apart
 const BEATS = [
   [0, null, SC, 40], [0.09, null, SC, 44],                                                               // face right at the screen, hunched
-  // then straight back out of the set, as it first was: low on the floor at the screen's own height and looking level at
-  // it the whole way (no rising, no tilting down), until the set and both chairs are in view
+  // then straight out and back from the set, drifting a little right, low on the floor and looking at it the whole way,
+  // until both chairs and the set are in view
   [0.13, [0.03, 0.53, -1.32], [0, 0.53, -1.9], 48], [0.25, [0.47, 0.55, 0.14], [0.01, 0.55, -1.9], 51],
   [0.37, [0.91, 0.56, 1.6], [0.02, 0.56, -1.9], 54],
-  [0.42, [0.92, 0.56, 1.6], [-0.86, 1.56, 0.88], 54],            // still on the floor, turning to the window: the sun in the eyes
-  [0.46, [0.92, 0.56, 1.6], [-1.95, 1.3, 0.92], 54],             // past it, to the sky and treetops
-  [0.51, [0.92, 0.57, 1.59], [-1.95, 1.33, 0.86], 54],           // watching the light and the dust
+  // one smooth turn left to the window, the gaze rising slowly: a third of the rise by halfway, the other two thirds
+  // after, ending on the window in the sun and the dust (yaw eases in and out; the rise follows t^1.585)
+  [0.391, [0.92, 0.56, 1.6], [-0.12, 0.60, -1.64], 54],
+  [0.412, [0.92, 0.56, 1.6], [-0.62, 0.69, -1.43], 54],
+  [0.433, [0.92, 0.56, 1.6], [-1.27, 0.80, -0.99], 54],
+  [0.440, [0.92, 0.56, 1.6], [-1.47, 0.85, -0.80], 54],
+  [0.454, [0.92, 0.56, 1.6], [-1.83, 0.94, -0.37], 54],
+  [0.475, [0.92, 0.56, 1.6], [-2.16, 1.11, 0.27], 54],
+  [0.496, [0.92, 0.56, 1.6], [-2.27, 1.29, 0.69], 54],
+  [0.510, [0.92, 0.56, 1.6], [-2.27, 1.41, 0.78], 54],
   [0.55, [0.85, 1.05, 1.55], [-1.9, 0.95, 0.9], 54],             // getting up: the view dips
   [0.59, [0.78, 1.6, 1.5], [-1.95, 1.4, 0.8], 52],               // up
-  [0.64, [-0.3, 1.58, 1.62], [-1.87, 0.92, 0.9], 50],            // walking over, a glance at the car
+  [0.64, [-0.3, 1.58, 1.62], [-1.87, 0.92, 0.9], 50],            // walking slowly over, a quick glance at the car
   [0.68, [-0.62, 1.56, 1.05], [-1.95, 1.25, 0.72], 50],          // eyes back to the window
   [0.72, [-0.7, 1.55, 0.62], [-1.95, 1.2, 0.6], 62],             // square to it, the whole window in view
-  [0.79, [-0.72, 1.55, 0.6], [-1.95, 1.18, 0.6], 62],            // looking out and down through it to the lawn, the bed, and the back fence, as in the photo
+  [0.79, [-0.72, 1.55, 0.6], [-1.95, 1.18, 0.6], 62],            // looking out and down through it
   [0.85, [-0.95, 1.5, 0.6], [-2.4, 1.0, 0.6], 62],               // a step closer, the sash going up (see OPEN)
-  // then, with the sash all the way up: leaning left toward the car, looking right and down through the opening to
-  // the concrete, the greenhouse, and the right fence; across to the right, looking left and down at the lawn,
-  // the left border, and the stockade; and back to center, square to the window, gliding in until the frame is
-  // gone and only the yard is ahead, held there before the white
-  [0.875, [-0.95, 1.32, 0.95], [-5.0, 0.45, -0.37], 60], [0.885, [-0.96, 1.32, 0.95], [-5.0, 0.44, -0.39], 60],   // a step back from the opening, so both sides of the frame stay in view, looking right and a little down, out to the far trees and the water
-  [0.915, [-0.95, 1.32, 0.25], [-5.0, 0.45, 1.57], 60], [0.925, [-0.96, 1.32, 0.25], [-5.0, 0.44, 1.59], 60],   // and the same looking left
-  [0.945, [-1.55, 1.3, 0.6], [-3.1, 1.02, 0.6], 52],
-  [0.97, [-2.2, 1.35, 0.62], [-3.6, 0.47, 0.6], 64],             // through the opening, looking down over the deck to the yard, the trees, and the water, as in the photo from this window
-  [0.985, [-2.2, 1.35, 0.62], [-3.6, 0.47, 0.6], 64],            // held, before the white
-  [1, [-2.2, 1.35, 0.62], [-3.6, 0.47, 0.6], 64],
+  // then the head out through the opening: a look straight out, to the right and down at the concrete and the
+  // greenhouse, then across to the left and a little up, settling on the middle of the lawn, held there before the white
+  [0.875, [-2.25, 1.35, 0.6], [-4.6, 0.55, 0.6], 60],
+  [0.905, [-2.3, 1.35, 0.5], [-4.3, -1.5, -2.3], 60], [0.915, [-2.3, 1.35, 0.5], [-4.32, -1.52, -2.33], 60],
+  [0.945, [-2.3, 1.35, 0.68], [-13.2, -4.3, 3.2], 60],           // the middle of the lawn
+  [0.97, [-2.3, 1.35, 0.68], [-13.2, -4.3, 3.2], 60],
+  [0.985, [-2.3, 1.35, 0.68], [-13.2, -4.3, 3.2], 60],           // held, before the white
+  [1, [-2.3, 1.35, 0.68], [-13.2, -4.3, 3.2], 60],
 ];
 const KEYS = BEATS.map((b) => b[0]), FOV = BEATS.map((b) => b[3]), LOOK = BEATS.map((b) => b[2]);
 // The sash starts a little up and goes the rest of the way as the camera steps closer
@@ -590,10 +595,10 @@ export function createScene({ onLost, onSound = () => {} }) {
     // whatever sits near its sides, like looking through a fishbowl. At the window it opens to about 92 degrees, as
     // the phone photo of it shows the whole window and more of the yard through it; out through the opening, about
     // 100 degrees, like the wide phone photo from this window, so the deck below and the water beyond both fit
-    const half = 36 + 10 * ramp(pr, [[0.62, 0], [0.72, 1]]) + 4 * ramp(pr, [[0.945, 0], [0.97, 1]]);
+    const half = 36 + 10 * ramp(pr, [[0.62, 0], [0.72, 1]]) + 4 * ramp(pr, [[0.855, 0], [0.875, 1]]);
     const across = T.MathUtils.radToDeg(2 * Math.atan(Math.tan(T.MathUtils.degToRad(half)) / aspect));
     fov += (Math.min(fov, across) - fov) * ramp(p, [[0.12, 0], [0.28, 1]]);
-    const back = Math.max(0, 0.9 / aspect - 0.9) * ramp(p, [[0.3, 0], [0.5, 1]]) * ramp(pr, [[0.84, 1], [0.94, 0]]);
+    const back = Math.max(0, 0.9 / aspect - 0.9) * ramp(p, [[0.3, 0], [0.5, 1]]) * ramp(pr, [[0.8, 1], [0.86, 0]]);
     D.subVectors(P, L).normalize();
     P.addScaledVector(D, back);
     if (!still) {
@@ -606,7 +611,7 @@ export function createScene({ onLost, onSound = () => {} }) {
       const w = (pr - WALK[0]) / (WALK[1] - WALK[0]), fade = Math.sin(w * Math.PI), ph = w * STEPS * Math.PI * 2;
       P.y -= (0.5 - 0.5 * Math.cos(ph)) * 0.028 * fade; P.z += Math.sin(ph / 2) * 0.012 * fade;
     }
-    if (pr < 0.9) P.set(T.MathUtils.clamp(P.x, -1.85, 3.05), T.MathUtils.clamp(P.y, 0.2, 2.4), T.MathUtils.clamp(P.z, -2.35, 2.35));
+    if (pr < 0.852) P.set(T.MathUtils.clamp(P.x, -1.85, 3.05), T.MathUtils.clamp(P.y, 0.2, 2.4), T.MathUtils.clamp(P.z, -2.35, 2.35));
     camera.position.copy(P); camera.lookAt(L);
     camera.rotateZ(ramp(pr, ROLL));
     camera.fov = fov; camera.aspect = aspect; camera.updateProjectionMatrix();

@@ -2,6 +2,13 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.32.1
+
+- A simpler walk. Out of the TV, the view goes straight out and back from the set, drifting a little right and looking at it, until both chairs and the set are in view.
+- Then, still on the floor, it turns left to the window in one smooth motion. The gaze rises slowly: a third of the way by the halfway point, the rest after, ending on the window in the sun and the dust.
+- Getting up stays as it was. Then a slow walk to the window with a quick glance at the car, squaring up to it, and the sash going up.
+- Then the head goes out through the opening: a look straight out, then right and down at the concrete and the greenhouse, then left and a little up to the middle of the lawn, held there before the white and "go touch grass".
+
 ## v0.32.0
 
 - Out the window, the yard is in full sun: shade and fallen leaves lie only under and downwind of the street and park trees, so the lawn, the concrete, and the mulch are brighter, and the lawn no longer has leaves across it.
