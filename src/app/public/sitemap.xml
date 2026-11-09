@@ -1,6 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- neon1.tech sitemap: the home page and the sample project in 1NEON; legal pages join once their final versions are published -->
+<!-- neon1.tech sitemap: the home page, the sample project in 1NEON, and the knowledge center (its block is written by scripts/knowledge.mjs) -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://neon1.tech/</loc></url>
   <url><loc>https://neon1.tech/1NEON/example</loc></url>
+  <!-- knowledge -->
+  <url><loc>https://neon1.tech/knowledge/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/company/about/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/company/charter/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/company/contact/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/company/names/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/company/process/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/services/services/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/standards/ai-quality/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/standards/client-trust/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/standards/discovery-and-delivery/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/standards/measurement/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/standards/operating-principles/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/standards/reliability-and-recovery/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/standards/security-and-data/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/standards/technology-decisions/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/faq/1neon-help/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/faq/working-with-neon1/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/case-studies/answers-in-seconds/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/case-studies/cameras-to-grandmas-email/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/case-studies/intake-out-of-the-inbox/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/case-studies/security-for-non-security-people/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/case-studies/two-offices-off-local-servers/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/case-studies/where-neon1-started/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/products/1neon/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/products/aws-clip/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/products/deploy-ops/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/products/ready-secure-go/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/landscape/where-else-to-get-help/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/templates/baa-request/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/templates/business-associate-agreement/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/templates/decision-review/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/templates/partner-responsibilities/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/templates/proposal/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/forms/change-request/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/forms/discovery/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/forms/incident-and-restore/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/forms/intake/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/forms/metric-record/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/forms/publication-permission/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/forms/release-and-handover/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/forms/service-and-recovery-profile/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/forms/tool-decision/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/examples/baa-request/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/examples/intake/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/examples/proposal/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/examples/release-and-handover/</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/policies/cookies/</loc><lastmod>2026-11-07</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/policies/privacy/</loc><lastmod>2026-11-08</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/policies/terms/</loc><lastmod>2026-11-07</lastmod></url>
+  <!-- /knowledge -->
 </urlset>

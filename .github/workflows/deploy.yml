@@ -64,6 +64,19 @@ jobs:
           role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
           aws-region: us-east-1
 
+      # The knowledge center's PDFs are printed here, from the pinned corpus, so they're never committed
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: knowledge/package-lock.json
+
+      - name: make knowledge-pdf
+        run: |
+          npm ci --prefix knowledge
+          npx --prefix knowledge playwright install --with-deps chromium
+          make knowledge-pdf
+
       - run: make deploy
 
       - name: make invalidate
