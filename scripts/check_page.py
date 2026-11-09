@@ -23,6 +23,31 @@ from urllib.parse import unquote, urlsplit
 # Paths served by other apps on the same domain, so not files in this site
 OTHER_APPS = ("/1NEON/",)
 
+# Files the deploy job writes beside the pages, so a fresh checkout doesn't have them yet
+BUILT_AT_DEPLOY = re.compile(r"^/knowledge/.+\.pdf$")
+
+
+def site_root(path):
+    """The site folder: the page's own folder, or the nearest one above it that holds index.html and
+    shared/, so a page in a subfolder such as /knowledge/ resolves root-relative paths from the site root."""
+    d = os.path.dirname(os.path.abspath(path))
+    while True:
+        if os.path.isfile(os.path.join(d, "index.html")) and os.path.isdir(os.path.join(d, "shared")):
+            return d
+        up = os.path.dirname(d)
+        if up == d:
+            return os.path.dirname(os.path.abspath(path))
+        d = up
+
+
+def local_file(root, ref):
+    """The file a site path names; a folder path names its index.html."""
+    local = unquote(urlsplit(ref).path).lstrip("/")
+    if local.endswith("/") or local == "":
+        local += "index.html"
+    return os.path.join(root, local)
+
+
 # Script types node can check, attributes that hold URLs, and root-relative url() in CSS
 JS_TYPES = {"", "text/javascript", "application/javascript", "module"}
 REF_ATTRS = {"href", "src", "poster", "data"}
@@ -108,7 +133,7 @@ def parse(path):
 
 def check_links(path, page):
     """Return problems with anchors and root-relative assets."""
-    root = os.path.dirname(os.path.abspath(path))
+    root = site_root(path)
     problems = []
     for line, target in page.anchors:
         if target not in page.ids:
@@ -116,8 +141,9 @@ def check_links(path, page):
     for line, ref in page.refs:
         if ref.startswith(OTHER_APPS):
             continue
-        local = unquote(urlsplit(ref).path).lstrip("/")
-        if local and not os.path.isfile(os.path.join(root, local)):
+        if BUILT_AT_DEPLOY.match(unquote(urlsplit(ref).path)):
+            continue
+        if not os.path.isfile(local_file(root, ref)):
             problems.append(f"{path}:{line}: missing file {ref}")
     return problems
 
@@ -155,7 +181,7 @@ def expand(entry, root, source_text):
 
 def check_graph(path, page):
     """Return assets missing anywhere below the page, following its stylesheets and scripts."""
-    root = os.path.dirname(os.path.abspath(path))
+    root = site_root(path)
     with open(REGISTRY, encoding="utf-8") as f:
         registry = {e["template"]: e for e in json.load(f)["dynamic"]}
     problems, seen, used = [], set(), set()
@@ -163,8 +189,8 @@ def check_graph(path, page):
 
     def need(ref, origin, line):
         local = unquote(urlsplit(ref).path)
-        if not local or local.endswith("/"):
-            return  # a folder prefix, such as the media URL rewrite in the scene
+        if not local or local.endswith("/") or BUILT_AT_DEPLOY.match(local):
+            return  # a folder prefix, such as the media URL rewrite in the scene, or a PDF the deploy prints
         if not os.path.isfile(os.path.join(root, local.lstrip("/"))):
             problems.append(f"{origin}:{line}: missing file {ref}")
         else:

@@ -2,6 +2,13 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.33.0
+
+- New: the knowledge center at [neon1.tech/knowledge](https://neon1.tech/knowledge/). Every public neon1 document in one place, on shelves: the charter, how I work, services, questions, case studies, products, alternatives, templates, forms, filled-out examples, and policies. Search filters them as you type, and `/` jumps to the box.
+- Each document has its own page with its edition, when it was first written and last updated, and a branded PDF to download. Forms and templates print with lines to write on and boxes to tick.
+- The pages are written from neon1-corpus v0.11.0, the same source Neo and the home page read, and `make check` fails if they drift from it. PDFs are printed in the deploy job, never committed.
+- The bar, the menu, and the footer link to the knowledge center.
+
 ## v0.32.6
 
 - Tapping into Neo's chat box on a phone no longer zooms the page in. The keyboard still comes up and the box moves into view. Pinch to zoom still works.
