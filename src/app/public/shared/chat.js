@@ -289,13 +289,35 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
   let generation = 0;
   let active = null;
 
+  // While Neo is cooling down for this visitor (the API said how long), the send button rests too,
+  // so a question isn't sent just to be refused. The API enforces the wait either way
+  let restUntil = 0;
+  let restTimer = 0;
+  const resting = () => Date.now() < restUntil;
+  function rest(seconds) {
+    if (!(seconds > 0)) return;
+    restUntil = Date.now() + seconds * 1000;
+    send.disabled = true;
+    clearTimeout(restTimer);
+    restTimer = setTimeout(() => {
+      if (!active) send.disabled = false;
+    }, seconds * 1000);
+  }
+  // Roughly how long is left, in words
+  function left() {
+    const s = Math.max(1, Math.ceil((restUntil - Date.now()) / 1000));
+    if (s >= 20 * 3600) return "until tomorrow";
+    if (s >= 3000) return `for about ${Math.round(s / 3600)} hour${s >= 5400 ? "s" : ""}`;
+    return s >= 90 ? `for about ${Math.round(s / 60)} minutes` : "for a moment";
+  }
+
   // Hand the controls back, once, and only for the request that still owns them
   function release(req) {
     if (active !== req) return;
     active = null;
     clearTimeout(req.timer);
     req.dots.remove();
-    send.disabled = false;
+    send.disabled = resting();
   }
 
   // A new conversation: the request in flight is cancelled, and the history, replies, and
@@ -357,6 +379,8 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
   async function ask(q) {
     q = q.trim();
     if (!q || active) return;
+    // Still resting: the question stays in the box for later, and nothing is sent
+    if (resting()) return void say(`Neo is still resting ${left()}. Your question will wait in the box.`, "bot");
     // The box can't hold more than the limit, but a pasted or scripted question still gets words
     if (q.length > LIMITS.chars) return void say(trouble({}, { code: "question_too_long" }), "bot");
 
@@ -397,6 +421,8 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
       // The history itself was refused, so it goes; the question waits in the box to send again,
       // unless the visitor has already started typing another
       if (data.code === "conversation_too_long") history.length = 0;
+      // A cooldown or the daily rest: hold the send button for as long as the API asked
+      if (res?.status === 429) rest(Number(res.headers.get("retry-after")));
       const back = !input.value;
       if (back) input.value = q;
       say(`${trouble(res, data, late)}${back ? " Your question is back in the box." : ""}`, "bot");
