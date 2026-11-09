@@ -2,6 +2,13 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.32.0
+
+- Out the window, the yard is in full sun: shade and fallen leaves lie only under and downwind of the street and park trees, so the lawn, the concrete, and the mulch are brighter, and the lawn no longer has leaves across it.
+- Coming back to the tab mid-scene keeps the white rabbit's full picture. The time away no longer counts as a slow frame that lowers its sharpness and turns off its glow.
+- Fonts, images, models, and the recording keep the same bytes at each address for good, and the deploy keeps the older ones, so a page left open from an earlier release still finds its files.
+- The checks catch release numbers that disagree, a changed file at an old address, a shipped asset without its source and license, and baked lighting that no longer matches the room. A measured budget holds the 3D scene's draw calls, triangles, and resources.
+
 ## v0.31.0
 
 - The optional pre-call brief can't be sent anywhere: pressing Enter does nothing, even if its script never runs. Its answers stay in the page until you copy or save them.
