@@ -171,9 +171,14 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
   log.append(hello, chips);
 
   const form = el("form", "n1chat-form");
-  const input = el("textarea", "n1chat-input", null, { rows: "2", maxlength: String(LIMITS.chars), "aria-label": "Your question", placeholder: "Ask Neo" });
+  const input = el("textarea", "n1chat-input", null, { rows: "2", maxlength: String(LIMITS.chars), "aria-label": "Your question", "aria-describedby": "n1chat-note", placeholder: "Ask Neo" });
   const send = el("button", "n1chat-send", "send", { type: "submit" });
   form.append(input, send);
+
+  // A reminder by the box: Neo needs nothing private. The policy opens in a new tab, since the
+  // conversation lives only in this page
+  const note = el("p", "n1chat-note", "Please don't share passwords, health details, or anything private. ", { id: "n1chat-note" });
+  note.append(el("a", "n1chat-plain", "Privacy", { href: "/1NEON/privacy", target: "_blank", rel: "noopener" }));
 
   // A person is always one click away, whatever Neo says
   const human = el("p", "n1chat-human");
@@ -187,7 +192,7 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
     ".",
   );
 
-  panel.append(head, log, form, human);
+  panel.append(head, log, form, note, human);
   for (const cls of className.split(/\s+/).filter(Boolean)) for (const node of [launcher, panel]) node.classList.add(cls);
   root.append(launcher, panel);
 
