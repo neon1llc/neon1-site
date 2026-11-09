@@ -32,7 +32,7 @@ WELL_KNOWN  := --include ".well-known/*"
 
 # Plain make shows the help
 .DEFAULT_GOAL := help
-.PHONY: help check html js links logic frame frame-check release manifest rehash models budget secrets behavior serve three deploy invalidate verify
+.PHONY: help check html js links logic frame frame-check release manifest rehash models budget secrets behavior perf serve three deploy invalidate verify
 
 
 ##@ Checks
@@ -95,6 +95,11 @@ budget: ## Fail if the deployed files exceed BUDGET_KB
 behavior: ## Check the brief, case studies, chooser links, and white rabbit in a real browser
 	@command -v node >/dev/null 2>&1 || { echo "behavior: install Node.js"; exit 1; }
 	node scripts/behavior.cjs $(SITE_DIR)
+
+# Also headless Chromium, and a few minutes of software rendering, so it stays out of check too
+perf: ## Measure the white rabbit's draw calls, triangles, and resources, and fail past scripts/perf-budget.json
+	@command -v node >/dev/null 2>&1 || { echo "perf: install Node.js"; exit 1; }
+	node scripts/perf.cjs $(SITE_DIR)
 
 secrets: ## Scan the git history for secrets with gitleaks
 	@if command -v gitleaks >/dev/null 2>&1; then \

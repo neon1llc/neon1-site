@@ -1,0 +1,12 @@
+{
+  "about": [
+    "The most the white rabbit's scene may reach at any checkpoint of make perf (scripts/perf.cjs), per profile.",
+    "Set on 2026-11-09 from v0.31.0's counts with about 10% headroom, rounded up. The desktop's frame calls, textures, and programs",
+    "also allow for bloom (13 draws, its render targets, and its shaders), which a real GPU keeps on but the software-rendered run drops.",
+    "Raise a number only on purpose, in the same change as what needs it, and rerun PERF_REPORT=docs/perf-report.md make perf."
+  ],
+  "profiles": {
+    "desktop": { "sceneCalls": 460, "sceneTriangles": 275000, "calls": 500, "geometries": 585, "textures": 90, "programs": 75 },
+    "phone": { "sceneCalls": 320, "sceneTriangles": 205000, "calls": 325, "geometries": 560, "textures": 65, "programs": 55 }
+  }
+}

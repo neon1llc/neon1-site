@@ -681,8 +681,9 @@ export function createScene({ onLost, onSound = () => {} }) {
     grade.uniforms.uAspect.value = aspect;
     composer.render();
 
-    // Slow frames step the pixel ratio down, and bloom goes first
-    if (!still && lastFrame) {
+    // Slow frames step the pixel ratio down, and bloom goes first. A gap over a second is time spent in a
+    // hidden tab (animation frames stop there) or a stall, not a slow frame, so it isn't counted
+    if (!still && lastFrame && now - lastFrame < 1000) {
       spent += now - lastFrame; frames++;
       if (frames === 30) {
         if (spent / frames > 20 && ratio > 1) {

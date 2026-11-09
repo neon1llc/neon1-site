@@ -12,6 +12,7 @@ You need Python 3 and Node.js. Gitleaks is used if it's installed, otherwise the
 make check      # HTML validation, JS syntax, anchors and asset paths, the white rabbit's lifetime, release versions, asset manifest, baked models, size budget, secret scan
 make serve      # http://localhost:8000
 make behavior   # the page driven in headless Chromium; needs Node's playwright package and its browser
+make perf       # the white rabbit's draw calls, triangles, and resources against their budget; same needs
 ```
 
 Run `make help` to list every target.
@@ -36,6 +37,8 @@ Two query flags help with testing, and in production they only add rabbits:
 
 - `?rabbit=now` keeps a rabbit on the landing and writes its position to `#whiteRabbit` as `data-spot`.
 - `?rabbit=p0.5` catches a rabbit and jumps to that point in the scene, from `p0` to `p1`.
+
+`make perf` enters the scene in headless Chromium on a desktop viewport and an emulated phone, records three.js's draw calls, triangles, geometries, textures, and shader programs at six fixed points of the walk, and fails if any goes past `scripts/perf-budget.json`. `docs/perf-report.md` has the last numbers and how the budget was set; `PERF_REPORT=docs/perf-report.md make perf` rewrites it. Headless WebGL is software-rendered, so its frame times are only for comparing runs on one machine.
 
 `make three` rebuilds the bundle from `scripts/three/entry.js` with pinned three.js and esbuild versions.
 
