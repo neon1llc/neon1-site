@@ -120,26 +120,49 @@ function card(d, { shelf = false } = {}) {
 }
 
 
-// The front door: what this is, a search box, the shelves, and every document on its shelf
+// The front door: what this is, a search box, a featured row, then the two groups and their shelves
+function shelfSection(s) {
+  return `      <section class="kc-shelf" id="${s.key}" aria-labelledby="${s.key}-h">
+        <div class="kc-shelf-head">
+          <h3 id="${s.key}-h">${esc(s.label)}</h3>
+          <p>${esc(s.description)}</p>
+        </div>
+        <ul class="kc-cards">
+${s.docs.map((d) => card(d)).join("\n")}
+        </ul>
+      </section>`
+}
+
 function indexPage() {
   const count = corpus.docs.length
   const pdfs = corpus.docs.filter((d) => d.pdf).length
-  const shelves = corpus.shelves
-    .map((s) => `    <section class="kc-shelf" id="${s.key}" aria-labelledby="${s.key}-h">
-      <div class="kc-shelf-head">
-        <h2 id="${s.key}-h">${esc(s.label)}</h2>
-        <p>${esc(s.description)}</p>
-      </div>
+  const featured = corpus.featured.length
+    ? `    <section class="kc-featured" aria-labelledby="kc-featured-h">
+      <h2 id="kc-featured-h">Start here</h2>
       <ul class="kc-cards">
-${s.docs.map((d) => card(d)).join("\n")}
+${corpus.featured.map((d) => card(d, { shelf: true })).join("\n")}
       </ul>
+    </section>
+`
+    : ""
+  const groups = corpus.groups
+    .map((g) => `    <section class="kc-group" id="${g.key}" aria-labelledby="${g.key}-h">
+      <div class="kc-group-head">
+        <h2 id="${g.key}-h">${esc(g.label)}</h2>
+        <p>${esc(g.description)}</p>
+      </div>
+${g.shelves.map(shelfSection).join("\n\n")}
     </section>`)
     .join("\n\n")
+  const nav = corpus.groups
+    .map((g) => `        <li class="kc-nav-group"><span>${esc(g.label)}</span></li>
+${g.shelves.map((s) => `        <li><a href="#${s.key}">${esc(s.label)} <span>${s.docs.length}</span></a></li>`).join("\n")}`)
+    .join("\n")
   const main = `    <section class="kc-band" aria-labelledby="kc-title">
       <div class="kc-band-inner">
         <p class="kc-eyebrow">neon1 · knowledge center</p>
         <h1 id="kc-title">Everything neon1 is, written down.</h1>
-        <p class="kc-lead">How I work, what I offer, the forms and agreements behind an engagement, filled-out examples, and an honest look at the alternatives. ${count} documents, ${pdfs} of them as PDFs to download, print, or send around.</p>
+        <p class="kc-lead">Guides, templates, forms, and filled-out examples you can use whether or not you ever hire me, plus how I work, what I offer, and an honest look at the alternatives. ${count} documents, ${pdfs} of them as PDFs to download, print, or send around.</p>
         <div class="kc-search" hidden>
           <label for="kc-q">Search the knowledge center</label>
           <input id="kc-q" type="search" placeholder="Try &quot;backup&quot;, &quot;proposal&quot;, or &quot;privacy&quot;" autocomplete="off" />
@@ -150,18 +173,19 @@ ${s.docs.map((d) => card(d)).join("\n")}
 
     <nav class="kc-shelves" aria-label="Shelves">
       <ul>
-${corpus.shelves.map((s) => `        <li><a href="#${s.key}">${esc(s.label)} <span>${s.docs.length}</span></a></li>`).join("\n")}
+${nav}
       </ul>
     </nav>
 
     <div class="kc-body">
-${shelves}
+${featured}
+${groups}
 
     <p class="kc-colophon">Every document here is written once in <a class="ext" href="https://github.com/neon1llc/neon1-corpus" target="_blank" rel="noopener">neon1-corpus</a>, the public source of neon1's words, and shared under CC BY-ND 4.0. Templates and examples are illustrations, not legal advice.</p>
     </div>`
   return page({
     title: "Knowledge center · neon1",
-    description: "neon1's public documents in one place: standards, services, policies, templates, forms, filled-out examples, and alternatives, each with a PDF to download.",
+    description: "neon1's public documents in one place: guides, templates, forms, filled-out examples, and alternatives, plus standards, services, and policies, each with a PDF to download.",
     path: BASE,
     main,
     kind: "index",

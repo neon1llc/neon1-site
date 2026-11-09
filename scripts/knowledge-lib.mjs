@@ -41,7 +41,10 @@ export function load(exportDir) {
   const byId = new Map(docs.map((d) => [d.id, d]))
   const bySource = new Map(docs.map((d) => [d.source, d]))
   const shelves = Object.entries(manifest.shelves).map(([key, s]) => ({ key, ...s, url: `${BASE}#${key}`, docs: docs.filter((d) => d.section === key) }))
-  return { manifest, docs, byId, bySource, shelves }
+  // Shelves in their groups, resources first, in the order the corpus gives
+  const groups = Object.entries(manifest.groups ?? {}).map(([key, g]) => ({ key, ...g, shelves: shelves.filter((s) => s.group === key) })).filter((g) => g.shelves.length)
+  const featured = docs.filter((d) => d.data.featured)
+  return { manifest, docs, byId, bySource, shelves, groups, featured }
 }
 
 
