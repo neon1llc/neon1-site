@@ -2,6 +2,12 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.34.0
+
+- The knowledge center grows to 60 documents: five more How I work standards (development, design and accessibility, customers, partners, outreach and selling), an accessibility statement, a security disclosure policy, and a new Guides shelf (getting ready for a first call, a family password manager, backups you can trust, before you buy a new tool, and whether you need a business associate agreement).
+- Search also matches each document's section headings, so "restore" or "two-step" finds the right guide.
+- From neon1-corpus v0.12.0.
+
 ## v0.33.0
 
 - New: the knowledge center at [neon1.tech/knowledge](https://neon1.tech/knowledge/). Every public neon1 document in one place, on shelves: the charter, how I work, services, questions, case studies, products, alternatives, templates, forms, filled-out examples, and policies. Search filters them as you type, and `/` jumps to the box.
