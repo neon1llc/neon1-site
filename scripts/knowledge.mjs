@@ -181,7 +181,7 @@ ${nav}
 ${featured}
 ${groups}
 
-    <p class="kc-colophon">These documents come from <a class="ext" href="https://github.com/neon1llc/neon1-corpus" target="_blank" rel="noopener">neon1-corpus</a> and are shared under CC BY-ND 4.0. An edition below 1.0 hasn't had its final review yet. Templates and examples are illustrations, not legal advice.</p>
+    <p class="kc-colophon">These documents come from <a class="ext" href="https://github.com/neon1llc/neon1-corpus" target="_blank" rel="noopener">neon1-corpus</a> and are shared under CC BY-ND 4.0. Templates and examples are illustrations, not legal advice.</p>
     </div>`
   return page({
     title: "Knowledge center · neon1",

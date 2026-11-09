@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.36.3
+
+- Every knowledge center document is now at edition 1.0. From neon1-corpus v0.17.0.
+
 ## v0.36.2
 
 - The knowledge center's heading is now "Everything neon1", with a plainer introduction.
