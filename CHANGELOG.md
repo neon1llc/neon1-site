@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.39.0
+
+- A shorter knowledge center. Writing and client trust were folded together, Where else to get help is now one table, and the longest standards are trimmed. From neon1-corpus v0.20.0.
+- Every earlier release in this changelog now has its tag.
+
 ## v0.38.0
 
 - The How I work shelf now leads with the two main standards, Writing and Development, followed by new standards for version control, versioning and releases, code style, testing and review, and documentation. From neon1-corpus v0.19.0.
