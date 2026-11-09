@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.36.2
+
+- The knowledge center's heading is now "Everything neon1", with a plainer introduction.
+- Documents written for the knowledge center show edition 0.9 until their final review. From neon1-corpus v0.16.0, which also tightens the wording across the new documents and limits the accessibility statement to what has been checked.
+
 ## v0.36.1
 
 - Every knowledge center document now shows its edition, written as X.Y (all at 1.0 to start), on its page and in its PDF footer. From neon1-corpus v0.15.0.

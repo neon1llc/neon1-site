@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.36.1" />
+  <meta name="version" content="0.36.2" />
   <title>AI quality and oversight · neon1 knowledge center</title>
   <meta name="description" content="When neon1 uses AI, how it&#x27;s tested before anyone relies on it, and where a person stays in charge." />
   <meta name="theme-color" content="#F2F4F2" />
@@ -80,7 +80,7 @@
         <p class="kc-summary">When neon1 uses AI, how it&#x27;s tested before anyone relies on it, and where a person stays in charge.</p>
         <dl class="kc-facts">
           <div><dt>Type</dt><dd>Standard</dd></div>
-          <div><dt>Edition</dt><dd>1.0</dd></div>
+          <div><dt>Edition</dt><dd>0.9</dd></div>
           <div><dt>First written</dt><dd>November 1, 2026</dd></div>
           <div><dt>Updated</dt><dd>November 9, 2026</dd></div>
         </dl>
@@ -92,15 +92,15 @@
 
       <div class="kc-text">
 <p>I use AI when it makes a defined task better after counting the errors, the review time, privacy, cost, and upkeep. A smooth demo is useful for exploring. It doesn't show that something is dependable. So I start with AI that a person can check and correct, and earn more autonomy with evidence.</p>
-<h2 id="does-ai-belong-here-at-all">Does AI belong here at all?</h2>
+<h2 id="whether-ai-belongs-in-the-solution">Whether AI belongs in the solution</h2>
 <p>I compare the current process, a simple rule or search, an existing product, and a narrow AI approach. Ordinary software wins when the rules are clear and mistakes are costly. AI tends to help with drafting, sorting messy text, summarizing documents you're allowed to share, and finding the right passage. You still need to know when to double-check.</p>
 <p>I use the <a class="ext" href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener">NIST AI Risk Management Framework</a> and its <a class="ext" href="https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf" target="_blank" rel="noopener">generative AI profile</a> as prompts for who's responsible, what the task is, how it's tested, and what risk is left. They don't certify anything.</p>
 <h2 id="one-page-on-intended-use">One page on intended use</h2>
-<p>Before choosing a model we write down the user, the task, the approved data, the output, the actions it may take, the decisions it may not make, who reviews, and the fallback. Is the output a draft, a search aid, a recommendation, or an action? Those are four different things.</p>
+<p>Before choosing a model we write down the user, the task, the approved data, the output, the actions it may take, the decisions it may not make, who reviews, and the fallback. We also decide whether the output is a draft, a search aid, a recommendation, or an action, since each needs different checks.</p>
 <p>A document-search assistant can find an invoice or a policy passage. That doesn't make it fit to give accounting or legal conclusions, and the interface should make that plain. We also set a spending limit, a response time, and how much review effort is acceptable.</p>
 <h2 id="a-test-set-that-looks-like-the-real-work">A test set that looks like the real work</h2>
 <p>We collect permitted examples and write the expected answer before tuning anything. The set includes ordinary requests, vague ones, missing information, out-of-date documents, conflicting sources, odd formats, and cases that should be refused or sent to a person. Examples used for building stay separate from examples used for the final check.</p>
-<p>Twenty or thirty cases make a good first hunt for problems. They aren't a basis for a big reliability claim.</p>
+<p>Twenty or thirty cases are enough to find early problems, but not enough to support a broad reliability claim.</p>
 <h2 id="testing-the-whole-task">Testing the whole task</h2>
 <p>Correctness, evidence, access boundaries, refusals, actions, speed, cost, and human effort are checked separately, and the same cases run against the old way. For search-based assistants I look at what was retrieved and what was claimed, because a plausible citation isn't proof. For data extraction I check fields, units, dates, amounts, and IDs against rules. For classification I look at results per category, since an overall score can hide failure on the rare ones that matter.</p>
 <p>Evaluation tools that use another model as the judge get checked against a small set graded by a person.</p>
@@ -109,14 +109,14 @@
 <p>Tools start read-only. Sending messages, spending money, changing permissions, or deleting anything needs a person to review the actual recipient, content, or change first. An approve button doesn't protect much if you can't see what it approves. Run time, retries, output size, and spend all have limits.</p>
 <h2 id="releasing-in-stages">Releasing in stages</h2>
 <ol><li><strong>Offline.</strong> Tested on permitted examples, away from live data.</li><li><strong>Shadow.</strong> Runs alongside the normal process without changing anything, so we can compare.</li><li><strong>Assisted pilot.</strong> Named people use the output on a limited task, with a fallback and a way to report problems.</li><li><strong>Controlled use.</strong> Expanded only when you accept the evidence, the remaining risks, and the running cost.</li></ol>
-<p>Many good services should stay at assisted forever. A pilot doesn't have to become autonomous.</p>
+<p>Some services are best left at the assisted stage permanently. A pilot doesn't have to become autonomous.</p>
 <h2 id="when-to-stop">When to stop</h2>
 <p>Release is blocked by a serious unauthorized disclosure or action in testing, unresolved serious errors, no working recovery, or costs and review effort that cancel the benefit. There's always a way to switch the AI part off and keep doing the essential task by hand or with something simpler.</p>
 <h2 id="after-launch">After launch</h2>
 <p>We track task success, corrections, review minutes, cost per successful task, and speed, and look for groups the change might be failing. Any change to the model, prompt, documents, or tool permissions means rerunning the test set. A provider's benchmark doesn't tell us how it does on your documents.</p>
 <h2 id="what-i-ll-say-publicly">What I'll say publicly</h2>
 <p>Only scoped statements with their conditions: "In a twenty-case test using made-up records, it completed eighteen without correction," if that's what happened. Never "reliable AI for every business."</p>
-<p>Neo, the chat on this site, follows these rules too. Its directives are public in <a class="ext" href="https://github.com/neon1llc/neon1-corpus/blob/main/corpus/neo/chat.md" target="_blank" rel="noopener">the corpus</a>.</p>
+<p>Neo, the chat on this site, answers only from neon1's public documents, is run against a set of test questions before each change, and has its directives published in <a class="ext" href="https://github.com/neon1llc/neon1-corpus/blob/main/corpus/neo/chat.md" target="_blank" rel="noopener">the corpus</a>.</p>
       </div>
 
       <aside class="kc-next" aria-labelledby="kc-next-h">
@@ -163,7 +163,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>No ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.36.1</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.36.2</a>
       </span>
     </div>
   </footer>

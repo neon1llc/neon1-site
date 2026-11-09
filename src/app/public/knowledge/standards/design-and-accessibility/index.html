@@ -4,15 +4,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.36.1" />
+  <meta name="version" content="0.36.2" />
   <title>Design and accessibility · neon1 knowledge center</title>
-  <meta name="description" content="How neon1 designs interfaces and documents that anyone can use, on any device, including people using assistive technology." />
+  <meta name="description" content="How neon1 designs interfaces and documents for any device and for people using assistive technology." />
   <meta name="theme-color" content="#F2F4F2" />
   <link rel="canonical" href="https://neon1.tech/knowledge/standards/design-and-accessibility/" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="neon1" />
   <meta property="og:title" content="Design and accessibility · neon1 knowledge center" />
-  <meta property="og:description" content="How neon1 designs interfaces and documents that anyone can use, on any device, including people using assistive technology." />
+  <meta property="og:description" content="How neon1 designs interfaces and documents for any device and for people using assistive technology." />
   <meta property="og:url" content="https://neon1.tech/knowledge/standards/design-and-accessibility/" />
   <meta property="og:image" content="https://neon1.tech/media/og-card-1.png" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -77,10 +77,10 @@
       <header class="kc-doc-head">
         <nav class="kc-crumbs" aria-label="Breadcrumb"><a href="/knowledge/">Knowledge center</a><span aria-hidden="true">/</span><a href="/knowledge/#standards">How I work</a></nav>
         <h1>Design and accessibility</h1>
-        <p class="kc-summary">How neon1 designs interfaces and documents that anyone can use, on any device, including people using assistive technology.</p>
+        <p class="kc-summary">How neon1 designs interfaces and documents for any device and for people using assistive technology.</p>
         <dl class="kc-facts">
           <div><dt>Type</dt><dd>Standard</dd></div>
-          <div><dt>Edition</dt><dd>1.0</dd></div>
+          <div><dt>Edition</dt><dd>0.9</dd></div>
           <div><dt>First written</dt><dd>November 1, 2026</dd></div>
           <div><dt>Updated</dt><dd>November 9, 2026</dd></div>
         </dl>
@@ -91,19 +91,19 @@
       </header>
 
       <div class="kc-text">
-<p>Good design here means the person can do what they came to do, quickly, and recover when something goes wrong. Looks matter, and neon1 has a look of its own, but the task always comes first.</p>
+<p>Good design means people can do what they came to do quickly, and recover when something goes wrong. neon1 has its own look, but the task comes first.</p>
 <h2 id="start-from-the-task">Start from the task</h2>
 <p>Every screen and document answers three questions before anything else: what is this, what can I do here, and what happens next. Navigation is ordinary and visible. Nobody has to learn a metaphor, finish an animation, or know a film reference to get to the useful part.</p>
 <h2 id="accessible-by-default">Accessible by default</h2>
-<p>I aim for <a class="ext" href="https://www.w3.org/TR/WCAG22/" target="_blank" rel="noopener">WCAG 2.2</a> level AA and test the real pages. In practice that means:</p>
+<p>I aim for <a class="ext" href="https://www.w3.org/TR/WCAG22/" target="_blank" rel="noopener">WCAG 2.2</a> level AA. That means designing and checking for:</p>
 <ul><li>Semantic headings and landmarks, so screen readers can jump around.</li><li>Every control is reachable and usable with a keyboard, with a visible focus ring.</li><li>Labels on every form field, and errors that say what went wrong and how to fix it.</li><li>Text contrast that meets AA on every background, including over animation.</li><li>Targets large enough to tap, at least 44 by 44 pixels for primary controls.</li><li>Motion that can be paused, and a calm version for people who set their device to reduce motion.</li><li>Pages that work when zoomed to 200% and on a 320-pixel-wide phone without sideways scrolling.</li></ul>
 <p>An automated accessibility score is a starting point. I also check with a keyboard, a screen reader, and a phone.</p>
 <h2 id="fast-and-light">Fast and light</h2>
-<p>Pages load what they need and nothing else. No trackers, no ad scripts, and no third-party fonts loaded from someone else's server. Images are sized for the screen. A slow connection is a real user, not an edge case.</p>
+<p>Pages load what they need and nothing else: no trackers, no ad scripts, and no fonts loaded from someone else's server. Images are sized for the screen, and pages should still work on a slow connection.</p>
 <h2 id="forms-people-can-finish">Forms people can finish</h2>
 <p>Short forms, one question per field, and only the questions the task needs. Inputs use the right keyboard on phones. A submitted form says it was received and what happens next. Nothing is lost if a field is wrong.</p>
 <h2 id="documents">Documents</h2>
-<p>Documents use one clear column, real headings, comfortable spacing, and tables only for real comparisons. PDFs from the <a class="ext" href="https://neon1.tech/knowledge/" target="_blank" rel="noopener">Knowledge Center</a> are tagged for screen readers, carry their title and edition, and print cleanly in black and white.</p>
+<p>Documents use one clear column, real headings, comfortable spacing, and tables only for real comparisons. PDFs from the <a class="ext" href="https://neon1.tech/knowledge/" target="_blank" rel="noopener">Knowledge Center</a> are tagged for screen readers and carry their title and edition.</p>
 <h2 id="the-neon1-look-used-with-restraint">The neon1 look, used with restraint</h2>
 <ul><li>Dark Matrix green over black for personality, light paper and brand green #035704 for reading.</li><li>Inter for text, JetBrains Mono for labels and code, Aptos in Office documents.</li><li>The rain animation is decoration. It pauses on request, stops when the tab is hidden, and becomes a still image for reduced motion.</li><li>Easter eggs, like the white rabbit, are optional and never stand between you and the content.</li></ul>
 <h2 id="for-your-projects">For your projects</h2>
@@ -155,7 +155,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>No ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.36.1</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.36.2</a>
       </span>
     </div>
   </footer>
