@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.37.0
+
+- New policy in the knowledge center: How I use AI. It covers where AI tools help in neon1's own work (research, understanding needs, and reviewing writing and code), what stays my responsibility, and how client information is kept out of them. From neon1-corpus v0.18.0.
+
 ## v0.36.3
 
 - Every knowledge center document is now at edition 1.0. From neon1-corpus v0.17.0.
