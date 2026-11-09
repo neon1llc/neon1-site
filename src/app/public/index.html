@@ -305,10 +305,11 @@
         <div><dt>after</dt><dd>A short proposal with options and estimates. Nothing starts until you pick one</dd></div>
       </dl>
       <a class="btn btn-primary reveal-on" href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a call</a>
-      <!-- Optional brief: answers stay in this page; copy or save it, nothing is sent -->
+      <!-- Optional brief: answers stay in this page; copy or save it, nothing is sent. A plain group, not a
+           form, so pressing Enter can never submit the answers anywhere, even if js/brief.js doesn't run -->
       <details class="brief-wrap reveal-on">
         <summary>Want to get more from the call? Write a short brief first (optional).</summary>
-        <form class="brief" id="brief">
+        <div class="brief" id="brief" role="group" aria-label="Pre-call brief">
           <label>What happens today?<textarea name="today" rows="3" maxlength="1200" placeholder="For example: every Friday we copy orders from email into a spreadsheet by hand."></textarea></label>
           <label>What should be better?<textarea name="better" rows="3" maxlength="1200" placeholder="For example: orders land in the spreadsheet on their own, and nobody retypes them."></textarea></label>
           <label>Any timing to know about?<input name="timing" maxlength="200" placeholder="For example: before tax season, or no rush." /></label>
@@ -319,7 +320,7 @@
             <button class="btn btn-ghost" type="button" id="briefSave">save as text</button>
             <span class="brief-done" id="briefDone" role="status"></span>
           </div>
-        </form>
+        </div>
       </details>
     </section>
   </main>

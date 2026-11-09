@@ -32,7 +32,7 @@ WELL_KNOWN  := --include ".well-known/*"
 
 # Plain make shows the help
 .DEFAULT_GOAL := help
-.PHONY: help check html js links frame frame-check budget secrets serve three deploy invalidate verify
+.PHONY: help check html js links frame frame-check budget secrets behavior serve three deploy invalidate verify
 
 
 ##@ Checks
@@ -65,6 +65,12 @@ budget: ## Fail if the deployed files exceed BUDGET_KB
 	@kb=$$(find $(SITE_DIR) -type f ! -name '.*' -exec cat {} + | wc -c | awk '{print int($$1 / 1024)}'); \
 	echo "site size: $${kb} KB of $(BUDGET_KB) KB"; \
 	test "$$kb" -le "$(BUDGET_KB)"
+
+# Drives headless Chromium against a loopback copy of the site, so it needs Playwright and its browser;
+# it stays out of check until the CI runner installs them
+behavior: ## Check the brief, case studies, chooser links, and white rabbit in a real browser
+	@command -v node >/dev/null 2>&1 || { echo "behavior: install Node.js"; exit 1; }
+	node scripts/behavior.cjs $(SITE_DIR)
 
 secrets: ## Scan the git history for secrets with gitleaks
 	@if command -v gitleaks >/dev/null 2>&1; then \

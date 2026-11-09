@@ -1,14 +1,16 @@
 // src/app/public/js/brief.js - The optional pre-call brief: three answers become a short text the
 // visitor can preview, copy, or download. Nothing is sent, stored, or put in the URL; the text
 // only leaves the page if the visitor pastes it into an email or the booking form themselves.
+// The fields sit in a plain group, not a <form>, so the browser has nothing to submit even when
+// this script fails to load; no submit handler is needed to keep the answers on the page.
 
-const form = document.getElementById("brief");
-if (form) {
+const brief = document.getElementById("brief");
+if (brief) {
   const out = document.getElementById("briefOut");
   const copy = document.getElementById("briefCopy");
   const save = document.getElementById("briefSave");
   const done = document.getElementById("briefDone");
-  const field = (name) => form.elements[name].value.trim();
+  const field = (name) => brief.querySelector(`[name="${name}"]`).value.trim();
 
   // The brief exactly as it will be copied or saved
   function text() {
@@ -27,8 +29,7 @@ if (form) {
     copy.disabled = save.disabled = !t;
     done.textContent = "";
   }
-  form.addEventListener("input", update);
-  form.addEventListener("submit", (e) => e.preventDefault());
+  brief.addEventListener("input", update);
 
   // Copy to the clipboard, falling back to selecting the preview so it can be copied by hand
   copy.addEventListener("click", async () => {
@@ -51,6 +52,6 @@ if (form) {
   });
 
   // The actions only make sense with this script, so they appear once it runs
-  form.querySelector(".brief-actions").hidden = false;
+  brief.querySelector(".brief-actions").hidden = false;
   update();
 }

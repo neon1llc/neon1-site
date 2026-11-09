@@ -1,0 +1,153 @@
+#!/usr/bin/env node
+// scripts/behavior.cjs - Browser checks for the home page's interactive contracts: the brief never
+// submits.
+// Usage: node scripts/behavior.cjs [SITE_DIR]   (make behavior; needs Playwright and its Chromium)
+//
+// Everything runs against a loopback copy of SITE_DIR served with a CSP like production's; any request
+// that leaves the loopback origin is aborted and fails the run. Text typed into fields is synthetic.
+// Output lines are tagged [browser] for DOM and keyboard behavior and [gpu] for checks that drive the
+// WebGL scene (headless Chromium renders it in software, so these are slow and prove lifecycle, not speed).
+
+"use strict";
+const http = require("http");
+const fs = require("fs");
+const path = require("path");
+
+let chromium;
+try { ({ chromium } = require("playwright")); } catch {
+  console.error("behavior: Playwright is not installed (npm i -g playwright, then npx playwright install chromium)");
+  process.exit(2);
+}
+
+const SITE = path.resolve(process.argv[2] || "src/app/public");
+const ONLY = process.env.ONLY ? new RegExp(process.env.ONLY) : null;
+
+// ---- Server: SITE_DIR on loopback, with the production policy's shape and per-test overrides ----
+// Production (neon1-aws-infrastructure) allows scripts, styles, fonts, and connections from the site
+// itself and images from the site or data: URLs; inline scripts, styles, and handlers are blocked
+const CSP = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'";
+const TYPES = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".woff2": "font/woff2", ".webp": "image/webp",
+  ".png": "image/png", ".glb": "model/gltf-binary", ".m4a": "audio/mp4", ".txt": "text/plain", ".xml": "application/xml" };
+const requests = [];       // every URL the server saw, to search for synthetic text
+const overrides = new Map(); // path -> async (body) => body | null (null answers 404), set per test
+
+const server = http.createServer(async (req, res) => {
+  requests.push(req.url);
+  const pathname = decodeURIComponent(new URL(req.url, "http://local").pathname);
+  const file = path.join(SITE, pathname === "/" ? "index.html" : pathname);
+  if (!file.startsWith(SITE + path.sep) || !fs.existsSync(file) || !fs.statSync(file).isFile()) { res.statusCode = 404; res.end(); return; }
+  let body = fs.readFileSync(file);
+  const hook = overrides.get(pathname);
+  if (hook) body = await hook(body);
+  if (body === null) { res.statusCode = 404; res.end(); return; }
+  res.setHeader("Content-Type", TYPES[path.extname(file)] || "application/octet-stream");
+  res.setHeader("Content-Security-Policy", CSP);
+  res.setHeader("Cache-Control", "no-store");
+  res.end(body);
+});
+
+// ---- Runner: each check is a named async function; failures are collected, not thrown past the run ----
+const checks = [];
+const check = (tag, name, fn) => checks.push({ tag, name, fn });
+function expect(ok, message, detail) {
+  if (!ok) throw new Error(message + (detail === undefined ? "" : ` (${JSON.stringify(detail)})`));
+}
+
+let browser, origin;
+const leaks = [], violations = [];
+
+// A fresh context per check: loopback only, CSP violations and page errors recorded
+async function open(options = {}, url = "/") {
+  const { init, ...contextOptions } = options;
+  const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, reducedMotion: "reduce", ...contextOptions });
+  await context.route("**/*", (r) => {
+    if (r.request().url().startsWith(origin)) return r.continue();
+    leaks.push(r.request().url());
+    return r.abort();
+  });
+  const page = await context.newPage();
+  const errors = [];
+  page.on("pageerror", (e) => errors.push(String(e)));
+  page.on("console", (m) => { if (/Content.Security.Policy|Refused to/i.test(m.text())) violations.push(m.text()); });
+  if (init) await page.addInitScript(init);
+  await page.goto(origin + url, { waitUntil: "domcontentloaded" });
+  return { page, context, errors };
+}
+
+// Rabbit's animation-frame callbacks by name, so a check can see whether the scene loop still runs
+const COUNT_FRAMES = () => {
+  const raf = window.requestAnimationFrame.bind(window), caf = window.cancelAnimationFrame.bind(window);
+  const pending = (window.__frames = new Map());
+  window.requestAnimationFrame = (cb) => { const id = raf((t) => { pending.delete(id); cb(t); }); pending.set(id, cb.name); return id; };
+  window.cancelAnimationFrame = (id) => { pending.delete(id); caf(id); };
+};
+const sceneFrames = (page) => page.evaluate(() => [...window.__frames.values()].filter((n) => n === "frame").length);
+
+
+// ---- SITE-01: the brief stays on the page ----
+// Without script, with brief.js blocked, and with brief.js failing as it starts, Enter in any field
+// must not navigate or send the synthetic answers anywhere
+const MARK = "SYNTHETIC-BRIEF-7f3a";
+for (const mode of ["javascript disabled", "brief.js blocked", "brief.js fails to start"]) {
+  check("browser", `brief: Enter sends nothing with ${mode}`, async () => {
+    if (mode === "brief.js blocked") overrides.set("/js/brief.js", async () => null);
+    if (mode === "brief.js fails to start") overrides.set("/js/brief.js", async (b) => `throw new Error("synthetic start failure");\n${b}`);
+    const { page, context } = await open({ javaScriptEnabled: mode !== "javascript disabled" });
+    try {
+      const before = page.url(), seen = requests.length;
+      await page.locator(".brief-wrap summary").click();
+      await page.locator("[name=today]").fill(MARK + "-today");
+      await page.locator("[name=better]").fill(MARK + "-better");
+      await page.locator("[name=timing]").fill(MARK + "-timing");
+      for (const name of ["timing", "today"]) await page.locator(`[name=${name}]`).press("Enter");
+      await page.waitForTimeout(400);
+      expect(page.url() === before, "the page navigated", page.url());
+      const sent = requests.slice(seen).filter((u) => u.includes(MARK));
+      expect(!sent.length, "a request carried the brief", sent);
+      expect(!(await page.locator(".brief-wrap form, #brief form").count()), "the brief sits in a form element again");
+    } finally { overrides.delete("/js/brief.js"); await context.close(); }
+  });
+}
+
+// With the script, the preview, copy, and save work, and nothing lands in storage or on the network
+check("browser", "brief: preview, copy, and save stay local", async () => {
+  const { page, context } = await open({ permissions: ["clipboard-read", "clipboard-write"] });
+  try {
+    const seen = requests.length;
+    await page.locator(".brief-wrap summary").click();
+    await page.locator("[name=today]").fill(MARK + " orders retyped");
+    await page.locator("[name=timing]").press("Enter");
+    expect((await page.locator("#briefOut").textContent()).includes(MARK), "the preview did not follow the fields");
+    await page.locator("#briefCopy").click();
+    await page.waitForFunction(() => /Copied|Selected/.test(document.getElementById("briefDone").textContent));
+    const [download] = await Promise.all([page.waitForEvent("download"), page.locator("#briefSave").click()]);
+    expect(download.suggestedFilename() === "neon1-brief.txt", "unexpected download name", download.suggestedFilename());
+    const stored = await page.evaluate(() => JSON.stringify({ ...localStorage }) + JSON.stringify({ ...sessionStorage }));
+    expect(!stored.includes(MARK), "the brief reached browser storage");
+    const dbs = await page.evaluate(async () => (indexedDB.databases ? (await indexedDB.databases()).length : 0));
+    expect(dbs === 0, "an IndexedDB database was created", dbs);
+    expect(!requests.slice(seen).some((u) => u.includes(MARK)), "a request carried the brief");
+  } finally { await context.close(); }
+});
+
+
+// ---- Run ----
+(async () => {
+  await new Promise((r) => server.listen(0, "127.0.0.1", r));
+  origin = `http://127.0.0.1:${server.address().port}`;
+  browser = await chromium.launch();
+  let failed = 0;
+  for (const { tag, name, fn } of checks) {
+    if (ONLY && !ONLY.test(name)) continue;
+    const t0 = Date.now();
+    try { await fn(); console.log(`ok   [${tag}] ${name} (${Date.now() - t0} ms)`); }
+    catch (e) { failed++; console.log(`FAIL [${tag}] ${name}: ${e.message}`); }
+  }
+  // Whole-run guarantees: nothing left loopback, and the policy blocked nothing the page needs
+  if (leaks.length) { failed++; console.log(`FAIL [browser] requests left the loopback origin: ${[...new Set(leaks)].join(", ")}`); }
+  if (violations.length) { failed++; console.log(`FAIL [browser] content security policy violations: ${[...new Set(violations)].join(" | ")}`); }
+  await browser.close();
+  server.close();
+  console.log(failed ? `behavior: ${failed} failed` : "behavior: all checks passed");
+  process.exit(failed ? 1 : 0);
+})();
