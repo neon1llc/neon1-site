@@ -14,6 +14,10 @@ AWS_REGION   ?= us-east-1
 PORT         ?= 8000
 BUDGET_KB    ?= 8192
 CHANGES      ?= .deploy-changes
+# neon1-corpus holds the case studies and questions. A tag pins it; CORPUS_DIR can point at a local checkout instead
+CORPUS_TAG   ?= v0.2.0
+CORPUS_REPO  ?= https://github.com/neon1llc/neon1-corpus
+CORPUS_DIR   ?= .corpus/$(CORPUS_TAG)
 
 # The AWS CLI reads the region from the environment
 export AWS_REGION
@@ -32,12 +36,12 @@ WELL_KNOWN  := --include ".well-known/*"
 
 # Plain make shows the help
 .DEFAULT_GOAL := help
-.PHONY: help check html js links logic frame frame-check release manifest rehash models budget secrets behavior perf serve three deploy invalidate verify
+.PHONY: help corpus corpus-check corpus-export check html js links logic frame frame-check release manifest rehash models budget secrets behavior perf serve three deploy invalidate verify
 
 
 ##@ Checks
 
-check: html js links logic frame-check release manifest models budget secrets ## Run every static check
+check: html js links logic frame-check corpus-check release manifest models budget secrets ## Run every static check
 
 # Every page served as HTML, so each check covers the tour as well as the home page
 PAGES := $(SITE_DIR)/index.html $(SITE_DIR)/tour.html
@@ -67,6 +71,18 @@ frame: ## Copy the shared bar and footer blocks from index.html into the other p
 
 frame-check: ## Fail if any page's bar or footer differs from index.html
 	@python3 scripts/frame.py check $(SITE_DIR)
+
+# The case studies and questions are written once, in neon1-corpus, and copied into index.html from the pinned tag
+corpus-export:
+	@command -v node >/dev/null 2>&1 || { echo "corpus: install Node.js"; exit 1; }
+	@test -d $(CORPUS_DIR)/tools || { git init -q $(CORPUS_DIR) && git -C $(CORPUS_DIR) fetch -q --depth 1 $(CORPUS_REPO) $(CORPUS_TAG) && git -C $(CORPUS_DIR) checkout -q FETCH_HEAD; }
+	@node $(CORPUS_DIR)/tools/export.mjs --target site --out "$(abspath .corpus/export)" >/dev/null
+
+corpus: corpus-export ## Rewrite the case studies and questions in index.html from the pinned neon1-corpus tag
+	@node scripts/corpus.mjs sync $(SITE_DIR) .corpus/export/site
+
+corpus-check: corpus-export ## Fail if the case studies or questions differ from the pinned neon1-corpus tag
+	@node scripts/corpus.mjs check $(SITE_DIR) .corpus/export/site
 
 # The version meta on every page, the footer link, the CHANGELOG's top entry, and any literal ?v=
 release: ## Fail if the places that name the release disagree

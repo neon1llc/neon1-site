@@ -9,7 +9,8 @@ The neon1.tech website. It's a static page in `src/app/public/`, served from a p
 You need Python 3 and Node.js. Gitleaks is used if it's installed, otherwise the secret scan runs it in Docker.
 
 ```bash
-make check      # HTML validation, JS syntax, anchors and asset paths, the white rabbit's lifetime, release versions, asset manifest, baked models, size budget, secret scan
+make check      # HTML validation, JS syntax, anchors and asset paths, the white rabbit's lifetime, corpus blocks, release versions, asset manifest, baked models, size budget, secret scan
+make corpus     # rewrite the case studies and questions from the pinned neon1-corpus tag
 make serve      # http://localhost:8000
 make behavior   # the page driven in headless Chromium; needs Node's playwright package and its browser
 make perf       # the white rabbit's draw calls, triangles, and resources against their budget; same needs
@@ -20,6 +21,12 @@ Run `make help` to list every target.
 A release is named in four places: the version meta in `index.html` and `tour.html`, the footer's link text, and the top `## vX.Y.Z` entry in `CHANGELOG.md`. `make release` (part of `make check`) fails if they disagree. The white rabbit's media loader reads the meta, so it has no copy of its own.
 
 The asset check follows each page into its stylesheets and scripts, so a missing texture or module fails it. A path a script builds at run time, like `` `/media/white-rabbit/tex/${name}.webp` ``, must be listed in `scripts/assets.json` with where its names come from, and every name it expands to must be a file. Add a new one there when you write one.
+
+## Words from neon1-corpus
+
+The case studies and the questions are written in [neon1-corpus](https://github.com/neon1llc/neon1-corpus), the one place neon1's public words live, and copied into `index.html` between `<!-- corpus:NAME -->` comments. Edit them there, not here. To bring a corpus change in, tag a corpus release, set `CORPUS_TAG` in the `Makefile`, and run `make corpus`. `make check` fails if the blocks differ from the pinned tag. To try unreleased corpus edits, run `make corpus CORPUS_DIR=../neon1-corpus`.
+
+The generated blocks are committed, so the deploy stays a plain copy of `src/app/public/` and nothing is fetched while someone reads the page. Checks need network access once, to fetch the tag into `.corpus/`.
 
 ## Content Security Policy
 
