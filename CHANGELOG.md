@@ -2,6 +2,15 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.31.0
+
+- The optional pre-call brief can't be sent anywhere: pressing Enter does nothing, even if its script never runs. Its answers stay in the page until you copy or save them.
+- An open case study holds focus: Tab and Shift+Tab stay inside it, Esc closes it, focus goes back to the card you opened, and the menu and chat wait until it's closed.
+- Each outcome in the chooser lands on its own case study card, and Back and Forward move between them.
+- The white rabbit can be followed from the keyboard, with a short help line, a "back to the page" button, and the car's switch while it's in view. Turning on reduced motion mid-scene switches to the still card, and leaving always frees the scene.
+- The chat window sends one question at a time and keeps its history within what the assistant accepts, closes cleanly every time, and reminds you not to share private details.
+- The footer and both pages show the same version.
+
 ## v0.30.3
 
 - The spiky shrub moves to the stone bed's deck end, with the flowers starting just past it. It is fuller, and its outer leaves arch over and down to the plant's foot.
