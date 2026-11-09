@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.32.6
+
+- Tapping into Neo's chat box on a phone no longer zooms the page in. The keyboard still comes up and the box moves into view. Pinch to zoom still works.
+
 ## v0.32.5
 
 - When Neo asks someone to slow down, the chat window now waits with them: the send button rests for as long as Neo said, and a question typed meanwhile stays in the box instead of being sent and refused.

@@ -72,6 +72,9 @@
 .n1chat-input { flex: 1; resize: none; font: 14px/1.4 var(--sans); color: var(--fg); background: var(--field);
   border: 1px solid var(--soft); border-radius: var(--glass-r); padding: 8px 10px; }
 .n1chat-input::placeholder { color: var(--muted); }
+/* Phones zoom the page in on any field under 16px when it takes focus; at 16px they only raise the
+ * keyboard. Touch screens only, so desktops keep the smaller box text. Pinch zoom stays available */
+@media (pointer: coarse) { .n1chat-input { font-size: 16px; } }
 .n1chat-send { font: 500 13px var(--mono); color: var(--accent-ink); background: var(--accent); border: 0;
   border-radius: var(--glass-r); padding: 0 14px; cursor: pointer; }
 .n1chat-send:disabled { opacity: .5; cursor: wait; }
