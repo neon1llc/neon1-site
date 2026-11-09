@@ -446,13 +446,13 @@ export function controls(root, r) {
   const mode = root.querySelector('[data-rain="mode"]');
   const charset = root.querySelector('[data-rain="charset"]');
   const pause = root.querySelector('[data-rain="pause"]');
-  // The buttons show the current setting; a click moves to the next one
-  mode.addEventListener("click", () => r.toggleMode());
-  charset.addEventListener("click", () => r.nextCharset());
+  // The buttons show the current setting; a click moves to the next one. Pages may offer only pause
+  mode?.addEventListener("click", () => r.toggleMode());
+  charset?.addEventListener("click", () => r.nextCharset());
   pause.addEventListener("click", () => r.setRunning(!r.running));
   return r.subscribe(() => {
-    mode.textContent = r.mode;
-    charset.textContent = r.charset;
+    if (mode) mode.textContent = r.mode;
+    if (charset) charset.textContent = r.charset;
     pause.textContent = r.running ? "pause" : "play";
     pause.setAttribute("aria-pressed", String(!r.running));
   });
