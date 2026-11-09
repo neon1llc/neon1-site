@@ -15,7 +15,7 @@ PORT         ?= 8000
 BUDGET_KB    ?= 8192
 CHANGES      ?= .deploy-changes
 # neon1-corpus holds the case studies and questions. A tag pins it; CORPUS_DIR can point at a local checkout instead
-CORPUS_TAG   ?= v0.11.0
+CORPUS_TAG   ?= v0.12.0
 CORPUS_REPO  ?= https://github.com/neon1llc/neon1-corpus
 CORPUS_DIR   ?= .corpus/$(CORPUS_TAG)
 
@@ -117,9 +117,10 @@ models: ## Fail if the baked room or the car models no longer match the code tha
 	@command -v node >/dev/null 2>&1 || { echo "models: install Node.js"; exit 1; }
 	@node scripts/models.cjs $(SITE_DIR)
 
-# Knowledge center PDFs are downloads printed at deploy, not page weight, so they're left out
-budget: ## Fail if the deployed files exceed BUDGET_KB
-	@kb=$$(find $(SITE_DIR) -type f ! -name '.*' ! -path '*/knowledge/*.pdf' -exec cat {} + | wc -c | awk '{print int($$1 / 1024)}'); \
+# The knowledge center grows with the corpus, one small page per document, so it's left out here and
+# scripts/knowledge.mjs caps each of its pages instead. Its PDFs are downloads printed at deploy
+budget: ## Fail if the deployed files outside the knowledge center exceed BUDGET_KB
+	@kb=$$(find $(SITE_DIR) -type f ! -name '.*' ! -path '*/knowledge/*' -exec cat {} + | wc -c | awk '{print int($$1 / 1024)}'); \
 	echo "site size: $${kb} KB of $(BUDGET_KB) KB"; \
 	test "$$kb" -le "$(BUDGET_KB)"
 
