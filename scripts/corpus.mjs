@@ -63,6 +63,10 @@ function caseCard(c) {
 const question = (s) => `        <details class="reveal-on"><summary>${s.headingHtml}</summary>${forPage(s.html).replace(/\n/g, "")}</details>`
 
 
+// The contact view's "where, when, size" list already answers these, so the home page doesn't ask them
+// twice. Neo and the Knowledge Center still carry the full FAQ
+const ON_CONTACT = new Set(["Do you come on site?", "When do you work?", "How long does a project take?"])
+
 const BLOCKS = {
   "case-studies": () =>
     ofType("case-study")
@@ -72,7 +76,7 @@ const BLOCKS = {
       .join("\n"),
   questions: () =>
     doc(manifest.files.find((f) => f.id === "faq-working-with-neon1"))
-      .sections.filter((s) => s.heading)
+      .sections.filter((s) => s.heading && !ON_CONTACT.has(s.heading))
       .map(question)
       .join("\n"),
 }
