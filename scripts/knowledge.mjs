@@ -233,7 +233,6 @@ ${facts.map(([k, v]) => `          <div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></di
         </dl>
         <div class="kc-actions">
           ${d.pdf ? `<a class="btn btn-primary" href="${d.pdf}" download>${ICON_PDF}Download PDF</a>` : ""}
-          <a class="btn btn-ghost" href="${esc(`https://github.com/neon1llc/neon1-corpus/blob/main/${d.source}`)}" target="_blank" rel="noopener">View source</a>
         </div>
       </header>
 
@@ -248,7 +247,7 @@ ${next.join("\n")}
         </ul>
       </aside>` : ""}
 
-      <p class="kc-colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit. ${d.type === "template" || d.type === "example" ? "Templates and examples are illustrations, not legal advice." : ""}</p>
+      <p class="kc-colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit. <a class="ext" href="${esc(`https://github.com/neon1llc/neon1-corpus/blob/main/${d.source}`)}" target="_blank" rel="noopener">Source on GitHub</a>. ${d.type === "template" || d.type === "example" ? "Templates and examples are illustrations, not legal advice." : ""}</p>
     </article>`
   return page({ title: `${d.title} · neon1 knowledge center`, description: d.summary, path: d.url, main, kind: "doc" })
 }
