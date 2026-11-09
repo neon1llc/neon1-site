@@ -11,6 +11,12 @@
 // scroll returns to the landing. The card is always silent.
 //
 // States, kept on root as data-state: idle, caught, playing, reversing, done, exiting.
+// Each catch is an entry with its own generation number; anything asynchronous (the scene's import,
+// its composing, the rain's halt) checks that its entry is still the current one before it acts, so a
+// rabbit caught, left, and caught again before the scene loads builds one scene, not two.
+// Keyboard: "follow the white rabbit" (#whiteRabbitIn, hidden until focused, like the skip link)
+// catches one; while caught, a short help line and a "back to the page" button stay on screen,
+// Tab moves between that button and the car's, and focus returns where it was when the entry ends.
 // Testing: ?rabbit=now keeps a rabbit on the landing and notes its cell center on root
 // as data-spot; ?rabbit=p0.5 catches one and jumps to that progress. Both only add
 // rabbits, so they are harmless in production.
@@ -40,12 +46,18 @@ export function whiteRabbit({ rain, root }) {
   const menu = document.getElementById("menu");
   const pauseBtn = document.querySelector('[data-rain="pause"]');
   const page = () => document.querySelectorAll("header, .top, .awake, .rainctl");
+  // The keyboard way in, and the help line with its buttons; the way in shows only with this script
+  const inBtn = document.getElementById("whiteRabbitIn");
+  const leaveBtn = root.querySelector('[data-rabbit="leave"]'), carBtn = root.querySelector('[data-rabbit="car"]');
+  if (inBtn) inBtn.hidden = false;
 
   // Progress: wanted and rendered, with the spring's velocity
   let state = "idle", mode = "scene", target = 0, p = 0, v = 0;
   let scene = null, loading = null, halted = false, prepared = false, handed = false;
   let raf = 0, last = 0, lastInput = 0, idleTimer = 0, disposeTimer = 0, escape = null, announced = false;
   let audio = null, sound = null;
+  // The current entry's generation, and where focus was when it began
+  let gen = 0, before = null;
 
   // ---- State and page ----
   // The state shows on root, so CSS and tests can follow it
@@ -150,64 +162,91 @@ export function whiteRabbit({ rain, root }) {
   // The rabbit only drops in on the landing, with nothing open and the egg at rest
   const ready = () => state === "idle" && scrollY < 8 && menu.hidden && !body.classList.contains("case-open");
 
-  // A catch stops the rain and starts loading the scene, usually done before the first scroll
+  // A catch stops the rain and starts loading the scene, usually done before the first scroll.
+  // It opens a new entry: completions still pending from an earlier one are ignored from here on
   function catchIt() {
     clearTimeout(disposeTimer);
+    const g = ++gen;
+    before = document.activeElement;
     set("caught"); lock(true);
     body.classList.remove("white-rabbit-hover");
     target = p = v = 0; halted = prepared = handed = false; escape = null; cardP = 0;
     mode = reduce.matches ? "card" : "scene";
     root.dataset.mode = mode;
+    showCar(false);
     openAudio();
-    rain.halt((kind, ms) => sound && sound.glitch(kind, ms)).then(() => { halted = true; prepare(); });
-    if (mode === "scene") load();
+    rain.halt((kind, ms) => sound && sound.glitch(kind, ms)).then(() => { if (g !== gen) return; halted = true; prepare(); });
+    if (mode === "scene") load(); else drop(); // a scene kept from the last entry isn't needed by the card
   }
 
-  // Imports the scene once per page and builds it once per catch; any failure means the card
+  // The keyboard way in: back to the landing if the page has moved, catch, and focus the way out
+  function enter() {
+    if (state !== "idle" || !menu.hidden || body.classList.contains("case-open")) return;
+    if (scrollY >= 8) scrollTo({ top: 0, behavior: "instant" });
+    catchIt();
+    if (leaveBtn) leaveBtn.focus();
+  }
+
+  // The one construction owner: the module is imported once per page and the scene built at most
+  // once per entry. A completion whose entry has ended, or that finds a scene already built, builds
+  // nothing; a failure in the current entry means the card
   function load() {
     if (scene) { prepare(); return; }
+    const g = gen;
     loading = loading || import(SCENE);
     loading.then((m) => {
-      if (state === "idle" || mode !== "scene") return;
-      scene = m.createScene({ onLost: fallback, onSound: (kind) => sound && sound.car(kind) });
+      if (g !== gen || scene || state === "idle" || mode !== "scene") return;
+      const made = m.createScene({ onLost: () => { if (made === scene) fallback(); }, onSound: (kind) => sound && sound.car(kind) });
+      scene = made;
       prepare();
-    }).catch(() => { loading = null; fallback(); });
+    }).catch(() => { loading = null; if (g === gen) fallback(); });
   }
 
-  // Draws the landing into the TV picture once the rain is still and the scene exists
+  // Draws the landing into the TV picture once the rain is still and the scene exists; the result
+  // only counts for the scene and entry that asked
   function prepare() {
     if (!halted || !scene || state === "idle" || mode !== "scene") return;
-    scene.compose().then(() => { prepared = true; }).catch(fallback);
+    const s = scene, g = gen;
+    const current = () => s === scene && g === gen;
+    s.compose().then(() => { if (current()) prepared = true; }).catch(() => { if (current()) fallback(); });
   }
 
-  // No WebGL, a failed import, or a lost context mid-scene: the still card takes over
+  // No WebGL, a failed import, a lost context, or reduced motion turned on mid-scene: the still card
+  // takes over from the same point. The scene loop stops at once and the scene is freed; a leave
+  // already under way (Esc, or the back button) carries on in the card
   function fallback() {
     if (state === "idle" || mode === "card") return;
+    if (state === "exiting") { drop(); return; } // the landing is already back; nothing to hand over
     mode = "card";
-    closeAudio();
-    drop();
+    stop(); closeAudio(); drop(); showCar(false);
+    root.dataset.mode = mode;
     if (state === "caught") return;
-    handed = false;
+    const leaving = !!escape;
+    handed = false; escape = null;
     cover(true, "card"); card(Math.max(0.001, p) - cardP);
+    if (leaving) card(-cardP);
   }
 
-  // Frees the scene's GPU memory; the imported modules stay cached for the next catch
+  // Frees the scene's GPU memory; the imported modules stay cached for the next catch. Safe to call
+  // more than once, and the scene's own dispose is too
   function drop() { if (scene) { scene.dispose(); scene = null; } prepared = false; }
 
   // ---- Leaving ----
   // Back to the landing without playing: the rain resumes and the rabbit is spent
   function leave() {
-    set("idle"); lock(false); cover(false);
+    gen++;
+    cover(false);
     rain.resume(); closeAudio();
     stop();
-    disposeTimer = setTimeout(drop, 1000);
+    rest();
   }
 
   // After playing back to the start: the landing returns, then input settles before the page takes over
   function exit() {
+    gen++;
     if (handed && scene) scene.render(0, { still: true });
     handed = false; escape = null;
-    cover(false); announce(false);
+    cover(false); announce(false); showCar(false);
     set("exiting");
     rain.resume(); closeAudio();
     stop();
@@ -220,9 +259,18 @@ export function whiteRabbit({ rain, root }) {
     idleTimer = setTimeout(() => {
       if (state !== "exiting") return;
       if (performance.now() - lastInput < IDLE) { settle(); return; }
-      set("idle"); lock(false);
-      disposeTimer = setTimeout(drop, 1000);
+      rest();
     }, IDLE);
+  }
+
+  // The entry's end: idle and unlocked, the scene freed shortly after (a quick second catch reuses
+  // it), and focus back where it was if it was left on the help line or nowhere
+  function rest() {
+    set("idle"); lock(false);
+    disposeTimer = setTimeout(drop, 1000);
+    const a = document.activeElement;
+    if (before && before !== body && before.isConnected && (!a || a === body || root.contains(a))) before.focus({ preventScroll: true });
+    before = null;
   }
 
   // ---- Input ----
@@ -285,12 +333,21 @@ export function whiteRabbit({ rain, root }) {
     if (Math.abs(vel) > 0.3 && performance.now() - tLast < 100) px(vel * 260);
   }, { capture: true });
 
-  // Keys: arrows nudge, paging and Space step, Home and End go to the ends, Esc always leaves
+  // Keys: arrows nudge, paging and Space step, Home and End go to the ends, Esc always leaves.
+  // Once the page is covered, Tab moves only between the help line's buttons; Space and Enter press
+  // whichever of them has focus
+  const helpButtons = () => [leaveBtn, carBtn].filter((b) => b && !b.hidden);
   addEventListener("keydown", (e) => {
     if (!active() || e.altKey || e.ctrlKey || e.metaKey) return;
     const k = e.key, space = k === " ";
     if (k === "Escape") { e.preventDefault(); e.stopPropagation(); bail(); return; }
-    if (k === "Tab" && state !== "caught") { e.preventDefault(); return; }
+    if (k === "Tab" && state !== "caught") {
+      e.preventDefault();
+      const b = helpButtons(), i = b.indexOf(document.activeElement);
+      if (b.length) b[(i + (e.shiftKey ? -1 : 1) + b.length) % b.length].focus();
+      return;
+    }
+    if (space && e.target.closest && e.target.closest("[data-rabbit]")) return;
     if (!space && !DOWN.includes(k) && !UP.includes(k)) return;
     e.preventDefault(); e.stopPropagation();
     if (state === "caught" && (UP.includes(k) || (space && e.shiftKey))) return;
@@ -300,8 +357,9 @@ export function whiteRabbit({ rain, root }) {
     step((DOWN.includes(k) || (space && !e.shiftKey)) ? size : -size);
   }, { capture: true });
 
-  // Esc: straight out when caught; otherwise the scene plays back to the start
+  // Esc, or "back to the page": straight out when caught; otherwise the scene plays back to the start
   function bail() {
+    if (state === "idle") return;
     if (state === "caught") { leave(); return; }
     if (state === "exiting") return;
     if (mode === "card") { card(-cardP); return; }
@@ -309,8 +367,17 @@ export function whiteRabbit({ rain, root }) {
     escape = { from: Math.min(target, 1), t0: performance.now() };
   }
 
-  // Clicks: on the rabbit, a catch; while caught, the pause button leaves and other controls leave and carry on
+  // Clicks: on the rabbit (or the keyboard way in), a catch; the help line's buttons leave or start the car;
+  // while caught, the pause button leaves and other controls leave and carry on
   addEventListener("click", (e) => {
+    const own = e.target.closest && e.target.closest("[data-rabbit], #whiteRabbitIn");
+    if (own) {
+      e.preventDefault(); e.stopPropagation();
+      if (own === inBtn) enter();
+      else if (own.dataset.rabbit === "leave") bail();
+      else if (scene && handed && mode === "scene") { scene.toggleCar(); carLabel(); }
+      return;
+    }
     if (state === "idle") {
       if (!ready() || !rain.rabbitAt(e.clientX, e.clientY)) return;
       e.preventDefault(); e.stopPropagation();
@@ -318,7 +385,7 @@ export function whiteRabbit({ rain, root }) {
       return;
     }
     if (state !== "caught") {
-      if (scene && handed && mode === "scene" && state !== "exiting" && scene.pick(e.clientX, e.clientY)) { e.preventDefault(); e.stopPropagation(); }
+      if (scene && handed && mode === "scene" && state !== "exiting" && scene.pick(e.clientX, e.clientY)) { e.preventDefault(); e.stopPropagation(); carLabel(); }
       return;
     }
     if (pauseBtn && pauseBtn.contains(e.target)) { e.preventDefault(); e.stopPropagation(); leave(); return; }
@@ -341,6 +408,14 @@ export function whiteRabbit({ rain, root }) {
     resizeTimer = setTimeout(() => { if (scene && halted) scene.compose(); }, 150);
   });
 
+  // Reduced motion turned on during an entry: the still card takes over at once, silently. Turned off,
+  // the card stays until the entry ends; the next catch reads the preference again
+  reduce.addEventListener("change", (e) => { if (e.matches) fallback(); });
+
+  // ---- The car's button: the same start and stop as clicking the car, while the car is in view ----
+  function showCar(on) { if (carBtn && carBtn.hidden === on) carBtn.hidden = !on; }
+  function carLabel() { if (carBtn && scene) carBtn.textContent = scene.carOn ? "stop the car" : "start the car"; }
+
   // ---- The card (reduced motion and fallbacks) ----
   // Scroll-linked and reversible, with nothing moving on its own: the page goes dark, the window and
   // its view come up out of the dark, then "go touch grass" rises from behind the trees. Scrolling
@@ -354,18 +429,20 @@ export function whiteRabbit({ rain, root }) {
     if (cardP >= 1) { if (state !== "done") { set("done"); announce(true); } return; }
     set(d < 0 ? "reversing" : "playing");
     if (cardP > 0) return;
-    cover(false); announce(false);
     ["--card-dark", "--card-window", "--card-rise"].forEach((k) => root.style.removeProperty(k));
-    set("exiting"); rain.resume(); closeAudio(); settle();
+    exit();
   }
 
   // ---- The scene loop ----
-  // Runs only while the scene plays; the clouds keep moving at the end
+  // Runs only while the scene plays; the clouds keep moving at the end. stop() is called on every
+  // way out (leave, exit, fallback), and a frame that finds the entry over or in the card doesn't
+  // schedule another, so the loop can't outlive the scene
   function start() { if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); } }
   function stop() { cancelAnimationFrame(raf); raf = 0; }
 
   // Follows the target with a critically damped spring and renders the frame
   function frame(now) {
+    if (state === "idle" || state === "exiting" || mode !== "scene") { raf = 0; return; }
     raf = requestAnimationFrame(frame);
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
     if (escape) {
@@ -384,6 +461,7 @@ export function whiteRabbit({ rain, root }) {
     scene.render(q, { speed: Math.abs(v) });
     if (sound) sound.update(scene.beat, scene.facing, scene.wind, scene.open);
     root.dataset.progress = q.toFixed(3);
+    showCar(q > 0.6 && q < 0.94); // from the glance at the sill until the walk out through the window
     grass.parentElement.style.opacity = smooth(0.993, 1, q).toFixed(3);
     if (q > 0.995) announce(true);
     if (state !== "done" && target >= 1 && p > 0.999 && Math.abs(v) < 0.01) set("done");

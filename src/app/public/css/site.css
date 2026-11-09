@@ -300,7 +300,22 @@ body.white-rabbit-scene > :not(.white-rabbit) { visibility: hidden; }
   border-radius: 3px 3px 9px 9px / 3px 3px 12px 12px; box-shadow: 0 7px 10px rgba(0,0,0,.4); position: relative; }
 .white-rabbit-sill::after { content: ""; position: absolute; left: 14px; right: 14px; top: 100%; height: 7px; background: #E4E1D6; border-radius: 0 0 4px 4px; }
 
-/* Skip link: off screen until a keyboard user tabs to it */
+/* The keyboard way in: below the screen until focused, then a chip over the rain, like the skip link */
+.white-rabbit-in { position: fixed; left: 50%; bottom: -64px; z-index: 8; transform: translateX(-50%); padding: 10px 16px; border-radius: var(--glass-r);
+  font: 500 13px var(--mono); color: var(--neon); background: rgba(13,2,8,.86); border: 1px solid rgba(0,255,65,.3); cursor: pointer; }
+.white-rabbit-in:focus { bottom: max(24px, env(safe-area-inset-bottom)); }
+
+/* While caught: the help line and its buttons, over the landing, the scene, or the card. The layer itself
+   stays hidden until something covers the page, so the line opts back in on its own */
+.white-rabbit-help { position: absolute; top: calc(64px + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); width: max-content; max-width: calc(100% - 32px);
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 10px; padding: 8px 10px 8px 14px; border-radius: var(--glass-r);
+  font: 12px/1.45 var(--mono); color: var(--text); background: rgba(13,2,8,.72); border: 1px solid var(--line); visibility: hidden; }
+body.white-rabbit-on .white-rabbit-help { visibility: visible; pointer-events: auto; }
+.white-rabbit-help p { margin: 0; }
+.white-rabbit-help .chip[hidden] { display: none; }
+/* The instructions show until the walk starts, then step out of sight without moving the buttons (a tap
+   that shifted them would land beside its target); the button keeps them as its description */
+.white-rabbit:not([data-state="caught"]) .white-rabbit-help p { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 /* ---- Service chooser: radios reveal the next question and the answer, with no script ---- */
 .choose { max-width: 860px; margin: 26px 0 0; border-top: 1px solid rgba(18,36,26,.12); border-bottom: 1px solid rgba(18,36,26,.12); }

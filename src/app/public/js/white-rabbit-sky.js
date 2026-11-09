@@ -246,6 +246,7 @@ export function createShafts({ touch }) {
 export function createSky({ scene, win, touch }) {
   const loader = new T.TextureLoader(), textures = [], uniforms = {};
   let cover = null; // the cloud layer's alpha, small, for measuring the sun
+  let gone = false; // set by dispose; an image that lands later is freed, not kept
 
   // One plane per layer, sized to its rect carried out to its depth; drawn back to front
   const loads = Object.entries(LAYERS).map(([name, [url, [z0, z1, y0, y1], x]], order) => {
@@ -262,6 +263,7 @@ export function createSky({ scene, win, touch }) {
     mesh.renderOrder = order - 10;
     scene.add(mesh);
     return new Promise((done) => loader.load(url, (tex) => {
+      if (gone) { tex.dispose(); done(); return; }
       tex.colorSpace = T.SRGBColorSpace;
       if (name === "clouds") {
         tex.wrapS = T.RepeatWrapping;
@@ -338,7 +340,7 @@ export function createSky({ scene, win, touch }) {
   function block(min, max) { beam.material.uniforms.uBlockMin.value.copy(min); beam.material.uniforms.uBlockMax.value.copy(max); }
 
   // Frees the layers' images; the meshes go with the scene
-  function dispose() { textures.forEach((t) => t.dispose()); }
+  function dispose() { gone = true; textures.forEach((t) => t.dispose()); }
 
   return { update, aim, block, dispose, ready, get sun() { return sun; }, get wind() { return wind; }, get phase() { return phase; }, set open(v) { open = v; }, set stir(v) { motes.material.uniforms.uStir.value.lerp(v, 0.2); } };
 }

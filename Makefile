@@ -32,12 +32,12 @@ WELL_KNOWN  := --include ".well-known/*"
 
 # Plain make shows the help
 .DEFAULT_GOAL := help
-.PHONY: help check html js links frame frame-check budget secrets behavior serve three deploy invalidate verify
+.PHONY: help check html js links logic frame frame-check budget secrets behavior serve three deploy invalidate verify
 
 
 ##@ Checks
 
-check: html js links frame-check budget secrets ## Run every static check
+check: html js links logic frame-check budget secrets ## Run every static check
 
 # Every page served as HTML, so each check covers the tour as well as the home page
 PAGES := $(SITE_DIR)/index.html $(SITE_DIR)/tour.html
@@ -53,6 +53,11 @@ js: ## Syntax-check the JavaScript files, vendored modules, shared modules, and 
 
 links: ## Check in-page anchors and root-relative asset paths
 	@for f in $(PAGES); do python3 scripts/check_page.py links "$$f" || exit 1; done
+
+# Plain Node, no browser: replays the white rabbit's lifetime faults against the real controller
+logic: ## Check the white rabbit's scene lifetime with stubbed imports, timers, and frames
+	@command -v node >/dev/null 2>&1 || { echo "logic: install Node.js"; exit 1; }
+	@node scripts/rabbit_lifecycle.cjs $(SITE_DIR)
 
 # The bar and footer markup lives once, in index.html; other pages get copies
 frame: ## Copy the shared bar and footer blocks from index.html into the other pages

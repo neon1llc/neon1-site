@@ -1,5 +1,5 @@
 // src/app/public/js/white-rabbit-car.js - A pearl black model muscle coupe on the white rabbit's window sill.
-// Usage: const car = createCar({ scene, env, at, onSound }); await car.ready; car.pick(raycaster); car.update(time, light)
+// Usage: const car = createCar({ scene, env, at, onSound }); await car.ready; car.pick(raycaster); car.toggle(); car.update(time, light)
 //
 // Imported by white-rabbit-scene.js. The model is based on "2019 Chevrolet Camaro" by
 // IsaacOldton (CC BY 4.0, credited on the site), unbranded, stripped of hidden parts, and
@@ -106,9 +106,12 @@ export function createCar({ scene, env, at, onSound = () => {} }) {
   // ---- The model: the body rides the rumble, the wheels stay put ----
   // Each piece takes the material named for it in Blender
   const mats = { paint, window: glass, trim, matte, chrome, lens, lamp: lamps, marker: markers, tail: tails, tire: rubber, rim: rims, rotor, caliper };
+  // A model that arrives after the scene was disposed is freed instead of added
+  let gone = false;
   const ready = new Promise((done) => {
     const loader = new T.GLTFLoader();
     const use = (gltf) => {
+      if (gone) { gltf.scene.traverse((m) => { if (m.isMesh) { m.geometry.dispose(); m.material.dispose(); } }); done(); return; }
       for (const o of [...gltf.scene.children]) {
         const wheel = o.name.startsWith("wheel-");
         o.traverse((m) => {
@@ -142,13 +145,19 @@ export function createCar({ scene, env, at, onSound = () => {} }) {
 
   let started = -1, running = false;
 
-  // True when the ray hits the car; unless only looking, a hit starts the sequence or shuts the engine off
+  // Starts the sequence, or shuts the engine off; the click on the car and the help line's button both
+  // land here. Returns true once started
+  function toggle() {
+    if (started < 0) { started = performance.now() / 1000; onSound("click"); }
+    else { started = -1; running = false; onSound("stop"); }
+    return started >= 0;
+  }
+
+  // True when the ray hits the car; unless only looking, a hit toggles it
   function pick(ray, look = false) {
     car.updateMatrixWorld();
     if (!ray.intersectObject(hit, false).length) return false;
-    if (look) return true;
-    if (started < 0) { started = performance.now() / 1000; onSound("click"); }
-    else { started = -1; running = false; onSound("stop"); }
+    if (!look) toggle();
     return true;
   }
 
@@ -184,7 +193,7 @@ export function createCar({ scene, env, at, onSound = () => {} }) {
   }
 
   // Frees what the scene's traversal doesn't reach; the meshes and materials go with the scene
-  function dispose() { paint.normalMap.dispose(); }
+  function dispose() { gone = true; paint.normalMap.dispose(); }
 
-  return { pick, update, box, ready, dispose, get running() { return running; } };
+  return { pick, toggle, update, box, ready, dispose, get running() { return running; }, get on() { return started >= 0; } };
 }

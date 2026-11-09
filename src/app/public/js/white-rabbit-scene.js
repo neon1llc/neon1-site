@@ -425,6 +425,8 @@ export function createScene({ onLost, onSound = () => {} }) {
   // contact shadows go once it is in. If it fails, the room simply stays as built
   const bakedTextures = [];
   const baked = new Promise((done) => new T.GLTFLoader().load("/media/white-rabbit/room.glb", (gltf) => {
+    // Arriving after dispose: free the model and make no textures for a scene that is gone
+    if (disposed) { gltf.scene.traverse((o) => { if (o.isMesh) o.geometry.dispose(); }); done(); return; }
     gltf.scene.updateMatrixWorld(true);
     const byName = new Map();
     scene.traverse((o) => { if (o.isMesh && o.userData.bake) byName.set(o.name, o); });
@@ -446,6 +448,7 @@ export function createScene({ onLost, onSound = () => {} }) {
     // same order as their geometry, and darkens the vertex colors they already carry
     const dense = [...byName.values()].filter((m) => !m.geometry.attributes.uv1);
     Promise.all(dense.map((m) => fetch(`/media/white-rabbit/lm/${m.name}.ao?v=${VER}`).then((r) => (r.ok ? r.arrayBuffer() : null)).then((buf) => {
+      if (disposed) return;
       const ao = buf && new Uint8Array(buf), col = m.geometry.attributes.color, n = m.geometry.attributes.position.count;
       if (!ao || ao.length !== n || !col) return;
       for (let i = 0; i < n; i++) col.setXYZ(i, col.getX(i) * ao[i] / 255, col.getY(i) * ao[i] / 255, col.getZ(i) * ao[i] / 255);
@@ -705,8 +708,10 @@ export function createScene({ onLost, onSound = () => {} }) {
   }
   resize();
 
-  // Frees every GPU resource the scene made, then the context and its canvas
+  // Frees every GPU resource the scene made, then the context and its canvas; a second call does nothing,
+  // and loads still in flight check disposed and free what they bring
   function dispose() {
+    if (disposed) return;
     disposed = true;
     scene.traverse((o) => {
       if (o.geometry) o.geometry.dispose();
@@ -724,5 +729,5 @@ export function createScene({ onLost, onSound = () => {} }) {
     canvas.remove();
   }
 
-  return { compose, render, resize, dispose, pick, over: (x, y) => pick(x, y, true), get facing() { return facing; }, get wind() { return sky.wind; }, get carRunning() { return car.running; }, get beat() { return beat; }, get open() { return open; } };
+  return { compose, render, resize, dispose, pick, over: (x, y) => pick(x, y, true), toggleCar: () => !disposed && car.toggle(), get carOn() { return car.on; }, get facing() { return facing; }, get wind() { return sky.wind; }, get carRunning() { return car.running; }, get beat() { return beat; }, get open() { return open; } };
 }

@@ -110,6 +110,9 @@
         <h1 class="brand" aria-label="neon1"><span class="ne dec" aria-hidden="true">neon</span><span class="one dec" aria-hidden="true">1</span></h1>
         <p class="tagline reveal d1">1 is glad to be of service.</p>
       </div>
+      <!-- The white rabbit's way in from the keyboard: off screen until focused, like the skip link,
+           and shown only once js/white-rabbit.js runs -->
+      <button class="white-rabbit-in" id="whiteRabbitIn" type="button" hidden>follow the white rabbit</button>
     </section>
   </div>
 
@@ -394,6 +397,12 @@
         <div class="white-rabbit-sill"></div>
       </div>
       <p class="white-rabbit-grass" role="status"></p>
+    </div>
+    <!-- While caught: how to move, a way back that needs no gesture, and the car's switch while it's in view -->
+    <div class="white-rabbit-help" role="group" aria-label="White rabbit">
+      <p id="whiteRabbitHow">Scroll down or press the down arrow to follow it. Up goes back, and Esc leaves.</p>
+      <button class="chip" type="button" data-rabbit="car" hidden>start the car</button>
+      <button class="chip" type="button" data-rabbit="leave" aria-describedby="whiteRabbitHow">back to the page</button>
     </div>
   </div>
 

@@ -445,7 +445,11 @@ export function createWorld({ scene, touch }) {
   const treeMesh = keep(new T.Mesh(quad, shaderMat({ uniforms: { ...common, ...timed, uMap: atlas }, vertexShader: TREE_VERT, fragmentShader: TREE_FRAG, side: T.DoubleSide })));
   treeMesh.frustumCulled = false;
   const loader = new T.TextureLoader();
+  // Images that land after dispose are freed rather than kept (late() is true then)
+  let gone = false;
+  const late = (t) => gone && (t.dispose(), true);
   const ready = new Promise((done) => loader.load("/media/white-rabbit/trees-atlas.webp", (t) => {
+    if (late(t)) { done(); return; }
     t.colorSpace = T.SRGBColorSpace; atlas.value = t; textures.push(t); done();
   }, undefined, () => done()));
 
@@ -771,7 +775,7 @@ export function createWorld({ scene, touch }) {
   // by zvanstone, CC BY 4.0). The plants sway with the wind, more toward their tops
   const sprite = (url, w, h, at, toward, sway = 0, parent = group) => {
     const map = { value: null };
-    loader.load(url, (t) => { t.colorSpace = T.SRGBColorSpace; map.value = t; textures.push(t); });
+    loader.load(url, (t) => { if (late(t)) return; t.colorSpace = T.SRGBColorSpace; map.value = t; textures.push(t); });
     const card = new T.PlaneGeometry(w, h, 24, 4); card.translate(0, h / 2, 0);
     const mesh = new T.Mesh(card, shaderMat({
       uniforms: { ...common, ...timed, uMap: map, uSway: { value: sway } }, transparent: true, depthWrite: false, side: T.DoubleSide,
@@ -1037,7 +1041,7 @@ export function createWorld({ scene, touch }) {
     fq.setAttribute("aBush", new T.InstancedBufferAttribute(new Float32Array(bush), 1));
     fq.instanceCount = items.length;
     const flora = { value: null };
-    loader.load("/media/white-rabbit/flora-atlas.webp", (t) => { t.colorSpace = T.SRGBColorSpace; flora.value = t; textures.push(t); });
+    loader.load("/media/white-rabbit/flora-atlas.webp", (t) => { if (late(t)) return; t.colorSpace = T.SRGBColorSpace; flora.value = t; textures.push(t); });
     const fm = keep(new T.Mesh(fq, shaderMat({
       uniforms: { ...common, ...timed, uMap: flora }, side: T.DoubleSide,
       // Each plant is mirrored or not, leans its own way, and is a little wider or narrower than the last,
@@ -1202,6 +1206,7 @@ export function createWorld({ scene, touch }) {
 
   // Frees what the world made
   function dispose() {
+    gone = true;
     group.traverse((o) => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); });
     textures.forEach((t) => t.dispose());
     scene.remove(group);
