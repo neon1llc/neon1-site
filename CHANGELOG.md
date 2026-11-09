@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.34.1
+
+- A glossary joins the Company shelf in the knowledge center: neon1's own names, plus the reliability, security, cloud, and AI terms the documents use. From neon1-corpus v0.12.1.
+
 ## v0.34.0
 
 - The knowledge center grows to 60 documents: five more How I work standards (development, design and accessibility, customers, partners, outreach and selling), an accessibility statement, a security disclosure policy, and a new Guides shelf (getting ready for a first call, a family password manager, backups you can trust, before you buy a new tool, and whether you need a business associate agreement).
