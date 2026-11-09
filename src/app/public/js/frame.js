@@ -23,6 +23,8 @@
 
   // ---- Menu: open/close, Esc, close on link; returns focus to the button ----
   // The page behind an open menu is inert, so Tab moves only between the menu and its button.
+  // One overlay owns the screen at a time: an open case study (js/cases.js) or white rabbit makes the
+  // bar inert too, so the menu can't open over them, and the menu makes their openers unreachable.
   // Looked up each time, because the chat window arrives after the page starts; missing parts are skipped
   const menu = document.getElementById("menu"), menuBtn = document.getElementById("menuBtn");
   const behind = () => document.querySelectorAll(".top, .awake, .rainctl, .n1chat-launch, .n1chat");

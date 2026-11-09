@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // scripts/behavior.cjs - Browser checks for the home page's interactive contracts: the brief never
-// submits.
+// submits, and a case study owns the screen while open.
 // Usage: node scripts/behavior.cjs [SITE_DIR]   (make behavior; needs Playwright and its Chromium)
 //
 // Everything runs against a loopback copy of SITE_DIR served with a CSP like production's; any request
@@ -127,6 +127,91 @@ check("browser", "brief: preview, copy, and save stay local", async () => {
     const dbs = await page.evaluate(async () => (indexedDB.databases ? (await indexedDB.databases()).length : 0));
     expect(dbs === 0, "an IndexedDB database was created", dbs);
     expect(!requests.slice(seen).some((u) => u.includes(MARK)), "a request carried the brief");
+  } finally { await context.close(); }
+});
+
+
+// ---- SITE-05: a case study owns the screen while open ----
+// Where focus is, whether it sits inside the panel, and whether the page behind is inert
+const caseState = (page) => page.evaluate(() => {
+  const a = document.activeElement, panel = document.querySelector(".case-panel");
+  return {
+    open: !document.getElementById("caseLayer").hidden,
+    locked: document.body.classList.contains("case-open") || document.documentElement.classList.contains("case-lock"),
+    inPanel: panel.contains(a), onPanel: a === panel,
+    focused: a.dataset.case || a.className || a.tagName,
+    inert: ["header", ".awake", ".top", ".rainctl"].map((s) => document.querySelector(s).inert),
+    last: a === [...panel.querySelectorAll("a[href], button")].pop(),
+  };
+});
+
+check("browser", "case: Shift+Tab from the panel, full Tab cycle, Escape, and focus back on the opener", async () => {
+  const { page, context, errors } = await open();
+  try {
+    await page.locator("[data-case=accounting]").focus();
+    await page.keyboard.press("Enter");
+    let s = await caseState(page);
+    expect(s.open && s.onPanel, "focus did not move to the open panel", s);
+    expect(s.inert.every(Boolean), "the page behind the panel is not inert", s.inert);
+    await page.keyboard.press("Shift+Tab");
+    s = await caseState(page);
+    expect(s.inPanel && s.last, "Shift+Tab from the panel left it or missed its last control", s);
+    const count = await page.locator(".case-panel").evaluate((p) => p.querySelectorAll("a[href], button").length);
+    for (let i = 0; i < count + 2; i++) {
+      await page.keyboard.press(i % 3 === 2 ? "Shift+Tab" : "Tab");
+      s = await caseState(page);
+      expect(s.inPanel, `Tab ${i + 1} left the panel`, s);
+    }
+    await page.keyboard.press("Escape");
+    s = await caseState(page);
+    expect(!s.open && !s.locked && s.focused === "accounting", "Escape did not close and return focus to the opener", s);
+    expect(!s.inert[0] && !s.inert[1], "the page stayed inert after closing", s.inert);
+    await page.keyboard.press("Escape");
+    expect(!(await caseState(page)).open, "a second Escape reopened or broke the panel");
+    expect(!errors.length, "page errors", errors);
+  } finally { await context.close(); }
+});
+
+check("browser", "case: on a phone, the menu can't open over an open case study", async () => {
+  const { page, context } = await open({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+  try {
+    await page.locator("[data-case=home]").click();
+    const box = await page.locator("#menuBtn").boundingBox();
+    await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+    const menuHidden = await page.locator("#menu").evaluate((m) => m.hidden);
+    const s = await caseState(page);
+    expect(menuHidden && s.open, "the menu opened over the case study", { menuHidden, s });
+    await page.locator(".case-close").click();
+    await page.locator("#menuBtn").click();
+    expect(!(await page.locator("#menu").evaluate((m) => m.hidden)), "the menu no longer opens after the case study closed");
+  } finally { await context.close(); }
+});
+
+check("browser", "case: closing settles after repeated input, cancelled animations, and a motion change", async () => {
+  const { page, context, errors } = await open({ reducedMotion: "no-preference" });
+  try {
+    const settled = async (why) => {
+      await page.waitForTimeout(900);
+      const s = await caseState(page);
+      expect(!s.open && !s.locked && s.focused === "dermatology" && !s.inert[1], `${why}: the panel did not settle closed`, s);
+    };
+    const btn = page.locator("[data-case=dermatology]");
+    await btn.click(); await page.waitForTimeout(120);
+    await page.keyboard.press("Escape"); await page.keyboard.press("Escape");
+    await settled("double Escape");
+    await btn.click(); await page.waitForTimeout(120);
+    await page.keyboard.press("Escape");
+    await page.evaluate(() => document.getAnimations().forEach((a) => a.cancel()));
+    await settled("cancelled close animation");
+    await btn.click(); await page.waitForTimeout(60);
+    await page.keyboard.press("Escape");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await settled("reduced motion turned on mid-close");
+    await btn.click();
+    expect((await caseState(page)).open, "the panel did not reopen after the interrupted closes");
+    await page.keyboard.press("Escape");
+    expect(!(await caseState(page)).open, "with reduced motion now on, Escape should close at once");
+    expect(!errors.length, "page errors", errors);
   } finally { await context.close(); }
 });
 
