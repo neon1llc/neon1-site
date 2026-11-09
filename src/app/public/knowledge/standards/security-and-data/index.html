@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.38.0" />
+  <meta name="version" content="0.39.0" />
   <title>Security and data · neon1 knowledge center</title>
   <meta name="description" content="How neon1 handles your accounts, access, and information, and the baseline every project starts from." />
   <meta name="theme-color" content="#F2F4F2" />
@@ -103,13 +103,12 @@
 <ul><li>Named accounts, the least access the job needs, and separate admin roles.</li><li>Multi-factor sign-in on business and admin accounts, phishing-resistant where the service supports it.</li><li>No shared admin passwords, and no credentials in proposals, chat, code, or bookmarks.</li><li>Every grant of access records who approved it, why, and when it ends. After handover I remove what I no longer need and check that it's gone.</li><li>No remote-control software left installed without a support agreement and your informed consent.</li></ul>
 <p>For apps with more than one user, I test permissions on the server. Hiding a button doesn't stop a direct request, so I check that one customer can't reach another's records by changing an ID, including through exports and search.</p>
 <h2 id="thinking-through-threats-briefly">Thinking through threats, briefly</h2>
-<p>For each project I sketch what's being built, where information crosses from one party to another, what could go wrong, what reduces the risk, and how we'll check. For a simple intake form that might mean a forged submission, a stolen account, a malicious attachment, a duplicate, an email sent to the wrong person, a failed integration, and lost recovery access. Each risk ends with a decision and a way to test it.</p>
+<p>For each project I sketch what's being built, where information changes hands, what could go wrong, and how we'll check. For an intake form that might mean a forged submission, a stolen account, a malicious attachment, or an email sent to the wrong person. Each risk ends with a decision and a test.</p>
 <h2 id="the-baseline">The baseline</h2>
 <table><thead><tr><th>Area</th><th>Practice</th><th>Evidence kept</th></tr></thead><tbody><tr><td>Inventory</td><td>Systems, accounts, vendors, data, and owners are named</td><td>A dated inventory, unknowns included</td></tr><tr><td>Sign-in</td><td>Multi-factor sign-in and protected recovery</td><td>Configuration evidence, never the codes</td></tr><tr><td>Permissions</td><td>Least access, with tests that someone can't get in</td><td>Role table and test results</td></tr><tr><td>Devices</td><td>Supported software, updates, disk encryption</td><td>A device baseline and update record</td></tr><tr><td>Storage and transfer</td><td>Encryption, retention, and access that fit the data</td><td>A data-flow record</td></tr><tr><td>Secrets</td><td>Kept out of code, rotated when exposed</td><td>An inventory by name, never the values</td></tr><tr><td>Backup</td><td>Recovery that doesn't share the original's weak points</td><td>A restore test</td></tr><tr><td>Logging</td><td>Important actions logged without sensitive content</td><td>Sample redacted events</td></tr><tr><td>Vulnerabilities</td><td>Findings triaged and fixes rechecked</td><td>Finding, decision, fix, recheck</td></tr><tr><td>Changes</td><td>Big changes reviewed, with a way back</td><td>Version, approval, and release record</td></tr><tr><td>Incidents</td><td>Contacts, authority, and a fallback are written down</td><td>A current incident procedure</td></tr></tbody></table>
 <p>This is neon1's starting point, not a full copy of any standard and not a guarantee against compromise. When the stakes call for it, I bring in a specialist.</p>
-<h2 id="software-and-automation">Software and automation</h2>
-<p>I use maintained dependencies, keep build credentials narrow, and never give untested outside code access to production secrets. Third-party CI actions are pinned to exact versions. Secret scanning, dependency scanning, and static analysis each catch different things and miss different things. A scan against a live system can change data, so its scope is agreed first.</p>
-<p>When a secret leaks, I revoke or rotate it and confirm the old one no longer works. Deleting the visible copy isn't enough.</p>
+<h2 id="software-and-secrets">Software and secrets</h2>
+<p>Code follows the <a href="/knowledge/standards/development/">development</a> standard. When a secret leaks, I revoke or rotate it and confirm the old one no longer works. Deleting the visible copy isn't enough. A scan against a live system can change data, so its scope is agreed first.</p>
 <h2 id="fixing-vulnerabilities">Fixing vulnerabilities</h2>
 <p>I ask whether the affected part is actually present, whether the weakness can be reached, whether it's being exploited, and what it would expose. A severity score helps sort the list but doesn't describe your risk. If something urgent needs a faster response than I can give, we arrange someone who can before I take on the service.</p>
 <h2 id="privacy-and-agreements">Privacy and agreements</h2>
@@ -165,7 +164,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>No ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.38.0</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.39.0</a>
       </span>
     </div>
   </footer>
