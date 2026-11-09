@@ -1,7 +1,7 @@
 /* src/app/public/css/frame.css - The frame every neon1.tech page shares: base type, buttons, the top bar
  * (dark over the rain, light over the page), the phone menu, the light surface, and the footer.
  * Fonts, brand tokens, the bar's position, and the logo come from /shared/neon1.css; each page adds
- * its own layout on top (css/site.css for the home page, css/tour.css for the sample tour). */
+ * its own layout on top (css/site.css for the home page; tour.html only redirects, so it has none). */
 
 /* ---- Page tokens: the dark layer; .awake below swaps them for the light surface ---- */
 :root {
