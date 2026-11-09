@@ -102,8 +102,7 @@ const GROUND_FRAG = /* glsl */`
   ${hash}
   ${WOB_GLSL}
   ${SHAPE_GLSL}
-  uniform vec3 uTrees[48];   // x, z, and height; unused slots are (999, 999, 0)
-  const float EMPTY = 1.0;   // what an unused slot adds to the leaves and the shade (see below)
+  uniform vec3 uTrees[48];   // x, z, and height; the unused slots come last, as (999, 999, 0)
   uniform vec4 uBed;
   uniform sampler2D uLawn, uLawnN;
   varying vec3 vW;
@@ -143,11 +142,13 @@ const GROUND_FRAG = /* glsl */`
     }
     float dande = step(0.9965, hash(floor(vW.xz * 7.0))) * step(0.4, noise(vW.xz * 0.5)) * (1.0 - smoothstep(0.12, 0.2, length(fract(vW.xz * 7.0) - 0.5)));   // round flower heads
     grass = mix(grass, vec3(0.92, 0.75, 0.12), dande);
+    // Fallen leaves lie under and downwind of the real trees only: the first unused slot ends the list,
+    // here and in the shade further down
     float leaves = 0.0;
-    // An empty tree slot (height 0, see EMPTY above) counts as full cover here and in the shade further
-    // down. That is what the old reversed-edge form gave on drivers that follow the formula, and the look
-    // the yard was tuned with; make it 0.0 to keep leaves and shade to the trees alone (a visible change).
-    for (int i = 0; i < 48; i++) leaves = max(leaves, uTrees[i].z > 0.0 ? 1.0 - smoothstep(uTrees[i].z * 0.2, uTrees[i].z * 1.1, distance(vW.xz, uTrees[i].xy + vec2(2.0, 1.0))) : EMPTY);
+    for (int i = 0; i < 48; i++) {
+      if (uTrees[i].z <= 0.0) break;
+      leaves = max(leaves, 1.0 - smoothstep(uTrees[i].z * 0.2, uTrees[i].z * 1.1, distance(vW.xz, uTrees[i].xy + vec2(2.0, 1.0))));
+    }
     float la = hash(floor(vW.xz * 18.0) + 3.1) * 6.283; vec2 lc = fract(vW.xz * 18.0) - 0.5; lc = mat2(cos(la), -sin(la), sin(la), cos(la)) * lc;
     float leaf = step(1.0 - leaves * 0.18, hash(floor(vW.xz * 18.0))) * (1.0 - smoothstep(0.36, 0.42, length(lc * vec2(1.0, 2.2))));   // fallen leaves, each its own way round
     vec3 leafCol = mix(vec3(0.62, 0.28, 0.06), vec3(0.78, 0.55, 0.12), hash(floor(vW.xz * 18.0) + 1.7));
@@ -245,8 +246,9 @@ const GROUND_FRAG = /* glsl */`
     // Soft shade under every tree, offset away from the sun
     float shade = 0.0;
     for (int i = 0; i < 48; i++) {
+      if (uTrees[i].z <= 0.0) break;
       vec2 c = uTrees[i].xy - uSunDir.xz / uSunDir.y * uTrees[i].z * 0.45;
-      shade = max(shade, uTrees[i].z > 0.0 ? 1.0 - smoothstep(uTrees[i].z * 0.12, uTrees[i].z * 0.42, distance(vW.xz, c)) : EMPTY);
+      shade = max(shade, 1.0 - smoothstep(uTrees[i].z * 0.12, uTrees[i].z * 0.42, distance(vW.xz, c)));
     }
     col *= 1.0 - 0.45 * shade * (0.3 + 0.7 * uSun);
     // The turf's own relief only on grass, not on paving
