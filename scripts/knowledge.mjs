@@ -161,8 +161,8 @@ ${g.shelves.map((s) => `        <li><a href="#${s.key}">${esc(s.label)} <span>${
   const main = `    <section class="kc-band" aria-labelledby="kc-title">
       <div class="kc-band-inner">
         <p class="kc-eyebrow">neon1 · knowledge center</p>
-        <h1 id="kc-title">Everything neon1 is, written down.</h1>
-        <p class="kc-lead">Guides, templates, forms, and filled-out examples you can use whether or not you ever hire me, plus how I work, what I offer, and an honest look at the alternatives. ${count} documents, ${pdfs} of them as PDFs to download, print, or send around.</p>
+        <h1 id="kc-title">Everything neon1</h1>
+        <p class="kc-lead">Guides, templates, forms, and filled-out examples, plus how I work, services, and policies. ${count} documents, ${pdfs} with a PDF to download.</p>
         <div class="kc-search" hidden>
           <label for="kc-q">Search the knowledge center</label>
           <input id="kc-q" type="search" placeholder="Try &quot;backup&quot;, &quot;proposal&quot;, or &quot;privacy&quot;" autocomplete="off" />
@@ -181,7 +181,7 @@ ${nav}
 ${featured}
 ${groups}
 
-    <p class="kc-colophon">Every document here is written once in <a class="ext" href="https://github.com/neon1llc/neon1-corpus" target="_blank" rel="noopener">neon1-corpus</a>, the public source of neon1's words, and shared under CC BY-ND 4.0. Templates and examples are illustrations, not legal advice.</p>
+    <p class="kc-colophon">These documents come from <a class="ext" href="https://github.com/neon1llc/neon1-corpus" target="_blank" rel="noopener">neon1-corpus</a> and are shared under CC BY-ND 4.0. An edition below 1.0 hasn't had its final review yet. Templates and examples are illustrations, not legal advice.</p>
     </div>`
   return page({
     title: "Knowledge center · neon1",
