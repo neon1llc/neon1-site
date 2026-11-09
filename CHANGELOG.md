@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.41.0
+
+- Fewer controls to work out. The rain on the home page keeps only its pause button, and the grid and character switches are gone.
+- Knowledge center documents show one button, Download PDF. The link to each document's source on GitHub moves to the note at the end of the page.
+
 ## v0.40.0
 
 - A calmer knowledge center. The Start here row, which repeated six documents shown again below, is gone. Those documents now lead their own shelves instead.
