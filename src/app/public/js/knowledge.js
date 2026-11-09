@@ -4,15 +4,16 @@
   const box = document.querySelector(".kc-search");
   const input = document.getElementById("kc-q");
   const status = document.getElementById("kc-results");
-  // The featured row repeats documents from the shelves, so only shelf cards are counted
   const cards = [...document.querySelectorAll(".kc-card")];
-  const counted = cards.filter((c) => !c.closest(".kc-featured"));
   const shelves = [...document.querySelectorAll(".kc-shelf")];
-  const groups = [...document.querySelectorAll(".kc-group, .kc-featured")];
+  const groups = [...document.querySelectorAll(".kc-group")];
+  // A search opens the developer folds that hold a match, and clearing it closes the ones it opened
+  const folds = [...document.querySelectorAll(".kc-fold")];
+  const opened = new Set();
 
   if (box && input && cards.length) {
     box.hidden = false;
-    const total = counted.length;
+    const total = cards.length;
 
     function filter() {
       const words = input.value.toLowerCase().split(/\s+/).filter(Boolean);
@@ -20,7 +21,13 @@
       for (const card of cards) {
         const hit = words.every((w) => card.dataset.words.includes(w));
         card.hidden = !hit;
-        if (hit && !card.closest(".kc-featured")) shown++;
+        if (hit) shown++;
+      }
+      for (const fold of folds) {
+        const hit = words.length && fold.querySelector(".kc-card:not([hidden])");
+        if (hit && !fold.open) { fold.open = true; opened.add(fold); }
+        if (!hit && opened.has(fold)) { fold.open = false; opened.delete(fold); }
+        fold.hidden = Boolean(words.length) && !hit;
       }
       for (const shelf of shelves) shelf.hidden = !shelf.querySelector(".kc-card:not([hidden])");
       for (const group of groups) group.hidden = !group.querySelector(".kc-card:not([hidden])");

@@ -2,6 +2,12 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.40.0
+
+- A calmer knowledge center. The Start here row, which repeated six documents shown again below, is gone. Those documents now lead their own shelves instead.
+- Cards drop the label that repeated their shelf's name and show only whether there's a PDF.
+- The six developer standards (Development, Version control, Versioning, Code style, Testing and review, and Documentation) sit in a For developers fold at the end of How I work. A search still finds them and opens the fold. From neon1-corpus v0.21.0.
+
 ## v0.39.1
 
 - A calmer home page. The services note and the contact intro are shorter, and the contact list no longer repeats what the process already says about proposals.

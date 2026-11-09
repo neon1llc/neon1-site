@@ -37,12 +37,9 @@ body.kc { background: var(--paper); }
 .kc-shelves a span { font-size: 11px; color: var(--mark); opacity: .8; }
 
 /* ---- Featured row and the two groups ---- */
-.kc-featured { padding-top: 36px; }
-.kc-featured h2, .kc-group-head h2 { margin: 0 0 6px; font: 600 12px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--mark); }
-.kc-featured .kc-card a { border-color: rgba(3, 87, 4, .35); background: linear-gradient(180deg, #fff, #f3f8f4); }
-.kc-featured .kc-cards { margin-top: 14px; }
 .kc-group { padding-top: 56px; scroll-margin-top: 120px; }
-.kc-group[hidden], .kc-featured[hidden] { display: none; }
+.kc-group-head h2 { margin: 0 0 6px; font: 600 12px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--mark); }
+.kc-group[hidden] { display: none; }
 .kc-group-head { padding: 18px 20px; border-radius: 10px; background: var(--void); color: #d6f5dc; }
 .kc-group-head h2 { color: var(--neon); font-size: 13px; }
 .kc-group-head p { margin: 0; color: #a9c9b0; font-size: 15px; }
@@ -53,6 +50,16 @@ body.kc { background: var(--paper); }
 .kc-body { max-width: 1040px; margin: 0 auto; padding: 8px 24px 64px; }
 .kc-shelf { padding-top: 40px; scroll-margin-top: 120px; }
 .kc-shelf[hidden] { display: none; }
+/* Developer standards: a closed fold at the end of their shelf, opened by a click or a search */
+.kc-fold { margin-top: 16px; }
+.kc-fold[hidden] { display: none; }
+.kc-fold > summary { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; font: 500 14px var(--mono); color: var(--brand); list-style: none; }
+.kc-fold > summary::-webkit-details-marker { display: none; }
+.kc-fold > summary::after { content: "+"; font-weight: 700; }
+.kc-fold[open] > summary::after { content: "\2212"; }
+.kc-fold > summary span { color: var(--muted); }
+.kc-fold > summary:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.kc-fold > .kc-cards { margin-top: 12px; }
 .kc-shelf-head { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1.5px solid var(--brand); }
 .kc-shelf-head h3 { margin: 0; font: 700 20px var(--sans); color: var(--brand); }
 .kc-shelf-head p { margin: 0; color: var(--muted); font-size: 15px; }
