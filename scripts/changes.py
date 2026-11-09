@@ -6,6 +6,9 @@
 # Compares content hashes, not timestamps, because a CI checkout gives every
 # file a new mtime. A single-part upload's ETag is the object's MD5, so a
 # multipart or KMS-encrypted object always counts as changed, which is safe.
+#
+# Fonts and media are never deleted by the deploy (see the Makefile), so one the site no longer has
+# is kept, not listed as a change; otherwise every later deploy would count it and invalidate.
 
 import hashlib
 import json
@@ -36,6 +39,10 @@ def synced(key):
     return not any(part.startswith(".") for part in parts)
 
 
+# Folders the deploy keeps old files in
+KEPT = ("fonts/", "media/")
+
+
 def main():
     if len(sys.argv) != 2:
         sys.exit("Usage: changes.py SITE_DIR < objects.json")
@@ -52,7 +59,8 @@ def main():
         if remote.get(key) != local[key]:
             print(f"{'update' if key in remote else 'add'} {key}")
     for key in sorted(set(remote) - set(local)):
-        print(f"delete {key}")
+        if not key.startswith(KEPT):
+            print(f"delete {key}")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,153 @@
+{
+  "about": [
+    "Every file served with the year-long immutable cache (fonts/ and media/ under src/app/public), with its sha256.",
+    "A path always means the same bytes: a changed file gets a new name, the old one stays deployed, and its users move to the new name.",
+    "scripts/manifest.py checks this file (make manifest, part of make check) and refreshes the hashes (make rehash)."
+  ],
+  "files": {
+    "fonts/OFL-Inter.txt": {
+      "sha256": "8c8fa881d9091ee315d2c80d207bb73afd4e90a66c9782ca445c5642f25db6dc"
+    },
+    "fonts/OFL-JetBrainsMono.txt": {
+      "sha256": "bb1c26eb6fe1839e3759548777c8a35b9495ce4878a4b833b1b63d43ff313a4b"
+    },
+    "fonts/inter-latin-wght-normal.woff2": {
+      "sha256": "f052ee44c3728dfd23aba8a4567150bc314d23903026fbb6ad089422c2df56af"
+    },
+    "fonts/jetbrains-mono-latin-wght-normal.woff2": {
+      "sha256": "d8188600846f4100acc72730c0576d8abca97ae837c2dbf188362df2fa785d82"
+    },
+    "media/og-card-1.png": {
+      "sha256": "7a06a3a04aecf5533a9fe7ecf72b76fda7f37e5f0b8423230db9a60dfbddd06f"
+    },
+    "media/white-rabbit-v8.m4a": {
+      "sha256": "113e77b1817599d079cd1799c60328acc04c11d23a9f9f7ffe267574b9259b0d"
+    },
+    "media/white-rabbit/CREDITS.txt": {
+      "sha256": "94ccf4382e8b9418098cf7fcf418ddc2e76cdec04066f6f91de936c34d4bbce2"
+    },
+    "media/white-rabbit/car-lite.glb": {
+      "sha256": "ff0e0c9349b28c1cf5edc51fcade8f0e946446aa5b4cef6b4f856e5358985bfd"
+    },
+    "media/white-rabbit/car.glb": {
+      "sha256": "a4134e2f5a61978d370d268d85cda95d8e2af4f0f77550a9d1a3e7785e197d42"
+    },
+    "media/white-rabbit/clouds.webp": {
+      "sha256": "75da2730cba980ea1e64ac9b519a5a2ee7e3fa9fa8de10ba694ec740bbda9244"
+    },
+    "media/white-rabbit/flora-atlas.webp": {
+      "sha256": "bee4ca01312baa4315d73fa29200d7951a57c4e7772fb8bff6965cd10b40bdcf"
+    },
+    "media/white-rabbit/lm/room-0.webp": {
+      "sha256": "493617f6bd9675e9a1ce872aae11cc47bd2addf6963788c83358a7274da63ed6"
+    },
+    "media/white-rabbit/lm/room-1.webp": {
+      "sha256": "ba2cc54992d04c4e5cb2d146d6b7a8d196a4ad2f5222ea9aacad5d23fceb1930"
+    },
+    "media/white-rabbit/lm/room-10.webp": {
+      "sha256": "e54d9fcc1e127868b3dc4eec83c1d5d8f6e82739dce64280897ef6ccedcebf67"
+    },
+    "media/white-rabbit/lm/room-11.webp": {
+      "sha256": "cab843876ea0e00ed4cfe820e675a426907103bdb4863eb4750cdbc43be1171b"
+    },
+    "media/white-rabbit/lm/room-15.webp": {
+      "sha256": "8f1dd53c0352871b87056e463b04ca629aec2f86fc52ba5e5ec137663e02b839"
+    },
+    "media/white-rabbit/lm/room-17.webp": {
+      "sha256": "31a85ab8c749376221985ee3734a7b589b2848c33f2f6dcdd7dc9f1ac2cfec59"
+    },
+    "media/white-rabbit/lm/room-18.webp": {
+      "sha256": "910740697498975b174692b4736fcdd2794000d67945359a6fb682f04d60dfda"
+    },
+    "media/white-rabbit/lm/room-19.webp": {
+      "sha256": "20769fa9182e363c1d8132ec12a37144214f407ef498d880011a17c094d581ac"
+    },
+    "media/white-rabbit/lm/room-2.webp": {
+      "sha256": "2cfb5fb38595319cc9875455e83172fd800e38639e3c79b1afd1a53c2a4b0165"
+    },
+    "media/white-rabbit/lm/room-20.webp": {
+      "sha256": "5b1b64cb93e2573d23f566b48216856786ee55daee17b4f0c1efc3c4992fee9a"
+    },
+    "media/white-rabbit/lm/room-22.webp": {
+      "sha256": "33ca04440bf4c051114e5a0ede076dfb5d38971e9baea09118136a5f42b61422"
+    },
+    "media/white-rabbit/lm/room-23.webp": {
+      "sha256": "dae6663731646aee345403c2ee606b574d5cc61a2368a06e633a5a9ec76ed4d7"
+    },
+    "media/white-rabbit/lm/room-24.ao": {
+      "sha256": "34ea65d9cbdecd6bd48dd71e21751d8d36231f59736c145ee50a7417c3c64898"
+    },
+    "media/white-rabbit/lm/room-25.ao": {
+      "sha256": "384221bcc20b370a0955efbbf115507b9b474f119e34eecf3dd1f1b6902eab13"
+    },
+    "media/white-rabbit/lm/room-26.ao": {
+      "sha256": "66045dc686b8f3e454e8d875d40c7d40a6bd8bd8d407bb3e73e53d6db78d0e17"
+    },
+    "media/white-rabbit/lm/room-3.webp": {
+      "sha256": "3637d96e8f946ab184e99d0bde37e689bd2d25bc4032810713960821726697ce"
+    },
+    "media/white-rabbit/lm/room-5.webp": {
+      "sha256": "7414c385a22621b750e61da98cc440d6daf6c5317c1eb37565a3b8ef83a7a83c"
+    },
+    "media/white-rabbit/lm/room-6.webp": {
+      "sha256": "3b71ab5338274ecf0be8e9e773578f7c3430b98ac5f9156555142cffc5edc05a"
+    },
+    "media/white-rabbit/lm/room-7.webp": {
+      "sha256": "771c419023a0e396ece5110b2785437f27090d79ba21530bd419326fb4c07640"
+    },
+    "media/white-rabbit/lm/room-8.webp": {
+      "sha256": "29b63c4400996ef960f97e7b239993cff472b18c91329fec0f90925d762cdfbf"
+    },
+    "media/white-rabbit/lm/room-9.webp": {
+      "sha256": "3c94ba17dfc91d108fbfd6577f2b35a27a0e4272254fb77247da77641ada20ba"
+    },
+    "media/white-rabbit/room.glb": {
+      "sha256": "b0ea342dab9fe10f16d87813e868c7571cc775912d8077e336cec597e01a4039"
+    },
+    "media/white-rabbit/sky.webp": {
+      "sha256": "aa2849a80b77c5b15e7363fe589bf4681f73ed4177fe744d9c530cb0b08d3a3f"
+    },
+    "media/white-rabbit/tex/carpet-detail.webp": {
+      "sha256": "f777e921afd601f0784e923b444704262a0608d2d9acc9112a33a2f2c3e8a8e7"
+    },
+    "media/white-rabbit/tex/carpet-normal.webp": {
+      "sha256": "6d751759de1f02d50887b23e34d55f7866264e73d318e9b396f834de7201f071"
+    },
+    "media/white-rabbit/tex/floor-color.webp": {
+      "sha256": "3acda4291faffae7c2fdfe4778c66ca450210cc3d95a58968d416ef38cfe7fb4"
+    },
+    "media/white-rabbit/tex/floor-normal.webp": {
+      "sha256": "2ffdd06d7dda67314d1a62072ec39c2023f08c578ef22e313d797d8690cc87d5"
+    },
+    "media/white-rabbit/tex/lawn-color.webp": {
+      "sha256": "f40a2c77f112ad47b4cf8735b79237e754d2f782b7e8da91230dfc1a904638dc"
+    },
+    "media/white-rabbit/tex/lawn-normal.webp": {
+      "sha256": "87df39ee8d80a4bb5d754ab4cad47be35edf9a0fdda61778db1999dae8a7ec8a"
+    },
+    "media/white-rabbit/tex/leather-detail.webp": {
+      "sha256": "594427a90cfab12a1331d8864e1b49ecd0ab3094681340dd22d70a7dae809ca6"
+    },
+    "media/white-rabbit/tex/leather-normal.webp": {
+      "sha256": "0bf17e9d826642eaf13b9e894934f4665526dcc17d3a46705e51f34c966720fd"
+    },
+    "media/white-rabbit/tex/plaster-normal.webp": {
+      "sha256": "83dfe8a98d5af7ce2cbaebc6fe58a01bcc54766b589c6f74e9d575e92e0a2a3a"
+    },
+    "media/white-rabbit/tex/walnut-color.webp": {
+      "sha256": "4e7037474320feb07dcfd6d63f2e1d56672013072e7751d6d199e14621748421"
+    },
+    "media/white-rabbit/tex/walnut-normal.webp": {
+      "sha256": "ef099e8e373a8cc5b307ca6440a14990a7a93b6a2918ba6d486b00a9bed44222"
+    },
+    "media/white-rabbit/trees-atlas.webp": {
+      "sha256": "871554655a0576f38aa09208aac1b7737ad96056cad41a94e57eb5951c7157f5"
+    },
+    "media/white-rabbit/trees-far.webp": {
+      "sha256": "c98be14f628c3770046ef4f117f8bf346ad57c3909f026ddd60f45fd227ac990"
+    },
+    "media/white-rabbit/yard-garden.webp": {
+      "sha256": "00f1237aabd88ddbf69521d679a4a5b37ae2a4c5298abcf70a159fb3ed414bd1"
+    }
+  }
+}

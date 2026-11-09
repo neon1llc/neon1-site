@@ -18,7 +18,8 @@ import { createWorld, SUNDIR } from "/js/white-rabbit-world.js";
 
 // The white-out, the floor's bounce light, the landing's void, and where the screen sits
 // (meters; the floor is y 0, the TV faces +z; the room itself is built in white-rabbit-room.js)
-// Media is served with a year-long immutable cache, so every load asks for this release's copy by version
+// Media is immutable once deployed: a changed file gets a new path (README, Deploy). The release query is older than
+// that rule and stays so browsers never reuse a copy cached before it
 const VER = document.querySelector('meta[name="version"]')?.content || "0";
 T.DefaultLoadingManager.setURLModifier((u) => (u.startsWith("/media/") ? `${u}?v=${VER}` : u));
 const PAPER = "#F2F4F2", FLOOR = "#D9CDB8", VOID = "#0D0208";

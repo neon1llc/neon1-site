@@ -33,7 +33,10 @@ jobs:
         with:
           node-version: 22
 
+      # A push compares fonts and media with the commit before it; a pull request, with origin/main
       - run: make check
+        env:
+          IMMUTABLE_BASE: ${{ github.event.before }}
 
   # Deploys only from main, after the checks pass
   deploy:

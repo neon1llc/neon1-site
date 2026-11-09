@@ -23,7 +23,7 @@ HTML_VALIDATE  := html-validate@11.17.0
 GITLEAKS_IMAGE := ghcr.io/gitleaks/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f
 
 # Fonts and media keep their names, so a changed file needs a new name to reach
-# browsers that already cached it. Everything else revalidates on each visit.
+# browsers that already cached it (make manifest enforces it). Everything else revalidates on each visit.
 LONG_CACHE  := public, max-age=31536000, immutable
 SHORT_CACHE := no-cache
 DOTFILES    := --exclude ".*" --exclude "*/.*"
@@ -32,12 +32,12 @@ WELL_KNOWN  := --include ".well-known/*"
 
 # Plain make shows the help
 .DEFAULT_GOAL := help
-.PHONY: help check html js links logic frame frame-check release budget secrets behavior serve three deploy invalidate verify
+.PHONY: help check html js links logic frame frame-check release manifest rehash budget secrets behavior serve three deploy invalidate verify
 
 
 ##@ Checks
 
-check: html js links logic frame-check release budget secrets ## Run every static check
+check: html js links logic frame-check release manifest budget secrets ## Run every static check
 
 # Every page served as HTML, so each check covers the tour as well as the home page
 PAGES := $(SITE_DIR)/index.html $(SITE_DIR)/tour.html
@@ -72,6 +72,14 @@ frame-check: ## Fail if any page's bar or footer differs from index.html
 release: ## Fail if the places that name the release disagree
 	@python3 scripts/release.py $(SITE_DIR) CHANGELOG.md
 
+# Fonts and media are immutable once deployed: a path keeps its bytes for good (see README, Deploy)
+MANIFEST := src/app/asset-manifest.json
+manifest: ## Fail if a font or media file is unlisted, differs from its hash, or changed bytes at an old path
+	@python3 scripts/manifest.py check $(SITE_DIR) $(MANIFEST)
+
+rehash: ## Refresh the hashes in the asset manifest after adding or renaming a file
+	@python3 scripts/manifest.py update $(SITE_DIR) $(MANIFEST)
+
 budget: ## Fail if the deployed files exceed BUDGET_KB
 	@kb=$$(find $(SITE_DIR) -type f ! -name '.*' -exec cat {} + | wc -c | awk '{print int($$1 / 1024)}'); \
 	echo "site size: $${kb} KB of $(BUDGET_KB) KB"; \
@@ -104,7 +112,9 @@ three: ## Rebuild the vendored three.js bundle for the white rabbit
 
 ##@ Deploy
 
-# Two passes set the cache headers: long for fonts and media, short for the rest
+# Two passes set the cache headers: long for fonts and media, short for the rest. Fonts and media go
+# first, so a page never points at a file that isn't there yet, and without --delete: a page left
+# open from an older release may still ask for a file this release renamed or dropped
 deploy: ## Sync the site to the bucket when its content differs
 	@test -n "$(BUCKET)" || { echo "deploy: BUCKET is empty"; exit 1; }
 	@test -f "$(SITE_DIR)/index.html" || { echo "deploy: no $(SITE_DIR)/index.html, refusing to sync"; exit 1; }
@@ -113,7 +123,7 @@ deploy: ## Sync the site to the bucket when its content differs
 	@if [ ! -s $(CHANGES) ]; then echo "s3://$(BUCKET) already matches $(SITE_DIR)"; exit 0; fi; \
 	cat $(CHANGES); \
 	set -e; \
-	aws s3 sync $(SITE_DIR) "s3://$(BUCKET)" --delete --no-progress \
+	aws s3 sync $(SITE_DIR) "s3://$(BUCKET)" --no-progress \
 		--exclude "*" --include "fonts/*" --include "media/*" $(DOTFILES) \
 		--cache-control "$(LONG_CACHE)"; \
 	aws s3 sync $(SITE_DIR) "s3://$(BUCKET)" --delete --no-progress \
