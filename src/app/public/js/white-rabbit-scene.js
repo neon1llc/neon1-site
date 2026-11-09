@@ -5,6 +5,9 @@
 // still landing becomes the picture on an old CRT. Progress 0 frames that picture
 // exactly as the page showed it, so the hand-off has no jump; progress 1 is the
 // window, through it, and a white-out over the lakefront below.
+//
+// A fade that falls as its input grows is written 1.0 - smoothstep(lo, hi, x): GLSL leaves smoothstep
+// undefined when its first edge is the larger, so a driver may return anything there.
 
 import * as T from "/js/vendor/three-0.187.0.rabbit.min.js";
 import { createSky, createShafts, LIGHT } from "/js/white-rabbit-sky.js";
@@ -179,8 +182,8 @@ const GLASS_FRAG = /* glsl */`
     float t = (uWin.x - vWorld.x) / min(r.x, -1e-3);
     vec3 hit = vWorld + r * t;
     vec2 q = vec2((hit.z - uWin.z) / uWinSize.x, (hit.y - uWin.y) / uWinSize.y);
-    float pane = (r.x < -0.05) ? smoothstep(0.62, 0.42, abs(q.x)) * smoothstep(0.62, 0.42, abs(q.y)) : 0.0;
-    pane *= 1.0 - 0.55 * smoothstep(0.05, 0.0, abs(q.y - 0.2));   // the meeting rail, raised with the lower sash
+    float pane = (r.x < -0.05) ? (1.0 - smoothstep(0.42, 0.62, abs(q.x))) * (1.0 - smoothstep(0.42, 0.62, abs(q.y))) : 0.0;
+    pane *= 1.0 - 0.55 * (1.0 - smoothstep(0.0, 0.05, abs(q.y - 0.2)));   // the meeting rail, raised with the lower sash
     // The room around it: brighter above, dim below
     float room = 0.07 + 0.08 * smoothstep(-0.3, 0.8, r.y);
     // A broad, soft glow around the window's reflection, as the tube's glass is never a perfect mirror
@@ -225,7 +228,7 @@ const GRADE = {
         for (int i = 1; i <= 3; i++) {
           vec2 gp = mix(uFlare.xy, vec2(0.5), 1.0 + float(i) * 0.45);
           float gr = length((vUv - gp) * a);
-          f += vec3(0.55, 0.75, 1.0) * smoothstep(0.05 + 0.03 * float(i), 0.0, gr) * 0.06 / float(i);
+          f += vec3(0.55, 0.75, 1.0) * (1.0 - smoothstep(0.0, 0.05 + 0.03 * float(i), gr)) * 0.06 / float(i);
         }
         c = c * (1.0 - 0.12 * uFlare.z) + f * uFlare.z + warm * 0.1 * uFlare.z;
       }

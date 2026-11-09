@@ -10,6 +10,9 @@
 // pass that smears only the brightest pixels away from the sun, so they stream from the
 // window, break at the sash rails, and fade by themselves when a cloud covers it. Beams from
 // the panes to the floor, and dust glinting in them, follow the sun too.
+//
+// A fade that falls as its input grows is written 1.0 - smoothstep(lo, hi, x): GLSL leaves smoothstep
+// undefined when its first edge is the larger, so a driver may return anything there.
 
 import * as T from "/js/vendor/three-0.187.0.rabbit.min.js";
 
@@ -58,7 +61,7 @@ const SKY_FRAG = /* glsl */`
     col = mix(vec3(0.74, 0.81, 0.9), col, smoothstep(0.0, 0.09, (vQ.y - 1.3) / 4000.0));
     float ds = length(vQ - uSun.xy);
     col += vec3(1.0, 0.86, 0.62) * exp(-ds / (uSun.z * 2.2)) * 1.1;
-    col += vec3(16.0, 13.5, 9.5) * smoothstep(uSun.z, uSun.z * 0.8, ds);
+    col += vec3(16.0, 13.5, 9.5) * (1.0 - smoothstep(uSun.z * 0.8, uSun.z, ds));
     gl_FragColor = vec4(col, 1.0);
   }`;
 // The clouds, drifting and wrapping
@@ -69,7 +72,7 @@ const CLOUD_FRAG = /* glsl */`
   void main() {
     // The layer is drawn 3.25 times its rendered width (it tiles), and fades out at its edges
     vec4 c = texture2D(uMap, vec2(vUv.x * 3.25 + uDrift, vUv.y));
-    float edge = smoothstep(0.0, 0.08, vUv.x) * smoothstep(1.0, 0.92, vUv.x) * smoothstep(0.0, 0.12, vUv.y) * smoothstep(1.0, 0.88, vUv.y);
+    float edge = smoothstep(0.0, 0.08, vUv.x) * (1.0 - smoothstep(0.92, 1.0, vUv.x)) * smoothstep(0.0, 0.12, vUv.y) * (1.0 - smoothstep(0.88, 1.0, vUv.y));
     gl_FragColor = vec4(mix(c.rgb, vec3(1.0, 0.99, 0.97), 0.25) * 1.18, c.a * edge);  // fair-weather white, not storm grey
   }`;
 // A point on the window opening, by its across (u, from the left as seen inside) and up (v) fractions
@@ -96,7 +99,7 @@ const BEAM_FRAG = /* glsl */`
     return step(max(a, 0.0), b);
   }
   void main() {
-    float edge = smoothstep(0.0, 0.12, vB.x) * smoothstep(1.0, 0.88, vB.x);
+    float edge = smoothstep(0.0, 0.12, vB.x) * (1.0 - smoothstep(0.88, 1.0, vB.x));
     float gap = vB.z < 0.0 ? 1.0 : smoothstep(0.02, 0.07, abs(vB.x - vB.z));
     float streak = 0.6 + 0.4 * sin(vB.x * 37.0 + uTime * 0.4) * sin(vB.x * 13.0 - uTime * 0.25 + vB.y * 3.0);
     float a = uLevel * edge * gap * streak * (1.0 - vB.y) * smoothstep(0.0, 0.3, vB.y) * (1.0 - 0.92 * blocked(vW)) * smoothstep(0.05, 0.4, vW.x + 1.95);
@@ -143,23 +146,23 @@ const DUST_VERT = /* glsl */`
     vec3 p = home + vec3(sin(uTime * 0.07 + home.z * 1.3 + home.y * 0.6), sin(uTime * 0.05 + home.x * 0.9) * 0.5, cos(uTime * 0.06 + home.x * 1.1 - home.y * 0.4)) * 0.16;
     p += vec3(sin(uTime * 0.31 + s.x * 40.0), sin(uTime * 0.23 + s.y * 40.0), sin(uTime * 0.27 + s.z * 40.0)) * 0.012;
     // The wind: in through the window (+x), gusty and erratic near it, arriving later and gentler farther in
-    float near = smoothstep(2.4, 0.2, distance(home, vec3(-1.95, 1.4, 0.6)));
+    float near = (1.0 - smoothstep(0.2, 2.4, distance(home, vec3(-1.95, 1.4, 0.6))));
     float g = mix(uGustLate, uGust, near) * (0.25 + 0.75 * uOpen);
     p += vec3(0.22 * near + 0.08, sin(uTime * 1.1 + s.x * 30.0) * 0.05, sin(uTime * 1.4 + s.z * 30.0) * 0.08 * near) * g;
     // Moving through the air pushes the motes near the camera along, swirling a little
-    float wake = smoothstep(1.0, 0.15, distance(p, cameraPosition));
+    float wake = (1.0 - smoothstep(0.15, 1.0, distance(p, cameraPosition)));
     p += (uStir * 0.18 + vec3(sin(uTime * 3.0 + s.y * 20.0), sin(uTime * 2.3 + s.x * 20.0), cos(uTime * 2.7 + s.z * 20.0)) * length(uStir) * 0.04) * wake;
     vec4 w = modelMatrix * vec4(p, 1.0);
     // In a beam? Trace toward the sun to the window wall and check the opening
     float t = (-1.95 - w.x) / min(uLight.x, -1e-3);
     vec3 hit = w.xyz + uLight * max(t, 0.0);
-    float lit = step(0.0, t) * smoothstep(0.62, 0.55, abs(hit.z - 0.6)) * smoothstep(0.68, 0.6, abs(hit.y - 1.45));
+    float lit = step(0.0, t) * (1.0 - smoothstep(0.55, 0.62, abs(hit.z - 0.6))) * (1.0 - smoothstep(0.6, 0.68, abs(hit.y - 1.45)));
     vec3 view = normalize(w.xyz - cameraPosition);
     float toward = pow(max(dot(view, uLight), 0.0), 2.0);
     vec4 mv = viewMatrix * w;
     float depth = -mv.z;
     float glint = pow(0.5 + 0.5 * sin(uTime * (0.6 + s.z * 2.2) + s.x * 40.0), 8.0);
-    float close = smoothstep(0.9, 0.25, depth);
+    float close = (1.0 - smoothstep(0.25, 0.9, depth));
     vA = uLevel * (0.04 + lit * (0.25 + 1.4 * toward)) * (0.35 + 0.65 * glint * (1.0 + 2.0 * close));
     vShape = floor(aSeed.w * 4.0); vTurn = s.y * 6.28 + uTime * (s.x - 0.5) * 0.6; vSoft = close;
     gl_PointSize = uSize * (0.5 + s.y) * (vShape > 1.5 ? 1.6 : 1.0) * (1.0 + close * 1.5) / depth;
@@ -172,10 +175,10 @@ const DUST_FRAG = /* glsl */`
     c = mat2(cos(vTurn), -sin(vTurn), sin(vTurn), cos(vTurn)) * c;
     float a;
     if (vShape < 0.5) a = exp(-dot(c, c) * 40.0);                                                   // a speck
-    else if (vShape < 1.5) a = smoothstep(0.5, 0.1, length(c * vec2(1.0, 1.3))) * 0.8;              // a soft flake
-    else if (vShape < 2.5) a = smoothstep(0.06, 0.0, abs(c.y)) * smoothstep(0.42, 0.3, abs(c.x));    // a straight fibre
-    else { float bend = c.y - 0.6 * c.x * c.x; a = smoothstep(0.05, 0.0, abs(bend)) * smoothstep(0.4, 0.28, abs(c.x)); } // a bent one
-    a = mix(a, smoothstep(0.5, 0.0, length(c)) * 0.5, vSoft * 0.6);                                 // close ones blur
+    else if (vShape < 1.5) a = (1.0 - smoothstep(0.1, 0.5, length(c * vec2(1.0, 1.3)))) * 0.8;              // a soft flake
+    else if (vShape < 2.5) a = (1.0 - smoothstep(0.0, 0.06, abs(c.y))) * (1.0 - smoothstep(0.3, 0.42, abs(c.x)));    // a straight fibre
+    else { float bend = c.y - 0.6 * c.x * c.x; a = (1.0 - smoothstep(0.0, 0.05, abs(bend))) * (1.0 - smoothstep(0.28, 0.4, abs(c.x))); } // a bent one
+    a = mix(a, (1.0 - smoothstep(0.0, 0.5, length(c))) * 0.5, vSoft * 0.6);                                 // close ones blur
     gl_FragColor = vec4(vec3(1.0, 0.93, 0.78) * a * vA * 2.0, 1.0);
   }`;
 
@@ -223,7 +226,7 @@ const SHAFT_FRAG = (n) => /* glsl */`
       w *= 0.97;
     }
     // Light falls into the room, so shafts below the sun count more than those climbing the wall
-    float down = 0.35 + 0.65 * smoothstep(0.2, -0.4, normalize(vUv - uSun + 1e-5).y);
+    float down = 0.35 + 0.65 * (1.0 - smoothstep(-0.4, 0.2, normalize(vUv - uSun + 1e-5).y));
     gl_FragColor = vec4(base.rgb + sum * vec3(1.0, 0.8, 0.52) * (uAmount * down / ${n}.0), base.a);
   }`;
 

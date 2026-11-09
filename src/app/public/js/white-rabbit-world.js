@@ -12,6 +12,9 @@
 // in them, and the sun's reflection and glitter. All of it is lit by the same sun, dimmed
 // as clouds cover it, and fades into the haze with distance. The trees, swings, and flowers move with
 // the wind the sound and the room share.
+//
+// A fade that falls as its input grows is written 1.0 - smoothstep(lo, hi, x): GLSL leaves smoothstep
+// undefined when its first edge is the larger, so a driver may return anything there.
 
 import * as T from "/js/vendor/three-0.187.0.rabbit.min.js";
 
@@ -99,7 +102,8 @@ const GROUND_FRAG = /* glsl */`
   ${hash}
   ${WOB_GLSL}
   ${SHAPE_GLSL}
-  uniform vec3 uTrees[48];
+  uniform vec3 uTrees[48];   // x, z, and height; unused slots are (999, 999, 0)
+  const float EMPTY = 1.0;   // what an unused slot adds to the leaves and the shade (see below)
   uniform vec4 uBed;
   uniform sampler2D uLawn, uLawnN;
   varying vec3 vW;
@@ -133,41 +137,44 @@ const GROUND_FRAG = /* glsl */`
       float edgeDist = min(min(x - ${YARD.back.toFixed(1)}, z - ${YARD.right.toFixed(1)}), ${YARD.left.toFixed(1)} - z);
       grass *= mix(0.62, 1.0, smoothstep(0.0, 1.1, edgeDist));
       grass *= mix(0.7, 1.0, smoothstep(0.0, 0.7, max(x - uBed.y, 0.0) + step(x, uBed.x) * 9.0));
-      grass = mix(grass, vec3(0.12, 0.25, 0.08), smoothstep(-19.0, -19.9, x) * 0.6);
-      float wear = smoothstep(1.7, 0.4, distance(vW.xz, vec2(-11.0, -4.0)) + noise(vW.xz * 3.0) * 0.6);
+      grass = mix(grass, vec3(0.12, 0.25, 0.08), (1.0 - smoothstep(-19.9, -19.0, x)) * 0.6);
+      float wear = (1.0 - smoothstep(0.4, 1.7, distance(vW.xz, vec2(-11.0, -4.0)) + noise(vW.xz * 3.0) * 0.6));
       grass = mix(grass, vec3(0.36, 0.3, 0.2) * (0.8 + 0.4 * hash(floor(vW.xz * 25.0))), wear * 0.85);   // worn only under the swing, no path across the lawn
     }
-    float dande = step(0.9965, hash(floor(vW.xz * 7.0))) * step(0.4, noise(vW.xz * 0.5)) * smoothstep(0.2, 0.12, length(fract(vW.xz * 7.0) - 0.5));   // round flower heads
+    float dande = step(0.9965, hash(floor(vW.xz * 7.0))) * step(0.4, noise(vW.xz * 0.5)) * (1.0 - smoothstep(0.12, 0.2, length(fract(vW.xz * 7.0) - 0.5)));   // round flower heads
     grass = mix(grass, vec3(0.92, 0.75, 0.12), dande);
     float leaves = 0.0;
-    for (int i = 0; i < 48; i++) leaves = max(leaves, smoothstep(uTrees[i].z * 1.1, uTrees[i].z * 0.2, distance(vW.xz, uTrees[i].xy + vec2(2.0, 1.0))));
+    // An empty tree slot (height 0, see EMPTY above) counts as full cover here and in the shade further
+    // down. That is what the old reversed-edge form gave on drivers that follow the formula, and the look
+    // the yard was tuned with; make it 0.0 to keep leaves and shade to the trees alone (a visible change).
+    for (int i = 0; i < 48; i++) leaves = max(leaves, uTrees[i].z > 0.0 ? 1.0 - smoothstep(uTrees[i].z * 0.2, uTrees[i].z * 1.1, distance(vW.xz, uTrees[i].xy + vec2(2.0, 1.0))) : EMPTY);
     float la = hash(floor(vW.xz * 18.0) + 3.1) * 6.283; vec2 lc = fract(vW.xz * 18.0) - 0.5; lc = mat2(cos(la), -sin(la), sin(la), cos(la)) * lc;
-    float leaf = step(1.0 - leaves * 0.18, hash(floor(vW.xz * 18.0))) * smoothstep(0.42, 0.36, length(lc * vec2(1.0, 2.2)));   // fallen leaves, each its own way round
+    float leaf = step(1.0 - leaves * 0.18, hash(floor(vW.xz * 18.0))) * (1.0 - smoothstep(0.36, 0.42, length(lc * vec2(1.0, 2.2))));   // fallen leaves, each its own way round
     vec3 leafCol = mix(vec3(0.62, 0.28, 0.06), vec3(0.78, 0.55, 0.12), hash(floor(vW.xz * 18.0) + 1.7));
     grass = mix(grass, leafCol, leaf);
     vec3 col = grass;
     // Sidewalks: pale concrete with joints every 1.5 m
     float walk = ((x < ${STRIP.sidewalk1[0].toFixed(1)} && x > ${STRIP.sidewalk1[1].toFixed(1)}) || (x < ${STRIP.sidewalk2[0].toFixed(1)} && x > ${STRIP.sidewalk2[1].toFixed(1)})) ? 1.0 : 0.0;
-    vec3 concrete = vec3(0.66, 0.64, 0.6) * (0.9 + 0.12 * noise(vW.xz * 7.0)) * (1.0 - 0.35 * smoothstep(0.03, 0.0, abs(fract(z / 1.5) - 0.5) - 0.47));
+    vec3 concrete = vec3(0.66, 0.64, 0.6) * (0.9 + 0.12 * noise(vW.xz * 7.0)) * (1.0 - 0.35 * (1.0 - smoothstep(0.0, 0.03, abs(fract(z / 1.5) - 0.5) - 0.47)));
     col = mix(col, concrete, walk);
     // The road: dark asphalt, white edge lines, and a double yellow line down the middle
     if (x < ${STRIP.road[0].toFixed(1)} && x > ${STRIP.road[1].toFixed(1)}) {
       vec3 tar = vec3(0.13, 0.13, 0.14) * (0.85 + 0.3 * noise(vW.xz * 9.0)) * (0.92 + 0.12 * noise(vW.xz * 0.6));
       float mid = ${((STRIP.road[0] + STRIP.road[1]) / 2).toFixed(2)};
-      float yellow = smoothstep(0.07, 0.05, abs(abs(x - mid) - 0.12));
-      float white = smoothstep(0.08, 0.06, abs(x - (${(STRIP.road[0] - 0.3).toFixed(2)}))) + smoothstep(0.08, 0.06, abs(x - (${(STRIP.road[1] + 0.3).toFixed(2)})));
+      float yellow = (1.0 - smoothstep(0.05, 0.07, abs(abs(x - mid) - 0.12)));
+      float white = (1.0 - smoothstep(0.06, 0.08, abs(x - (${(STRIP.road[0] - 0.3).toFixed(2)})))) + (1.0 - smoothstep(0.06, 0.08, abs(x - (${(STRIP.road[1] + 0.3).toFixed(2)}))));
       col = mix(tar, vec3(0.85, 0.66, 0.12), yellow);
       col = mix(col, vec3(0.86), white);
     }
     // The cross street off to the right, running out from beside the house to the road, with its sidewalks
     if (x > ${STRIP.road[1].toFixed(1)}) {
       if ((z < ${CROSS.walk1[0].toFixed(1)} && z > ${CROSS.walk1[1].toFixed(1)}) || (z < ${CROSS.walk2[0].toFixed(1)} && z > ${CROSS.walk2[1].toFixed(1)})) if (x > ${STRIP.sidewalk1[0].toFixed(1)})
-        col = vec3(0.66, 0.64, 0.6) * (0.9 + 0.12 * noise(vW.xz * 7.0)) * (1.0 - 0.35 * smoothstep(0.03, 0.0, abs(fract(x / 1.5) - 0.5) - 0.47));
+        col = vec3(0.66, 0.64, 0.6) * (0.9 + 0.12 * noise(vW.xz * 7.0)) * (1.0 - 0.35 * (1.0 - smoothstep(0.0, 0.03, abs(fract(x / 1.5) - 0.5) - 0.47)));
       if (z < ${CROSS.road[0].toFixed(1)} && z > ${CROSS.road[1].toFixed(1)}) {
         float mz = ${((CROSS.road[0] + CROSS.road[1]) / 2).toFixed(2)};
         col = vec3(0.14, 0.14, 0.15) * (0.85 + 0.3 * noise(vW.xz * 9.0)) * (0.9 + 0.15 * noise(vW.xz * 0.5));
-        col = mix(col, vec3(0.85, 0.66, 0.12), smoothstep(0.07, 0.05, abs(abs(z - mz) - 0.12)) * step(${STRIP.road[0].toFixed(1)}, x));
-        col = mix(col, vec3(0.1), 0.25 * smoothstep(0.6, 0.0, noise(vW.xz * 0.8)));   // patched cracks and oil
+        col = mix(col, vec3(0.85, 0.66, 0.12), (1.0 - smoothstep(0.05, 0.07, abs(abs(z - mz) - 0.12))) * step(${STRIP.road[0].toFixed(1)}, x));
+        col = mix(col, vec3(0.1), 0.25 * (1.0 - smoothstep(0.0, 0.6, noise(vW.xz * 0.8))));   // patched cracks and oil
       }
     }
     // The yard's right side: soil borders along the right and back fences, concrete inside them up to the
@@ -190,12 +197,12 @@ const GROUND_FRAG = /* glsl */`
           float chip = hash(cell), edge = smoothstep(0.42, 0.5, max(abs(fract(cp.x + 0.5 * hash(floor(cp.yx))) - 0.5), abs(fract(cp.y) - 0.5)));
           vec3 mulch = mix(vec3(0.17, 0.04, 0.022), vec3(0.27, 0.065, 0.032), chip) * (0.8 + 0.35 * noise(vW.xz * 3.0)) * (1.0 - 0.45 * edge);
           float bare = 0.0;
-          ${[[-25.4, YARD.left - 1.1, 0.75], [-21.6, YARD.left - 0.85, 0.55], [-18.4, YARD.left - 0.8, 0.5], [YARD.back + 1.15, YARD.left - 1.25, 1.0]].map(([px, pz, r]) => `bare = max(bare, smoothstep(${(r * 1.1).toFixed(2)}, ${(r * 0.35).toFixed(2)}, distance(vW.xz, vec2(${px.toFixed(2)}, ${pz.toFixed(2)}))) * 0.9);`).join("\n          ")}
+          ${[[-25.4, YARD.left - 1.1, 0.75], [-21.6, YARD.left - 0.85, 0.55], [-18.4, YARD.left - 0.8, 0.5], [YARD.back + 1.15, YARD.left - 1.25, 1.0]].map(([px, pz, r]) => `bare = max(bare, (1.0 - smoothstep(${(r * 0.35).toFixed(2)}, ${(r * 1.1).toFixed(2)}, distance(vW.xz, vec2(${px.toFixed(2)}, ${pz.toFixed(2)})))) * 0.9);`).join("\n          ")}
           bare = max(bare, smoothstep(0.6, 0.75, noise(vW.xz * 1.7 + 5.0)) * 0.7);
           bare = max(bare, step(0.93, hash(floor(vW.xz * 9.0))) * 0.5);
           // the mulch's ragged edge where it meets the lawn
           float lip = smoothstep(${(YARD.left - SOIL).toFixed(2)}, ${(YARD.left - SOIL + 0.2).toFixed(2)}, z - 0.25 * wob(x + 7.0) + 0.12 * noise(vW.xz * 4.0));
-          lip = max(lip, smoothstep(${(YARD.back + SOIL).toFixed(2)}, ${(YARD.back + SOIL - 0.2).toFixed(2)}, x - 0.25 * wob(z + 3.0) - 0.12 * noise(vW.xz * 4.0)));
+          lip = max(lip, (1.0 - smoothstep(${(YARD.back + SOIL - 0.2).toFixed(2)}, ${(YARD.back + SOIL).toFixed(2)}, x - 0.25 * wob(z + 3.0) - 0.12 * noise(vW.xz * 4.0))));
           col = mix(col, mulch, (1.0 - bare) * lip);
         }
         paved = 1.0;
@@ -204,14 +211,14 @@ const GROUND_FRAG = /* glsl */`
         // and there with lighter quick-set cement that has cracked in its turn
         col = vec3(0.17, 0.17, 0.165) * (0.82 + 0.26 * fbm(vW.xz * 0.7)) * (0.86 + 0.28 * hash(floor(vW.xz * 70.0)));
         col *= 1.0 - 0.15 * smoothstep(0.6, 0.72, fbm(vW.xz * 0.3 + 4.0));
-        float crack = smoothstep(0.012, 0.0, abs(fbm(vW.xz * 0.55 + 2.0) - 0.5)) * step(0.55, noise(vW.xz * 0.25 + 9.0));
-        crack = max(crack, smoothstep(0.008, 0.0, abs(fbm(vW.xz * 1.3 + 7.0) - 0.5)) * step(0.62, noise(vW.xz * 0.5 + 3.0)));
+        float crack = (1.0 - smoothstep(0.0, 0.012, abs(fbm(vW.xz * 0.55 + 2.0) - 0.5))) * step(0.55, noise(vW.xz * 0.25 + 9.0));
+        crack = max(crack, (1.0 - smoothstep(0.0, 0.008, abs(fbm(vW.xz * 1.3 + 7.0) - 0.5))) * step(0.62, noise(vW.xz * 0.5 + 3.0)));
         float patchM = smoothstep(0.66, 0.68, fbm(vW.xz * 0.45 + 13.0)) * step(0.45, noise(vW.xz * 0.2 + 5.0));
         col = mix(col, vec3(0.2, 0.198, 0.19) * (0.9 + 0.2 * hash(floor(vW.xz * 90.0))), patchM);
-        crack = max(crack * (1.0 - patchM * 0.6), patchM * smoothstep(0.01, 0.0, abs(fbm(vW.xz * 2.4) - 0.5)));
+        crack = max(crack * (1.0 - patchM * 0.6), patchM * (1.0 - smoothstep(0.0, 0.01, abs(fbm(vW.xz * 2.4) - 0.5))));
         // Hairline cracks branching off the big ones, and a few running in from the edges
-        crack = max(crack, 0.6 * smoothstep(0.005, 0.0, abs(fbm(vW.xz * 2.1 + 21.0) - 0.5)) * step(0.5, noise(vW.xz * 0.7 + 17.0)));
-        crack = max(crack, 0.8 * smoothstep(0.007, 0.0, abs(fbm(vW.zx * 0.9 + 31.0) - 0.5)) * step(0.58, noise(vW.xz * 0.35 + 23.0)));
+        crack = max(crack, 0.6 * (1.0 - smoothstep(0.0, 0.005, abs(fbm(vW.xz * 2.1 + 21.0) - 0.5))) * step(0.5, noise(vW.xz * 0.7 + 17.0)));
+        crack = max(crack, 0.8 * (1.0 - smoothstep(0.0, 0.007, abs(fbm(vW.zx * 0.9 + 31.0) - 0.5))) * step(0.58, noise(vW.xz * 0.35 + 23.0)));
         col *= 1.0 - 0.6 * crack;
         // Indentations: shallow dents and pitted spots where the surface spalled, dark inside with a worn lip
         float dent = fbm(vW.xz * 1.6 + 41.0);
@@ -232,14 +239,14 @@ const GROUND_FRAG = /* glsl */`
     if (x > ${DECK.x0.toFixed(2)} - 0.3 && x < ${DECK.x1.toFixed(2)} && z > ${DECK.z0.toFixed(2)} - 0.3 && z < ${DECK.z1.toFixed(2)} + 0.3) col *= 0.45;
     // Around the pond: a rim of quarry stone at the water, a strip of grass, then the gravel walkway
     if (e < 0.9) col = vec3(0.52, 0.5, 0.46) * (0.7 + 0.45 * hash(floor(vW.xz * 6.0)));
-    else if (e > 2.2 && e < 4.2) col = vec3(0.7, 0.66, 0.58) * (0.85 + 0.25 * hash(floor(vW.xz * 30.0))) * (1.0 - 0.15 * smoothstep(0.3, 0.0, min(e - 2.2, 4.2 - e)));
+    else if (e > 2.2 && e < 4.2) col = vec3(0.7, 0.66, 0.58) * (0.85 + 0.25 * hash(floor(vW.xz * 30.0))) * (1.0 - 0.15 * (1.0 - smoothstep(0.0, 0.3, min(e - 2.2, 4.2 - e))));
     // The flower bed: patchy, half grown over (its plants and weeds are in the bed's picture)
     if (x > uBed.x && x < uBed.y && z > uBed.z && z < uBed.w) col = mix(col, vec3(0.24, 0.17, 0.1), 0.35 * noise(vW.xz * 3.0));
     // Soft shade under every tree, offset away from the sun
     float shade = 0.0;
     for (int i = 0; i < 48; i++) {
       vec2 c = uTrees[i].xy - uSunDir.xz / uSunDir.y * uTrees[i].z * 0.45;
-      shade = max(shade, smoothstep(uTrees[i].z * 0.42, uTrees[i].z * 0.12, distance(vW.xz, c)));
+      shade = max(shade, uTrees[i].z > 0.0 ? 1.0 - smoothstep(uTrees[i].z * 0.12, uTrees[i].z * 0.42, distance(vW.xz, c)) : EMPTY);
     }
     col *= 1.0 - 0.45 * shade * (0.3 + 0.7 * uSun);
     // The turf's own relief only on grass, not on paving
@@ -283,7 +290,7 @@ const WATER_FRAG = /* glsl */`
     float toSun = max(dot(r, uSunDir), 0.0);
     col += vec3(1.0, 0.92, 0.75) * (pow(toSun, 60.0) * 0.6 + pow(toSun, 900.0) * 30.0) * uSun;
     // Darker right at the stone rim, where the bank shades the water
-    col *= 0.75 + 0.25 * smoothstep(-0.2, -2.0, edge);
+    col *= 0.75 + 0.25 * (1.0 - smoothstep(-2.0, -0.2, edge));
     gl_FragColor = vec4(mix(col, uHaze, 1.0 - exp(-d / 1400.0)), 1.0);
   }`;
 
@@ -561,7 +568,7 @@ export function createWorld({ scene, touch }) {
     uniforms: { ...common }, vertexShader: SOLID_VERT,
     fragmentShader: `${COMMON}\n${hash}\nvarying vec3 vW, vN, vTint;
       void main() { float a = ${along}, y = vW.y - ${GROUND.toFixed(1)};
-        vec3 c = vec3(0.8, 0.79, 0.75) * (1.0 - 0.18 * smoothstep(0.012, 0.0, abs(fract(a / 0.178) - 0.5) - 0.48));
+        vec3 c = vec3(0.8, 0.79, 0.75) * (1.0 - 0.18 * (1.0 - smoothstep(0.0, 0.012, abs(fract(a / 0.178) - 0.5) - 0.48)));
         c *= mix(vec3(0.74, 0.76, 0.68), vec3(1.0), smoothstep(0.0, 0.5, y)) * (0.96 + 0.06 * noise(vec2(a * 3.0, y * 2.0)));
         c *= 1.0 - 0.08 * smoothstep(0.65, 0.9, noise(vec2(a * 0.7, y * 1.3) + 4.0));   // a streak of dirt from the rain
         gl_FragColor = vec4(outdoor(c, normalize(vN), vW), 1.0); }`,
