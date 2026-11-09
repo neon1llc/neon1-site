@@ -1,0 +1,25 @@
+{
+  "about": [
+    "Paths the site builds at run time, for scripts/check_page.py links. Each entry is a template literal exactly as a script writes it,",
+    "and where its filled-in names come from: names (listed here), from_calls (the first string argument of each named call in the",
+    "script that uses the template), or from_glb_nodes (the node names in that model). Every expansion must be a file in the site,",
+    "and a template that isn't listed here fails the check. Anything after a ? in a template is a query and ignored."
+  ],
+  "dynamic": [
+    {
+      "template": "/media/white-rabbit/tex/${name}.webp",
+      "from_calls": ["photo", "tile"],
+      "why": "The room's and the lawn's photographed maps (js/white-rabbit-room.js photo(), js/white-rabbit-world.js tile())"
+    },
+    {
+      "template": "/media/white-rabbit/lm/${o.name}.webp",
+      "from_glb_nodes": "/media/white-rabbit/room.glb",
+      "why": "The baked occlusion map for each mesh in room.glb (js/white-rabbit-scene.js); a rebuilt model with new or renamed meshes fails here until its maps ship"
+    },
+    {
+      "template": "/media/white-rabbit/lm/${m.name}.ao?v=${VER}",
+      "names": ["room-24", "room-25", "room-26"],
+      "why": "Per-vertex occlusion for the dense chair meshes, one byte per vertex in build order (js/white-rabbit-scene.js)"
+    }
+  ]
+}

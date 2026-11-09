@@ -9,11 +9,14 @@ The neon1.tech website. It's a static page in `src/app/public/`, served from a p
 You need Python 3 and Node.js. Gitleaks is used if it's installed, otherwise the secret scan runs it in Docker.
 
 ```bash
-make check   # HTML validation, JS syntax, anchors and asset paths, size budget, secret scan
-make serve   # http://localhost:8000
+make check      # HTML validation, JS syntax, anchors and asset paths, the white rabbit's lifetime, size budget, secret scan
+make serve      # http://localhost:8000
+make behavior   # the page driven in headless Chromium; needs Node's playwright package and its browser
 ```
 
 Run `make help` to list every target.
+
+The asset check follows each page into its stylesheets and scripts, so a missing texture or module fails it. A path a script builds at run time, like `` `/media/white-rabbit/tex/${name}.webp` ``, must be listed in `scripts/assets.json` with where its names come from, and every name it expands to must be a file. Add a new one there when you write one.
 
 ## Content Security Policy
 

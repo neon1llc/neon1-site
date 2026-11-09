@@ -54,10 +54,12 @@ js: ## Syntax-check the JavaScript files, vendored modules, shared modules, and 
 links: ## Check in-page anchors and root-relative asset paths
 	@for f in $(PAGES); do python3 scripts/check_page.py links "$$f" || exit 1; done
 
-# Plain Node, no browser: replays the white rabbit's lifetime faults against the real controller
-logic: ## Check the white rabbit's scene lifetime with stubbed imports, timers, and frames
+# No browser: replays the white rabbit's lifetime faults against the real controller, then breaks a fixture
+# site one way at a time to prove the links check catches each break
+logic: ## Check the white rabbit's scene lifetime, and that the links check fails on broken fixtures
 	@command -v node >/dev/null 2>&1 || { echo "logic: install Node.js"; exit 1; }
 	@node scripts/rabbit_lifecycle.cjs $(SITE_DIR)
+	@python3 scripts/test_check_page.py
 
 # The bar and footer markup lives once, in index.html; other pages get copies
 frame: ## Copy the shared bar and footer blocks from index.html into the other pages
