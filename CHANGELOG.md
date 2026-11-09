@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.35.0
+
+- The Alternatives shelf adds an open-source shortlist: the projects I'd look at first for automation, business apps, documents, reporting, monitoring, backup, security checks, infrastructure, AI, and planning, with what each is for and what to check first.
+- Where else to get help now quotes only terms read on each provider's own page. From neon1-corpus v0.13.0.
+
 ## v0.34.2
 
 - Three use cases join the Guides shelf: one workflow without retyping, a cloud account you can trust, and security awareness for a team or family. Each is labeled as a typical pattern, not a client story. From neon1-corpus v0.12.2.
