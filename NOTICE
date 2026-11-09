@@ -1,0 +1,13 @@
+neon1-site
+Copyright (c) 2026 neon1 LLC (neon1.tech). All rights not granted below are reserved.
+
+The source of neon1.tech, the website of neon1 LLC (DBA neon1).
+
+Required credit on every copy: "© neon1 LLC (neon1.tech)"
+
+Content (the site's written copy and case studies in src/app/public/) is under CC BY-ND 4.0, see LICENSE.
+Code (the site code: HTML structure, CSS, JavaScript, scripts and build files) is under FSL-1.1-ALv2, see LICENSE-CODE. Each release
+becomes Apache-2.0 two years after it's published.
+Names, logos and brand marks are reserved, see TRADEMARK.md.
+
+Keep this file with every copy.
