@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.32.4
+
+- The case studies and the questions now come from neon1-corpus, the one place neon1's public words are written, so the site, Neo and the knowledge area all say the same thing. The page reads exactly as before.
+
 ## v0.32.3
 
 - neon1's security readiness guide is now called Ready, Secure, Go. The security case study and the projects list use the new name.

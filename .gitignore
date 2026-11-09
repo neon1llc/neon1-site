@@ -8,3 +8,6 @@
 
 # Local Node tools
 node_modules/
+
+# neon1-corpus checkout and export, from make corpus
+.corpus/
