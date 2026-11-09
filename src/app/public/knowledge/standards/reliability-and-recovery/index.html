@@ -4,15 +4,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.36.1" />
+  <meta name="version" content="0.36.2" />
   <title>Reliability and recovery · neon1 knowledge center</title>
-  <meta name="description" content="How neon1 sets honest service targets, plans for failure, and proves that backups actually restore." />
+  <meta name="description" content="How neon1 sets service targets, plans for failure, and tests that backups restore." />
   <meta name="theme-color" content="#F2F4F2" />
   <link rel="canonical" href="https://neon1.tech/knowledge/standards/reliability-and-recovery/" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="neon1" />
   <meta property="og:title" content="Reliability and recovery · neon1 knowledge center" />
-  <meta property="og:description" content="How neon1 sets honest service targets, plans for failure, and proves that backups actually restore." />
+  <meta property="og:description" content="How neon1 sets service targets, plans for failure, and tests that backups restore." />
   <meta property="og:url" content="https://neon1.tech/knowledge/standards/reliability-and-recovery/" />
   <meta property="og:image" content="https://neon1.tech/media/og-card-1.png" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -77,10 +77,10 @@
       <header class="kc-doc-head">
         <nav class="kc-crumbs" aria-label="Breadcrumb"><a href="/knowledge/">Knowledge center</a><span aria-hidden="true">/</span><a href="/knowledge/#standards">How I work</a></nav>
         <h1>Reliability and recovery</h1>
-        <p class="kc-summary">How neon1 sets honest service targets, plans for failure, and proves that backups actually restore.</p>
+        <p class="kc-summary">How neon1 sets service targets, plans for failure, and tests that backups restore.</p>
         <dl class="kc-facts">
           <div><dt>Type</dt><dd>Standard</dd></div>
-          <div><dt>Edition</dt><dd>1.0</dd></div>
+          <div><dt>Edition</dt><dd>0.9</dd></div>
           <div><dt>First written</dt><dd>November 1, 2026</dd></div>
           <div><dt>Updated</dt><dd>November 9, 2026</dd></div>
         </dl>
@@ -91,7 +91,7 @@
       </header>
 
       <div class="kc-text">
-<p>Reliability means you can do the task when you need to, and get back on your feet when something goes wrong. Targets come from how much interruption and data loss your business can actually tolerate, what the design can do, what it costs, and who's available to respond. I never start by picking an impressive uptime percentage.</p>
+<p>Reliability means you can do the task when you need to, and get back on your feet when something goes wrong. Targets come from how much interruption and data loss your business can actually tolerate, what the design can do, what it costs, and who's available to respond. I don't start by picking an uptime percentage.</p>
 <h2 id="define-the-service-first">Define the service first</h2>
 <p>A service profile names the task that matters, operating hours, users, normal volume, dependencies, data owner, support owner, and the manual fallback. "The website" is too vague when the real task is "a request reaches the right person." We describe normal, degraded, and failed states separately, because a form that accepts a request but sends the email late hasn't lost the request.</p>
 <p>Dependencies such as sign-in, DNS, email delivery, storage, payments, an AI provider, and your own internet connection are listed, along with which failures the design survives. A vendor's uptime figure doesn't describe your whole experience.</p>
@@ -105,7 +105,7 @@
 <p>I ask what happens if the task fails for five minutes, an hour, a day, and a weekend. When's the busy period? Is a manual process acceptable, and for how long? Then we price the design and the coverage against those answers. Targets start few, get a baseline period, and say what happens when they're missed.</p>
 <h2 id="recoverable-data-is-more-than-a-schedule">Recoverable data is more than a schedule</h2>
 <p>An hourly backup doesn't guarantee an hour of data loss at most. Jobs fail, copies come out incomplete, credentials get lost, and corruption is found late. Recovery also needs uploaded files, configuration, and the keys to decrypt it all.</p>
-<aside class="callout example"><p class="callout-title">Counting data loss honestly</p><p>Trouble starts at 10:15. The last backup finished at 9:00, but the data in it only goes up to 8:30. You've lost an hour and forty-five minutes of work, not an hour and fifteen.</p></aside>
+<aside class="callout example"><p class="callout-title">Counting data loss</p><p>Trouble starts at 10:15. The last backup finished at 9:00, but the data in it only goes up to 8:30. You've lost an hour and forty-five minutes of work, not an hour and fifteen.</p></aside>
 <p>Replication copies deletions and corruption too, and file sync spreads unwanted changes. I keep an independent copy that matches the threat, following the 3-2-1 idea (several copies, different places, one off site) plus an offline or locked copy and regular test restores, as <a class="ext" href="https://www.cisa.gov/stopransomware/ransomware-guide" target="_blank" rel="noopener">CISA recommends</a>.</p>
 <h2 id="matching-recovery-to-the-stakes">Matching recovery to the stakes</h2>
 <table><thead><tr><th>Situation</th><th>The question</th><th>How neon1 fits</th></tr></thead><tbody><tr><td>A brochure site with nothing unique stored</td><td>Can versioned source and a documented deploy rebuild it?</td><td>A good fit</td></tr><tr><td>Ordinary intake with a workable manual fallback</td><td>Can you keep taking requests and catch up afterward?</td><td>A fit when ownership, backup, and support terms are explicit</td></tr><tr><td>Essential daily data</td><td>How much loss and downtime before real harm?</td><td>Needs proven recovery and coverage beyond appointment-based help</td></tr><tr><td>Continuous payments or critical operations</td><td>Who responds right away?</td><td>I refer you to a provider with the right operations team</td></tr></tbody></table>
@@ -115,8 +115,8 @@
 <h2 id="when-something-breaks">When something breaks</h2>
 <p>An incident disrupts or threatens normal work. A request asks for access, advice, or a change. Severity comes from the consequences to you. For each incident we name who coordinates, who can change the system, and your contact, and keep a timestamped log. Updates say what's affected, what's known, what isn't, what you can do meanwhile, and when the next update comes. Suspected security incidents follow your agreed route, keep the evidence intact, and bring in the right specialist or insurer.</p>
 <p>Afterward a short review covers impact, timeline, what helped, and what changes, focused on conditions rather than blame, with a few actions that get checked later.</p>
-<h2 id="what-care-can-honestly-promise">What care can honestly promise</h2>
-<p>Ongoing care with neon1 is scheduled attention to a named workflow within an agreed allowance. It isn't a help desk, round-the-clock security monitoring, an unlimited repair fund, or insurance against vendor outages. If the work regularly outgrows the allowance, the scope or the price changes. A low monthly fee never quietly turns into an unlimited recovery promise.</p>
+<h2 id="what-ongoing-care-covers">What ongoing care covers</h2>
+<p>Ongoing care with neon1 is scheduled attention to a named workflow within an agreed allowance. It isn't a help desk, round-the-clock security monitoring, an unlimited repair fund, or insurance against vendor outages. If the work regularly outgrows the allowance, we change the scope or the price.</p>
       </div>
 
       <aside class="kc-next" aria-labelledby="kc-next-h">
@@ -164,7 +164,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>No ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.36.1</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.36.2</a>
       </span>
     </div>
   </footer>

@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.36.1" />
+  <meta name="version" content="0.36.2" />
   <title>Security and data · neon1 knowledge center</title>
   <meta name="description" content="How neon1 handles your accounts, access, and information, and the baseline every project starts from." />
   <meta name="theme-color" content="#F2F4F2" />
@@ -80,7 +80,7 @@
         <p class="kc-summary">How neon1 handles your accounts, access, and information, and the baseline every project starts from.</p>
         <dl class="kc-facts">
           <div><dt>Type</dt><dd>Standard</dd></div>
-          <div><dt>Edition</dt><dd>1.0</dd></div>
+          <div><dt>Edition</dt><dd>0.9</dd></div>
           <div><dt>First written</dt><dd>November 1, 2026</dd></div>
           <div><dt>Updated</dt><dd>November 9, 2026</dd></div>
         </dl>
@@ -97,13 +97,13 @@
 <p>Informed by a framework isn't the same as certified against it. I won't call work "NIST certified," "compliant," or "enterprise grade" because these sources shaped it.</p>
 <h2 id="know-the-data-first">Know the data first</h2>
 <p>Before connecting anything, we list the information involved, why it's needed, where it lives, who can see it, which vendors receive it, and when it should be deleted. We label it in plain words: public, internal, confidential, or restricted.</p>
-<p>I don't collect what the work doesn't need. Development uses sample or redacted records. Before your data goes to a vendor, I explain where it's processed, how long it's kept, and who else touches it. Free consumer accounts and business accounts often have different terms, and that matters.</p>
+<p>I don't collect what the work doesn't need. Development uses sample or redacted records. Before your data goes to a vendor, I explain where it's processed, how long it's kept, and who else touches it. Free consumer accounts and business accounts often have different terms, so I check which one applies.</p>
 <p>Information also lingers in places people forget: email notifications, automation history, logs, AI prompts, search indexes, and backups. I won't promise complete deletion until I know how each of those behaves.</p>
 <h2 id="access-and-ownership">Access and ownership</h2>
 <ul><li>Named accounts, the least access the job needs, and separate admin roles.</li><li>Multi-factor sign-in on business and admin accounts, phishing-resistant where the service supports it.</li><li>No shared admin passwords, and no credentials in proposals, chat, code, or bookmarks.</li><li>Every grant of access records who approved it, why, and when it ends. After handover I remove what I no longer need and check that it's gone.</li><li>No remote-control software left installed without a support agreement and your informed consent.</li></ul>
 <p>For apps with more than one user, I test permissions on the server. Hiding a button doesn't stop a direct request, so I check that one customer can't reach another's records by changing an ID, including through exports and search.</p>
 <h2 id="thinking-through-threats-briefly">Thinking through threats, briefly</h2>
-<p>For each project I sketch what's being built, where information crosses from one party to another, what could go wrong, what reduces the risk, and how we'll check. For a simple intake form that might mean a forged submission, a stolen account, a malicious attachment, a duplicate, an email sent to the wrong person, a failed integration, and lost recovery access. The output that matters is a decision and a test, not a diagram.</p>
+<p>For each project I sketch what's being built, where information crosses from one party to another, what could go wrong, what reduces the risk, and how we'll check. For a simple intake form that might mean a forged submission, a stolen account, a malicious attachment, a duplicate, an email sent to the wrong person, a failed integration, and lost recovery access. Each risk ends with a decision and a way to test it.</p>
 <h2 id="the-baseline">The baseline</h2>
 <table><thead><tr><th>Area</th><th>Practice</th><th>Evidence kept</th></tr></thead><tbody><tr><td>Inventory</td><td>Systems, accounts, vendors, data, and owners are named</td><td>A dated inventory, unknowns included</td></tr><tr><td>Sign-in</td><td>Multi-factor sign-in and protected recovery</td><td>Configuration evidence, never the codes</td></tr><tr><td>Permissions</td><td>Least access, with tests that someone can't get in</td><td>Role table and test results</td></tr><tr><td>Devices</td><td>Supported software, updates, disk encryption</td><td>A device baseline and update record</td></tr><tr><td>Storage and transfer</td><td>Encryption, retention, and access that fit the data</td><td>A data-flow record</td></tr><tr><td>Secrets</td><td>Kept out of code, rotated when exposed</td><td>An inventory by name, never the values</td></tr><tr><td>Backup</td><td>Recovery that doesn't share the original's weak points</td><td>A restore test</td></tr><tr><td>Logging</td><td>Important actions logged without sensitive content</td><td>Sample redacted events</td></tr><tr><td>Vulnerabilities</td><td>Findings triaged and fixes rechecked</td><td>Finding, decision, fix, recheck</td></tr><tr><td>Changes</td><td>Big changes reviewed, with a way back</td><td>Version, approval, and release record</td></tr><tr><td>Incidents</td><td>Contacts, authority, and a fallback are written down</td><td>A current incident procedure</td></tr></tbody></table>
 <p>This is neon1's starting point, not a full copy of any standard and not a guarantee against compromise. When the stakes call for it, I bring in a specialist.</p>
@@ -165,7 +165,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>No ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.36.1</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.36.2</a>
       </span>
     </div>
   </footer>

@@ -4,15 +4,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.36.1" />
+  <meta name="version" content="0.36.2" />
   <title>Technology decisions · neon1 knowledge center</title>
-  <meta name="description" content="How neon1 chooses tools and architecture, counts the real cost, and checks licenses before you depend on anything." />
+  <meta name="description" content="How neon1 chooses tools and architecture, counts the full cost, and checks licenses." />
   <meta name="theme-color" content="#F2F4F2" />
   <link rel="canonical" href="https://neon1.tech/knowledge/standards/technology-decisions/" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="neon1" />
   <meta property="og:title" content="Technology decisions · neon1 knowledge center" />
-  <meta property="og:description" content="How neon1 chooses tools and architecture, counts the real cost, and checks licenses before you depend on anything." />
+  <meta property="og:description" content="How neon1 chooses tools and architecture, counts the full cost, and checks licenses." />
   <meta property="og:url" content="https://neon1.tech/knowledge/standards/technology-decisions/" />
   <meta property="og:image" content="https://neon1.tech/media/og-card-1.png" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -77,10 +77,10 @@
       <header class="kc-doc-head">
         <nav class="kc-crumbs" aria-label="Breadcrumb"><a href="/knowledge/">Knowledge center</a><span aria-hidden="true">/</span><a href="/knowledge/#standards">How I work</a></nav>
         <h1>Technology decisions</h1>
-        <p class="kc-summary">How neon1 chooses tools and architecture, counts the real cost, and checks licenses before you depend on anything.</p>
+        <p class="kc-summary">How neon1 chooses tools and architecture, counts the full cost, and checks licenses.</p>
         <dl class="kc-facts">
           <div><dt>Type</dt><dd>Standard</dd></div>
-          <div><dt>Edition</dt><dd>1.0</dd></div>
+          <div><dt>Edition</dt><dd>0.9</dd></div>
           <div><dt>First written</dt><dd>November 1, 2026</dd></div>
           <div><dt>Updated</dt><dd>November 9, 2026</dd></div>
         </dl>
@@ -91,7 +91,7 @@
       </header>
 
       <div class="kc-text">
-<p>I choose technology by your task and by what it costs to run after I've handed it over. Popular, new, and free are all fine qualities. None of them is a reason on its own.</p>
+<p>I choose technology by your task and by what it costs to run after I've handed it over. Being popular, new, or free isn't a reason on its own.</p>
 <h2 id="start-with-what-you-already-have">Start with what you already have</h2>
 <p>First I list the subscriptions, devices, skills, data, and integrations you already have, and check what's built in. A feature already included in Microsoft 365 or Google Workspace is often cheaper and easier to support than a new free server.</p>
 <p>For a decision that matters, I compare four options: improve the process, configure an existing product, adopt a managed service, or build a narrow piece. "Not yet" is an option too. Each recommendation says what evidence would change it.</p>
@@ -99,14 +99,14 @@
 <p>A tool that can't meet the hard requirements is out, however good it looks. Those requirements are permissions, export, lawful use, and recovery. Only then do I compare ease of use, maintenance, total cost, fit, and how good the evidence is. A weighted score helps us talk it through. It isn't an objective fact. The <a href="/knowledge/forms/tool-decision/">tool and architecture decision form</a> keeps it short.</p>
 <h2 id="count-the-whole-cost">Count the whole cost</h2>
 <p>First-year cost includes setup, subscriptions, computing, storage, data transfer, backups, monitoring, AI usage, payment fees, migration, training, upkeep, and the cost of leaving later.</p>
-<aside class="callout example"><p class="callout-title">Why the license price isn't the price</p><p>A free tool on a $12 a month server that needs an hour of someone's time each month, valued here at $75, costs at least $1,044 a year before setup, backups, or incidents. A $25 a month managed service costs $300 a year in fees before its own admin time and limits. Neither is automatically better. The point is that "free" was never the whole number.</p></aside>
+<aside class="callout example"><p class="callout-title">Why the license price isn't the price</p><p>A free tool on a $12 a month server that needs an hour of someone's time each month, valued here at $75, costs at least $1,044 a year before setup, backups, or incidents. A $25 a month managed service costs $300 a year in fees before its own admin time and limits. Neither is automatically better, and the license price is only part of the cost.</p></aside>
 <p>I follow the <a class="ext" href="https://www.finops.org/framework/" target="_blank" rel="noopener">FinOps</a> idea at a small scale: a budget, an owner, a regular look at the bill, and a cost per useful result.</p>
 <h2 id="architecture-that-fits-a-small-business">Architecture that fits a small business</h2>
 <ul><li>A brochure website is usually a static site on managed hosting with versioned source and a documented redeploy.</li><li>Client workflows use a few clearly owned parts and supported integrations. A modular app or a managed workflow usually beats microservices or Kubernetes at this size.</li><li>Infrastructure as code is worth it when repeatability and recovery justify the setup.</li><li>The <a class="ext" href="https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html" target="_blank" rel="noopener">AWS Well-Architected</a> pillars (operations, security, reliability, performance, cost, sustainability) are a useful lens even when nothing runs on AWS.</li></ul>
 <h2 id="integrations-that-don-t-break-quietly">Integrations that don't break quietly</h2>
 <ul><li>Supported APIs over screen scraping.</li><li>API limits, paging, time zones, currencies, and ID formats written down.</li><li>Incoming data validated. Each business action gets a stable ID, so a retry doesn't send a second invoice or make a second booking.</li><li>Temporary failures retry a limited number of times with a delay. Permanent ones go somewhere a person will see them.</li><li>Partial success is kept. If a record saves but its email fails, the record stays and the failed email shows up. Reconciliation checks make missing or duplicate results visible.</li></ul>
 <h2 id="knowing-when-it-s-broken">Knowing when it's broken</h2>
-<p>Every service starts with a health check on the journey that matters, a clear failure log, cost visibility, and a named person for alerts. Alerts say what's affected, what to do next, and where the instructions are. A monitor hosted on the same server as the app goes down with it, so it doesn't count.</p>
+<p>Every service starts with a health check on the journey that matters, a clear failure log, cost visibility, and a named person for alerts. Alerts say what's affected, what to do next, and where the instructions are. A monitor hosted on the same server as the app goes down with it, so it can't report that outage.</p>
 <h2 id="licenses-and-terms">Licenses and terms</h2>
 <p>Open source, source available, open core, free tier, and free trial mean different things. Code licenses, hosted terms, model weights, datasets, plugins, logos, and fonts can each have their own rules. I read the actual license at the version being adopted, and note whether we're consulting on your own installation, distributing software, embedding it, or hosting it for others. Some popular automation and AI platforms allow internal use but need commercial terms for hosting or white-labeling. Notices and attribution are kept intact.</p>
 <h2 id="qualifying-a-tool-before-you-rely-on-it">Qualifying a tool before you rely on it</h2>
@@ -159,7 +159,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>No ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.36.1</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.36.2</a>
       </span>
     </div>
   </footer>
