@@ -36,7 +36,7 @@ const WINDOW = { z: 0.6, y: 1.45, w: 1.2, h: 1.3 };
 // Each is [progress, camera position, look target, vertical fov]; the first two positions are filled in from the
 // picture's fit. Pauses are pairs of beats a hair apart
 const BEATS = [
-  [0, null, SC, 40], [0.09, null, SC, 44],                                                               // face right at the screen, hunched
+  [0, null, SC, 40], [0.035, null, SC, 44],                                                               // face right at the screen, hunched
   // then straight out and back from the set, drifting a little right, low on the floor and looking at it the whole way,
   // until both chairs and the set are in view
   [0.13, [0.03, 0.53, -1.32], [0, 0.53, -1.9], 48], [0.25, [0.47, 0.55, 0.14], [0.01, 0.55, -1.9], 51],
@@ -73,9 +73,10 @@ const OPEN = [[0.79, 0.3], [0.85, 1]];
 // Getting up tilts the view (counterclockwise, in radians), and the walk bobs with each step
 const ROLL = [[0.51, 0], [0.55, 0.07], [0.58, -0.015], [0.6, 0]];
 const WALK = [0.59, 0.72], STEPS = 7;
-// The lighting, screen, and grade below were timed on an earlier, shorter walk; this maps progress
+// The lighting, screen, and grade below were timed on an earlier, shorter walk; this maps progress (the screen
+// part is kept short, so the first scrolls already move the view and never feel stuck)
 // onto that timeline (the room appearing, the window coming into view, the white-out)
-const LEGACY = [[0, 0], [0.09, 0.28], [0.17, 0.4], [0.33, 0.6], [0.64, 0.82], [0.89, 0.94], [0.985, 0.95], [1, 1]];
+const LEGACY = [[0, 0], [0.035, 0.28], [0.17, 0.4], [0.33, 0.6], [0.64, 0.82], [0.89, 0.94], [0.985, 0.95], [1, 1]];
 // The scroll's whole span (q) runs the walk (its progress, pr) straight through to the yard, then holds the
 // view outside for a pause of scrolling (HOLD), and the last stretch whitens
 const HOLD = [0.94, 0.975];

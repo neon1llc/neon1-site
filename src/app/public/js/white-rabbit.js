@@ -288,6 +288,9 @@ export function whiteRabbit({ rain, root }) {
     if (state === "done" && d > 0) { target = Math.min(1 + BAND, target + d * 0.3); band(); return; }
     set(d > 0 ? "playing" : "reversing");
     target = target + d > 1 ? Math.min(1 + BAND, 1 + (target + d - 1) * 0.3) : Math.max(0, target + d);
+    // Until the scene is ready nothing moves, so input then is not banked: otherwise the first frames would
+    // spring through everything scrolled while it loaded, and the start would rush by
+    if (!prepared) target = Math.min(target, 0.004);
     band();
   }
 

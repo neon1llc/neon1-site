@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.32.2
+
+- The start of the scroll no longer feels stuck. The view now starts moving back from the screen within the first few scrolls, instead of holding on the screen for over a screen's height of scrolling.
+- Scrolling while the scene is still loading no longer piles up, so the start can't rush past once it's ready.
+
 ## v0.32.1
 
 - A simpler walk. Out of the TV, the view goes straight out and back from the set, drifting a little right and looking at it, until both chairs and the set are in view.
