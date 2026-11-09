@@ -4,15 +4,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.36.1" />
+  <meta name="version" content="0.36.2" />
   <title>Development · neon1 knowledge center</title>
-  <meta name="description" content="How neon1 writes, reviews, tests, and ships code, so the software you receive is readable, safe to change, and yours to keep." />
+  <meta name="description" content="How neon1 writes, reviews, tests, and ships code, and how the code is handed over to you." />
   <meta name="theme-color" content="#F2F4F2" />
   <link rel="canonical" href="https://neon1.tech/knowledge/standards/development/" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="neon1" />
   <meta property="og:title" content="Development · neon1 knowledge center" />
-  <meta property="og:description" content="How neon1 writes, reviews, tests, and ships code, so the software you receive is readable, safe to change, and yours to keep." />
+  <meta property="og:description" content="How neon1 writes, reviews, tests, and ships code, and how the code is handed over to you." />
   <meta property="og:url" content="https://neon1.tech/knowledge/standards/development/" />
   <meta property="og:image" content="https://neon1.tech/media/og-card-1.png" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -77,10 +77,10 @@
       <header class="kc-doc-head">
         <nav class="kc-crumbs" aria-label="Breadcrumb"><a href="/knowledge/">Knowledge center</a><span aria-hidden="true">/</span><a href="/knowledge/#standards">How I work</a></nav>
         <h1>Development</h1>
-        <p class="kc-summary">How neon1 writes, reviews, tests, and ships code, so the software you receive is readable, safe to change, and yours to keep.</p>
+        <p class="kc-summary">How neon1 writes, reviews, tests, and ships code, and how the code is handed over to you.</p>
         <dl class="kc-facts">
           <div><dt>Type</dt><dd>Standard</dd></div>
-          <div><dt>Edition</dt><dd>1.0</dd></div>
+          <div><dt>Edition</dt><dd>0.9</dd></div>
           <div><dt>Updated</dt><dd>November 9, 2026</dd></div>
         </dl>
         <div class="kc-actions">
@@ -90,13 +90,13 @@
       </header>
 
       <div class="kc-text">
-<p>Most of what I deliver isn't code. When it is, it should be code you could hand to another developer tomorrow without an apology. These are the habits behind every repository I touch, including neon1's own, which are public on <a class="ext" href="https://github.com/neon1llc" target="_blank" rel="noopener">GitHub</a>.</p>
+<p>Most of what I deliver isn't code. When it is, another developer should be able to pick it up and work on it without me. These are the habits behind every repository I touch, including neon1's own, which are public on <a class="ext" href="https://github.com/neon1llc" target="_blank" rel="noopener">GitHub</a>.</p>
 <h2 id="write-for-the-next-person">Write for the next person</h2>
-<ul><li>Plain names, small functions, and comments that explain why rather than what.</li><li>Every file starts with a line saying what it's for.</li><li>The README says what it is, who it's for, how to run it, how to deploy it, what's missing, and the license.</li><li>No clever tricks where an ordinary approach works. The next person may be you, a year from now, in a hurry.</li></ul>
+<ul><li>Plain names, small functions, and comments that explain why rather than what.</li><li>Every file starts with a line saying what it's for.</li><li>The README says what it is, who it's for, how to run it, how to deploy it, what's missing, and the license.</li><li>No clever tricks where an ordinary approach works.</li></ul>
 <h2 id="fewer-moving-parts">Fewer moving parts</h2>
 <ul><li>Use the platform's built-in features before adding a library, and a library before writing a framework.</li><li>Every dependency is a long-term commitment, so each one has to earn its place. Several neon1 tools run on Node with no dependencies at all.</li><li>Pin versions, including CI actions, and update them on purpose rather than by accident.</li></ul>
 <h2 id="version-control">Version control</h2>
-<ul><li>Every change lives on a named branch that says what it does, such as <code>fix/office-hours</code>.</li><li>Commit messages follow <a class="ext" href="https://www.conventionalcommits.org/" target="_blank" rel="noopener">Conventional Commits</a>: <code>feat</code>, <code>fix</code>, <code>docs</code>, <code>refactor</code>, <code>chore</code>, or <code>test</code>, with a plain subject.</li><li>Each commit makes sense on its own and passes the checks.</li><li>History on the main branch is never rewritten. Releases are tagged and listed in a changelog written for people, not machines.</li></ul>
+<ul><li>Every change lives on a named branch that says what it does, such as <code>fix/office-hours</code>.</li><li>Commit messages follow <a class="ext" href="https://www.conventionalcommits.org/" target="_blank" rel="noopener">Conventional Commits</a>: <code>feat</code>, <code>fix</code>, <code>docs</code>, <code>refactor</code>, <code>chore</code>, or <code>test</code>, with a plain subject.</li><li>Each commit makes sense on its own and passes the checks.</li><li>History on the main branch is never rewritten. Releases are tagged and listed in a changelog written in plain language.</li></ul>
 <h2 id="tests-that-match-the-promise">Tests that match the promise</h2>
 <p>Tests check what the client was promised: a request arrives once, permissions hold, a retry doesn't duplicate work, and a failure leaves a visible, recoverable state. A green test suite that skips those is weak evidence. When a bug is found, a test that would have caught it comes first.</p>
 <p>Checks run the same way locally and in CI, from one command. If a check is too slow or needs a browser, it says so instead of quietly being skipped.</p>
@@ -108,8 +108,6 @@
 <ul><li>Every deploy says which version it shipped and checks that the live site serves it.</li><li>A rollback is a known command, not an improvisation.</li><li>Static assets that never change are cached for a long time. Pages that do change are always revalidated.</li></ul>
 <h2 id="your-code-is-yours">Your code is yours</h2>
 <p>Code written for you lives in a repository you own, under the license we agree on. The handover includes how to build, test, deploy, and roll back without me. If I reuse open-source work, its license and notices stay intact, and I'll tell you what each one allows.</p>
-<h2 id="ai-assisted-work">AI-assisted work</h2>
-<p>I may use AI coding tools as one of many aids. A person reviews, tests, and takes responsibility for every line that ships, the same as for code written by hand. Your confidential information doesn't go into any AI service unless you've approved that service. See <a href="/knowledge/standards/ai-quality/">AI quality and oversight</a> for AI inside the systems I build.</p>
       </div>
 
       <aside class="kc-next" aria-labelledby="kc-next-h">
@@ -157,7 +155,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>No ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.36.1</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.36.2</a>
       </span>
     </div>
   </footer>
