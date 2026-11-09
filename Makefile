@@ -32,12 +32,12 @@ WELL_KNOWN  := --include ".well-known/*"
 
 # Plain make shows the help
 .DEFAULT_GOAL := help
-.PHONY: help check html js links logic frame frame-check budget secrets behavior serve three deploy invalidate verify
+.PHONY: help check html js links logic frame frame-check release budget secrets behavior serve three deploy invalidate verify
 
 
 ##@ Checks
 
-check: html js links logic frame-check budget secrets ## Run every static check
+check: html js links logic frame-check release budget secrets ## Run every static check
 
 # Every page served as HTML, so each check covers the tour as well as the home page
 PAGES := $(SITE_DIR)/index.html $(SITE_DIR)/tour.html
@@ -67,6 +67,10 @@ frame: ## Copy the shared bar and footer blocks from index.html into the other p
 
 frame-check: ## Fail if any page's bar or footer differs from index.html
 	@python3 scripts/frame.py check $(SITE_DIR)
+
+# The version meta on every page, the footer link, the CHANGELOG's top entry, and any literal ?v=
+release: ## Fail if the places that name the release disagree
+	@python3 scripts/release.py $(SITE_DIR) CHANGELOG.md
 
 budget: ## Fail if the deployed files exceed BUDGET_KB
 	@kb=$$(find $(SITE_DIR) -type f ! -name '.*' -exec cat {} + | wc -c | awk '{print int($$1 / 1024)}'); \

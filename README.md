@@ -9,12 +9,14 @@ The neon1.tech website. It's a static page in `src/app/public/`, served from a p
 You need Python 3 and Node.js. Gitleaks is used if it's installed, otherwise the secret scan runs it in Docker.
 
 ```bash
-make check      # HTML validation, JS syntax, anchors and asset paths, the white rabbit's lifetime, size budget, secret scan
+make check      # HTML validation, JS syntax, anchors and asset paths, the white rabbit's lifetime, release versions, size budget, secret scan
 make serve      # http://localhost:8000
 make behavior   # the page driven in headless Chromium; needs Node's playwright package and its browser
 ```
 
 Run `make help` to list every target.
+
+A release is named in four places: the version meta in `index.html` and `tour.html`, the footer's link text, and the top `## vX.Y.Z` entry in `CHANGELOG.md`. `make release` (part of `make check`) fails if they disagree. The white rabbit's media loader reads the meta, so it has no copy of its own.
 
 The asset check follows each page into its stylesheets and scripts, so a missing texture or module fails it. A path a script builds at run time, like `` `/media/white-rabbit/tex/${name}.webp` ``, must be listed in `scripts/assets.json` with where its names come from, and every name it expands to must be a file. Add a new one there when you write one.
 
