@@ -20,7 +20,7 @@ export AWS_REGION
 
 # Pinned tools: Node runs html-validate, and Docker stands in for a missing gitleaks
 HTML_VALIDATE  := html-validate@11.17.0
-GITLEAKS_IMAGE := ghcr.io/gitleaks/gitleaks:v8.30.1
+GITLEAKS_IMAGE := ghcr.io/gitleaks/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f
 
 # Fonts and media keep their names, so a changed file needs a new name to reach
 # browsers that already cached it. Everything else revalidates on each visit.
