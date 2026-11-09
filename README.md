@@ -68,3 +68,7 @@ Everything under `fonts/` and `media/` is served as `immutable` for a year, so a
 - `src/app/asset-manifest.json` lists every font and media file with its sha256. After adding or renaming one, run `make rehash` and commit the result. `make manifest` (part of `make check`) fails if a file is missing from it, or if a path that exists on `origin/main` (on a push, the commit before it; `IMMUTABLE_BASE` overrides) now holds different bytes.
 
 The scene's loaders still add `?v=` with the release to media URLs, which only makes browsers fetch again on each release. It stays because some of those paths changed bytes before this rule existed.
+
+## License
+
+The code is MIT licensed (see `LICENSE`). The license covers the code only. These are not licensed for reuse: the neon1 and 1NEON names, logos, and other brand marks; the site's written copy and case studies; and the photographs and photo-based textures of the white rabbit's room and yard. Third-party models, textures, fonts, and libraries keep their own licenses, listed with their sources in `src/app/asset-manifest.json` and `src/app/public/media/white-rabbit/CREDITS.txt`.
