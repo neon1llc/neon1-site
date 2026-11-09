@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.34.2
+
+- Three use cases join the Guides shelf: one workflow without retyping, a cloud account you can trust, and security awareness for a team or family. Each is labeled as a typical pattern, not a client story. From neon1-corpus v0.12.2.
+
 ## v0.34.1
 
 - A glossary joins the Company shelf in the knowledge center: neon1's own names, plus the reliability, security, cloud, and AI terms the documents use. From neon1-corpus v0.12.1.
