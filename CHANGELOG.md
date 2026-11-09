@@ -2,6 +2,12 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.39.1
+
+- A calmer home page. The services note and the contact intro are shorter, and the contact list no longer repeats what the process already says about proposals.
+- The home questions skip where, when, and how long, since the contact list right below answers them. Neo and the knowledge center keep the full set.
+- DeployOps no longer shows a version number its tags don't match yet, and the footer note is lowercase like its neighbors.
+
 ## v0.39.0
 
 - A shorter knowledge center. Writing and client trust were folded together, Where else to get help is now one table, and the longest standards are trimmed. From neon1-corpus v0.20.0.
