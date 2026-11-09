@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.36.1
+
+- Every knowledge center document now shows its edition, written as X.Y (all at 1.0 to start), on its page and in its PDF footer. From neon1-corpus v0.15.0.
+
 ## v0.36.0
 
 - The knowledge center now opens with a Start here row of the most useful documents, then two halves: For you (guides, alternatives, templates, forms, and filled-out examples, useful whether or not you hire neon1) and About neon1 (company, services, how I work, questions, case studies, products, and policies). The shelf bar is grouped the same way, and search hides empty halves.
