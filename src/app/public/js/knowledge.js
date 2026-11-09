@@ -4,12 +4,15 @@
   const box = document.querySelector(".kc-search");
   const input = document.getElementById("kc-q");
   const status = document.getElementById("kc-results");
+  // The featured row repeats documents from the shelves, so only shelf cards are counted
   const cards = [...document.querySelectorAll(".kc-card")];
+  const counted = cards.filter((c) => !c.closest(".kc-featured"));
   const shelves = [...document.querySelectorAll(".kc-shelf")];
+  const groups = [...document.querySelectorAll(".kc-group, .kc-featured")];
 
   if (box && input && cards.length) {
     box.hidden = false;
-    const total = cards.length;
+    const total = counted.length;
 
     function filter() {
       const words = input.value.toLowerCase().split(/\s+/).filter(Boolean);
@@ -17,9 +20,10 @@
       for (const card of cards) {
         const hit = words.every((w) => card.dataset.words.includes(w));
         card.hidden = !hit;
-        if (hit) shown++;
+        if (hit && !card.closest(".kc-featured")) shown++;
       }
       for (const shelf of shelves) shelf.hidden = !shelf.querySelector(".kc-card:not([hidden])");
+      for (const group of groups) group.hidden = !group.querySelector(".kc-card:not([hidden])");
       status.textContent = words.length ? (shown ? `${shown} of ${total} documents` : "Nothing matches. Try a shorter word.") : "";
     }
 
