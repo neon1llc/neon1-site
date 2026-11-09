@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.32.3
+
+- neon1's security readiness guide is now called Ready, Secure, Go. The security case study and the projects list use the new name.
+
 ## v0.32.2
 
 - The start of the scroll no longer feels stuck. The view now starts moving back from the screen within the first few scrolls, instead of holding on the screen for over a screen's height of scrolling.
