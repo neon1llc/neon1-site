@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.36.0
+
+- The knowledge center now opens with a Start here row of the most useful documents, then two halves: For you (guides, alternatives, templates, forms, and filled-out examples, useful whether or not you hire neon1) and About neon1 (company, services, how I work, questions, case studies, products, and policies). The shelf bar is grouped the same way, and search hides empty halves.
+- From neon1-corpus v0.14.0.
+
 ## v0.35.0
 
 - The Alternatives shelf adds an open-source shortlist: the projects I'd look at first for automation, business apps, documents, reporting, monitoring, backup, security checks, infrastructure, AI, and planning, with what each is for and what to check first.
