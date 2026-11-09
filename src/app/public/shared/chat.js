@@ -11,6 +11,11 @@ const ENDPOINT = "/chat/api/chat";
 const MAX_CHARS = 1200;
 const MAX_TURNS = 11;
 
+// Longest open and close animations, plus a margin: each completes on time even when the browser
+// never reports its end (cancelled, hidden by an overlay, motion turned off, or no stylesheet)
+const GROW_MS = 600;
+const FOLD_MS = 450;
+
 // Starting points for a first-time visitor, and the ways to reach a person
 const SUGGESTIONS = ["What does neon1 do?", "How does a project work?", "What is 1NEON?", "When are you available?"];
 const BOOKING = "https://calendly.com/1isgladtobeofservice/neon1-consultation";
@@ -18,7 +23,8 @@ const EMAIL = "mailto:hello@neon1.tech";
 const PHONE = "tel:+14243263661";
 
 const SVG = "http://www.w3.org/2000/svg";
-const reduce = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+const motion = matchMedia("(prefers-reduced-motion: reduce)");
+const reduce = () => motion.matches;
 
 // Small element helper: tag, class, text, and attributes
 function el(tag, cls, text, attrs = {}) {
@@ -164,39 +170,68 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
   }
 
   // ---- Open and close: the window grows up out of the launcher, and folds back into it ----
-  let busy = false;
+
+  // The running grow or fold, as a function that completes it now. It runs once, whichever comes
+  // first: the panel's own animation ending or being cancelled, the time limit, or a new open/close
+  let finish = null;
+  function animate(cls, ms, after) {
+    const end = (e) => {
+      if (!e || e.target === panel) complete(); // a message sliding in inside the panel doesn't count
+    };
+    const timer = setTimeout(end, ms);
+    const complete = () => {
+      if (finish !== complete) return;
+      finish = null;
+      clearTimeout(timer);
+      panel.removeEventListener("animationend", end);
+      panel.removeEventListener("animationcancel", end);
+      panel.classList.remove(cls);
+      after();
+    };
+    finish = complete;
+    panel.addEventListener("animationend", end);
+    panel.addEventListener("animationcancel", end);
+    panel.classList.add(cls);
+    // No animation to wait for (motion off, the stylesheet missing, or the panel hidden by an overlay)
+    if (panel.getAnimations && !panel.getAnimations().length) complete();
+  }
+
+  let folding = false;
   function open(show) {
-    if (busy || show === !panel.hidden) return;
+    // Already there, or already on the way out; otherwise any animation still running ends now
+    if (folding ? !show : show === !panel.hidden) return;
+    finish?.();
     launcher.setAttribute("aria-expanded", String(show));
 
     if (show) {
       launcher.classList.add("n1chat-hidden");
       panel.hidden = false;
-      if (!reduce()) {
-        panel.classList.add("n1chat-grow");
-        panel.addEventListener("animationend", () => panel.classList.remove("n1chat-grow"), { once: true });
-      }
+      if (!reduce()) animate("n1chat-grow", GROW_MS, () => {});
       // Focus lands on the window, not the box, so phones don't raise the keyboard until someone taps in
       if (!panel.hasAttribute("tabindex")) panel.tabIndex = -1;
       panel.focus({ preventScroll: true });
       return;
     }
 
+    // Runs once per close (animate sees to that). Focus returns to the launcher only if it was in
+    // the window (or nowhere), so a menu or case study that opened meanwhile keeps its focus
     const done = () => {
+      folding = false;
+      const focused = document.activeElement;
+      const ours = !focused || focused === document.body || panel.contains(focused);
       panel.hidden = true;
-      panel.classList.remove("n1chat-fold");
       launcher.classList.remove("n1chat-hidden");
-      launcher.focus({ preventScroll: true });
-      busy = false;
+      if (ours) launcher.focus({ preventScroll: true });
     };
     if (reduce()) return done();
-    busy = true;
-    panel.classList.add("n1chat-fold");
-    panel.addEventListener("animationend", done, { once: true });
+    folding = true;
+    animate("n1chat-fold", FOLD_MS, done);
   }
   launcher.addEventListener("click", () => open(true));
   close.addEventListener("click", () => open(false));
   panel.addEventListener("keydown", (e) => e.key === "Escape" && open(false));
+  // Turning motion off midway ends the animation at once rather than waiting out the timer
+  motion.addEventListener?.("change", () => finish?.());
 
   // A new conversation: the history and replies go, the greeting and suggestions come back
   fresh.addEventListener("click", () => {
