@@ -1,0 +1,436 @@
+/* knowledge/print.css - neon1 print styles for the knowledge center PDFs printed by scripts/knowledge-pdf.mjs.
+   Adapted from Ready, Secure, Go (documents/document.css), so every neon1 document prints the same way. */
+/* */
+/* Aptos is used where it's installed (Microsoft 365 and recent Windows). Elsewhere Inter, which ships in documents/fonts, stands in. */
+
+
+/* Bundled fonts, both under the SIL Open Font License */
+@font-face {
+  font-family: "Inter";
+  src: url("../src/app/public/fonts/inter-latin-wght-normal.woff2") format("woff2");
+  font-weight: 100 900;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("../src/app/public/fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2");
+  font-weight: 100 800;
+}
+
+
+/* neon1 brand tokens, matching neon1.tech */
+:root {
+  --void: #0d0208;
+  --deep: #003b00;
+  --mid: #008f11;
+  --glow: #00e676;
+  --neon: #6cffa8;
+  --brand: #035704;
+  --mark: #327641;
+  --paper: #f2f4f2;
+  --ink: #12241a;
+  --muted: #56665c;
+  --wash: #e6efe7;
+  --alarm: #9b1c1c;
+  --alarm-wash: #fbeeee;
+  --body: "Aptos", "Inter", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+
+
+/* Page box. Margins leave room for the footer Chromium draws. */
+@page {
+  size: Letter;
+  margin: 0.7in 0.75in 0.8in;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background: #fff;
+  font: 10.5pt/1.55 var(--body);
+}
+
+
+/* Header band with the mark, wordmark and document kind */
+.band {
+  display: flex;
+  align-items: center;
+  gap: 10pt;
+  padding: 12pt 16pt;
+  border-radius: 6pt;
+  background: var(--deep);
+  color: var(--neon);
+}
+
+.band svg {
+  width: 26pt;
+  height: 26pt;
+}
+
+.band .wordmark {
+  font: 700 14pt var(--mono);
+  letter-spacing: 0.06em;
+}
+
+.band .kind {
+  margin-left: auto;
+  font: 500 8.5pt var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--paper);
+  opacity: 0.85;
+}
+
+
+/* Title block */
+h1 {
+  margin: 18pt 0 6pt;
+  font: 700 21pt/1.2 var(--body);
+  color: var(--deep);
+}
+
+.summary {
+  margin: 0 0 12pt;
+  font-size: 12pt;
+  color: var(--muted);
+}
+
+
+/* At-a-glance facts under the title */
+.glance {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4pt 18pt;
+  margin: 0 0 14pt;
+  padding: 8pt 12pt;
+  border-left: 3pt solid var(--glow);
+  background: var(--wash);
+  font-size: 9.5pt;
+}
+
+.glance b {
+  margin-right: 4pt;
+  font: 600 7.5pt var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mark);
+}
+
+.glance .for {
+  flex-basis: 100%;
+}
+
+
+/* Section headings */
+h2 {
+  margin: 18pt 0 6pt;
+  padding-bottom: 3pt;
+  border-bottom: 1.5pt solid var(--glow);
+  font: 700 13.5pt/1.25 var(--body);
+  color: var(--brand);
+  break-after: avoid;
+}
+
+h3 {
+  margin: 12pt 0 4pt;
+  font: 700 11.5pt var(--body);
+  color: var(--deep);
+  break-after: avoid;
+}
+
+p {
+  margin: 0 0 7pt;
+}
+
+a {
+  color: var(--brand);
+  text-decoration: underline;
+  text-decoration-color: var(--glow);
+  text-underline-offset: 2pt;
+}
+
+strong {
+  color: var(--deep);
+}
+
+code {
+  padding: 0 2pt;
+  border-radius: 2pt;
+  background: var(--wash);
+  font: 9pt var(--mono);
+}
+
+
+/* Numbered steps become badges with a rule between steps */
+ol {
+  margin: 0 0 8pt;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+ol > li {
+  position: relative;
+  margin: 0;
+  padding: 6pt 0 6pt 28pt;
+  border-bottom: 0.5pt solid #d5e2d7;
+  counter-increment: step;
+  break-inside: avoid;
+}
+
+ol > li:last-child {
+  border-bottom: 0;
+}
+
+ol > li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 6pt;
+  width: 18pt;
+  height: 18pt;
+  border-radius: 50%;
+  background: var(--brand);
+  color: #fff;
+  font: 700 9pt/18pt var(--mono);
+  text-align: center;
+}
+
+ol > li > p:last-child {
+  margin-bottom: 0;
+}
+
+ul {
+  margin: 0 0 8pt;
+  padding-left: 14pt;
+}
+
+li {
+  margin: 2pt 0;
+}
+
+
+/* Checklists print as empty boxes to tick by hand */
+li.task, li.task-list-item {
+  list-style: none;
+  margin-left: -14pt;
+  padding-left: 18pt;
+  position: relative;
+}
+
+li.task input, li.task-list-item input {
+  display: none;
+}
+
+li.task::before, li.task-list-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 3pt;
+  width: 9pt;
+  height: 9pt;
+  border: 1pt solid var(--brand);
+  border-radius: 2pt;
+}
+
+
+/* Callouts for questions, checks and the attacker's view */
+.callout {
+  margin: 10pt 0;
+  padding: 8pt 12pt;
+  border: 1pt solid var(--mark);
+  border-left-width: 4pt;
+  border-radius: 4pt;
+  background: var(--wash);
+  break-inside: avoid;
+}
+
+.callout-title {
+  margin: 0 0 4pt;
+  font: 600 8.5pt var(--mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+
+.callout.success {
+  border-color: var(--glow);
+}
+
+.callout.danger {
+  border-color: var(--alarm);
+  background: var(--alarm-wash);
+}
+
+.callout.danger .callout-title {
+  color: var(--alarm);
+}
+
+.callout > :last-child {
+  margin-bottom: 0;
+}
+
+
+/* Tables */
+table {
+  width: 100%;
+  margin: 6pt 0 10pt;
+  border-collapse: collapse;
+  font-size: 9.5pt;
+}
+
+th {
+  padding: 4pt 6pt;
+  border-bottom: 1.5pt solid var(--brand);
+  text-align: left;
+  font: 600 8pt var(--mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+
+td {
+  padding: 4pt 6pt;
+  border-bottom: 0.5pt solid #d5e2d7;
+  vertical-align: top;
+}
+
+tr {
+  break-inside: avoid;
+}
+
+tbody tr:nth-child(even) td {
+  background: #f6f9f6;
+}
+
+blockquote {
+  margin: 8pt 0;
+  padding-left: 10pt;
+  border-left: 3pt solid var(--glow);
+  color: var(--muted);
+}
+
+
+/* Reference block at the end: sources and framework IDs */
+.refs {
+  margin-top: 18pt;
+  padding-top: 8pt;
+  border-top: 0.5pt solid var(--mark);
+  font-size: 8.5pt;
+  color: var(--muted);
+  break-inside: avoid;
+}
+
+.refs h2 {
+  margin-top: 0;
+  border: 0;
+  font-size: 10pt;
+}
+
+.refs ul {
+  padding-left: 12pt;
+}
+
+.refs .maps span {
+  margin-right: 10pt;
+}
+
+.refs .maps b {
+  font: 600 7.5pt var(--mono);
+  color: var(--mark);
+}
+
+.colophon {
+  margin-top: 14pt;
+  font-size: 8pt;
+  color: var(--muted);
+}
+
+
+/* Checked boxes in filled-out examples */
+li.task:has(input[checked])::after {
+  content: "";
+  position: absolute;
+  left: 3pt;
+  top: 4pt;
+  width: 3pt;
+  height: 6pt;
+  border: solid var(--brand);
+  border-width: 0 1.5pt 1.5pt 0;
+  transform: rotate(45deg);
+}
+
+/* Lines to write on */
+.blank {
+  display: inline-block;
+  min-width: 2.2in;
+  height: 1.05em;
+  vertical-align: -0.25em;
+  border-bottom: 0.75pt solid #7f9787;
+}
+
+td .blank {
+  min-width: 0.9in;
+}
+
+/* Callouts from the corpus: note, tip, warning, example */
+aside.callout.warning {
+  border-color: #c98a00;
+  background: #fff8e6;
+}
+
+aside.callout.warning .callout-title {
+  color: #7a5200;
+}
+
+aside.callout.example {
+  border-color: #8f74c8;
+  background: #f6f2fd;
+}
+
+aside.callout.example .callout-title {
+  color: #4b2f8a;
+}
+
+/* Fictional flag beside the title of an example */
+.flag {
+  display: inline-block;
+  margin: 14pt 0 0;
+  padding: 2pt 7pt;
+  border-radius: 3pt;
+  background: #fff4d6;
+  color: #6b4e00;
+  font: 600 7.5pt var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.flag + h1 {
+  margin-top: 6pt;
+}
+
+/* Forms leave room to write */
+body.fillable p {
+  margin-bottom: 10pt;
+}
+
+body.fillable li.task {
+  margin: 4pt 0;
+}
+
+/* A blank on its own line is a full-width line to write on, with room above it */
+p > .blank:only-child {
+  display: block;
+  width: 100%;
+  height: 20pt;
+}
