@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.42.0" />
+  <meta name="version" content="0.43.0" />
   <title>Writing · neon1 knowledge center</title>
   <meta name="description" content="How everything neon1 writes is written, from policies and proposals to READMEs, commit messages, code comments, and interface text." />
   <meta name="theme-color" content="#F2F4F2" />
@@ -75,7 +75,7 @@
         <p class="kc-summary">How everything neon1 writes is written, from policies and proposals to READMEs, commit messages, code comments, and interface text.</p>
         <dl class="kc-facts">
           <div><dt>Type</dt><dd>Standard</dd></div>
-          <div><dt>Edition</dt><dd>1.0</dd></div>
+          <div><dt>Edition</dt><dd>1.1</dd></div>
           <div><dt>First written</dt><dd>November 1, 2026</dd></div>
           <div><dt>Updated</dt><dd>November 9, 2026</dd></div>
         </dl>
@@ -88,9 +88,13 @@
 <p>This is the main writing standard for neon1. It applies to every word neon1 publishes or ships: documents on this site, proposals, emails, READMEs, changelogs, commit messages, code comments, and the text inside an interface. Other standards add rules for particular kinds of writing and point back here.</p>
 <h2 id="the-core-rules">The core rules</h2>
 <ol><li><strong>Lead with what the reader needs.</strong> Put the answer, decision, or action first. Background comes after, and only if it helps.</li><li><strong>Use plain words.</strong> Everyday verbs, short sentences, and natural contractions. Keep an exact technical term when it carries meaning, and explain it once in terms of the reader's task.</li><li><strong>Be concrete.</strong> Name who does what, when, and what happens next. A specific detail beats a general claim.</li><li><strong>Say only what's true and supported.</strong> Keep the difference between what was planned, built, tested, released, and shown to help. Don't invent experience, numbers, quotes, or results. When something is unknown, say so.</li><li><strong>Use the fewest words that keep the full meaning.</strong> Cut framing, repetition, and filler. Don't cut a detail that explains a cause, a limit, or a consequence.</li><li><strong>Write in the right voice.</strong> "I" where Pradeep is doing the work, "neon1" for the business, and "you" for the reader. Warm through clarity and follow-through, not through reassurance.</li></ol>
+<h2 id="voice">Voice</h2>
+<p>Write like a technical business owner talking to another one: direct, candid, and specific. The care shows in what gets done for the reader, not in how the writing feels about them.</p>
+<ul><li><strong>Say it and stop.</strong> State what's true, what it costs, and what happens next. Don't add warmth, reassurance, or enthusiasm on top.</li><li><strong>Don't solicit.</strong> No pitch, no urgency, no "let's get started," and no telling readers how they feel or what they deserve.</li><li><strong>Argue from evidence.</strong> A number, a named method, or a real example beats an adjective. When the evidence is thin, say that.</li><li><strong>Leave the decision with the reader.</strong> Give the options and their tradeoffs. Recommend plainly when it helps, and say why.</li><li><strong>Be candid about limits.</strong> Say what neon1 doesn't do, when someone else is a better fit, and what might not work.</li><li><strong>Show values as practices.</strong> "Accounts stay in your name" says more than "we value your ownership." Talk about the work and the reader's problem, not about neon1's passion or commitment.</li></ul>
+<p>The test: would a capable professional say this sentence across a table to a peer? If it sounds like an advertisement, a greeting card, or a pitch, rewrite it.</p>
 <h2 id="patterns-to-avoid">Patterns to avoid</h2>
 <p>These are signs of writing that sounds produced rather than meant:</p>
-<ul><li>Inflated words: leverage, utilize, robust (as praise), seamless, cutting-edge, delve, landscape, tapestry, pivotal, crucial, furthermore, moreover.</li><li>Slogan sentences that sound good but say little, such as "Technology that works together, and stays yours."</li><li>"Not just X, but Y," and other set-piece contrasts used for effect.</li><li>A question answered right away ("Why does this matter? Because...").</li><li>Lists of exactly three used as rhythm rather than content.</li><li>Dashes and semicolons in prose. Use a period or a comma instead.</li><li>Absolutes such as "always," "never," and "every" unless they're literally true.</li><li>Selling words in place of facts: guaranteed, best-in-class, effortless, game-changing.</li></ul>
+<ul><li>Inflated words: leverage, utilize, robust (as praise), seamless, cutting-edge, delve, landscape, tapestry, pivotal, crucial, furthermore, moreover.</li><li>Slogan sentences that sound good but say little, such as "Technology that works together, and stays yours."</li><li>"Not just X, but Y," and other set-piece contrasts used for effect.</li><li>A question answered right away ("Why does this matter? Because...").</li><li>Lists of exactly three used as rhythm rather than content.</li><li>Dashes and semicolons in prose. Use a period or a comma instead.</li><li>Absolutes such as "always," "never," and "every" unless they're literally true.</li><li>Selling words in place of facts: guaranteed, best-in-class, effortless, game-changing.</li><li>Soft selling: "happy to help," "I'd love to," "no pressure," "peace of mind," "worry-free," "let's get started," "reach out."</li><li>Intensifiers that stand in for evidence: really, truly, genuinely, honestly, simply, just, actually, incredibly.</li><li>Describing neon1's character instead of its practice: passionate, dedicated, committed to, care deeply, here for you.</li><li>Telling the reader how they feel ("Worried about...?", "Tired of...?") or what they'll feel afterward.</li></ul>
 <p>Lists, the passive voice, and formal words aren't errors on their own. Judge them by whether they help the reader.</p>
 <h2 id="mechanics">Mechanics</h2>
 <ul><li><strong>neon1</strong> is always lowercase, even at the start of a sentence. The company is <strong>neon1 LLC</strong>.</li><li>Serial comma: "email, spreadsheets, and POS."</li><li>Sentence case for titles and headings.</li><li>Numbers: words for one to nine in prose, numerals for 10 and up, and numerals for measurements, money, versions, and dates in tables.</li><li>Dates: "November 9, 2026" in prose, <code>2026-11-09</code> in data and file names.</li><li>Times: "8am to 8pm, Eastern time."</li><li>Links say where they go ("see the <a href="/knowledge/policies/privacy/">privacy policy</a>"), never "click here."</li><li>Code, commands, file names, and identifiers go in <code>code formatting</code>, copied exactly.</li></ul>
@@ -150,7 +154,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.42.0</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.43.0</a>
       </span>
     </div>
   </footer>
