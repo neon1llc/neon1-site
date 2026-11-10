@@ -46,7 +46,7 @@
   text-decoration: none; font: 700 13px var(--mono); letter-spacing: .06em; text-shadow: 0 0 8px rgba(108, 255, 168, .45); }
 .n1-logo svg { width: 26px; height: 26px; }
 
-/* Rain controls: a glass pause chip in the bottom-right corner */
+/* Rain controls: three glass chips in the bottom-right corner */
 .rainctl { position: fixed; right: 16px; bottom: 16px; z-index: 6; display: flex; gap: 8px; transition: opacity .3s; }
 .rainctl button { font: 12px var(--mono); color: #84a98c; background: transparent; border: 1px solid rgba(0, 255, 65, .16);
   border-radius: var(--glass-r); padding: 6px 12px; cursor: pointer; }

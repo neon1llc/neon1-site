@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.41.0" />
+  <meta name="version" content="0.42.0" />
   <title>neon1 · cloud, AI, and IT consulting</title>
   <meta name="description" content="neon1 is a one-person technology practice: cloud and AI engineering, business automation, networks, and cameras." />
   <meta name="theme-color" content="#0D0208" />
@@ -71,13 +71,8 @@
         <span><span class="ne">neon</span><span class="one">1</span></span>
       </a>
       <!-- /frame:logo -->
+      <!-- The bar holds only the two actions; every section lives in the menu, at every width -->
       <ul class="links">
-        <li><a href="#services">services</a></li>
-        <li><a href="#process">process</a></li>
-        <li><a href="#projects">case studies</a></li>
-        <li><a href="#work">projects</a></li>
-        <li><a href="#why">about</a></li>
-        <li><a href="/knowledge/">knowledge</a></li>
         <!-- frame:actions -->
         <li><a class="btn btn-ghost" href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a call</a></li>
         <!-- The client portal, a separate app on the same domain -->
@@ -91,7 +86,7 @@
     </nav>
   </header>
 
-  <!-- Full-screen menu: the only navigation, so the hero stays empty -->
+  <!-- Full-screen menu: the only navigation, at every width, so the bar and the hero stay quiet -->
   <div class="menu" id="menu" hidden>
     <ul>
       <li><a href="#services">services</a></li>
@@ -102,7 +97,8 @@
       <li><a href="#faq">questions</a></li>
       <li><a href="#contact">contact</a></li>
       <li><a href="/knowledge/">knowledge</a></li>
-      <li><a href="/1NEON/" data-handoff>1NEON</a></li>
+      <li class="menu-phone"><a href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a call</a></li>
+      <li class="menu-phone"><a href="/1NEON/" data-handoff>1NEON</a></li>
     </ul>
   </div>
 
@@ -140,47 +136,6 @@
           <p class="line"><strong>Security awareness and readiness.</strong> <span>Plain-language sessions on phishing, fraud, passwords, and data brokers, plus SOC 2 readiness for companies heading into an audit.</span></p>
         </div>
       </div>
-      <!-- Service chooser: two picks point to a service and a case. Plain radios and CSS only, nothing stored -->
-      <details class="choose reveal-on">
-        <summary>Not sure which one fits? Pick what's going on.</summary>
-        <div class="choose-body">
-          <fieldset class="choose-areas">
-            <legend>Where does it hurt?</legend>
-            <label class="pick"><input type="radio" name="fit-area" id="fit-biz" /> Running a business</label>
-            <label class="pick"><input type="radio" name="fit-area" id="fit-cloud" /> Software, cloud, or AI</label>
-            <label class="pick"><input type="radio" name="fit-area" id="fit-space" /> An office, home, or building</label>
-            <label class="pick"><input type="radio" name="fit-area" id="fit-safe" /> Staying safe</label>
-          </fieldset>
-          <fieldset class="choose-needs" data-area="biz">
-            <legend>What's going on?</legend>
-              <label class="pick"><input type="radio" name="fit-need" id="fit-retype" /> We type the same orders, forms, or invoices into more than one place</label>
-              <label class="pick"><input type="radio" name="fit-need" id="fit-connect" /> Our email, spreadsheets, and booking or accounting tools don&#x27;t talk to each other</label>
-          </fieldset>
-          <fieldset class="choose-needs" data-area="cloud">
-            <legend>What's going on?</legend>
-              <label class="pick"><input type="radio" name="fit-need" id="fit-find" /> People can&#x27;t find answers in our own documents</label>
-              <label class="pick"><input type="radio" name="fit-need" id="fit-servers" /> Our servers, deploys, or backups worry us</label>
-          </fieldset>
-          <fieldset class="choose-needs" data-area="space">
-            <legend>What's going on?</legend>
-              <label class="pick"><input type="radio" name="fit-need" id="fit-wifi" /> The Wi-Fi drops, or some rooms barely get it</label>
-              <label class="pick"><input type="radio" name="fit-need" id="fit-cameras" /> Cameras, smart devices, or new gear need setting up properly</label>
-          </fieldset>
-          <fieldset class="choose-needs" data-area="safe">
-            <legend>What's going on?</legend>
-              <label class="pick"><input type="radio" name="fit-need" id="fit-phish" /> Our people need to spot phishing, fraud, and scams</label>
-              <label class="pick"><input type="radio" name="fit-need" id="fit-audit" /> A customer or audit is asking about our security (SOC 2)</label>
-          </fieldset>
-          <p class="choose-result" data-need="retype" role="status">Start with <strong>Business workflows and technology</strong>. See how a similar one went in <a href="#case-dermatology">Intake, out of the shared inbox</a>, then <a href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a free call</a> and we'll look at yours.</p>
-          <p class="choose-result" data-need="connect" role="status">Start with <strong>Business workflows and technology</strong>. See how a similar one went in <a href="#case-dermatology">Intake, out of the shared inbox</a>, then <a href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a free call</a> and we'll look at yours.</p>
-          <p class="choose-result" data-need="find" role="status">Start with <strong>Cloud and AI engineering</strong>. See how a similar one went in <a href="#case-accounting">Answers in seconds, with sources</a>, then <a href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a free call</a> and we'll look at yours.</p>
-          <p class="choose-result" data-need="servers" role="status">Start with <strong>Cloud and AI engineering</strong>. See how a similar one went in <a href="#case-migration">Two offices off local servers</a>, then <a href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a free call</a> and we'll look at yours.</p>
-          <p class="choose-result" data-need="wifi" role="status">Start with <strong>Networks, devices, and spaces</strong>. See how a similar one went in <a href="#case-home">From cameras to Grandma&#x27;s email</a>, then <a href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a free call</a> and we'll look at yours.</p>
-          <p class="choose-result" data-need="cameras" role="status">Start with <strong>Networks, devices, and spaces</strong>. See how a similar one went in <a href="#case-home">From cameras to Grandma&#x27;s email</a>, then <a href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a free call</a> and we'll look at yours.</p>
-          <p class="choose-result" data-need="phish" role="status">Start with <strong>Security awareness and readiness</strong>. See how a similar one went in <a href="#case-security">Security for non-security people</a>, then <a href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a free call</a> and we'll look at yours.</p>
-          <p class="choose-result" data-need="audit" role="status">Start with <strong>Security awareness and readiness</strong>. See how a similar one went in <a href="#case-security">Security for non-security people</a>, then <a href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a free call</a> and we'll look at yours.</p>
-        </div>
-      </details>
       <p class="lead quote reveal-on">A free 15-minute call finds the main pain points and your options. If a quick fix will do, I'll just tell you.</p>
     </section>
 
@@ -281,10 +236,9 @@
     <section id="why" class="view" aria-labelledby="why-h">
       <h2 id="why-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>about</h2>
       <div class="story">
-        <p class="reveal-on">Hey, <a class="ext" href="https://www.linkedin.com/in/pradeep-tathineni/" target="_blank" rel="noopener">Pradeep</a> here. Technology and automation have held my interest for close to 15 years, at home and at work. neon1 is how I put that to work for the people and places around me, with one goal: leave people better off with their tech than they were before.</p>
-        <p class="reveal-on">That comes down to a few habits. Listen before building anything. Leave you knowing your options, even if that's all you need from me. Keep it as simple as the problem allows. Make sure you own your accounts, your data, and the docs to run it. Be clear about what things cost and why. Plan for things to break, and check that the work actually does what it should.</p>
-        <p class="reveal-on">The name nods to Neo from <em>The Matrix</em>, who brought peace between man and machine, and the slogan to Robin Williams' Andrew from <em>Bicentennial Man</em>, a machine who spends two centuries being of service while searching for his humanity.</p>
-        <p class="sign reveal-on">Neo means new. Neon is unmissable. 1 is glad to be of service.</p>
+        <p class="reveal-on">I'm <a class="ext" href="https://www.linkedin.com/in/pradeep-tathineni/" target="_blank" rel="noopener">Pradeep</a>. I've worked with technology and automation for about 15 years, at home and at work. neon1 is how I do that work for local businesses, teams, and families, so they end up better off with their tech than before.</p>
+        <p class="reveal-on">I listen before I build, and you get your options even if that's all you need. I keep it as simple as the problem allows, explain costs up front, and test that the work does what we agreed. Your accounts, data, and documentation stay yours.</p>
+        <p class="reveal-on more"><a href="/knowledge/company/names/">Where the name comes from</a></p>
       </div>
     </section>
 
@@ -298,35 +252,56 @@
         <details class="reveal-on"><summary>What don't you do?</summary><p>I don't repair electronics, though I can debug software and hardware installs and get them working together. I don't handle personal or health data without the right agreements in place, such as a Business Associate Agreement, but I can help you get them. I'm not a lawyer, but I'll work alongside yours on the technical side.</p></details>
         <!-- /corpus:questions -->
       </div>
+      <p class="more reveal-on"><a href="/faqs/">More questions</a></p>
     </section>
     <section id="contact" class="view contact" aria-labelledby="contact-h">
       <h2 id="contact-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>contact</h2>
-      <p class="lead reveal-on">Tell me what's going on, or ask for a second opinion. Send an <a class="ext" href="mailto:hello@neon1.tech">email</a>, call or text <a class="ext" href="tel:+14243263661" title="(424) 326-3661">(424) 32-neon1</a>, or pick a time below.</p>
-      <!-- Engagement fit: where, when, what size, and the first call, in one glance. The questions above skip these -->
-      <dl class="fit reveal-on">
-        <div><dt>where</dt><dd>Remote from anywhere, or on site within about 30 miles</dd></div>
-        <div><dt>when</dt><dd>Weekends 8am to 8pm and weekday evenings, Eastern time</dd></div>
-        <div><dt>size</dt><dd>Small jobs of a week or two up to projects of four to six weeks, with at most two clients at a time</dd></div>
-        <div><dt>first call</dt><dd>Free and 15 minutes: the main pain points and your options</dd></div>
-      </dl>
-      <a class="btn btn-primary reveal-on" href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a call</a>
-      <!-- Optional brief: answers stay in this page; copy or save it, nothing is sent. A plain group, not a
-           form, so pressing Enter can never submit the answers anywhere, even if js/brief.js doesn't run -->
-      <details class="brief-wrap reveal-on">
-        <summary>Want to get more from the call? Write a short brief first (optional).</summary>
-        <div class="brief" id="brief" role="group" aria-label="Pre-call brief">
-          <label>What happens today?<textarea name="today" rows="3" maxlength="1200" placeholder="For example: every Friday we copy orders from email into a spreadsheet by hand."></textarea></label>
-          <label>What should be better?<textarea name="better" rows="3" maxlength="1200" placeholder="For example: orders land in the spreadsheet on their own, and nobody retypes them."></textarea></label>
-          <label>Any timing to know about?<input name="timing" maxlength="200" placeholder="For example: before tax season, or no rush." /></label>
-          <p class="brief-note">Please leave out passwords, health details, and payment information. Nothing you type here is sent or saved; it stays on this page until you copy it.</p>
-          <pre class="brief-out" id="briefOut" aria-live="polite">Your brief appears here as you type.</pre>
-          <div class="brief-actions" hidden>
-            <button class="btn btn-ghost" type="button" id="briefCopy">copy brief</button>
-            <button class="btn btn-ghost" type="button" id="briefSave">save as text</button>
-            <span class="brief-done" id="briefDone" role="status"></span>
+      <p class="lead reveal-on">Tell me what's going on and I'll reply by email. You can also <a class="ext" href="mailto:hello@neon1.tech">email</a>, call or text <a class="ext" href="tel:+14243263661" title="(424) 326-3661">(424) 32-neon1</a>, or <a class="ext" href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a 15-minute call</a>.</p>
+      <div class="contact-grid reveal-on">
+        <!-- The form appears once js/contact.js runs; without it, the email and phone links above do the job.
+             It posts to 1NEON's contact route, which mails neon1's inbox only -->
+        <form class="cform" id="cform" hidden novalidate>
+          <fieldset class="ctopic">
+            <legend>What's it about?</legend>
+            <label class="pick"><input type="radio" name="topic" value="business" required /> Running a business</label>
+            <label class="pick"><input type="radio" name="topic" value="cloud" /> Software, cloud, or AI</label>
+            <label class="pick"><input type="radio" name="topic" value="spaces" /> An office, home, or building</label>
+            <label class="pick"><input type="radio" name="topic" value="security" /> Staying safe</label>
+            <label class="pick"><input type="radio" name="topic" value="other" /> Something else</label>
+          </fieldset>
+          <div class="cstarts" id="cstarts" hidden><p>Start from a common one, then add your details:</p><div class="cstart-list"></div></div>
+          <label>What happens today?<textarea name="today" rows="4" maxlength="3000" required placeholder="For example: every Friday we copy orders from email into a spreadsheet by hand."></textarea></label>
+          <label><span>What would better look like? <span class="opt">optional</span></span><textarea name="better" rows="2" maxlength="1500" placeholder="For example: orders land in the spreadsheet on their own."></textarea></label>
+          <div class="crow">
+            <label>Name<input name="name" autocomplete="name" maxlength="100" required /></label>
+            <label>Email<input name="email" type="email" autocomplete="email" maxlength="200" required /></label>
           </div>
+          <div class="crow">
+            <label><span>Organization <span class="opt">optional</span></span><input name="company" autocomplete="organization" maxlength="120" /></label>
+            <label><span>Timing <span class="opt">optional</span></span><select name="timing">
+              <option value="">No particular timing</option>
+              <option>In the next few weeks</option>
+              <option>Soon, it's getting in the way</option>
+              <option>There's a deadline (say when above)</option>
+            </select></label>
+          </div>
+          <!-- Hidden from people and screen readers; a bot that fills every field fills this one -->
+          <div class="hp" aria-hidden="true"><label>Leave this empty<input name="website" tabindex="-1" autocomplete="off" /></label></div>
+          <p class="cnote">Leave out passwords, health details, and payment information. Your message goes to my inbox and nowhere else.</p>
+          <div class="cactions"><button class="btn btn-primary" type="submit">send message</button><p class="cstatus" id="cstatus" role="status"></p></div>
+        </form>
+        <div class="cdone" id="cdone" hidden tabindex="-1">
+          <p><strong>Sent.</strong> I'll reply to <span id="cdoneTo"></span>.</p>
+          <button class="btn btn-ghost" type="button" id="cagain">write another</button>
         </div>
-      </details>
+        <!-- Engagement fit: where, when, what size, and the first call, in one glance. The questions above skip these -->
+        <dl class="fit">
+          <div><dt>where</dt><dd>Remote from anywhere, or on site within about 30 miles</dd></div>
+          <div><dt>when</dt><dd>Weekends 8am to 8pm and weekday evenings, Eastern time</dd></div>
+          <div><dt>size</dt><dd>Jobs of a week or two up to projects of four to six weeks, with at most two clients at a time</dd></div>
+          <div><dt>first call</dt><dd>Free and 15 minutes: the main problem and your options</dd></div>
+        </dl>
+      </div>
     </section>
   </main>
 
@@ -362,7 +337,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.41.0</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.42.0</a>
       </span>
     </div>
   </footer>
@@ -380,6 +355,8 @@
 
   <!-- Rain controls -->
   <div class="rainctl" role="group" aria-label="Rain controls">
+    <button data-rain="mode" type="button" title="Rain motion: grid or free. Click to switch.">grid</button>
+    <button data-rain="charset" type="button" title="Rain characters. Click to cycle.">text</button>
     <button data-rain="pause" type="button" aria-pressed="false">pause</button>
   </div>
 
@@ -415,6 +392,6 @@
   <!-- The shared frame (menu, footer year, 1NEON fade), then rain, wordmark, chat, and the white rabbit -->
   <script type="module" src="/js/frame.js"></script>
   <script type="module" src="/js/page.js"></script>
-  <script type="module" src="/js/brief.js"></script>
+  <script type="module" src="/js/contact.js"></script>
 </body>
 </html>

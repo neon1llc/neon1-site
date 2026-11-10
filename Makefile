@@ -126,7 +126,7 @@ budget: ## Fail if the deployed files outside the knowledge center exceed BUDGET
 
 # Drives headless Chromium against a loopback copy of the site, so it needs Playwright and its browser;
 # it stays out of check until the CI runner installs them
-behavior: ## Check the brief, case studies, chooser links, and white rabbit in a real browser
+behavior: ## Check the contact form, case studies, case links, and white rabbit in a real browser
 	@command -v node >/dev/null 2>&1 || { echo "behavior: install Node.js"; exit 1; }
 	node scripts/behavior.cjs $(SITE_DIR)
 
