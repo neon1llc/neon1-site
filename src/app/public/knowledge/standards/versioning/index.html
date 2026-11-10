@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.47.1" />
+  <meta name="version" content="0.47.2" />
   <title>Versioning and releases · neon1 knowledge center</title>
   <meta name="description" content="How neon1 numbers releases of code (vX.Y.Z) and editions of documents (X.Y), when each number goes up, and how tags, changelogs, and package files stay in agreement." />
   <meta name="theme-color" content="#F2F4F2" />
@@ -85,7 +85,7 @@
         <p class="kc-summary">How neon1 numbers releases of code (vX.Y.Z) and editions of documents (X.Y), when each number goes up, and how tags, changelogs, and package files stay in agreement.</p>
         <dl class="kc-facts">
           <div><dt>Type</dt><dd>Standard</dd></div>
-          <div><dt>Edition</dt><dd>1.1</dd></div>
+          <div><dt>Edition</dt><dd>1.2</dd></div>
           <div><dt>First written</dt><dd>November 9, 2026</dd></div>
           <div><dt>Updated</dt><dd>November 10, 2026</dd></div>
           <div><dt>For</dt><dd>Developers</dd></div>
@@ -114,6 +114,8 @@
 <p>A project's checks should fail when these disagree. Every version named in a changelog has a tag, and every tag has a changelog entry. Tags are never moved or reused.</p>
 <h2 id="when-versions-have-drifted">When versions have drifted</h2>
 <p>If a project's numbers have drifted, such as a package file saying <code>0.42.0</code> while the latest tag is <code>v0.13.0</code>, don't rewrite old tags. Pick the next correct number from where the project actually is, make every place agree in that release, and note the change in the changelog. History stays as it was, and the numbers are right from then on.</p>
+<h2 id="when-a-project-shipped-before-it-was-tagged">When a project shipped before it was tagged</h2>
+<p>A project that ran from main before its first tag can still show how it got there. Pick the commits on main where a meaningful piece landed and tag them as pre-releases of the first tagged version, in order: <code>v0.1.0-alpha.1</code>, <code>v0.1.0-alpha.2</code>, and so on. Tag the commits as they are; don't rebase or rewrite main to make the history look tidier. Give each one a short entry under a "Before v0.1.0" heading in the changelog, dated when it shipped, and say when the tags were added. Tags already pushed stay where they are.</p>
 <h2 id="changelogs">Changelogs</h2>
 <p>Every project keeps a <code>CHANGELOG.md</code>, newest first, following <a class="ext" href="https://keepachangelog.com/en/1.1.0/" target="_blank" rel="noopener">Keep a Changelog 1.1.0</a>:</p>
 <pre><code>## v1.5.0
@@ -184,7 +186,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.47.1</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.47.2</a>
       </span>
     </div>
   </footer>
