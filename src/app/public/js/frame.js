@@ -44,5 +44,7 @@
     menuBtn.addEventListener("click", () => setMenu(menu.hidden));
     menu.addEventListener("click", (e) => { if (e.target.closest("a") || e.target === menu) setMenu(false); });
     addEventListener("keydown", (e) => { if (e.key === "Escape" && !menu.hidden) setMenu(false); });
+    // Widening past the menu's breakpoint brings back the bar's links, so the menu closes
+    matchMedia("(min-width: 1041px)").addEventListener("change", (e) => { if (e.matches && !menu.hidden) setMenu(false); });
   }
 }
