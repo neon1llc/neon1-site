@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.46.0" />
+  <meta name="version" content="0.47.0" />
   <title>neon1 · cloud, AI, and IT consulting</title>
   <meta name="description" content="neon1 is a one-person technology practice: cloud and AI engineering, business automation, networks, and cameras." />
   <meta name="theme-color" content="#0D0208" />
@@ -93,7 +93,7 @@
         <li><a href="#services">services</a></li>
         <li><a href="#process">process</a></li>
         <li><a href="#projects">client work</a></li>
-        <li><a href="#work">tools I'm building</a></li>
+        <li><a href="#work">prose</a></li>
         <li><a href="#why">about</a></li>
         <li><a href="/knowledge/">knowledge</a></li>
         <!-- frame:actions -->
@@ -117,7 +117,7 @@
       <li><a href="#services">services</a></li>
       <li><a href="#process">process</a></li>
       <li><a href="#projects">client work</a></li>
-      <li><a href="#work">tools I'm building</a></li>
+      <li><a href="#work">prose</a></li>
       <li><a href="#why">about</a></li>
       <li><a href="#faq">questions</a></li>
       <li><a href="#contact">contact</a></li>
@@ -238,42 +238,28 @@
     </section>
 
     <section id="work" class="view" aria-labelledby="work-h">
-      <h2 id="work-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>tools I'm building</h2>
-      <!-- Each tool says whether it can be used now, who it helps, one example, its limits, and the honest next step.
-           Nothing here links to a product that isn't available. Claims follow each tool's current README or plan -->
-      <p class="lead intro reveal-on">One can be tried now; two are still in development. Status as of November 2026.</p>
-      <div class="rows tools">
-        <div class="row tool reveal-on">
-          <h3>AWS CLIP</h3>
-          <p class="state">available now · public pre-release</p>
-          <div class="tool-body">
-            <p><b>Account guards and approval checks around the AWS CLI.</b> For people who work across several AWS accounts from a terminal.</p>
-            <p><span class="k">example</span> Bind a production profile to its account, and a command that resolves to a different account stops before it runs. Changes still ask for approval.</p>
-            <p><span class="k">limits</span> Built from source with Go. Account checks always run in its workflows, but on single commands only when a profile or account guard is set. Its previews leave out argument values, and AWS's own output is shown unchanged, so it can contain sensitive data.</p>
-            <p class="next"><a class="ext" href="https://github.com/neon1llc/aws-clip" target="_blank" rel="noopener">Read the README on GitHub</a></p>
-          </div>
+      <h2 id="work-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>neon1 <span class="spaced">prose</span></h2>
+      <!-- What I build in the open: neon1's own repositories, then tools for others. Each row is a short
+           description with its visibility and release; public ones open on GitHub in a new tab -->
+      <p class="lead intro reveal-on"><b class="nl">P</b>redictable (or purposeful; I decide), <b class="nl">r</b>epeatable, <b class="nl">o</b>pen-<b class="nl">s</b>ource <b class="nl">e</b>ngineering.</p>
+      <details class="fold group reveal-on">
+        <summary>business <span class="arr" aria-hidden="true">&larr;</span></summary>
+        <div class="rows repos">
+          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">neon1-site</a></h3><p class="state">public · v0.47.0</p><p>The neon1.tech website and its Knowledge Center.</p></div>
+          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-1NEON" target="_blank" rel="noopener">neon1-1NEON</a></h3><p class="state">public · live from main</p><p>1NEON, the client portal: Needs, Execute, Observe, Normalize.</p></div>
+          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-chat" target="_blank" rel="noopener">neon1-chat</a></h3><p class="state">public · live from main</p><p>Neo, the site's assistant, answering from neon1's public pages.</p></div>
+          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-corpus" target="_blank" rel="noopener">neon1-corpus</a></h3><p class="state">public · v0.23.1</p><p>neon1's public information, written once in Markdown and shared by the site, 1NEON, and Neo.</p></div>
+          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-aws-infrastructure" target="_blank" rel="noopener">neon1-aws-infrastructure</a></h3><p class="state">public · live from main</p><p>Terraform for neon1.tech on AWS.</p></div>
         </div>
-        <div class="row tool reveal-on">
-          <h3>DeployOps <span class="lock" tabindex="0" role="img" aria-label="currently private"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span></h3>
-          <p class="state dim">in development · private</p>
-          <div class="tool-body">
-            <p><b>Deploy pipelines for one cloud or several.</b> For teams shipping infrastructure and applications on AWS, Azure, or Google Cloud.</p>
-            <p><span class="k">example</span> The plan is to add checks, approvals, rollback, and alerts to the pipeline of a repo that already uses Terraform.</p>
-            <p><span class="k">limits</span> Not available to use or try yet, and what it covers may change before it is.</p>
-            <p class="next">Pipeline work today is part of my cloud engineering. <a class="ext" href="#contact">Ask about your deploys</a></p>
-          </div>
+      </details>
+      <details class="fold group reveal-on">
+        <summary>tools <span class="arr" aria-hidden="true">&larr;</span></summary>
+        <div class="rows repos">
+          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/aws-clip" target="_blank" rel="noopener">AWS CLIP</a></h3><p class="state">public · pre-release</p><p>Account guards and approval checks around the AWS CLI.</p></div>
+          <div class="row repo"><h3>DeployOps <span class="lock" tabindex="0" role="img" aria-label="currently private"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span></h3><p class="state dim">private · in development</p><p>Deploy pipelines with checks, approvals, and rollback, on one cloud or several.</p></div>
+          <div class="row repo"><h3>Ready, Secure, Go <span class="lock" tabindex="0" role="img" aria-label="currently private"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span></h3><p class="state dim">private · in development</p><p>Security steps for each kind of space, from a home network to a SOC 2 audit.</p></div>
         </div>
-        <div class="row tool reveal-on">
-          <h3>Ready, Secure, Go <span class="lock" tabindex="0" role="img" aria-label="currently private"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span></h3>
-          <p class="state dim">in development · private</p>
-          <div class="tool-body">
-            <p><b>Security steps for each kind of space.</b> For households, classrooms, small offices, and companies heading into SOC 2.</p>
-            <p><span class="k">example</span> For a home network, the five things worth doing first, then what comes next.</p>
-            <p><span class="k">limits</span> Not published yet. Until it is, the same guidance comes through my security sessions.</p>
-            <p class="next"><a class="ext" href="#contact">Ask about a session</a></p>
-          </div>
-        </div>
-      </div>
+      </details>
     </section>
 
     <section id="why" class="view" aria-labelledby="why-h">
@@ -309,7 +295,7 @@
       </dl>
       <!-- The form, folded until asked for. It appears once js/contact.js runs; without it, the email and
            phone links above do the job. It posts to 1NEON's contact route, which mails neon1's inbox only -->
-      <details class="cfold reveal-on" id="cfold" hidden>
+      <details class="fold cfold reveal-on" id="cfold" hidden>
         <summary>send me your use case <span class="arr" aria-hidden="true">&larr;</span></summary>
         <form class="cform" id="cform" novalidate>
           <fieldset class="ctopic">
@@ -371,7 +357,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.46.0</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.47.0</a>
       </span>
     </div>
   </footer>

@@ -2,6 +2,13 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.47.0
+
+### Changed
+- "tools I'm building" is now "neon1 prose": predictable (or purposeful; I decide), repeatable, open-source engineering. It holds two folds, business (the neon1 repositories) and tools (AWS CLIP, DeployOps, and Ready, Secure, Go). Each row has a short description, whether it's public or private, and its release. Public rows open on GitHub in a new tab.
+- "send me your use case" has no underline or gray tap flash on phones, and its arrow sits right beside the words.
+- A rule now sits above the contact view's "where" row.
+
 ## v0.46.0
 
 ### Changed
