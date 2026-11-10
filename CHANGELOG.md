@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.43.1
+
+### Fixed
+- The names page now says who the 1 is: Pradeep, neon1's sole owner. From neon1-corpus v0.22.3.
+
 ## v0.43.0
 
 ### Changed
