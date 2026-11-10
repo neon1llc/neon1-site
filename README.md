@@ -53,7 +53,7 @@ The scene's models and images are in `media/white-rabbit/`, with their credits i
 
 ## Deploy
 
-Pushing to `main` runs the checks and then deploys from GitHub Actions. The workflow assumes an AWS role through OIDC, so the repo holds no AWS keys. The role ARN is the repository variable `AWS_DEPLOY_ROLE_ARN`.
+Pushing to `main` runs the checks and then deploys from GitHub Actions. The `check` job runs `make check`, then `make behavior` and `scripts/chat_check.cjs` in headless Chromium with every API stubbed, and the deploy job starts only after all three pass. The workflow assumes an AWS role through OIDC, so the repo holds no AWS keys. The role ARN is the repository variable `AWS_DEPLOY_ROLE_ARN`.
 
 To deploy by hand:
 

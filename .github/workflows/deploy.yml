@@ -29,16 +29,40 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      # The npm cache is keyed on the printer's lockfile, which also pins the Playwright the browser checks use
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
+          cache: npm
+          cache-dependency-path: knowledge/package-lock.json
 
       # A push compares fonts and media with the commit before it; a pull request, with origin/main
       - run: make check
         env:
           IMMUTABLE_BASE: ${{ github.event.before }}
 
-  # Deploys only from main, after the checks pass
+      # Browser contracts, gating the deploy job like make check: the contact form (including a send that
+      # never answers), case studies and case links, the first screen and section snap, the tool cards, the
+      # white rabbit's entry, controls, and lifetime, and the chat window. Both scripts serve the site on
+      # loopback and stub every API, aborting anything that leaves it, so nothing reaches a live service.
+      # Playwright comes from knowledge/package-lock.json, the same locked version the PDF printer uses
+      - name: Install Playwright and Chromium
+        run: |
+          npm ci --prefix knowledge
+          npx --prefix knowledge playwright install --with-deps chromium
+
+      - name: make behavior
+        env:
+          NODE_PATH: ${{ github.workspace }}/knowledge/node_modules
+        run: make behavior
+
+      - name: Chat window checks
+        env:
+          NODE_PATH: ${{ github.workspace }}/knowledge/node_modules
+        run: node scripts/chat_check.cjs
+
+  # Deploys only from main, after the static checks and the browser contracts in check pass; nothing
+  # touches S3 or CloudFront before then
   deploy:
     needs: check
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'

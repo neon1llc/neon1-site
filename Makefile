@@ -124,8 +124,9 @@ budget: ## Fail if the deployed files outside the knowledge center exceed BUDGET
 	echo "site size: $${kb} KB of $(BUDGET_KB) KB"; \
 	test "$$kb" -le "$(BUDGET_KB)"
 
-# Drives headless Chromium against a loopback copy of the site, so it needs Playwright and its browser;
-# it stays out of check until the CI runner installs them
+# Drives headless Chromium against a loopback copy of the site, so it needs Playwright and its browser.
+# It stays out of check, which needs neither; CI's check job installs them and runs it, with
+# scripts/chat_check.cjs, before the deploy job may start
 behavior: ## Check the contact form, case studies, case links, and white rabbit in a real browser
 	@command -v node >/dev/null 2>&1 || { echo "behavior: install Node.js"; exit 1; }
 	node scripts/behavior.cjs $(SITE_DIR)
