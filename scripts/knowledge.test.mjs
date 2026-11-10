@@ -7,7 +7,7 @@ import { join, dirname } from "node:path"
 import { tmpdir } from "node:os"
 import { spawnSync } from "node:child_process"
 import { fileURLToPath } from "node:url"
-import { TASK_PATHS, singleH1, classifyLinks, catalogFacts, load } from "./knowledge-lib.mjs"
+import { TASK_PATHS, singleH1, classifyLinks, catalogFacts, keepFields, load } from "./knowledge-lib.mjs"
 import { prepare, search } from "../src/app/public/js/knowledge-search-core.js"
 
 const here = dirname(fileURLToPath(import.meta.url))
@@ -163,4 +163,10 @@ test("the listed queries return documents from the pinned corpus", { skip: !exis
     const got = search(prepared, q).results.map((r) => byUrl.get(r.url.split("#")[0]))
     assert.ok(got.slice(0, 8).includes(id), `${q} should rank ${id} near the top, got ${got.slice(0, 8).join(", ")}`)
   }
+})
+
+test("a printed label and its blank are wrapped as one unit", () => {
+  const blank = '<span class="blank" role="img" aria-label="blank to fill in"></span>'
+  assert.equal(keepFields(`<strong>Date:</strong> ${blank}`), `<span class="field"><strong>Date:</strong> ${blank}</span>`)
+  assert.equal(keepFields("<strong>Note:</strong> text"), "<strong>Note:</strong> text")
 })

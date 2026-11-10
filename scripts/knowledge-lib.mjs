@@ -157,3 +157,8 @@ export const TASK_PATHS = [
   { key: "diligence", title: "Technical due diligence", blurb: "How I handle security, data, and recovery, in writing.",
     ids: ["standards-security-and-data", "standards-reliability-and-recovery", "policy-security"] },
 ]
+
+
+// A bold label and the blank after it travel as one unit, so a line break never strands a date's blank on the next line
+const BLANK = '<span class="blank"[^>]*></span>'
+export const keepFields = (html) => html.replace(new RegExp(`(<strong>[^<]*</strong>)\\s*(${BLANK})`, "g"), '<span class="field">$1 $2</span>')

@@ -383,6 +383,16 @@ td .blank {
   min-width: 0.9in;
 }
 
+/* A label and its blank never split across lines; when several share a paragraph their blanks are a little
+   shorter so two or three fit on a line, and the one that doesn't fit moves down whole */
+.field {
+  white-space: nowrap;
+}
+
+p:has(.field ~ .field) .blank {
+  min-width: 1.6in;
+}
+
 /* Callouts from the corpus: note, tip, warning, example */
 aside.callout.warning {
   border-color: #c98a00;
@@ -433,4 +443,18 @@ p > .blank:only-child {
   display: block;
   width: 100%;
   height: 20pt;
+}
+
+/* Keep a checklist with the sentence and heading that introduce it: the list stays whole, the sentence before it
+   stays with it, and h2 already stays with what follows. Text size is unchanged; a long list may still split */
+li.task {
+  break-inside: avoid;
+}
+
+ul:has(> li.task) {
+  break-inside: avoid;
+}
+
+p:has(+ ul > li.task) {
+  break-after: avoid;
 }
