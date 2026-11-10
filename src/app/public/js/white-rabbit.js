@@ -15,11 +15,9 @@
 // its composing, the rain's halt) checks that its entry is still the current one before it acts, so a
 // rabbit caught, left, and caught again before the scene loads builds one scene, not two.
 // Keyboard: "follow the white rabbit" (#whiteRabbitIn, hidden until focused, like the skip link)
-// catches one and focuses a line, read only by screen readers, that says how to move and leave. On screen, a
-// small cluster offers exit (the same as Esc), a sound switch in the scene (the card is silent), and a hint
-// that fades after the first move. Tab cycles between that line and the cluster while the page is covered,
-// Esc always leaves, and focus returns where it was when the entry ends. The car on the sill starts when
-// clicked, inside the scene itself. Turning the sound off lasts until the page is reloaded and is not stored.
+// catches one and focuses a line, read only by screen readers, that says how to move and leave; nothing on
+// screen explains the scene, Tab stays on that line while the page is covered, Esc always leaves, and focus
+// returns where it was when the entry ends. The car on the sill starts when clicked, inside the scene itself.
 // Testing: ?rabbit=now keeps a rabbit on the landing and notes its cell center on root
 // as data-spot; ?rabbit=p0.5 catches one and jumps to that progress. Both only add
 // rabbits, so they are harmless in production.
@@ -53,15 +51,12 @@ export function whiteRabbit({ rain, root }) {
   const inBtn = document.getElementById("whiteRabbitIn");
   const how = root.querySelector(".white-rabbit-how");
   if (inBtn) inBtn.hidden = false;
-  // The on-screen cluster: exit, the sound switch, and the hint. Any of them may be missing (a test stub page)
-  const ctl = root.querySelector(".white-rabbit-ctl");
-  const soundBtn = ctl && ctl.querySelector('[data-rabbit="sound"]');
 
   // Progress: wanted and rendered, with the spring's velocity
   let state = "idle", mode = "scene", target = 0, p = 0, v = 0;
   let scene = null, loading = null, halted = false, prepared = false, handed = false;
   let raf = 0, last = 0, lastInput = 0, idleTimer = 0, disposeTimer = 0, escape = null, announced = false;
-  let audio = null, sound = null, muted = false;
+  let audio = null, sound = null;
   // The current entry's generation, and where focus was when it began
   let gen = 0, before = null;
 
@@ -111,7 +106,7 @@ export function whiteRabbit({ rain, root }) {
   // idling picks the car's engine back up, for a device rebuilt while it runs
   function openAudio(idling = false) {
     const AC = window.AudioContext || window.webkitAudioContext;
-    if (audio || !AC || !wanted() || muted) return;
+    if (audio || !AC || !wanted()) return;
     const ctx = (audio = new AC());
     ctx.resume();
     // Phones unlock output only for sound started inside the gesture: a silent sample does it at once
@@ -131,14 +126,6 @@ export function whiteRabbit({ rain, root }) {
     body.classList.remove("white-rabbit-hover");
     if (sound) sound.close(); else if (audio) audio.close().catch(() => {});
     audio = sound = null;
-  }
-
-  // The sound switch: off closes the audio device at once, on opens it again inside this click (phones need
-  // the gesture), picking the car's idle back up if it is running. Nothing else plays while it is off
-  function setSound(on) {
-    muted = !on;
-    if (soundBtn) { soundBtn.setAttribute("aria-pressed", String(on)); soundBtn.textContent = on ? "sound on" : "sound off"; }
-    if (muted) closeAudio(); else openAudio(!!(scene && scene.carRunning));
   }
 
   // A hidden tab goes quiet, and the sound comes back with it. Phones may refuse to resume until the
@@ -185,7 +172,6 @@ export function whiteRabbit({ rain, root }) {
     set("caught"); lock(true);
     body.classList.remove("white-rabbit-hover");
     target = p = v = 0; halted = prepared = handed = false; escape = null; cardP = 0;
-    root.dataset.hint = "on";
     mode = reduce.matches ? "card" : "scene";
     root.dataset.mode = mode;
     openAudio();
@@ -292,7 +278,6 @@ export function whiteRabbit({ rain, root }) {
   function step(d) {
     lastInput = performance.now();
     if (state === "exiting" || !d || escape) return;
-    root.dataset.hint = "off";
     if (state === "caught") {
       if (d < 0) return;
       set("playing");
@@ -359,11 +344,9 @@ export function whiteRabbit({ rain, root }) {
     if (k === "Escape") { e.preventDefault(); e.stopPropagation(); bail(); return; }
     if (k === "Tab" && state !== "caught") {
       e.preventDefault();
-      cycle(e.shiftKey ? -1 : 1);
+      if (how) how.focus();
       return;
     }
-    // Space on a cluster button presses it, rather than moving the scene
-    if (space && ctl && ctl.contains(document.activeElement)) return;
     if (!space && !DOWN.includes(k) && !UP.includes(k)) return;
     e.preventDefault(); e.stopPropagation();
     if (state === "caught" && (UP.includes(k) || (space && e.shiftKey))) return;
@@ -372,14 +355,6 @@ export function whiteRabbit({ rain, root }) {
     const size = k.startsWith("Arrow") ? 0.04 : 0.2;
     step((DOWN.includes(k) || (space && !e.shiftKey)) ? size : -size);
   }, { capture: true });
-
-  // Tab while the page is covered: the line that says how to move, then each cluster button that shows, and round
-  function cycle(dir) {
-    const stops = [how, ...(ctl ? ctl.querySelectorAll("button") : [])].filter((el) => el && (el === how || el.getClientRects().length));
-    if (!stops.length) return;
-    const i = stops.indexOf(document.activeElement);
-    stops[(i < 0 ? 0 : i + dir + stops.length) % stops.length].focus();
-  }
 
   // Esc: straight out when caught; otherwise the scene plays back to the start
   function bail() {
@@ -395,14 +370,6 @@ export function whiteRabbit({ rain, root }) {
   // while caught, the pause button leaves and other controls leave and carry on
   addEventListener("click", (e) => {
     if (inBtn && inBtn.contains(e.target)) { e.preventDefault(); e.stopPropagation(); enter(); return; }
-    // The cluster: exit leaves the way Esc does, and sound switches; neither reaches the scene or the page
-    const press = active() && ctl && e.target.closest && ctl.contains(e.target) && e.target.closest("button");
-    if (press) {
-      e.preventDefault(); e.stopPropagation();
-      if (press.dataset.rabbit === "exit") bail();
-      else if (press.dataset.rabbit === "sound") setSound(muted);
-      return;
-    }
     if (state === "idle") {
       if (!ready() || !rain.rabbitAt(e.clientX, e.clientY)) return;
       e.preventDefault(); e.stopPropagation();
