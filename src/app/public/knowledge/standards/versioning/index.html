@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.47.0" />
+  <meta name="version" content="0.47.1" />
   <title>Versioning and releases · neon1 knowledge center</title>
   <meta name="description" content="How neon1 numbers releases of code (vX.Y.Z) and editions of documents (X.Y), when each number goes up, and how tags, changelogs, and package files stay in agreement." />
   <meta name="theme-color" content="#F2F4F2" />
@@ -85,8 +85,9 @@
         <p class="kc-summary">How neon1 numbers releases of code (vX.Y.Z) and editions of documents (X.Y), when each number goes up, and how tags, changelogs, and package files stay in agreement.</p>
         <dl class="kc-facts">
           <div><dt>Type</dt><dd>Standard</dd></div>
-          <div><dt>Edition</dt><dd>1.0</dd></div>
-          <div><dt>Updated</dt><dd>November 9, 2026</dd></div>
+          <div><dt>Edition</dt><dd>1.1</dd></div>
+          <div><dt>First written</dt><dd>November 9, 2026</dd></div>
+          <div><dt>Updated</dt><dd>November 10, 2026</dd></div>
           <div><dt>For</dt><dd>Developers</dd></div>
         </dl>
         <div class="kc-actions">
@@ -124,7 +125,11 @@
 - What was wrong and is now right.</code></pre>
 <p>The release date may follow the version in the heading. Sections are <strong>Added</strong>, <strong>Changed</strong>, <strong>Deprecated</strong>, <strong>Removed</strong>, <strong>Fixed</strong>, and <strong>Security</strong>, used only when they have entries. Work merged but not yet released goes under <code>## Unreleased</code>. Entries follow the <a href="/knowledge/standards/writing/">writing standard</a>: they describe the change from the reader's side, not the code's.</p>
 <h2 id="releasing">Releasing</h2>
-<ol><li>Merge everything the release includes into main, with the checks passing.</li><li>Update the changelog and every place the version appears, in one commit.</li><li>Tag that commit: <code>git tag -a vX.Y.Z -m "vX.Y.Z: one line on what it brings"</code>, then push the tag.</li><li>Deploy or publish from the tag, and check that what's live reports the new version.</li></ol>
+<ol><li>Merge everything the release includes into main, with the checks passing.</li><li>Update the changelog and every place the version appears, in one commit.</li><li>Merge it to main. The pipeline deploys it, checks that what's live reports the new version, and then tags that commit: <code>vX.Y.Z</code>, annotated.</li><li>A project without a pipeline tags by hand the same way: <code>git tag -a vX.Y.Z -m "vX.Y.Z: one line on what it brings"</code>, then pushes the tag.</li></ol>
+<h2 id="how-neon1-s-repositories-release">How neon1's repositories release</h2>
+<p>In every neon1 repository, the pipeline makes the tag, not a person. A tag then always means "this exact commit passed its checks and is live", and a release can't be forgotten or tagged on the wrong commit.</p>
+<table><thead><tr><th>Repository</th><th>Where the version is set</th><th>When the tag is made</th></tr></thead><tbody><tr><td>neon1-site</td><td>The changelog, the page's version, and the footer</td><td>After the deploy, once the live site reports the new version</td></tr><tr><td>neon1-1NEON</td><td>The changelog and <code>package.json</code></td><td>After the deploy, once the portal is verified live</td></tr><tr><td>neon1-chat</td><td>The changelog and <code>package.json</code></td><td>After the deploy, once Neo's health check reports the new commit</td></tr><tr><td>neon1-aws-infrastructure</td><td>The changelog</td><td>Once every stack's plan or apply has passed</td></tr><tr><td>neon1-corpus</td><td>The changelog</td><td>On main, by the release workflow, which also publishes the bundles</td></tr></tbody></table>
+<ul><li><strong>A change that people will notice ships in a release.</strong> Add its changelog entry in the same merge: a fix goes under the next patch, new capability under the next minor.</li><li><strong>A push with no new version ships under the current one.</strong> Keep that to changes nobody would notice, such as CI, comments, or a dependency bump with no effect.</li><li><strong>Checks enforce agreement.</strong> Each repository's checks fail when its version places disagree, and the tag step stops when the changelog names no version.</li><li><strong>A tag that exists is never made again or moved.</strong> If a release went wrong, the fix is the next patch.</li></ul>
 <h2 id="documents-editions-x-y">Documents: editions X.Y</h2>
 <p>Documents, such as the standards, policies, and templates in this Knowledge Center, use an <strong>edition</strong> written as two numbers without a <code>v</code>: <code>1.0</code>, <code>1.1</code>, <code>2.0</code>. The missing <code>v</code> keeps document editions distinct from software versions.</p>
 <table><thead><tr><th>Number</th><th>Goes up when</th></tr></thead><tbody><tr><td><strong>Major</strong> (X)</td><td>A promise, a rule, a required field, or an obligation changes</td></tr><tr><td><strong>Minor</strong> (Y)</td><td>Wording is clarified, a fact is corrected, or something is added without changing a promise</td></tr></tbody></table>
@@ -179,7 +184,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.47.0</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.47.1</a>
       </span>
     </div>
   </footer>

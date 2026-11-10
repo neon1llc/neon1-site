@@ -2,6 +2,12 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.47.1
+
+### Changed
+- Versioning and releases (edition 1.1) in the Knowledge Center says how each neon1 repository releases, from neon1-corpus v0.24.1.
+- neon1 prose shows each repository's current release: 1NEON, the chat, and the AWS infrastructure are now tagged at v0.1.0, and the corpus at v0.24.1.
+
 ## v0.47.0
 
 ### Changed
