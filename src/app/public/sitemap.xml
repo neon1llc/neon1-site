@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- neon1.tech sitemap: the home page, the sample project in 1NEON, and the knowledge center (its block is written by scripts/knowledge.mjs) -->
+<!-- neon1.tech sitemap: the home page and the knowledge center (its block is written by scripts/knowledge.mjs) -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://neon1.tech/</loc></url>
-  <url><loc>https://neon1.tech/1NEON/example</loc></url>
+  <!-- /1NEON/example is left out until it is pre-rendered with its own content; the canonical 1NEON help is /knowledge/faq/1neon-help/, listed below -->
   <!-- knowledge -->
   <url><loc>https://neon1.tech/knowledge/</loc><lastmod>2026-11-09</lastmod></url>
   <url><loc>https://neon1.tech/knowledge/company/about/</loc><lastmod>2026-11-09</lastmod></url>
