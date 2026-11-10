@@ -29,28 +29,31 @@ const WINDOW = { z: 0.6, y: 1.45, w: 1.2, h: 1.3 };
 
 // Beats, as a person would take them: out of the TV, then straight out and back from the set, drifting a little
 // right, low on the floor and looking at it, until the set and both chairs are in view; still sitting, one smooth
-// turn left to the window, the gaze rising slowly at first and more toward the end, into the sun and the dust;
-// getting up (the view dips and tilts, then rights itself); walking slowly over with the bob of each step, a quick
-// glance at the car on the sill, then squaring up to the window; a step closer as the sash goes up; the head out
-// through the opening, looking right and down, then left and a little up to the middle of the lawn; and the white.
-// Each is [progress, camera position, look target, vertical fov]; the first two positions are filled in from the
-// picture's fit. Pauses are pairs of beats a hair apart
+// turn left to the window, the gaze rising slowly at first and more toward the end, into the sun and the dust, and a
+// moment there; getting up (the view dips and tilts, then rights itself); walking slowly over with the bob of each
+// step, a quick glance at the car on the sill, then squaring up to the window; a step closer as the sash goes up; a
+// pause with it open; then slowly out through the opening, looking straight out the same way, to the square view of
+// the yard (the deck's stair rail, the lawn, the bed, the greenhouse, the trees, and the water), held there before the
+// white. Each is [progress, camera position, look target, vertical fov]; the first two positions are filled in from
+// the picture's fit. Pauses are pairs of beats with the same view
 const BEATS = [
   [0, null, SC, 40], [0.035, null, SC, 44],                                                               // face right at the screen, hunched
   // then straight out and back from the set, drifting a little right, low on the floor and looking at it the whole way,
-  // until both chairs and the set are in view
+  // until both chairs and the set are in view (path() keeps this always moving back, never forward again)
   [0.13, [0.03, 0.53, -1.32], [0, 0.53, -1.9], 48], [0.25, [0.47, 0.55, 0.14], [0.01, 0.55, -1.9], 51],
   [0.37, [0.91, 0.56, 1.6], [0.02, 0.56, -1.9], 54],
   // one smooth turn left to the window, the gaze rising slowly: a third of the rise by halfway, the other two thirds
-  // after, ending on the window in the sun and the dust (yaw eases in and out; the rise follows t^1.585)
-  [0.391, [0.92, 0.56, 1.6], [-0.12, 0.60, -1.64], 54],
-  [0.412, [0.92, 0.56, 1.6], [-0.62, 0.69, -1.43], 54],
-  [0.433, [0.92, 0.56, 1.6], [-1.27, 0.80, -0.99], 54],
-  [0.440, [0.92, 0.56, 1.6], [-1.47, 0.85, -0.80], 54],
-  [0.454, [0.92, 0.56, 1.6], [-1.83, 0.94, -0.37], 54],
-  [0.475, [0.92, 0.56, 1.6], [-2.16, 1.11, 0.27], 54],
-  [0.496, [0.92, 0.56, 1.6], [-2.27, 1.29, 0.69], 54],
-  [0.510, [0.92, 0.56, 1.6], [-2.27, 1.41, 0.78], 54],
+  // after, ending on the window in the sun and the dust (yaw eases in and out; the rise follows t^1.585), and a moment
+  // there before getting up, so the rise has settled when the view dips
+  [0.388, [0.92, 0.56, 1.6], [-0.12, 0.60, -1.64], 54],
+  [0.406, [0.92, 0.56, 1.6], [-0.62, 0.69, -1.43], 54],
+  [0.424, [0.92, 0.56, 1.6], [-1.27, 0.80, -0.99], 54],
+  [0.430, [0.92, 0.56, 1.6], [-1.47, 0.85, -0.80], 54],
+  [0.442, [0.92, 0.56, 1.6], [-1.83, 0.94, -0.37], 54],
+  [0.460, [0.92, 0.56, 1.6], [-2.16, 1.11, 0.27], 54],
+  [0.478, [0.92, 0.56, 1.6], [-2.27, 1.29, 0.69], 54],
+  [0.490, [0.92, 0.56, 1.6], [-2.27, 1.41, 0.78], 54],
+  [0.510, [0.92, 0.56, 1.6], [-2.27, 1.41, 0.78], 54],           // watching the light and the dust
   [0.55, [0.85, 1.05, 1.55], [-1.9, 0.95, 0.9], 54],             // getting up: the view dips
   [0.59, [0.78, 1.6, 1.5], [-1.95, 1.4, 0.8], 52],               // up
   [0.64, [-0.3, 1.58, 1.62], [-1.87, 0.92, 0.9], 50],            // walking slowly over, a quick glance at the car
@@ -58,14 +61,11 @@ const BEATS = [
   [0.72, [-0.7, 1.55, 0.62], [-1.95, 1.2, 0.6], 62],             // square to it, the whole window in view
   [0.79, [-0.72, 1.55, 0.6], [-1.95, 1.18, 0.6], 62],            // looking out and down through it
   [0.85, [-0.95, 1.5, 0.6], [-2.4, 1.0, 0.6], 62],               // a step closer, the sash going up (see OPEN)
-  // then the head out through the opening: a look straight out, to the right and down at the concrete and the
-  // greenhouse, then across to the left and a little up, settling on the middle of the lawn, held there before the white
-  [0.875, [-2.25, 1.35, 0.6], [-4.6, 0.55, 0.6], 60],
-  [0.905, [-2.3, 1.35, 0.5], [-4.3, -1.5, -2.3], 60], [0.915, [-2.3, 1.35, 0.5], [-4.32, -1.52, -2.33], 60],
-  [0.945, [-2.3, 1.35, 0.68], [-13.2, -4.3, 3.2], 60],           // the middle of the lawn
-  [0.97, [-2.3, 1.35, 0.68], [-13.2, -4.3, 3.2], 60],
-  [0.985, [-2.3, 1.35, 0.68], [-13.2, -4.3, 3.2], 60],           // held, before the white
-  [1, [-2.3, 1.35, 0.68], [-13.2, -4.3, 3.2], 60],
+  [0.88, [-0.95, 1.5, 0.6], [-2.4, 1.0, 0.6], 62],               // a pause with it open
+  // then slowly out through the opening, looking straight out the same way the whole time, to the square view of the yard
+  [0.955, [-2.25, 1.35, 0.6], [-4.6, 0.55, 0.6], 60],
+  [0.985, [-2.25, 1.35, 0.6], [-4.6, 0.55, 0.6], 60],            // held, before the white
+  [1, [-2.25, 1.35, 0.6], [-4.6, 0.55, 0.6], 60],
 ];
 const KEYS = BEATS.map((b) => b[0]), FOV = BEATS.map((b) => b[3]), LOOK = BEATS.map((b) => b[2]);
 // The sash starts a little up and goes the rest of the way as the camera steps closer
@@ -84,6 +84,28 @@ function progress(q) {
   if (q <= HOLD[0]) return (q / HOLD[0]) * 0.97;
   if (q <= HOLD[1]) return 0.97 + ((q - HOLD[0]) / (HOLD[1] - HOLD[0])) * 0.015;
   return 0.985 + ((q - HOLD[1]) / (1 - HOLD[1])) * 0.015;
+}
+
+// Monotone cubic through [key, value] pairs (Fritsch and Carlson): it passes through every beat, never swings past
+// one and comes back (so nothing moves forward, then back), stays still between two equal beats, and its speed
+// changes smoothly across each beat instead of stopping at it. Returns a function of progress, flat outside the keys
+function monotone(xs, ys) {
+  const n = xs.length, d = [], m = new Array(n);
+  for (let i = 0; i < n - 1; i++) d.push((ys[i + 1] - ys[i]) / (xs[i + 1] - xs[i]));
+  m[0] = d[0]; m[n - 1] = d[n - 2];
+  for (let i = 1; i < n - 1; i++) {
+    if (d[i - 1] * d[i] <= 0) { m[i] = 0; continue; }
+    const h0 = xs[i] - xs[i - 1], h1 = xs[i + 1] - xs[i], w0 = 2 * h1 + h0, w1 = h1 + 2 * h0;
+    m[i] = (w0 + w1) / (w0 / d[i - 1] + w1 / d[i]);
+  }
+  return (x) => {
+    if (x <= xs[0]) return ys[0];
+    if (x >= xs[n - 1]) return ys[n - 1];
+    let i = 0;
+    while (x > xs[i + 1]) i++;
+    const h = xs[i + 1] - xs[i], t = (x - xs[i]) / h, t2 = t * t, t3 = t2 * t;
+    return (2 * t3 - 3 * t2 + 1) * ys[i] + (t3 - 2 * t2 + t) * h * m[i] + (-2 * t3 + 3 * t2) * ys[i + 1] + (t3 - t2) * h * m[i + 1];
+  };
 }
 function linear(p, pts) {
   if (p <= pts[0][0]) return pts[0][1];
@@ -555,48 +577,48 @@ export function createScene({ onLost, onSound = () => {} }) {
     path();
   }
 
-  // Camera curves through the beats; portrait screens sit further back and see wider in the room
-  let posCurve = null, lookCurve = null;
+  // Camera paths through the beats: where the camera is, and which way it looks (a unit direction, so a pause holds the
+  // view still and a straight move out keeps the same look), each eased with monotone() on the beats' own progress
+  let posAt = null, dirAt = null, fovAt = null;
   function path() {
     const sz = SC.z, d0 = fit.d0;
-    const pos = [[0, SC.y, sz + d0], [0, SC.y, sz + Math.max(0.62, d0 + 0.2)], ...BEATS.slice(2).map((b) => b[1])];
     const v = (a) => (a.isVector3 ? a.clone() : new T.Vector3(...a));
-    posCurve = new T.CatmullRomCurve3(pos.map(v), false, "centripetal");
-    lookCurve = new T.CatmullRomCurve3(LOOK.map(v), false, "centripetal");
+    // Off the screen: a small step back from the fit, and the next beat always further back, never forward again
+    const near = sz + d0 + 0.06;
+    const second = v(BEATS[2][1]); second.z = Math.max(second.z, near + 0.26);
+    const pos = [new T.Vector3(0, SC.y, sz + d0), new T.Vector3(0, SC.y, near), second, ...BEATS.slice(3).map((b) => v(b[1]))];
+    const dir = LOOK.map((l, i) => v(l).sub(pos[i]).normalize());
+    const track = (pts) => ["x", "y", "z"].map((k) => monotone(KEYS, pts.map((p) => p[k])));
+    const [px, py, pz] = track(pos), [dx, dy, dz] = track(dir);
+    posAt = (pr, out) => out.set(px(pr), py(pr), pz(pr));
+    dirAt = (pr, out) => out.set(dx(pr), dy(pr), dz(pr)).normalize();
+    fovAt = monotone(KEYS, FOV);
     screenU.uScanCount.value = Math.round(fit.lines / 3);
-  }
-
-  // Curve parameter for progress: each beat gets its own share of the scroll
-  function along(p) {
-    let i = 0;
-    while (i < KEYS.length - 2 && p > KEYS[i + 1]) i++;
-    const t = Math.min(1, Math.max(0, (p - KEYS[i]) / (KEYS[i + 1] - KEYS[i])));
-    return (i + t) / (KEYS.length - 1);
   }
 
   // ---- One frame ----
   const P = new T.Vector3(), L = new T.Vector3(), D = new T.Vector3(), sunAt = new T.Vector3(), stirV = new T.Vector3(), lastCam = new T.Vector3();
   let frames = 0, spent = 0, lastFrame = 0, prev = 0, facing = 1, beat = 0, open = 0;
   function render(q, { speed = 0, still = false } = {}) {
-    if (disposed || !posCurve) return;
+    if (disposed || !posAt) return;
     const pr = progress(q);
     const now = performance.now(), time = now / 1000, dt = prev ? (now - prev) / 1000 : 0;
     prev = now;
     // pr is the walk's progress; p is the same moment on the lighting's timeline (see LEGACY)
-    const aspect = innerWidth / innerHeight, u = along(pr), p = linear(pr, LEGACY);
+    const aspect = innerWidth / innerHeight, p = linear(pr, LEGACY);
     beat = p;
 
     // Camera: curve, portrait widening and pull-back, a little handheld sway, and the room's walls
     // (only until the camera goes out through the window)
-    posCurve.getPoint(u, P); lookCurve.getPoint(u, L);
-    let fov = ramp(pr, KEYS.map((k, i) => [k, FOV[i]]));
+    posAt(pr, P); L.copy(P).addScaledVector(dirAt(pr, D), 3);
+    let fov = fovAt(pr);
     const wide = T.MathUtils.radToDeg(2 * Math.atan(Math.tan(T.MathUtils.degToRad(19)) / aspect));
     fov += (Math.max(fov, wide) - fov) * ramp(p, [[0.28, 0], [0.45, 1]]);
     // Wide screens: the view across is held to about 72 degrees, past which a flat picture stretches
     // whatever sits near its sides, like looking through a fishbowl. At the window it opens to about 92 degrees, as
     // the phone photo of it shows the whole window and more of the yard through it; out through the opening, about
     // 100 degrees, like the wide phone photo from this window, so the deck below and the water beyond both fit
-    const half = 36 + 10 * ramp(pr, [[0.62, 0], [0.72, 1]]) + 4 * ramp(pr, [[0.855, 0], [0.875, 1]]);
+    const half = 36 + 10 * ramp(pr, [[0.62, 0], [0.72, 1]]) + 4 * ramp(pr, [[0.88, 0], [0.955, 1]]);
     const across = T.MathUtils.radToDeg(2 * Math.atan(Math.tan(T.MathUtils.degToRad(half)) / aspect));
     fov += (Math.min(fov, across) - fov) * ramp(p, [[0.12, 0], [0.28, 1]]);
     const back = Math.max(0, 0.9 / aspect - 0.9) * ramp(p, [[0.3, 0], [0.5, 1]]) * ramp(pr, [[0.8, 1], [0.86, 0]]);
@@ -612,7 +634,7 @@ export function createScene({ onLost, onSound = () => {} }) {
       const w = (pr - WALK[0]) / (WALK[1] - WALK[0]), fade = Math.sin(w * Math.PI), ph = w * STEPS * Math.PI * 2;
       P.y -= (0.5 - 0.5 * Math.cos(ph)) * 0.028 * fade; P.z += Math.sin(ph / 2) * 0.012 * fade;
     }
-    if (pr < 0.852) P.set(T.MathUtils.clamp(P.x, -1.85, 3.05), T.MathUtils.clamp(P.y, 0.2, 2.4), T.MathUtils.clamp(P.z, -2.35, 2.35));
+    if (pr < 0.88) P.set(T.MathUtils.clamp(P.x, -1.85, 3.05), T.MathUtils.clamp(P.y, 0.2, 2.4), T.MathUtils.clamp(P.z, -2.35, 2.35));
     camera.position.copy(P); camera.lookAt(L);
     camera.rotateZ(ramp(pr, ROLL));
     camera.fov = fov; camera.aspect = aspect; camera.updateProjectionMatrix();
@@ -705,7 +727,7 @@ export function createScene({ onLost, onSound = () => {} }) {
   // True when the point (client px) lands on the car, which then starts or stops unless only looking
   const ray = new T.Raycaster(), ndc = new T.Vector2();
   function pick(x, y, look = false) {
-    if (disposed || !posCurve) return false;
+    if (disposed || !posAt) return false;
     const b = canvas.getBoundingClientRect();
     ndc.set(((x - b.left) / b.width) * 2 - 1, -((y - b.top) / b.height) * 2 + 1);
     ray.setFromCamera(ndc, camera);
@@ -741,5 +763,5 @@ export function createScene({ onLost, onSound = () => {} }) {
     canvas.remove();
   }
 
-  return { compose, render, resize, dispose, pick, over: (x, y) => pick(x, y, true), toggleCar: () => !disposed && car.toggle(), get carOn() { return car.on; }, get facing() { return facing; }, get wind() { return sky.wind; }, get carRunning() { return car.running; }, get beat() { return beat; }, get open() { return open; } };
+  return { compose, render, resize, dispose, pick, over: (x, y) => pick(x, y, true), get facing() { return facing; }, get wind() { return sky.wind; }, get carRunning() { return car.running; }, get beat() { return beat; }, get open() { return open; } };
 }
