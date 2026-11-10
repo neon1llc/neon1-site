@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.45.1" />
+  <meta name="version" content="0.46.0" />
   <title>Service and recovery profile · neon1 knowledge center</title>
   <meta name="description" content="What a running service must do, how it&#x27;s measured, who supports it, and how it comes back after a failure." />
   <meta name="theme-color" content="#F2F4F2" />
@@ -47,7 +47,9 @@
         <li><a href="/#why">about</a></li>
         <li><a href="/knowledge/" aria-current="page">knowledge</a></li>
         <!-- frame:actions -->
-        <li><a class="btn btn-ghost" href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a call</a></li>
+        <!-- Contact: the view with the call booking, email, phone, and form. On the home page it springs there
+             (js/views.js, data-view); on other pages it opens the home page at that view -->
+        <li><a class="btn btn-ghost" href="/#contact" data-view="contact">contact</a></li>
         <!-- The client portal, a separate app on the same domain -->
         <li><a class="btn portal" href="/1NEON/" data-handoff title="1NEON, the client portal">
           <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="5" aria-hidden="true"><circle cx="32" cy="32" r="28" /><circle cx="32" cy="32" r="19" /><circle cx="32" cy="32" r="10" /><circle cx="32" cy="32" r="2" /></svg>1NEON</a></li>
@@ -169,7 +171,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.45.1</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.46.0</a>
       </span>
     </div>
   </footer>

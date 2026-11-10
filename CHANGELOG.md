@@ -2,6 +2,14 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.46.0
+
+### Changed
+- The first screen is back to the wordmark and tagline alone.
+- The bar's "book a call" button is now "contact", which goes to the contact view, where booking, email, phone, and the form are.
+- The contact form folds under "send me your use case" below the fit list. It asks less: pick any of the four services (or none), add your own words, say what's going on, then name and email. The starter suggestions and their repeated case links are gone.
+- The form's note ends with Morpheus's line: "Remember, all I'm offering is the truth. Nothing more."
+
 ## v0.45.1
 
 ### Changed

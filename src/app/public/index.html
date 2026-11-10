@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.45.1" />
+  <meta name="version" content="0.46.0" />
   <title>neon1 · cloud, AI, and IT consulting</title>
   <meta name="description" content="neon1 is a one-person technology practice: cloud and AI engineering, business automation, networks, and cameras." />
   <meta name="theme-color" content="#0D0208" />
@@ -97,7 +97,9 @@
         <li><a href="#why">about</a></li>
         <li><a href="/knowledge/">knowledge</a></li>
         <!-- frame:actions -->
-        <li><a class="btn btn-ghost" href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a call</a></li>
+        <!-- Contact: the view with the call booking, email, phone, and form. On the home page it springs there
+             (js/views.js, data-view); on other pages it opens the home page at that view -->
+        <li><a class="btn btn-ghost" href="/#contact" data-view="contact">contact</a></li>
         <!-- The client portal, a separate app on the same domain -->
         <li><a class="btn portal" href="/1NEON/" data-handoff title="1NEON, the client portal">
           <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="5" aria-hidden="true"><circle cx="32" cy="32" r="28" /><circle cx="32" cy="32" r="19" /><circle cx="32" cy="32" r="10" /><circle cx="32" cy="32" r="2" /></svg>1NEON</a></li>
@@ -130,11 +132,6 @@
       <div class="glass glass-pane hero-pane">
         <h1 class="brand" aria-label="neon1"><span class="ne dec" aria-hidden="true">neon</span><span class="one dec" aria-hidden="true">1</span></h1>
         <p class="tagline reveal d1">1 is glad to be of service.</p>
-        <!-- The plain offer and the one way to start, so the first screen says what, for whom, and how to begin.
-             The link settles on the contact view, which has the form, email, phone, and booking -->
-        <p class="offer reveal d2">Practical technology help for small businesses, teams, and homes.</p>
-        <p class="offer-sub reveal d2">Connect the tools you use, reduce repetitive work, and leave with a setup you can run.</p>
-        <p class="start reveal d3"><a class="btn btn-primary" href="#contact">Talk through your project</a><span class="start-note">Free 15-minute introduction</span></p>
       </div>
       <!-- The white rabbit's way in from the keyboard: off screen until focused, like the skip link,
            and shown only once js/white-rabbit.js runs -->
@@ -303,51 +300,42 @@
     <section id="contact" class="view contact" aria-labelledby="contact-h">
       <h2 id="contact-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>contact</h2>
       <p class="lead reveal-on">Tell me what's going on and I'll reply by email. You can also <a class="ext" href="mailto:hello@neon1.tech">email</a>, call or text <a class="ext" href="tel:+14243263661" title="(424) 326-3661">(424) 32-neon1</a>, or <a class="ext" href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a 15-minute call</a>.</p>
-      <div class="contact-grid reveal-on">
-        <!-- The form appears once js/contact.js runs; without it, the email and phone links above do the job.
-             It posts to 1NEON's contact route, which mails neon1's inbox only -->
-        <form class="cform" id="cform" hidden novalidate>
+      <!-- Engagement fit: where, when, what size, and the first call, in one glance -->
+      <dl class="fit reveal-on">
+        <div><dt>where</dt><dd>Remote from anywhere, or on site within about 30 miles</dd></div>
+        <div><dt>when</dt><dd>Weekends 8am to 8pm and weekday evenings, Eastern time</dd></div>
+        <div><dt>size</dt><dd>Jobs of a week or two up to projects of four to six weeks, with at most two clients at a time</dd></div>
+        <div><dt>first call</dt><dd>Free and 15 minutes: the main problem and your options</dd></div>
+      </dl>
+      <!-- The form, folded until asked for. It appears once js/contact.js runs; without it, the email and
+           phone links above do the job. It posts to 1NEON's contact route, which mails neon1's inbox only -->
+      <details class="cfold reveal-on" id="cfold" hidden>
+        <summary>send me your use case <span class="arr" aria-hidden="true">&larr;</span></summary>
+        <form class="cform" id="cform" novalidate>
           <fieldset class="ctopic">
-            <legend>What's it about?</legend>
-            <label class="pick"><input type="radio" name="topic" value="business" required /> Running a business</label>
-            <label class="pick"><input type="radio" name="topic" value="cloud" /> Software, cloud, or AI</label>
-            <label class="pick"><input type="radio" name="topic" value="spaces" /> An office, home, or building</label>
-            <label class="pick"><input type="radio" name="topic" value="security" /> Staying safe</label>
-            <label class="pick"><input type="radio" name="topic" value="other" /> Something else</label>
+            <legend>What's it about? <span class="opt">pick any, or none</span></legend>
+            <label class="pick"><input type="checkbox" name="topics" value="business" /> Business workflows</label>
+            <label class="pick"><input type="checkbox" name="topics" value="cloud" /> Cloud and AI</label>
+            <label class="pick"><input type="checkbox" name="topics" value="spaces" /> Networks and devices</label>
+            <label class="pick"><input type="checkbox" name="topics" value="security" /> Security</label>
+            <label class="pick pick-other"><span class="sr">Something else</span><input name="other" maxlength="120" placeholder="something else" aria-label="Something else, in your words" /></label>
           </fieldset>
-          <div class="cstarts" id="cstarts" hidden><p>Start from a common one, then add your details:</p><div class="cstart-list"></div></div>
-          <label>What happens today?<textarea name="today" rows="4" maxlength="3000" required placeholder="For example: every Friday we copy orders from email into a spreadsheet by hand."></textarea></label>
-          <label><span>What would better look like? <span class="opt">optional</span></span><textarea name="better" rows="2" maxlength="1500" placeholder="For example: orders land in the spreadsheet on their own."></textarea></label>
+          <label>What's going on?<textarea name="today" rows="4" maxlength="3000" required placeholder="e.g. every Friday we copy orders from email into a spreadsheet by hand."></textarea></label>
           <div class="crow">
             <label>Name<input name="name" autocomplete="name" maxlength="100" required /></label>
             <label>Email<input name="email" type="email" autocomplete="email" maxlength="200" required /></label>
           </div>
-          <div class="crow">
-            <label><span>Organization <span class="opt">optional</span></span><input name="company" autocomplete="organization" maxlength="120" /></label>
-            <label><span>Timing <span class="opt">optional</span></span><select name="timing">
-              <option value="">No particular timing</option>
-              <option>In the next few weeks</option>
-              <option>Soon, it's getting in the way</option>
-              <option>There's a deadline (say when above)</option>
-            </select></label>
-          </div>
+          <label><span>Organization <span class="opt">optional</span></span><input name="company" autocomplete="organization" maxlength="120" /></label>
           <!-- Hidden from people and screen readers; a bot that fills every field fills this one -->
           <div class="hp" aria-hidden="true"><label>Leave this empty<input name="website" tabindex="-1" autocomplete="off" /></label></div>
-          <p class="cnote">Leave out passwords, health details, and payment information. Your message goes to my inbox and nowhere else.</p>
+          <p class="cnote">Leave out passwords, health details, and payment information. Your message goes to my inbox and nowhere else. <span class="truth">Remember, all I'm offering is the truth. Nothing more.</span></p>
           <div class="cactions"><button class="btn btn-primary" type="submit">send message</button><p class="cstatus" id="cstatus" role="status"></p></div>
         </form>
         <div class="cdone" id="cdone" hidden tabindex="-1">
           <p><strong>Sent.</strong> I'll reply to <span id="cdoneTo"></span>.</p>
           <button class="btn btn-ghost" type="button" id="cagain">write another</button>
         </div>
-        <!-- Engagement fit: where, when, what size, and the first call, in one glance. The questions above skip these -->
-        <dl class="fit">
-          <div><dt>where</dt><dd>Remote from anywhere, or on site within about 30 miles</dd></div>
-          <div><dt>when</dt><dd>Weekends 8am to 8pm and weekday evenings, Eastern time</dd></div>
-          <div><dt>size</dt><dd>Jobs of a week or two up to projects of four to six weeks, with at most two clients at a time</dd></div>
-          <div><dt>first call</dt><dd>Free and 15 minutes: the main problem and your options</dd></div>
-        </dl>
-      </div>
+      </details>
     </section>
   </main>
 
@@ -383,7 +371,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.45.1</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.46.0</a>
       </span>
     </div>
   </footer>

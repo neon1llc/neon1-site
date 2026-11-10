@@ -1,16 +1,15 @@
-// src/app/public/js/contact.js - The contact form: pick a topic, start from a common situation if one
-// fits, and send. Messages go to 1NEON's contact route, which mails neon1's inbox and no one else.
-// Nothing is stored in the browser or put in the URL. Without this script the form stays hidden and
-// the email and phone links beside it do the job. A send waits at most WAIT ms; past that the outcome
-// is unknown, so the draft stays and the visitor is told to check before sending again (no auto-retry).
+// src/app/public/js/contact.js - The contact form, folded under "send me your use case": pick any of the
+// four services (or none), add your own words in "something else", say what's going on, and send.
+// Messages go to 1NEON's contact route, which mails neon1's inbox and no one else. Nothing is stored in
+// the browser or put in the URL. Without this script the fold stays hidden and the email and phone links
+// above it do the job. A send waits at most WAIT ms; past that the outcome is unknown, so the draft stays
+// and the visitor is told to check before sending again (no auto-retry).
 
+const fold = document.getElementById("cfold");
 const form = document.getElementById("cform");
-if (form) {
+if (fold && form) {
   const status = document.getElementById("cstatus");
-  const starts = document.getElementById("cstarts");
-  const list = starts.querySelector(".cstart-list");
   const done = document.getElementById("cdone");
-  const today = form.elements.today;
   const submit = form.querySelector('[type="submit"]');
 
   // How long a send may stay pending before the page stops waiting. The server may still have accepted it,
@@ -19,59 +18,30 @@ if (form) {
   const UNSURE = "I couldn't confirm your message was sent. It may still have arrived, so before sending it again, please email hello@neon1.tech.";
   let pending = false;
 
-  // Common situations for each topic, each with the case study closest to it
-  const STARTS = {
-    business: [
-      ["We type the same orders, forms, or invoices into more than one place.", "dermatology", "Intake, out of the shared inbox"],
-      ["Our email, spreadsheets, and booking or accounting tools don't talk to each other.", "dermatology", "Intake, out of the shared inbox"],
-    ],
-    cloud: [
-      ["People can't find answers in our own documents.", "accounting", "Answers in seconds, with sources"],
-      ["Our servers, deploys, or backups worry us.", "migration", "Two offices off local servers"],
-    ],
-    spaces: [
-      ["The Wi-Fi drops, or some rooms barely get it.", "home", "From cameras to Grandma's email"],
-      ["Cameras, smart devices, or new gear need setting up properly.", "home", "From cameras to Grandma's email"],
-    ],
-    security: [
-      ["Our people need to spot phishing, fraud, and scams.", "security", "Security for non-security people"],
-      ["A customer or audit is asking about our security (SOC 2).", "security", "Security for non-security people"],
-    ],
-    other: [],
-  };
+  // Opening the fold puts the cursor in the first field it asks for
+  fold.addEventListener("toggle", () => { if (fold.open && !form.hidden) form.elements.today.focus({ preventScroll: true }); });
 
-  // A tapped situation goes into "What happens today?", after anything already written
-  function showStarts(topic) {
-    list.replaceChildren(...(STARTS[topic] ?? []).map(([text, id, title]) => {
-      const row = document.createElement("div");
-      row.className = "cstart";
-      const b = document.createElement("button");
-      b.type = "button";
-      b.textContent = text;
-      b.addEventListener("click", () => {
-        const now = today.value.trim();
-        if (!now.includes(text)) today.value = now ? `${now}\n${text} ` : `${text} `;
-        today.focus();
-        today.setSelectionRange(today.value.length, today.value.length);
-      });
-      const a = document.createElement("a");
-      a.href = `#case-${id}`;
-      a.textContent = `A similar project: ${title}`;
-      row.append(b, a);
-      return row;
-    }));
-    starts.hidden = !list.children.length;
-  }
-  form.addEventListener("change", (e) => { if (e.target.name === "topic") showStarts(e.target.value); });
-
-  // Plain checks before sending; the first field that needs attention gets focus
+  // Plain checks before sending; the first field that needs attention gets focus. What it's about is optional
   function problems() {
     const f = form.elements, out = [];
-    if (!form.querySelector('[name="topic"]:checked')) out.push(["topic", "Pick what it's about."]);
-    if (!f.today.value.trim()) out.push(["today", "Say what happens today."]);
+    if (!f.today.value.trim()) out.push(["today", "Say what's going on."]);
     if (!f.name.value.trim()) out.push(["name", "Add your name."]);
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.value.trim())) out.push(["email", "Add an email address I can reply to."]);
     return out;
+  }
+
+  // The message as the API takes it: every checked topic, plus the visitor's own words
+  function message() {
+    const f = form.elements;
+    return {
+      topics: [...form.querySelectorAll('[name="topics"]:checked')].map((c) => c.value),
+      other: f.other.value.trim(),
+      today: f.today.value,
+      name: f.name.value,
+      email: f.email.value,
+      company: f.company.value,
+      website: f.website.value,
+    };
   }
 
   form.addEventListener("submit", async (e) => {
@@ -87,7 +57,7 @@ if (form) {
     }
     // One send at a time: the button is disabled and a second submit (Enter in a field) is ignored
     if (pending) return;
-    const data = Object.fromEntries(new FormData(form));
+    const data = message();
     pending = true;
     submit.disabled = true;
     status.textContent = "Sending…";
@@ -107,7 +77,6 @@ if (form) {
       }
       document.getElementById("cdoneTo").textContent = data.email;
       form.reset();
-      showStarts("");
       status.textContent = "";
       form.hidden = true;
       done.hidden = false;
@@ -126,8 +95,8 @@ if (form) {
   document.getElementById("cagain").addEventListener("click", () => {
     done.hidden = true;
     form.hidden = false;
-    form.querySelector('[name="topic"]').focus();
+    form.elements.today.focus();
   });
 
-  form.hidden = false;
+  fold.hidden = false;
 }

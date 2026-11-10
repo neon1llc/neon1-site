@@ -89,8 +89,10 @@ const sceneFrames = (page) => page.evaluate(() => [...window.__frames.values()].
 // Synthetic text only; the API is answered by the test, so nothing leaves the loopback origin
 const MARK = "SYNTHETIC-CONTACT-7f3a";
 const fillForm = async (page, email = "dana@example.com") => {
+  if (!(await page.locator("#cfold").evaluate((d) => d.open))) await page.locator("#cfold > summary").click();
   await page.locator('label.pick:has(input[value="business"])').click();
-  await page.locator(".cstart button").first().click();
+  await page.locator('label.pick:has(input[value="security"])').click();
+  await page.locator("[name=other]").fill("Printer setup");
   await page.locator("[name=today]").type(MARK);
   await page.locator("[name=name]").fill("Dana Kim");
   await page.locator("[name=email]").fill(email);
@@ -99,22 +101,25 @@ const fillForm = async (page, email = "dana@example.com") => {
 check("browser", "contact: without script, the form stays hidden and the email link remains", async () => {
   const { page, context } = await open({ javaScriptEnabled: false });
   try {
-    expect(await page.locator("#cform").evaluate((f) => f.hidden), "the form shows without its script");
+    expect(!(await page.locator("#cform").isVisible()), "the form shows without its script");
     expect(await page.locator('#contact a[href="mailto:hello@neon1.tech"]').count(), "the email link is missing");
   } finally { await context.close(); }
 });
 
-check("browser", "contact: a starter fills the message, and a send posts JSON with the header", async () => {
+check("browser", "contact: the fold opens with its arrow turned down, and a send posts every pick and the visitor's words", async () => {
   const { page, context, errors } = await open();
   try {
     let sent = null;
     await page.route("**/1NEON/api/contact", async (r) => { sent = { body: r.request().postDataJSON(), header: r.request().headers()["x-1neon"] }; await r.fulfill({ status: 200, contentType: "application/json", body: '{"ok":true}' }); });
     await page.locator("#contact").scrollIntoViewIfNeeded();
+    expect(!(await page.locator("#cform").isVisible()), "the form shows before the fold is opened");
     await fillForm(page);
-    expect((await page.locator("[name=today]").inputValue()).startsWith("We type the same orders"), "the starter did not fill the message");
+    const turned = await page.locator("#cfold .arr").evaluate((a) => getComputedStyle(a).transform);
+    expect(turned !== "none", "the arrow did not turn when the fold opened", turned);
     await page.locator('#cform [type="submit"]').click();
     await page.waitForSelector("#cdone:not([hidden])");
-    expect(sent && sent.header === "1" && sent.body.topic === "business" && sent.body.today.includes(MARK) && !sent.body.website, "unexpected request", sent);
+    const b = sent && sent.body;
+    expect(sent && sent.header === "1" && b.topics.join() === "business,security" && b.other === "Printer setup" && b.today.includes(MARK) && !b.website, "unexpected request", sent);
     expect((await page.locator("#cdoneTo").textContent()) === "dana@example.com", "the confirmation names the wrong address");
     expect(!page.url().includes(MARK), "the message reached the URL");
     const stored = await page.evaluate(() => JSON.stringify({ ...localStorage }) + JSON.stringify({ ...sessionStorage }));
@@ -129,9 +134,10 @@ check("browser", "contact: missing fields are named and nothing is sent; a refus
     let calls = 0;
     await page.route("**/1NEON/api/contact", (r) => { calls++; return r.fulfill({ status: 429, contentType: "application/json", body: '{"error":"too_many","message":"That\'s a lot of messages in an hour."}' }); });
     await page.locator("#contact").scrollIntoViewIfNeeded();
+    await page.locator("#cfold > summary").click();
     await page.locator('#cform [type="submit"]').click();
     expect(calls === 0, "an incomplete form was sent");
-    expect(/Pick what it's about/.test(await page.locator("#cstatus").textContent()), "the problems were not named");
+    expect(/Say what's going on/.test(await page.locator("#cstatus").textContent()), "the problems were not named");
     await fillForm(page);
     await page.locator('#cform [type="submit"]').click();
     await page.waitForFunction(() => /hello@neon1.tech/.test(document.getElementById("cstatus").textContent));
@@ -166,24 +172,17 @@ check("browser", "contact: a send that never answers stops waiting, keeps the dr
   } finally { await context.close(); }
 });
 
-// ---- CP-10: the first screen says what, for whom, and how to start, and the views still snap ----
-for (const [label, viewport] of [["phone", { width: 390, height: 844 }], ["wide", { width: 1280, height: 800 }]]) {
-  check("browser", `home: the offer and its start link fit the first screen, and the start link settles on contact (motion, ${label})`, async () => {
-    const { page, context, errors } = await open({ viewport, reducedMotion: "no-preference" });
-    try {
-      await page.waitForLoadState("load");
-      const first = await page.evaluate(() => {
-        const inView = (el) => { const r = el && el.getBoundingClientRect(); return !!r && r.width > 0 && r.top >= 0 && r.bottom <= innerHeight; };
-        return { offer: inView(document.querySelector(".hero .offer")), start: inView(document.querySelector(".hero .start a")),
-          href: document.querySelector(".hero .start a")?.getAttribute("href"), wide: document.documentElement.scrollWidth <= innerWidth };
-      });
-      expect(first.offer && first.start && first.href === "#contact" && first.wide, "the offer or its start link is off the first screen", first);
-      await page.locator(".hero .start a").click();
-      await page.waitForFunction(() => Math.abs(document.getElementById("contact").getBoundingClientRect().top - 64) < 3, null, { timeout: 5000 });
-      expect(!errors.length, "page errors", errors);
-    } finally { await context.close(); }
-  });
-}
+// ---- The first screen is the wordmark and tagline; the bar's contact link settles on contact, and the views still snap ----
+check("browser", "home: the first screen has no offer block, and the bar's contact link settles on contact (motion, wide)", async () => {
+  const { page, context, errors } = await open({ reducedMotion: "no-preference" });
+  try {
+    await page.waitForLoadState("load");
+    expect(!(await page.locator(".hero .offer, .hero .start").count()), "the offer block is back on the first screen");
+    await page.locator('.links a[data-view="contact"]').click();
+    await page.waitForFunction(() => Math.abs(document.getElementById("contact").getBoundingClientRect().top - 64) < 3, null, { timeout: 5000 });
+    expect(!errors.length, "page errors", errors);
+  } finally { await context.close(); }
+});
 
 check("browser", "home: one wheel gesture from the first screen settles on services (motion, wide)", async () => {
   const { page, context } = await open({ reducedMotion: "no-preference" });
@@ -300,7 +299,8 @@ check("browser", "case: closing settles after repeated input, cancelled animatio
 
 
 // ---- SITE-09: case links land on their exact card ----
-// The contact form's "a similar project" links point at single cards; each must land on its card
+// A link to a single card, from anywhere on the page, must land on that card. The test puts the links in
+// the contact view, the farthest view from the cards
 
 // Resolves once the card is in view vertically, inside the row sideways, focused, and named in the URL
 const landed = (page, id) => page.waitForFunction((id) => {
@@ -310,21 +310,26 @@ const landed = (page, id) => page.waitForFunction((id) => {
     document.activeElement === card.querySelector("[data-case]") && location.hash === "#case-" + id && card.classList.contains("is-target");
 }, id, { timeout: 5000 }).then(() => true, () => false);
 
-// Each topic and the card its first starter's link names
-const STARTS = [["business", "dermatology"], ["cloud", "accounting"], ["spaces", "home"], ["security", "security"]];
+// The cards a link is tried on, and a link to one placed in the contact view
+const CARDS = ["dermatology", "accounting", "home", "security"];
+const caseLink = (page, id) => page.evaluate((id) => {
+  const a = Object.assign(document.createElement("a"), { href: "#case-" + id, textContent: "case " + id, className: "test-case-link" });
+  // In the middle of the view, clear of the fixed bar, so clicking it needs no scroll
+  document.querySelector("#contact .fit div:last-child dd").append(" ", a);
+}, id);
 for (const [label, options] of [
   ["reduced motion, wide", { reducedMotion: "reduce" }],
   ["motion, phone", { reducedMotion: "no-preference", viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }],
 ]) {
-  check("browser", `case links: each starter's similar project lands on its card (${label})`, async () => {
+  check("browser", `case links: a link from the contact view lands on its card (${label})`, async () => {
     const { page, context, errors } = await open(options);
     try {
-      for (const [topic, id] of STARTS) {
+      for (const id of CARDS) {
         await page.goto(origin + "/#contact", { waitUntil: "domcontentloaded" });
         await page.waitForTimeout(400);
-        await page.locator(`label.pick:has(input[value="${topic}"])`).click();
-        await page.locator(`.cstart a[href="#case-${id}"]`).first().click();
-        expect(await landed(page, id), `${topic} did not land on case-${id}`, await page.evaluate(() => [location.hash, document.activeElement.outerHTML.slice(0, 80)]));
+        await caseLink(page, id);
+        await page.locator(`a.test-case-link[href="#case-${id}"]`).click();
+        expect(await landed(page, id), `the link did not land on case-${id}`, await page.evaluate(() => [location.hash, document.activeElement.outerHTML.slice(0, 80)]));
       }
       expect(!errors.length, "page errors", errors);
     } finally { await context.close(); }
@@ -338,8 +343,12 @@ for (const motion of ["reduce", "no-preference"]) {
       expect(await landed(page, "home"), "opening /#case-home did not land on the card");
       await page.goto(origin + "/#contact", { waitUntil: "domcontentloaded" });
       await page.waitForTimeout(400);
-      await page.locator('label.pick:has(input[value="cloud"])').click();
-      const link = page.locator('.cstart a[href="#case-migration"]');
+      // The visitor goes to contact from the bar, so the page rests at the top of that view
+      await page.locator('.links a[data-view="contact"]').click();
+      // At rest means the same place twice, a moment apart, near the top of the screen
+      await page.waitForFunction(() => new Promise((ok) => { const a = document.getElementById("contact").getBoundingClientRect().top; setTimeout(() => { const b = document.getElementById("contact").getBoundingClientRect().top; ok(a === b && b >= -2 && b <= 160); }, 250); }), null, { timeout: 5000, polling: 300 });
+      await caseLink(page, "migration");
+      const link = page.locator('a.test-case-link[href="#case-migration"]');
       const at = await link.evaluate((a) => a.getBoundingClientRect().top + scrollY);
       await link.click();
       expect(await landed(page, "migration"), "the link did not land on case-migration");
