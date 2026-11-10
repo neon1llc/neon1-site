@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.43.2
+
+### Changed
+- The top bar is back to its earlier layout: the section links, knowledge, book a call, and 1NEON on wide screens, and the full-screen menu below 1040 pixels. The menu now also lists book a call.
+
 ## v0.43.1
 
 ### Fixed
