@@ -1,7 +1,8 @@
 // src/app/public/js/contact.js - The contact form: pick a topic, start from a common situation if one
 // fits, and send. Messages go to 1NEON's contact route, which mails neon1's inbox and no one else.
 // Nothing is stored in the browser or put in the URL. Without this script the form stays hidden and
-// the email and phone links beside it do the job.
+// the email and phone links beside it do the job. A send waits at most WAIT ms; past that the outcome
+// is unknown, so the draft stays and the visitor is told to check before sending again (no auto-retry).
 
 const form = document.getElementById("cform");
 if (form) {
@@ -11,6 +12,12 @@ if (form) {
   const done = document.getElementById("cdone");
   const today = form.elements.today;
   const submit = form.querySelector('[type="submit"]');
+
+  // How long a send may stay pending before the page stops waiting. The server may still have accepted it,
+  // so this is an uncertain outcome, not a failure: nothing is resent automatically
+  const WAIT = 15000;
+  const UNSURE = "I couldn't confirm your message was sent. It may still have arrived, so before sending it again, please email hello@neon1.tech.";
+  let pending = false;
 
   // Common situations for each topic, each with the case study closest to it
   const STARTS = {
@@ -78,15 +85,21 @@ if (form) {
       form.querySelector(`[name="${bad[0][0]}"]`).focus();
       return;
     }
+    // One send at a time: the button is disabled and a second submit (Enter in a field) is ignored
+    if (pending) return;
     const data = Object.fromEntries(new FormData(form));
+    pending = true;
     submit.disabled = true;
     status.textContent = "Sending…";
     status.className = "cstatus";
+    const stop = new AbortController();
+    const timer = setTimeout(() => stop.abort(), WAIT);
     try {
       const r = await fetch("/1NEON/api/contact", {
         method: "POST",
         headers: { "content-type": "application/json", "x-1neon": "1" },
         body: JSON.stringify(data),
+        signal: stop.signal,
       });
       if (!r.ok) {
         const j = await r.json().catch(() => ({}));
@@ -100,9 +113,12 @@ if (form) {
       done.hidden = false;
       done.focus();
     } catch (err) {
-      status.textContent = `${err.message || "That didn't send."} You can also email hello@neon1.tech.`;
+      // The typed draft is never cleared on a failure or a timeout, so nothing has to be written twice
+      status.textContent = stop.signal.aborted ? UNSURE : `${err.message || "That didn't send."} You can also email hello@neon1.tech.`;
       status.className = "cstatus err";
     } finally {
+      clearTimeout(timer);
+      pending = false;
       submit.disabled = false;
     }
   });
