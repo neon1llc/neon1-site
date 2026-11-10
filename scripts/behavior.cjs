@@ -195,6 +195,25 @@ check("browser", "home: one wheel gesture from the first screen settles on servi
   } finally { await context.close(); }
 });
 
+// ---- CP-16: every tool states whether it can be used now and ends on a next step that works; a tool in
+// development offers no link that would suggest it can be opened, only a way to ask ----
+check("browser", "tools: each has a state and a working next step, and tools in development link only to contact", async () => {
+  const { page, context } = await open();
+  try {
+    const tools = await page.$$eval("#work .tool", (rows) => rows.map((r) => ({
+      name: r.querySelector("h3")?.textContent.trim(), state: r.querySelector(".state")?.textContent.trim() || "",
+      links: [...r.querySelectorAll("a")].map((a) => a.getAttribute("href")),
+      next: [...r.querySelectorAll(".next a")].map((a) => a.getAttribute("href")),
+      targets: [...r.querySelectorAll('a[href^="#"]')].every((a) => !!document.getElementById(a.getAttribute("href").slice(1))),
+    })));
+    expect(tools.length >= 3, "the tools are missing", tools);
+    for (const t of tools) {
+      expect(/available now|in development/.test(t.state) && t.next.length === 1 && t.targets, "a tool lacks a state or a working next step", t);
+      if (/in development/.test(t.state)) expect(t.links.every((h) => h === "#contact"), "a tool in development links somewhere other than contact", t);
+    }
+  } finally { await context.close(); }
+});
+
 // ---- SITE-05: a case study owns the screen while open ----
 // Where focus is, whether it sits inside the panel, and whether the page behind is inert
 const caseState = (page) => page.evaluate(() => {

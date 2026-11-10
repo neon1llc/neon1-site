@@ -364,3 +364,12 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 
 /* The link from the process steps to the sample tour */
 .tour-link { margin: 22px 0 0; color: var(--muted); }
+
+/* ---- Tools I'm building: state, who it helps, an example, limits, and the next step for each ---- */
+.tools .row { align-items: start; }
+.tool-body p { margin: 0 0 8px; color: var(--muted); font-size: 15px; line-height: 1.5; max-width: 640px; }
+.tool-body p:last-child { margin: 0; }
+.tool-body .k { margin-right: 8px; font: 500 12px var(--mono); color: var(--glow); }
+.tool-body .next { color: var(--ink); }
+/* Phones: name, then state, then the details, each on its own line */
+@media (max-width: 700px) { .tools .row { grid-template-columns: 1fr; gap: 4px; } .tool-body { grid-column: 1 / -1; margin-top: 8px; } }

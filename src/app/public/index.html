@@ -242,21 +242,39 @@
 
     <section id="work" class="view" aria-labelledby="work-h">
       <h2 id="work-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>tools I'm building</h2>
-      <div class="rows">
-        <a class="row reveal-on" href="https://github.com/neon1llc/aws-clip" target="_blank" rel="noopener">
-          <h3>AWS CLIP <span class="go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></span></h3>
-          <p class="state">public · pre-release</p>
-          <p><b>AWS CLI Plus.</b> A wrapper around the AWS CLI that checks which account you're in, explains what a command will do before it runs, and hides secrets in its output.</p>
-        </a>
-        <div class="row reveal-on">
-          <h3>DeployOps <span class="lock" tabindex="0" role="img" aria-label="currently private"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span></h3>
-          <p class="state dim">private · pre-release</p>
-          <p><b>Deploy pipelines for any cloud.</b> Pipelines for infrastructure and applications on AWS, Azure, Google Cloud, or several at once. It sets up CI/CD for one repo or many, works with the IaC you already use, and adds checks, approvals, rollback, monitoring, and alerts where your team will see them.</p>
+      <!-- Each tool says whether it can be used now, who it helps, one example, its limits, and the honest next step.
+           Nothing here links to a product that isn't available. Claims follow each tool's current README or plan -->
+      <p class="lead intro reveal-on">One can be tried now; two are still in development. Status as of November 2026.</p>
+      <div class="rows tools">
+        <div class="row tool reveal-on">
+          <h3>AWS CLIP</h3>
+          <p class="state">available now · public pre-release</p>
+          <div class="tool-body">
+            <p><b>Account guards and approval checks around the AWS CLI.</b> For people who work across several AWS accounts from a terminal.</p>
+            <p><span class="k">example</span> Bind a production profile to its account, and a command that resolves to a different account stops before it runs. Changes still ask for approval.</p>
+            <p><span class="k">limits</span> Built from source with Go. Account checks always run in its workflows, but on single commands only when a profile or account guard is set. Its previews leave out argument values, and AWS's own output is shown unchanged, so it can contain sensitive data.</p>
+            <p class="next"><a class="ext" href="https://github.com/neon1llc/aws-clip" target="_blank" rel="noopener">Read the README on GitHub</a></p>
+          </div>
         </div>
-        <div class="row reveal-on">
+        <div class="row tool reveal-on">
+          <h3>DeployOps <span class="lock" tabindex="0" role="img" aria-label="currently private"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span></h3>
+          <p class="state dim">in development · private</p>
+          <div class="tool-body">
+            <p><b>Deploy pipelines for one cloud or several.</b> For teams shipping infrastructure and applications on AWS, Azure, or Google Cloud.</p>
+            <p><span class="k">example</span> The plan is to add checks, approvals, rollback, and alerts to the pipeline of a repo that already uses Terraform.</p>
+            <p><span class="k">limits</span> Not available to use or try yet, and what it covers may change before it is.</p>
+            <p class="next">Pipeline work today is part of my cloud engineering. <a class="ext" href="#contact">Ask about your deploys</a></p>
+          </div>
+        </div>
+        <div class="row tool reveal-on">
           <h3>Ready, Secure, Go <span class="lock" tabindex="0" role="img" aria-label="currently private"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span></h3>
-          <p class="state dim">private · pre-release</p>
-          <p><b>Security steps for each kind of space.</b> Plain-language guidance for a phone, a home network, a classroom, a small office, or a company heading into SOC 2: five things worth doing first, then what's next.</p>
+          <p class="state dim">in development · private</p>
+          <div class="tool-body">
+            <p><b>Security steps for each kind of space.</b> For households, classrooms, small offices, and companies heading into SOC 2.</p>
+            <p><span class="k">example</span> For a home network, the five things worth doing first, then what comes next.</p>
+            <p><span class="k">limits</span> Not published yet. Until it is, the same guidance comes through my security sessions.</p>
+            <p class="next"><a class="ext" href="#contact">Ask about a session</a></p>
+          </div>
         </div>
       </div>
     </section>
