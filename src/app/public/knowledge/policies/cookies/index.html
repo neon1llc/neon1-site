@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.44.0" />
+  <meta name="version" content="0.45.0" />
   <title>Cookie and browser storage notice · neon1 knowledge center</title>
   <meta name="description" content="The only cookies and browser storage neon1.tech and 1NEON use, and why." />
   <meta name="theme-color" content="#F2F4F2" />
@@ -16,7 +16,9 @@
   <meta property="og:url" content="https://neon1.tech/knowledge/policies/cookies/" />
   <meta property="og:image" content="https://neon1.tech/media/og-card-1.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22 fill=%22none%22 stroke=%22%2300B84F%22 stroke-width=%225%22 stroke-linecap=%22round%22><path d=%22M6 6a24 24 0 0 1 24 24v30M6 18a12 12 0 0 1 12 12v30M34 6a24 24 0 0 1 24 24v30M34 18a12 12 0 0 1 12 12v30%22/></svg>" />
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="stylesheet" href="/shared/neon1.css" />
   <link rel="stylesheet" href="/css/frame.css" />
   <link rel="stylesheet" href="/css/knowledge.css" />
@@ -81,9 +83,9 @@
         <p class="kc-summary">The only cookies and browser storage neon1.tech and 1NEON use, and why.</p>
         <dl class="kc-facts">
           <div><dt>Type</dt><dd>Policy</dd></div>
-          <div><dt>Edition</dt><dd>1.0</dd></div>
+          <div><dt>Edition</dt><dd>1.1</dd></div>
           <div><dt>First written</dt><dd>November 6, 2026</dd></div>
-          <div><dt>Updated</dt><dd>November 7, 2026</dd></div>
+          <div><dt>Updated</dt><dd>November 10, 2026</dd></div>
         </dl>
         <div class="kc-actions">
           <a class="btn btn-primary" href="/knowledge/policies/cookies/neon1-cookies.pdf" download><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Download PDF</a>
@@ -91,7 +93,7 @@
       </header>
 
       <div class="kc-text">
-<p><em>Last updated November 7, 2026.</em></p>
+<p><em>Last updated November 10, 2026.</em> This update lists every key the portal and its demos save in your browser, including a few that were missing before. Nothing new is stored.</p>
 <p>Neither neon1.tech nor the 1NEON portal uses analytics, advertising, or tracking of any kind.</p>
 <h2 id="neon1-tech">neon1.tech</h2>
 <p>The website sets no cookies. Your browser saves two small things, on your device only:</p>
@@ -101,7 +103,10 @@
 <table><thead><tr><th>Cookie</th><th>What it's for</th><th>How long it lasts</th></tr></thead><tbody><tr><td><code>__Secure-1neon_at</code></td><td>Keeps you signed in (access token)</td><td>15 minutes</td></tr><tr><td><code>__Secure-1neon_rt</code></td><td>Renews your sign-in without asking again</td><td>Up to 30 days, or until you sign out. Without "remember me", until you close the browser</td></tr><tr><td><code>__Secure-1neon_step</code></td><td>Holds a sign-in in progress between steps</td><td>5 minutes</td></tr><tr><td><code>__Secure-1neon_rm</code></td><td>Remembers your "remember me" choice during sign-in</td><td>5 minutes</td></tr><tr><td><code>__Secure-1neon_flow</code></td><td>Protects sign-in with Google</td><td>10 minutes</td></tr><tr><td>Sign-in service cookies on auth.neon1.tech</td><td>Protect the sign-in step (Amazon Cognito)</td><td>Your sign-in session</td></tr></tbody></table>
 <p>These cookies are strictly necessary, can only be read by the portal's own server, are never used for advertising or analytics, and are never shared. Because of that, the portal doesn't show a cookie consent banner. If you block them, you won't be able to sign in.</p>
 <p>The portal also saves, on your device only:</p>
-<table><thead><tr><th>Saved item</th><th>What it's for</th><th>How long it lasts</th></tr></thead><tbody><tr><td><code>1neon.last</code> (local storage)</td><td>Whether you were last signed in, so a reload starts on the right background</td><td>Until you clear it</td></tr><tr><td><code>1neon.signin</code> (session storage)</td><td>Your email and the sign-in step in progress, so a reload mid sign-in returns to the code step. The code itself is never saved</td><td>5 minutes, or until the tab closes</td></tr><tr><td><code>neon1.rain</code> (local storage)</td><td>The same rain settings as the website, on the sign-in screen</td><td>Until you clear it</td></tr></tbody></table>
+<table><thead><tr><th>Saved item</th><th>What it's for</th><th>How long it lasts</th></tr></thead><tbody><tr><td><code>1neon.last</code> (local storage)</td><td>Whether you were last signed in, so a reload starts on the right background</td><td>Until you clear it</td></tr><tr><td><code>1neon.lastOrg</code> (local storage)</td><td>The organization you last had open, so pages outside one, such as your profile, keep its menu</td><td>Until you clear it</td></tr><tr><td><code>1neon.projects.view</code> (local storage)</td><td>Whether you last looked at projects as a list or a timeline</td><td>Until you clear it</td></tr><tr><td><code>1neon.signin</code> (session storage)</td><td>Your email and the sign-in step in progress, so a reload mid sign-in returns to the code step. The code itself is never saved</td><td>5 minutes, or until the tab closes</td></tr><tr><td><code>1neon.tour-offered</code> (session storage)</td><td>That the welcome tour was already offered, so it isn't offered again in this tab</td><td>Until the tab closes</td></tr><tr><td><code>neon1.rain</code> (local storage)</td><td>The same rain settings as the website, on the sign-in screen</td><td>Until you clear it</td></tr></tbody></table>
+<p>The public demo (neon1.tech/1NEON/demo) and the guided playback (neon1.tech/1NEON/live) run entirely in your browser and send nothing to me. They keep different things:</p>
+<table><thead><tr><th>Saved item</th><th>What it's for</th><th>How long it lasts</th></tr></thead><tbody><tr><td><code>1neon-demo</code> (IndexedDB)</td><td>The demo's sample data and any files you add to it, so the demo survives a reload. If your browser blocks this storage, the demo still works but starts fresh each time</td><td>Until you reset the demo or clear site data</td></tr><tr><td><code>1neon.devUser</code> (local storage)</td><td>Which sample person you chose to be in the demo</td><td>Until you clear it</td></tr><tr><td><code>1neon.liveUser</code> (local storage)</td><td>Which sample person the guided playback is showing</td><td>Cleared each time the playback loads</td></tr><tr><td><code>1neon.live</code> (session storage)</td><td>Which section of the guided playback was on screen, so a reload resumes there</td><td>Until the tab closes</td></tr><tr><td><code>1neon.liveSpeed</code> (local storage)</td><td>The playback speed you picked</td><td>Until you clear it</td></tr></tbody></table>
+<p>The guided playback never saves its story: each load starts again from the same made-up project.</p>
 <p>Your other preferences, such as your theme, are saved with your account.</p>
 <p>If I ever add optional cookies or storage, such as analytics, I'll update this notice and ask for your consent first.</p>
       </div>
@@ -143,7 +148,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.44.0</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.45.0</a>
       </span>
     </div>
   </footer>

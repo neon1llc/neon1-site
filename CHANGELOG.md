@@ -2,6 +2,25 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.45.0
+
+### Added
+- The first screen says what I do and who it's for, with one button to talk through a project and a note that the first 15 minutes are free.
+- Knowledge Center search reads every document, not just card keywords. It understands common variants such as MFA, 2FA, and two-factor, or Wi-Fi and WiFi, shows a snippet, and links to the matching section. Nothing you type leaves your browser.
+- A "Start here" block above the library, with a few documents for each common reason to visit.
+- Square icons for browser tabs, bookmarks, and search results, and a square logo for search engines.
+
+### Changed
+- The sections are now called client work and tools I'm building. Each tool says whether it's available now or still in development, who it helps, its limits, and what to do next.
+- AWS CLIP is described by what it actually does: account guards and approval checks around the AWS CLI. Its previews leave out argument values, and AWS output is shown unchanged.
+- The privacy policy, terms, cookie notice, 1NEON help, password manager guide, and several standards are corrected, from neon1-corpus v0.23.0.
+- Templates and forms may now be filled in, adapted, and shared as completed copies.
+- Printed templates keep each label with its blank and keep the acceptance section together.
+- Links to other neon1.tech pages open in the same tab. Each knowledge page has one main heading.
+
+### Fixed
+- The contact form stops waiting after 15 seconds, keeps what you wrote, and tells you plainly if it couldn't confirm the send.
+
 ## v0.44.0
 
 ### Changed

@@ -4,19 +4,21 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.44.0" />
+  <meta name="version" content="0.45.0" />
   <title>AWS CLIP · neon1 knowledge center</title>
-  <meta name="description" content="AWS CLI Plus: a wrapper around the AWS CLI that checks your account, explains commands and hides secrets." />
+  <meta name="description" content="AWS CLI Plus: account guards and approval checks around the AWS CLI, for people who juggle several AWS profiles." />
   <meta name="theme-color" content="#F2F4F2" />
   <link rel="canonical" href="https://neon1.tech/knowledge/products/aws-clip/" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="neon1" />
   <meta property="og:title" content="AWS CLIP · neon1 knowledge center" />
-  <meta property="og:description" content="AWS CLI Plus: a wrapper around the AWS CLI that checks your account, explains commands and hides secrets." />
+  <meta property="og:description" content="AWS CLI Plus: account guards and approval checks around the AWS CLI, for people who juggle several AWS profiles." />
   <meta property="og:url" content="https://neon1.tech/knowledge/products/aws-clip/" />
   <meta property="og:image" content="https://neon1.tech/media/og-card-1.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22 fill=%22none%22 stroke=%22%2300B84F%22 stroke-width=%225%22 stroke-linecap=%22round%22><path d=%22M6 6a24 24 0 0 1 24 24v30M6 18a12 12 0 0 1 12 12v30M34 6a24 24 0 0 1 24 24v30M34 18a12 12 0 0 1 12 12v30%22/></svg>" />
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="stylesheet" href="/shared/neon1.css" />
   <link rel="stylesheet" href="/css/frame.css" />
   <link rel="stylesheet" href="/css/knowledge.css" />
@@ -78,12 +80,12 @@
       <header class="kc-doc-head">
         <nav class="kc-crumbs" aria-label="Breadcrumb"><a href="/knowledge/">Knowledge center</a><span aria-hidden="true">/</span><a href="/knowledge/#products">Products</a></nav>
         <h1>AWS CLIP</h1>
-        <p class="kc-summary">AWS CLI Plus: a wrapper around the AWS CLI that checks your account, explains commands and hides secrets.</p>
+        <p class="kc-summary">AWS CLI Plus: account guards and approval checks around the AWS CLI, for people who juggle several AWS profiles.</p>
         <dl class="kc-facts">
           <div><dt>Type</dt><dd>Page</dd></div>
-          <div><dt>Edition</dt><dd>1.0</dd></div>
+          <div><dt>Edition</dt><dd>1.1</dd></div>
           <div><dt>First written</dt><dd>September 13, 2026</dd></div>
-          <div><dt>Updated</dt><dd>November 9, 2026</dd></div>
+          <div><dt>Updated</dt><dd>November 10, 2026</dd></div>
         </dl>
         <div class="kc-actions">
           
@@ -92,8 +94,15 @@
 
       <div class="kc-text">
 <p><em>Public · pre-release</em></p>
-<p><strong>AWS CLI Plus.</strong> A wrapper around the AWS CLI that checks which account you're in, explains what a command will do before it runs, and hides secrets in its output.</p>
-<p>Code and docs: <a class="ext" href="https://github.com/neon1llc/aws-clip" target="_blank" rel="noopener">neon1llc/aws-clip</a>.</p>
+<p><strong>AWS CLI Plus.</strong> Account guards and approval checks around the AWS CLI. It doesn't replace the AWS CLI, which still handles sign-in, credentials, requests, and output.</p>
+<ul><li><strong>Available now:</strong> the code is public and runs from source. It's pre-release, so commands and settings may still change.</li><li><strong>Who it helps:</strong> people who work across several AWS profiles and want to see which account they're in, and confirm before anything risky runs.</li></ul>
+<h2 id="what-it-does">What it does</h2>
+<ul><li><strong>Shows where you are.</strong> It reports the profile, Region, and the account and role AWS says you're signed in as, and it never prints credential values.</li><li><strong>Asks before risky commands.</strong> Before a command runs, it shows the target profile and Region, the service and operation, and how its policy rules classify it. It doesn't explain every argument: its own previews and plans list option names and leave argument values out, because they can hold sensitive data. Anything that isn't a known read, or that returns credentials or secrets, needs your confirmation.</li><li><strong>Guards production accounts.</strong> A profile can be bound to the account it must resolve to. If it resolves to a different account, the command is refused, and a confirmation can't override that.</li></ul>
+<p>For example, <code>aws-clip --profile production exec -- ec2 terminate-instances ...</code> shows the target and <code>ec2:terminate-instances</code>, then waits for a yes. If the production profile is bound to an account and resolves to another one, it stops.</p>
+<h2 id="current-limits">Current limits</h2>
+<ul><li><strong>AWS output isn't filtered.</strong> What the AWS CLI prints, on screen or in logs, can contain sensitive service data. Protect it as you would plain AWS CLI output.</li><li><strong>Account checks depend on how it's used.</strong> Reviewed workflows always check your identity with AWS before the first step. A single command checks the account only when the profile is bound to an account, a policy lists allowed accounts, or you pass <code>--approve-account</code>. Otherwise it runs without that check.</li><li><strong>Classification goes by operation name</strong>, not by what an argument value would do. IAM, service control policies, and your own change process still decide what's allowed.</li></ul>
+<h2 id="next-step">Next step</h2>
+<p>Read the <a class="ext" href="https://github.com/neon1llc/aws-clip/blob/c90f092292cd2dd60be89ea906777c667666b4c5/README.md" target="_blank" rel="noopener">README</a> for install steps and the full list of safety limits, or browse the code at <a class="ext" href="https://github.com/neon1llc/aws-clip" target="_blank" rel="noopener">neon1llc/aws-clip</a>.</p>
       </div>
 
 
@@ -133,7 +142,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.44.0</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.45.0</a>
       </span>
     </div>
   </footer>

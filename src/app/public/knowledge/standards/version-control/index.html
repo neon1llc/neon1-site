@@ -4,19 +4,21 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.44.0" />
+  <meta name="version" content="0.45.0" />
   <title>Version control · neon1 knowledge center</title>
-  <meta name="description" content="How neon1 uses git: branch names, commit messages, merges, protected branches, and the history rules, before and after version 1.0.0." />
+  <meta name="description" content="How neon1 uses git: branch names, commit messages, merges, protected branches, and the history rules, and which safeguards production and client data require." />
   <meta name="theme-color" content="#F2F4F2" />
   <link rel="canonical" href="https://neon1.tech/knowledge/standards/version-control/" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="neon1" />
   <meta property="og:title" content="Version control · neon1 knowledge center" />
-  <meta property="og:description" content="How neon1 uses git: branch names, commit messages, merges, protected branches, and the history rules, before and after version 1.0.0." />
+  <meta property="og:description" content="How neon1 uses git: branch names, commit messages, merges, protected branches, and the history rules, and which safeguards production and client data require." />
   <meta property="og:url" content="https://neon1.tech/knowledge/standards/version-control/" />
   <meta property="og:image" content="https://neon1.tech/media/og-card-1.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22 fill=%22none%22 stroke=%22%2300B84F%22 stroke-width=%225%22 stroke-linecap=%22round%22><path d=%22M6 6a24 24 0 0 1 24 24v30M6 18a12 12 0 0 1 12 12v30M34 6a24 24 0 0 1 24 24v30M34 18a12 12 0 0 1 12 12v30%22/></svg>" />
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="stylesheet" href="/shared/neon1.css" />
   <link rel="stylesheet" href="/css/frame.css" />
   <link rel="stylesheet" href="/css/knowledge.css" />
@@ -78,12 +80,12 @@
       <header class="kc-doc-head">
         <nav class="kc-crumbs" aria-label="Breadcrumb"><a href="/knowledge/">Knowledge center</a><span aria-hidden="true">/</span><a href="/knowledge/#standards">How I work</a></nav>
         <h1>Version control</h1>
-        <p class="kc-summary">How neon1 uses git: branch names, commit messages, merges, protected branches, and the history rules, before and after version 1.0.0.</p>
+        <p class="kc-summary">How neon1 uses git: branch names, commit messages, merges, protected branches, and the history rules, and which safeguards production and client data require.</p>
         <dl class="kc-facts">
           <div><dt>Type</dt><dd>Standard</dd></div>
-          <div><dt>Edition</dt><dd>1.0</dd></div>
+          <div><dt>Edition</dt><dd>2.0</dd></div>
           <div><dt>First written</dt><dd>November 8, 2026</dd></div>
-          <div><dt>Updated</dt><dd>November 9, 2026</dd></div>
+          <div><dt>Updated</dt><dd>November 10, 2026</dd></div>
           <div><dt>For</dt><dd>Developers</dd></div>
         </dl>
         <div class="kc-actions">
@@ -92,7 +94,7 @@
       </header>
 
       <div class="kc-text">
-<p>Every neon1 project lives in git, on GitHub. These rules apply to all of them. A repository can add stricter rules in its own <code>VCS-ETIQUETTE.md</code>, but not looser ones. The rules get stricter at <code>v1.0.0</code>, when other people and systems start depending on the project.</p>
+<p>Every neon1 project lives in git, on GitHub. These rules apply to all of them. A repository can add stricter rules in its own <code>VCS-ETIQUETTE.md</code>, but not looser ones. The rules get stricter when a repository deploys to production or holds client data, whatever its version number says.</p>
 <h2 id="before-you-commit">Before you commit</h2>
 <ul><li>Check which branch you're on, what's staged, and whether anyone else's changes are in the working tree.</li><li>Keep unrelated changes out. One branch holds one change.</li><li>Run the project's checks and read the full diff before committing.</li></ul>
 <h2 id="branch-names">Branch names</h2>
@@ -112,14 +114,19 @@ Optional footers, such as BREAKING CHANGE: what breaks and how to move.</code></
 <h2 id="authorship">Authorship</h2>
 <p>Commits are made under the name and email of the person responsible for the change. Tools that help along the way, including AI review tools, aren't listed as authors or co-authors. The person committing has read and stands behind every line.</p>
 <h2 id="merging">Merging</h2>
-<ul><li>Merge a feature branch with <code>git merge --no-ff</code>, so the branch stays visible in history, then delete it.</li><li>Small pull requests may be squash-merged after <code>v1.0.0</code> when the individual commits don't matter.</li><li>Keep the main branch releasable. If the checks fail on main, fixing them comes before anything else.</li></ul>
+<ul><li>Merge a feature branch with <code>git merge --no-ff</code>, so the branch stays visible in history, then delete it.</li><li>Small pull requests may be squash-merged once the repository is protected (see below) when the individual commits don't matter.</li><li>Keep the main branch releasable. If the checks fail on main, fixing them comes before anything else.</li></ul>
 <h2 id="history">History</h2>
 <ul><li>Never rewrite history on the main branch, on a shared branch, or on anyone else's branch.</li><li>Rebasing your own unpushed work is fine.</li><li>Never force-push to main. A mistake on main is fixed by a new commit, such as a <code>git revert</code>.</li><li>A leaked secret is revoked and rotated first. Removing it, or correcting a wrong author, from history is a separate decision the repository's owner makes deliberately, with branch protection paused only for that change and restored right after.</li></ul>
-<h2 id="before-v1-0-0">Before v1.0.0</h2>
-<p>The project moves fast, and these are strong habits rather than hard gates:</p>
+<h2 id="before-anything-is-live">Before anything is live</h2>
+<p>A repository that deploys nothing to production and holds no client data moves fast, and these are strong habits rather than hard gates:</p>
 <ul><li>Named branches for anything bigger than a typo, merged with <code>--no-ff</code>.</li><li>Typos and broken links may go straight to main.</li><li>Pull requests are optional. Read your own diff before merging.</li></ul>
-<h2 id="from-v1-0-0-on">From v1.0.0 on</h2>
-<ul><li><strong>The main branch is protected.</strong> No direct pushes. Every change arrives through a pull request from a named branch.</li><li><strong>Required checks pass</strong> before merge.</li><li><strong>Review:</strong> every pull request needs an approving review from someone other than the author when a second person is available. Policies and agreements also need a reviewer who can check them against what's live.</li><li><strong>Signed commits and tags</strong> on main.</li><li><strong>Urgent fixes</strong>, such as a wrong policy or contact detail, go on a <code>fix/urgent-...</code> branch and can be merged with one review and released as a patch the same day.</li></ul>
+<h2 id="from-the-first-live-release-or-when-client-data-is-at-stake">From the first live release, or when client data is at stake</h2>
+<p>Production deployment and risk to clients or their data decide when the safeguards apply, not the version number. A <code>v0.x</code> repository that deploys a live site or holds client data follows these rules from its first live release:</p>
+<ul><li><strong>The main branch is protected</strong> against force pushes and deletion, with no one allowed to bypass that.</li><li><strong>Required checks pass</strong> before a change reaches main.</li><li><strong>Every change is reviewed</strong> as a full diff before it merges. When a second person is available, someone other than the author approves it. Policies and agreements also need a reviewer who can check them against what's live.</li><li><strong>Rollback is ready:</strong> the previous release can be put back, and how is written down before the release goes out.</li><li><strong>Signed commits and tags</strong> on main, from <code>v1.0.0</code> on.</li><li><strong>Urgent fixes</strong>, such as a wrong policy or contact detail, go on a <code>fix/urgent-...</code> branch and can be merged with one review and released as a patch the same day.</li></ul>
+<h3 id="how-this-works-today">How this works today</h3>
+<p>neon1 is one person, so the controls are honest about that. On the repositories that deploy to production (the website, the 1NEON portal, the chat, and the AWS infrastructure), main has two rulesets in force:</p>
+<ul><li><strong>No force push or deletion</strong>, with no bypass for anyone, including me.</li><li><strong>Required checks</strong> must pass before a change lands on main. As the sole maintainer and repository admin, I can bypass this ruleset, and GitHub prints a bypass warning whenever I push to main directly.</li></ul>
+<p>That bypass is the sole-maintainer exception. It's for when no second reviewer exists, not for skipping checks. I use it for small changes I've reviewed myself as a full diff, with the checks run locally first, and for an urgent fix when waiting would cause more harm. Each bypass shows in GitHub's warnings and in the history, and I look back at any bypassed change once it's live. When a second maintainer joins, review by someone other than the author becomes required.</p>
 <h2 id="tags">Tags</h2>
 <p>Every released version has an annotated tag on the commit it was built from, named exactly <code>vX.Y.Z</code>. Tags are never moved or deleted once pushed. See <a href="/knowledge/standards/versioning/">versioning and releases</a> for when to tag.</p>
 <h2 id="sources">Sources</h2>
@@ -171,7 +178,7 @@ Optional footers, such as BREAKING CHANGE: what breaks and how to move.</code></
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.44.0</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.45.0</a>
       </span>
     </div>
   </footer>
