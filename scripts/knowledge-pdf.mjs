@@ -14,7 +14,7 @@ import { join, dirname, resolve } from "node:path"
 import { createRequire } from "node:module"
 import { fileURLToPath, pathToFileURL } from "node:url"
 import { tmpdir } from "node:os"
-import { load, relink, esc, longDate, TYPE_LABELS, SITE } from "./knowledge-lib.mjs"
+import { load, relink, singleH1, esc, longDate, TYPE_LABELS, SITE } from "./knowledge-lib.mjs"
 
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..")
@@ -72,7 +72,7 @@ function pageHtml(d) {
   <h1>${esc(d.title)}</h1>
   <p class="summary">${esc(d.summary)}</p>
   ${glance(d)}
-  <main>${relink(d.html, d, corpus, { absolute: true })}</main>
+  <main>${relink(singleH1(d.html, d.title), d, corpus, { absolute: true })}</main>
   <p class="colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit.${note} The latest version is at <a href="${SITE}${d.url}">${esc(`neon1.tech${d.url}`)}</a>.</p>
 </body>
 </html>`

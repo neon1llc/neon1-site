@@ -75,3 +75,85 @@ export const TYPE_LABELS = {
   page: "Page", standard: "Standard", guide: "Guide", policy: "Policy", template: "Template", form: "Form",
   example: "Filled-out example", faq: "Questions", "case-study": "Case study", comparison: "Comparison", directive: "Directive",
 }
+
+
+// ---- Body repair, done once here so the page and the PDF agree ----
+
+const plain = (s) => String(s).replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&#x27;|&#39;/g, "'").replace(/&quot;/g, '"').replace(/\s+/g, " ").trim().toLowerCase()
+
+// The page's own heading is the generated title, so a body <h1> that repeats it is dropped (even when a callout comes
+// first), and any other body <h1> becomes an <h2>. The document then has exactly one H1.
+export function singleH1(html, title) {
+  const want = plain(title)
+  return html
+    .replace(/<h1\b[^>]*>([\s\S]*?)<\/h1>\s*/g, (whole, inner) => (plain(inner) === want ? "" : whole))
+    .replace(/<h1\b([^>]*)>([\s\S]*?)<\/h1>/g, "<h2$1>$2</h2>")
+}
+
+// Links to this site's own origin are internal: written as paths so they open in the same tab. Other http(s)
+// links are marked external and open in a new tab. mailto: and the like are left alone.
+const SAME_ORIGIN = /^https?:\/\/(?:www\.)?neon1\.tech(?=[/?#]|$)/i
+export function classifyLinks(html) {
+  return html.replace(/<a href="(https?:[^"]+)">/g, (whole, href) => {
+    if (SAME_ORIGIN.test(href)) return `<a href="${href.replace(SAME_ORIGIN, "") || "/"}">`
+    return `<a class="ext" href="${href}" target="_blank" rel="noopener">`
+  })
+}
+
+// A document's body as the web page shows it
+export function pageBody(doc, corpus) {
+  return classifyLinks(relink(singleH1(doc.html, doc.title), doc, corpus))
+}
+
+// Counts and the PDF claim, read from the documents so no sentence can say more than the manifest does
+export function catalogFacts(docs) {
+  const count = docs.length
+  const pdfs = docs.filter((d) => d.pdf).length
+  const pdfClaim = pdfs === 0 ? "" : `${pdfs} with a PDF to download`
+  return { count, pdfs, pdfClaim, summary: `${count} documents${pdfClaim ? `, ${pdfClaim}` : ""}` }
+}
+
+
+// ---- Search index ----
+
+// A section's HTML as plain text for searching and snippets
+export function htmlToText(html) {
+  return String(html)
+    .replace(/<\/(p|li|h[1-6]|tr|aside|div|blockquote)>/g, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#x27;|&#39;/g, "'").replace(/&nbsp;/g, " ")
+    .replace(/[*_`]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+}
+
+// One small JSON file the browser fetches on first use: for each document its title, summary, shelf, and sections
+// as plain text with the anchor each heading has on the page. Matching, weights, and synonyms live in the
+// browser module, so the file holds only text.
+export function searchIndex(corpus) {
+  return {
+    v: 1,
+    docs: corpus.docs.map((d) => ({
+      u: d.url,
+      t: d.title,
+      s: d.summary,
+      sh: corpus.manifest.shelves[d.section].label,
+      ty: TYPE_LABELS[d.type] ?? d.type,
+      // [anchor id, heading, text]; the lead has no heading
+      k: d.sections.map((x) => [x.heading ? x.key : "", x.heading || "", htmlToText(x.html)]).filter((x) => x[2] || x[1]),
+    })),
+  }
+}
+
+
+// Four ways in for someone who doesn't know the library's shelves yet, with documents chosen by id
+export const TASK_PATHS = [
+  { key: "considering", title: "Considering a project", blurb: "Before the first call, or before you spend anything.",
+    ids: ["guides-first-call", "guides-before-you-buy", "case-security-for-non-security-people"] },
+  { key: "recurring", title: "Fixing a recurring problem", blurb: "The same thing keeps going wrong, and you want it to stop.",
+    ids: ["guides-backups-you-can-trust", "guides-use-case-workflows"] },
+  { key: "using", title: "Using 1NEON", blurb: "Answers for the client portal, and what it is.",
+    ids: ["faq-1neon-help", "product-1neon"] },
+  { key: "diligence", title: "Technical due diligence", blurb: "How I handle security, data, and recovery, in writing.",
+    ids: ["standards-security-and-data", "standards-reliability-and-recovery", "policy-security"] },
+]
