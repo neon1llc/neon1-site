@@ -38,7 +38,7 @@ CloudFront serves the page with a strict policy: scripts, styles, fonts, and con
 
 Now and then a white rabbit drops into the rain on the landing. Catching it stops the rain, and scrolling down pulls back out of an old TV into a sunlit room that ends on "go touch grass". Scrolling up plays it back. The controller is `js/white-rabbit.js`. The 3D scene in `js/white-rabbit-scene.js` and the three.js bundle in `js/vendor/` load only after a catch. Reduced motion, or a browser without WebGL, gets a still card instead, and turning on reduced motion mid-scene switches to the card.
 
-From the keyboard, "follow the white rabbit" sits after the bar's links, off screen until it has focus, like the skip link. While a rabbit is caught, nothing on screen explains it: focus moves to a line only screen readers read (how to move, and that Esc leaves), Tab stays there, and focus goes back where it was when it ends. Each catch is its own entry: the scene is built at most once per entry, and its loop stops on every way out.
+From the keyboard, "follow the white rabbit" sits after the bar's links, off screen until it has focus, like the skip link. While a rabbit is caught, a small cluster at the bottom offers exit (the same as Esc), a sound switch in the 3D scene (the card is silent), and a hint to scroll or swipe that fades after the first move. Focus moves to a line only screen readers read (how to move, and that Esc leaves), Tab cycles between that line and the cluster, and focus goes back where it was when it ends. Turning sound off lasts until the page reloads and isn't stored. Each catch is its own entry: the scene is built at most once per entry, and its loop stops on every way out.
 
 Two query flags help with testing, and in production they only add rabbits:
 

@@ -315,10 +315,29 @@ body.white-rabbit-scene > :not(.white-rabbit) { visibility: hidden; }
   font: 500 13px var(--mono); color: var(--neon); background: rgba(13,2,8,.86); border: 1px solid rgba(0,255,65,.3); cursor: pointer; }
 .white-rabbit-in:focus { bottom: max(24px, env(safe-area-inset-bottom)); }
 
-/* While caught: how to move, for screen readers only; nothing on screen explains the scene */
+/* While caught: how to move, for screen readers only; the small cluster below is what shows on screen */
 .white-rabbit-how { position: absolute; width: 1px; height: 1px; margin: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 /* The layer stays hidden until something covers the page, so the line opts back in on its own while caught */
 body.white-rabbit-on .white-rabbit-how { visibility: visible; }
+
+/* The cluster while caught: exit, sound, and a hint, small and low at the bottom center, over the scene and the card.
+   Like the line above, it opts back in while the layer itself is still hidden (caught, before the first move) */
+.white-rabbit-ctl { position: absolute; left: 50%; bottom: max(18px, env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 1;
+  display: none; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; width: max-content; max-width: calc(100vw - 32px); }
+body.white-rabbit-on .white-rabbit-ctl { display: flex; visibility: visible; pointer-events: auto; }
+.white-rabbit-btn { min-height: 36px; padding: 6px 12px; border-radius: var(--glass-r); font: 500 12px var(--mono); color: #e9ffee; cursor: pointer;
+  background: rgba(13,2,8,.55); border: 1px solid rgba(233,255,238,.28); opacity: .7; transition: opacity .2s; }
+.white-rabbit-btn:hover, .white-rabbit-btn:focus-visible { opacity: 1; }
+.white-rabbit-btn:focus-visible { outline: 2px solid var(--neon); outline-offset: 2px; }
+.white-rabbit-key { margin-left: 4px; opacity: .65; }
+/* Touch screens have no Esc key to name */
+@media (pointer: coarse) { .white-rabbit-key { display: none; } }
+/* The card is silent, so it has no sound switch */
+.white-rabbit[data-mode="card"] [data-rabbit="sound"] { display: none; }
+.white-rabbit-hint { flex-basis: 100%; margin: 0 0 2px; text-align: center; font: 12px var(--mono); color: #e9ffee; opacity: .75;
+  text-shadow: 0 1px 4px rgba(0,0,0,.6); transition: opacity .8s; }
+.white-rabbit[data-hint="off"] .white-rabbit-hint { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .white-rabbit-hint, .white-rabbit-btn { transition: none; } }
 
 /* ---- Engagement fit: five short facts beside the booking button ---- */
 .fit { max-width: 760px; margin: 0 auto 26px; display: grid; gap: 10px; text-align: left; align-content: start; }
