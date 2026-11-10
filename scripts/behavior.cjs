@@ -166,6 +166,35 @@ check("browser", "contact: a send that never answers stops waiting, keeps the dr
   } finally { await context.close(); }
 });
 
+// ---- CP-10: the first screen says what, for whom, and how to start, and the views still snap ----
+for (const [label, viewport] of [["phone", { width: 390, height: 844 }], ["wide", { width: 1280, height: 800 }]]) {
+  check("browser", `home: the offer and its start link fit the first screen, and the start link settles on contact (motion, ${label})`, async () => {
+    const { page, context, errors } = await open({ viewport, reducedMotion: "no-preference" });
+    try {
+      await page.waitForLoadState("load");
+      const first = await page.evaluate(() => {
+        const inView = (el) => { const r = el && el.getBoundingClientRect(); return !!r && r.width > 0 && r.top >= 0 && r.bottom <= innerHeight; };
+        return { offer: inView(document.querySelector(".hero .offer")), start: inView(document.querySelector(".hero .start a")),
+          href: document.querySelector(".hero .start a")?.getAttribute("href"), wide: document.documentElement.scrollWidth <= innerWidth };
+      });
+      expect(first.offer && first.start && first.href === "#contact" && first.wide, "the offer or its start link is off the first screen", first);
+      await page.locator(".hero .start a").click();
+      await page.waitForFunction(() => Math.abs(document.getElementById("contact").getBoundingClientRect().top - 64) < 3, null, { timeout: 5000 });
+      expect(!errors.length, "page errors", errors);
+    } finally { await context.close(); }
+  });
+}
+
+check("browser", "home: one wheel gesture from the first screen settles on services (motion, wide)", async () => {
+  const { page, context } = await open({ reducedMotion: "no-preference" });
+  try {
+    await page.waitForLoadState("load");
+    await page.mouse.move(640, 450);
+    for (let i = 0; i < 6; i++) { await page.mouse.wheel(0, 30); await page.waitForTimeout(20); }
+    await page.waitForFunction(() => Math.abs(document.getElementById("services").getBoundingClientRect().top - 64) < 3, null, { timeout: 5000 });
+  } finally { await context.close(); }
+});
+
 // ---- SITE-05: a case study owns the screen while open ----
 // Where focus is, whether it sits inside the panel, and whether the page behind is inert
 const caseState = (page) => page.evaluate(() => {
