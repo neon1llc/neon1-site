@@ -215,11 +215,8 @@ html.case-lock { overflow: hidden; }
 /* Views set their own spacing; the about story reads as one column */
 .story { display: block; max-width: 720px; }
 .story p { font-size: 18px; line-height: 1.65; margin: 0 0 18px; }
-/* "More" links: a bold link with an arrow that leads to the full story elsewhere */
-.more a { font-weight: 600; color: var(--brand); text-decoration: none; }
-.more a::after { content: " \2192"; display: inline-block; transition: transform .15s; }
-.more a:hover { text-decoration: underline; }
-.more a:hover::after { transform: translateX(3px); }
+/* "More" links: a line of its own under a section, in the site's usual bold link style (.ext) */
+.more { margin: 18px 0 0; }
 .row p b { color: var(--ink); font-weight: 600; }
 
 /* Process view centers as a grid */
