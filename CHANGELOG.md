@@ -2,6 +2,15 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.43.0
+
+### Changed
+- Plainer writing throughout, following the new Voice section of neon1's writing standard: say it, back it with evidence, and don't pitch. The services, the process, the projects, and the knowledge center's services, about, FAQ, case studies, and guides lose their soft sell. From neon1-corpus v0.22.1.
+- The FAQ answers on cost and on data link to the matching moments in 1NEON's live playback.
+
+### Removed
+- The placeholder page at /faqs. neon1.tech/faqs now redirects to the full questions in the knowledge center.
+
 ## v0.42.0
 
 ### Added
