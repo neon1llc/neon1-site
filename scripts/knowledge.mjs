@@ -30,7 +30,7 @@ const block = (name) => {
 }
 
 // The home page's sections, reached from here by full path
-const SECTIONS = [["services", "services"], ["process", "process"], ["projects", "case studies"], ["work", "projects"], ["why", "about"]]
+const SECTIONS = [["services", "services"], ["process", "process"], ["projects", "client work"], ["work", "tools I'm building"], ["why", "about"]]
 const navLinks = SECTIONS.map(([id, label]) => `        <li><a href="/#${id}">${label}</a></li>`).join("\n")
 const menuLinks = [...SECTIONS, ["faq", "questions"], ["contact", "contact"]]
   .map(([id, label]) => `      <li><a href="/#${id}">${label}</a></li>`).join("\n")
