@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.43.3" />
+  <meta name="version" content="0.44.0" />
   <title>neon1 · cloud, AI, and IT consulting</title>
   <meta name="description" content="neon1 is a one-person technology practice: cloud and AI engineering, business automation, networks, and cameras." />
   <meta name="theme-color" content="#0D0208" />
@@ -341,7 +341,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.43.3</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.44.0</a>
       </span>
     </div>
   </footer>
@@ -380,12 +380,9 @@
       </div>
       <p class="white-rabbit-grass" role="status"></p>
     </div>
-    <!-- While caught: how to move, a way back that needs no gesture, and the car's switch while it's in view -->
-    <div class="white-rabbit-help" role="group" aria-label="White rabbit">
-      <p id="whiteRabbitHow">Scroll down or press the down arrow to follow it. Up goes back, and Esc leaves.</p>
-      <button class="chip" type="button" data-rabbit="car" hidden>start the car</button>
-      <button class="chip" type="button" data-rabbit="leave" aria-describedby="whiteRabbitHow">back to the page</button>
-    </div>
+    <!-- While caught, only for screen readers: how to move and how to leave. Nothing on screen explains the scene;
+         keyboard entry focuses this line so it is read out -->
+    <p class="white-rabbit-how" id="whiteRabbitHow" tabindex="-1">Scroll down or press the down arrow to follow it. Up goes back, and Esc leaves.</p>
   </div>
 
   <!-- Deferred scripts run in order, so Motion loads before the views and case studies -->

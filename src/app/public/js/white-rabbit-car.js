@@ -145,8 +145,7 @@ export function createCar({ scene, env, at, onSound = () => {} }) {
 
   let started = -1, running = false;
 
-  // Starts the sequence, or shuts the engine off; the click on the car and the help line's button both
-  // land here. Returns true once started
+  // Starts the sequence, or shuts the engine off; a click on the car lands here. Returns true once started
   function toggle() {
     if (started < 0) { started = performance.now() / 1000; onSound("click"); }
     else { started = -1; running = false; onSound("stop"); }

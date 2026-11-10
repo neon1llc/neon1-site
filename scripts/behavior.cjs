@@ -283,12 +283,15 @@ for (const motion of ["reduce", "no-preference"]) {
 // ---- SITE-06 and SITE-07: the white rabbit ----
 const rabbit = (page) => page.evaluate(() => {
   const root = document.getElementById("whiteRabbit"), a = document.activeElement;
-  const help = root.querySelector(".white-rabbit-help"), how = help && help.querySelector("p");
+  const how = root.querySelector(".white-rabbit-how");
+  // Anything on screen that could be pressed or read as a control: there should never be one over the scene or the card
+  const shown = (el) => { const r = el.getBoundingClientRect(), c = getComputedStyle(el); return r.width > 1 && r.height > 1 && c.visibility === "visible" && c.display !== "none"; };
   return {
     state: root.dataset.state, mode: root.dataset.mode, progress: root.dataset.progress,
     canvases: document.querySelectorAll(".white-rabbit-gl").length,
-    focus: a.id || a.dataset.rabbit || a.tagName,
-    helpShown: !!help && getComputedStyle(help).visibility === "visible", howShown: !!how && how.getBoundingClientRect().width > 1,
+    focus: a.id || a.tagName,
+    controls: [...root.querySelectorAll("button, a, [role=group], .chip")].filter(shown).length,
+    howShown: !!how && shown(how), howText: how ? how.textContent : "",
   };
 });
 const until = (page, fn, arg, timeout = 15000) => page.waitForFunction(fn, arg, { timeout, polling: 100 }).then(() => true, () => false);
@@ -310,24 +313,25 @@ async function tabToRabbit(page) {
   throw new Error("Tab never reached the white rabbit's way in");
 }
 
-check("browser", "rabbit: keyboard entry, help, Tab, leave, and focus back (reduced motion card)", async () => {
+check("browser", "rabbit: keyboard entry, no controls on screen, Tab, Esc, and focus back (reduced motion card)", async () => {
   const { page, context, errors } = await open({ init: COUNT_FRAMES });
   try {
     await tabToRabbit(page);
     await page.keyboard.press("Enter");
     let r = await rabbit(page);
-    expect(r.state === "caught" && r.mode === "card" && r.focus === "leave", "Enter did not catch and focus the way back", r);
-    expect(r.helpShown && r.howShown, "the help line is not shown while caught", r);
+    expect(r.state === "caught" && r.mode === "card" && r.focus === "whiteRabbitHow", "Enter did not catch and focus the line that says how to move", r);
+    expect(!r.howShown && /Esc leaves/.test(r.howText) && r.controls === 0, "something explains or controls the scene on screen", r);
     for (let i = 0; i < 6; i++) await page.keyboard.press("PageDown");
     r = await rabbit(page);
     expect(r.state === "playing" || r.state === "done", "the down keys did not play the card", r);
+    expect(r.controls === 0, "a control showed over the card", r);
     await page.keyboard.press("Tab"); await page.keyboard.press("Shift+Tab");
     r = await rabbit(page);
-    expect(r.focus === "leave" && r.helpShown, "Tab left the help line while the page is covered", r);
-    await page.keyboard.press("Enter");
-    expect(await isState(page, "idle"), "back to the page did not end the entry", await rabbit(page));
+    expect(r.focus === "whiteRabbitHow", "Tab left the rabbit while the page is covered", r);
+    await page.keyboard.press("Escape");
+    expect(await isState(page, "idle"), "Esc did not end the entry", await rabbit(page));
     r = await rabbit(page);
-    expect(r.focus === "whiteRabbitIn" && !r.helpShown, "focus did not return to the way in", r);
+    expect(r.focus === "whiteRabbitIn", "focus did not return to the way in", r);
     // Again, leaving with Esc while only caught
     await page.keyboard.press("Enter");
     expect((await rabbit(page)).state === "caught", "a second entry did not catch");
@@ -339,12 +343,19 @@ check("browser", "rabbit: keyboard entry, help, Tab, leave, and focus back (redu
   } finally { await context.close(); }
 });
 
-check("browser", "rabbit: a touch screen can leave the card with the visible button", async () => {
+check("browser", "rabbit: a touch screen leaves the card by swiping back up", async () => {
   const { page, context } = await open({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }, "/?rabbit=p0.5");
   try {
     expect(await isState(page, "playing"), "the test flag did not catch a rabbit", await rabbit(page));
-    await page.locator('[data-rabbit="leave"]').tap();
-    expect(await isState(page, "idle"), "tapping back to the page did not leave", await rabbit(page));
+    expect((await rabbit(page)).controls === 0, "a control showed over the card", await rabbit(page));
+    const cdp = await context.newCDPSession(page);
+    const touch = (type, y) => cdp.send("Input.dispatchTouchEvent", { type, touchPoints: type === "touchEnd" ? [] : [{ x: 195, y }] });
+    for (let i = 0; i < 40 && (await rabbit(page)).state !== "idle"; i++) {
+      await touch("touchStart", 200);
+      for (let y = 260; y <= 800; y += 60) await touch("touchMove", y);
+      await touch("touchEnd");
+    }
+    expect(await isState(page, "idle"), "swiping back up did not leave", await rabbit(page));
   } finally { await context.close(); }
 });
 
@@ -356,27 +367,23 @@ check("gpu", "rabbit: turning on reduced motion mid-scene switches to the still 
     await page.emulateMedia({ reducedMotion: "reduce" });
     await until(page, () => document.getElementById("whiteRabbit").dataset.mode === "card");
     let r = await rabbit(page);
-    expect(r.mode === "card" && r.canvases === 0 && r.helpShown, "the scene did not hand over to the card", r);
+    expect(r.mode === "card" && r.canvases === 0 && r.controls === 0, "the scene did not hand over to the card", r);
     expect(!(await sceneFrames(page)), "the scene loop kept running in the card");
-    await page.locator('[data-rabbit="leave"]').click();
+    await page.keyboard.press("Escape");
     expect(await isState(page, "idle"), "the card did not leave", await rabbit(page));
     expect(!errors.length, "page errors", errors);
   } finally { await context.close(); }
 });
 
-check("gpu", "rabbit: the car's button shows while the car is in view and starts it from the keyboard", async () => {
+check("gpu", "rabbit: nothing to press shows at the window, and Tab stays on the rabbit", async () => {
   const { page, context, errors } = await open(SMALL, "/?rabbit=p0.7");
   try {
     expect(await until(page, () => !!document.getElementById("whiteRabbit").dataset.progress, null, 90000), "the scene never rendered", await rabbit(page));
-    const car = page.locator('[data-rabbit="car"]');
-    expect(await until(page, () => !document.querySelector('[data-rabbit="car"]').hidden), "the car's button did not show at the window");
+    let r = await rabbit(page);
+    expect(r.controls === 0 && !r.howShown, "something to press showed over the scene at the window", r);
     await page.keyboard.press("Tab");
-    await page.keyboard.press("Tab");
-    const focus = (await rabbit(page)).focus;
-    expect(focus === "car" || focus === "leave", "Tab did not move between the help line's buttons", focus);
-    await car.focus();
-    await page.keyboard.press("Enter");
-    expect(await until(page, () => document.querySelector('[data-rabbit="car"]').textContent === "stop the car"), "Enter on the car's button did not start it", await car.textContent());
+    r = await rabbit(page);
+    expect(r.focus === "whiteRabbitHow", "Tab left the rabbit while the scene covers the page", r);
     expect(!errors.length, "page errors", errors);
   } finally { await context.close(); }
 });

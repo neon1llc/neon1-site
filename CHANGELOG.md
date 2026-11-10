@@ -2,6 +2,15 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.44.0
+
+### Changed
+- The white rabbit keeps its mystery: no help line and no buttons on screen (no "back to the page", no "start the car"). Esc still leaves, scrolling back up still returns to the page, the car still starts when clicked, and screen readers still hear how to move.
+- The walk out of the TV only ever moves back; the small dip forward at the start is gone.
+- A moment on the window after the turn, so the rise has settled before getting up.
+- No more looking right and left out of the window. After the sash goes up there is a pause, then a slow move straight out through the opening, the same way the window looks, to the square view of the yard, held before the white.
+- The camera's position, direction, and zoom are eased with monotone curves through every beat, so nothing swings past a beat and back, and speed never stops and starts at a beat.
+
 ## v0.43.3
 
 ### Changed

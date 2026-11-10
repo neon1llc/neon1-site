@@ -35,8 +35,8 @@ function world() {
   let time = 0, serial = 0;
   const frames = new Map(), timers = new Map();
   const grass = element({ textContent: "", parentElement: element() });
-  const leaveBtn = element({ dataset: { rabbit: "leave" } }), carBtn = element({ dataset: { rabbit: "car" }, hidden: true });
-  const root = element({ querySelector: (s) => ({ ".white-rabbit-grass": grass, '[data-rabbit="leave"]': leaveBtn, '[data-rabbit="car"]': carBtn })[s] || null });
+  const how = element();
+  const root = element({ querySelector: (s) => ({ ".white-rabbit-grass": grass, ".white-rabbit-how": how })[s] || null });
   const body = element(), html = element(), menu = element({ hidden: true });
   const doc = { body, documentElement: html, hidden: false, activeElement: body, addEventListener() {},
     getElementById: (id) => (id === "menu" ? menu : id === "whiteRabbitIn" ? element() : null), querySelector: () => null, querySelectorAll: () => [] };
