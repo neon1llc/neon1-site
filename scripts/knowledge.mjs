@@ -11,7 +11,7 @@
 
 import { readFileSync, writeFileSync, mkdirSync, rmSync, readdirSync, statSync, existsSync } from "node:fs"
 import { join, dirname, relative } from "node:path"
-import { load, relink, esc, longDate, TYPE_LABELS, SITE, BASE } from "./knowledge-lib.mjs"
+import { load, pageBody, catalogFacts, TASK_PATHS, searchIndex, esc, longDate, TYPE_LABELS, SITE, BASE } from "./knowledge-lib.mjs"
 
 
 const [mode, siteDir, exportDir] = process.argv.slice(2)
@@ -105,20 +105,40 @@ ${main}
 
 
 // A document as a small card: title, summary, and whether it has a PDF. The shelf heading already
-// names the kind, so the card doesn't repeat it
+// names the kind, so the card doesn't repeat it. Search reads search-index.json, not the cards
 function card(d) {
   const tags = d.pdf ? ["PDF"] : []
-  // Search reads the title, summary, type, audience, and every section heading
-  const headings = d.sections.map((x) => x.heading).filter(Boolean)
-  const words = [d.title, d.summary, TYPE_LABELS[d.type], d.data.audience, corpus.manifest.shelves[d.section].label, ...headings]
-    .filter(Boolean).join(" ").replace(/[*_`]/g, "").toLowerCase()
-  return `        <li class="kc-card" data-words="${esc(words)}">
+  return `        <li class="kc-card">
           <a href="${d.url}">
             <span class="kc-card-title">${esc(d.title)}</span>
             <span class="kc-card-summary">${esc(d.summary)}</span>
             ${tags.length ? `<span class="kc-tags">${tags.map((t) => `<span>${esc(t)}</span>`).join("")}</span>` : ""}
           </a>
         </li>`
+}
+
+
+// The four task paths come from knowledge-lib.mjs. The build fails if a chosen document disappears, so a path never points at nothing
+const PATHS = TASK_PATHS
+for (const p of PATHS) for (const id of p.ids) if (!corpus.byId.has(id)) {
+  console.error(`knowledge: task path "${p.title}" names ${id}, which is not in the corpus export`)
+  process.exit(1)
+}
+
+function pathsSection() {
+  return `    <section class="kc-paths" aria-labelledby="kc-paths-h">
+      <h2 id="kc-paths-h">Start here</h2>
+      <ul class="kc-path-list">
+${PATHS.map((p) => `        <li class="kc-path">
+          <h3>${esc(p.title)}</h3>
+          <p>${esc(p.blurb)}</p>
+          <ul>
+${p.ids.map((id) => `            <li><a href="${corpus.byId.get(id).url}">${esc(corpus.byId.get(id).title)}</a></li>`).join("\n")}
+          </ul>
+        </li>`).join("\n")}
+      </ul>
+      <p class="kc-paths-more">Not sure where you fit? <a href="/#services">See what I offer</a> or <a href="/#contact">get in touch</a>.</p>
+    </section>`
 }
 
 
@@ -149,8 +169,7 @@ function shelfSection(s) {
 }
 
 function indexPage() {
-  const count = corpus.docs.length
-  const pdfs = corpus.docs.filter((d) => d.pdf).length
+  const facts = catalogFacts(corpus.docs)
   const groups = corpus.groups
     .map((g) => `    <section class="kc-group" id="${g.key}" aria-labelledby="${g.key}-h">
       <div class="kc-group-head">
@@ -168,14 +187,33 @@ ${g.shelves.map((s) => `        <li><a href="#${s.key}">${esc(s.label)} <span>${
       <div class="kc-band-inner">
         <p class="kc-eyebrow">neon1 · knowledge center</p>
         <h1 id="kc-title">Everything neon1</h1>
-        <p class="kc-lead">Guides, templates, forms, and filled-out examples, plus how I work, services, and policies. ${count} documents, ${pdfs} with a PDF to download.</p>
-        <div class="kc-search" hidden>
+        <p class="kc-lead">Guides, templates, forms, and filled-out examples, plus how I work, services, and policies. ${facts.summary}.</p>
+        <form class="kc-search" role="search" action="${BASE}" method="get" hidden>
           <label for="kc-q">Search the knowledge center</label>
-          <input id="kc-q" type="search" placeholder="Try &quot;backup&quot;, &quot;proposal&quot;, or &quot;privacy&quot;" autocomplete="off" />
-          <p class="kc-results" id="kc-results" role="status"></p>
-        </div>
+          <input id="kc-q" name="q" type="search" placeholder="Try &quot;backup&quot;, &quot;passkey&quot;, or &quot;privacy&quot;" autocomplete="off" />
+          <p class="kc-results" id="kc-results" role="status" aria-live="polite" aria-atomic="true"></p>
+        </form>
       </div>
     </section>
+
+    <section class="kc-found" id="kc-found" aria-label="Search results" hidden>
+      <ol class="kc-hits" id="kc-found-list"></ol>
+    </section>
+
+    <section class="kc-none" id="kc-none" aria-label="No results" hidden>
+      <h2>I don't have a page for that yet</h2>
+      <p>Try one of these, or ask me directly.</p>
+      <ul>
+        <li><a href="${BASE}?q=backups" data-term="backups">backups</a></li>
+        <li><a href="${BASE}?q=phishing" data-term="phishing">phishing</a></li>
+        <li><a href="${BASE}?q=proposal" data-term="proposal">proposal</a></li>
+        <li><a href="${BASE}?q=privacy" data-term="privacy">privacy</a></li>
+      </ul>
+      <p><a href="${BASE}faq/1neon-help/">1NEON help</a> answers portal questions, and <a href="/#contact">contact</a> reaches me.</p>
+    </section>
+
+    <div id="kc-browse">
+${pathsSection()}
 
     <nav class="kc-shelves" aria-label="Shelves">
       <ul>
@@ -187,10 +225,11 @@ ${nav}
 ${groups}
 
     <p class="kc-colophon">These documents come from <a class="ext" href="https://github.com/neon1llc/neon1-corpus" target="_blank" rel="noopener">neon1-corpus</a> and are shared under CC BY-ND 4.0. Templates and examples are illustrations, not legal advice.</p>
+    </div>
     </div>`
   return page({
     title: "Knowledge center · neon1",
-    description: "neon1's public documents in one place: guides, templates, forms, filled-out examples, and alternatives, plus standards, services, and policies, each with a PDF to download.",
+    description: `neon1's public documents in one place: guides, templates, forms, filled-out examples, and alternatives, plus standards, services, and policies. ${facts.summary}.`,
     path: BASE,
     main,
     kind: "index",
@@ -220,8 +259,7 @@ function docPage(d) {
     ...related.map((r) => `          <li><a href="${r.url}"><span class="kc-kicker">${esc(corpus.manifest.shelves[r.section].label)}</span><span class="kc-card-title">${esc(r.title)}</span></a></li>`),
   ]
 
-  const body = relink(d.html, d, corpus)
-    .replace(/<a href="(https?:[^"]+)">/g, '<a class="ext" href="$1" target="_blank" rel="noopener">')
+  const body = pageBody(d, corpus)
   const fictional = d.data.fictional ? '<p class="kc-flag">Fictional example</p>' : ""
 
   const main = `    <article class="kc-doc">
@@ -257,6 +295,8 @@ ${next.join("\n")}
 // Everything the folder should hold, by path under the site
 const want = new Map([["knowledge/index.html", indexPage()]])
 for (const d of corpus.docs) want.set(`${d.url.slice(1)}index.html`, docPage(d))
+// The search index sits beside the shelves and is fetched only when someone searches
+want.set("knowledge/search-index.json", JSON.stringify(searchIndex(corpus)) + "\n")
 
 // The sitemap lists every knowledge center page between its <!-- knowledge --> markers, with each document's updated date
 const sitemapFile = join(siteDir, "sitemap.xml")
@@ -272,9 +312,11 @@ const walk = (dir) => (existsSync(dir) ? readdirSync(dir).flatMap((f) => (statSy
 const have = walk(join(siteDir, "knowledge")).map((f) => relative(siteDir, f)).filter((f) => !f.endsWith(".pdf"))
 
 // Each page stays light: the text of one document plus the shared frame
+// The search index is the one file that holds every document's text, so it has its own cap
 const PAGE_MAX = 120 * 1024
-for (const [path, html] of want) if (Buffer.byteLength(html) > PAGE_MAX) {
-  console.error(`knowledge: ${path} is ${Math.round(Buffer.byteLength(html) / 1024)} KB, over ${PAGE_MAX / 1024} KB`)
+const INDEX_MAX = 256 * 1024
+for (const [path, html] of want) if (Buffer.byteLength(html) > (path.endsWith(".json") ? INDEX_MAX : PAGE_MAX)) {
+  console.error(`knowledge: ${path} is ${Math.round(Buffer.byteLength(html) / 1024)} KB, over its limit`)
   process.exit(1)
 }
 

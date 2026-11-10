@@ -1,50 +1,118 @@
-// src/app/public/js/knowledge.js - The knowledge center's search: filters the shelves as you type. Without
-// it the page still lists every document, and the box stays hidden.
-{
-  const box = document.querySelector(".kc-search");
-  const input = document.getElementById("kc-q");
-  const status = document.getElementById("kc-results");
-  const cards = [...document.querySelectorAll(".kc-card")];
-  const shelves = [...document.querySelectorAll(".kc-shelf")];
-  const groups = [...document.querySelectorAll(".kc-group")];
-  // A search opens the developer folds that hold a match, and clearing it closes the ones it opened
-  const folds = [...document.querySelectorAll(".kc-fold")];
-  const opened = new Set();
+// src/app/public/js/knowledge.js - The knowledge center's search. It fetches one local index file on first use and
+// lists matching documents with a snippet and a link to the section. Nothing leaves the browser. Without JavaScript
+// the box stays hidden and the page lists every document.
+import { prepare, search } from "./knowledge-search-core.js";
 
-  if (box && input && cards.length) {
-    box.hidden = false;
-    const total = cards.length;
+const box = document.querySelector(".kc-search");
+const input = document.getElementById("kc-q");
+const status = document.getElementById("kc-results");
+const found = document.getElementById("kc-found");
+const list = document.getElementById("kc-found-list");
+const none = document.getElementById("kc-none");
+const browse = document.getElementById("kc-browse");
 
-    function filter() {
-      const words = input.value.toLowerCase().split(/\s+/).filter(Boolean);
-      let shown = 0;
-      for (const card of cards) {
-        const hit = words.every((w) => card.dataset.words.includes(w));
-        card.hidden = !hit;
-        if (hit) shown++;
-      }
-      for (const fold of folds) {
-        const hit = words.length && fold.querySelector(".kc-card:not([hidden])");
-        if (hit && !fold.open) { fold.open = true; opened.add(fold); }
-        if (!hit && opened.has(fold)) { fold.open = false; opened.delete(fold); }
-        fold.hidden = Boolean(words.length) && !hit;
-      }
-      for (const shelf of shelves) shelf.hidden = !shelf.querySelector(".kc-card:not([hidden])");
-      for (const group of groups) group.hidden = !group.querySelector(".kc-card:not([hidden])");
-      status.textContent = words.length ? (shown ? `${shown} of ${total} documents` : "Nothing matches. Try a shorter word.") : "";
+if (box && input && status && found && list && none && browse) {
+  box.hidden = false;
+  // The index is fetched once, on the first focus or keystroke
+  let prepared = null;
+  let loading = null;
+  const load = () => {
+    loading ??= fetch("/knowledge/search-index.json")
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .then((index) => { prepared = prepare(index); });
+    return loading;
+  };
+
+  const make = (tag, className, text) => {
+    const el = document.createElement(tag);
+    if (className) el.className = className;
+    if (text) el.textContent = text;
+    return el;
+  };
+
+  // Marks come from text nodes, so nothing from the index is ever parsed as HTML
+  function resultItem(r) {
+    const item = make("li", "kc-hit");
+    const link = make("a");
+    link.href = r.url;
+    link.append(make("span", "kc-card-title", r.title));
+    link.append(make("span", "kc-hit-where", r.section ? `${r.shelf} · ${r.section}` : `${r.shelf} · ${r.type}`));
+    const p = make("span", "kc-card-summary");
+    for (const part of r.snippet) {
+      if (part.hit) p.append(make("mark", "", part.text));
+      else p.append(document.createTextNode(part.text));
     }
-
-    input.addEventListener("input", filter);
-    // "/" jumps to the search box, as on many documentation sites
-    addEventListener("keydown", (e) => {
-      if (e.key === "/" && document.activeElement !== input && !e.metaKey && !e.ctrlKey && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName)) {
-        e.preventDefault();
-        input.focus();
-      }
-      if (e.key === "Escape" && document.activeElement === input && input.value) { input.value = ""; filter(); }
-    });
-    // A ?q= link opens with the search filled in
-    const q = new URLSearchParams(location.search).get("q");
-    if (q) { input.value = q; filter(); }
+    link.append(p);
+    item.append(link);
+    return item;
   }
+
+  let token = 0;
+  async function run() {
+    const q = input.value.trim();
+    const mine = ++token;
+    if (!q) return show(null);
+    try { await load(); } catch {
+      status.textContent = "Search couldn't load. The full list below still works.";
+      return show(null, true);
+    }
+    if (mine !== token) return;
+    show(search(prepared, q), false, q);
+  }
+
+  // Swaps the catalog for results while there is a query; the count is announced through the status region
+  function show(res, failed = false, q = "") {
+    const active = Boolean(res);
+    browse.hidden = active;
+    found.hidden = !active || !res.results.length;
+    none.hidden = !active || res.results.length > 0;
+    list.replaceChildren(...(active ? res.results.map(resultItem) : []));
+    if (!active) { if (!failed) status.textContent = ""; return; }
+    const n = res.results.length;
+    status.textContent = n
+      ? `${res.total} ${res.total === 1 ? "document" : "documents"}${res.relaxed ? ` match some of your words` : ""}`
+      : `No documents match "${q}"`;
+    try {
+      const url = new URL(location.href);
+      url.searchParams.set("q", q);
+      history.replaceState(null, "", url);
+    } catch { /* the address bar is a convenience only */ }
+  }
+
+  input.addEventListener("input", run);
+  input.addEventListener("focus", () => { load().catch(() => {}); }, { once: true });
+  // The form has no other job, so Enter just searches
+  box.addEventListener("submit", (e) => { e.preventDefault(); run(); });
+
+  // Suggested terms in the empty state run a search in place
+  for (const a of none.querySelectorAll("[data-term]")) {
+    a.addEventListener("click", (e) => { e.preventDefault(); input.value = a.dataset.term; input.focus(); run(); });
+  }
+
+  function clear() {
+    input.value = "";
+    try { const url = new URL(location.href); url.searchParams.delete("q"); history.replaceState(null, "", url); } catch { /* as above */ }
+    run();
+  }
+
+  // From the box, the arrow keys step through the results, and Escape clears the search
+  addEventListener("keydown", (e) => {
+    const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName ?? "");
+    // "/" jumps to the search box, as on many documentation sites
+    if (e.key === "/" && !typing && !e.metaKey && !e.ctrlKey) { e.preventDefault(); input.focus(); return; }
+    if (e.key === "Escape" && document.activeElement === input && input.value) { clear(); return; }
+    const links = [...list.querySelectorAll("a")];
+    const at = links.indexOf(document.activeElement);
+    if (e.key === "ArrowDown" && links.length && (document.activeElement === input || at !== -1)) {
+      e.preventDefault();
+      links[Math.min(at + 1, links.length - 1)].focus();
+    } else if (e.key === "ArrowUp" && at !== -1) {
+      e.preventDefault();
+      (at === 0 ? input : links[at - 1]).focus();
+    }
+  });
+
+  // A ?q= link opens with the search filled in
+  const q = new URLSearchParams(location.search).get("q");
+  if (q) { input.value = q; run(); }
 }
