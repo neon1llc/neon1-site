@@ -56,10 +56,9 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 .links a:not(.btn):hover { color: var(--neon); }
 .links .btn { min-height: 36px; padding: 7px 14px; margin-left: 6px; font-size: 13px; border-radius: var(--glass-r); }
 /* 1NEON: quieter than book a call, with the portal's rings */
-/* 1NEON: its rings and name, with no box around them */
-.links .portal { color: var(--neon); border-color: transparent; background: transparent; gap: 7px; }
-.links .portal:hover { border-color: transparent; background: rgba(0,230,118,.08); }
-.links .portal svg { width: 16px; height: 16px; }
+.links .portal { color: var(--neon); border-color: var(--line); background: transparent; }
+.links .portal:hover { border-color: var(--neon); background: rgba(0,230,118,.08); }
+.links .portal svg { width: 14px; height: 14px; }
 /* Over the rain: clear glass, so the rain's lens shows through every item in the bar */
 .n1-bar:not(.light) .n1-logo, .n1-bar:not(.light) .links a, .n1-bar:not(.light) .menu-btn { border-radius: var(--glass-r); background: transparent; box-shadow: none; }
 .n1-bar:not(.light) .links .portal:hover { background: rgba(0,230,118,.08); }
@@ -68,15 +67,13 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 .n1-bar.light .links a:not(.btn), .n1-bar.light .links .note { color: #56665c; }
 .n1-bar.light .links a:not(.btn):hover { color: var(--brand); }
 .n1-bar.light .btn-ghost { color: var(--brand); border-color: var(--brand); }
-.n1-bar.light .links .portal { color: var(--brand); border-color: transparent; }
-.n1-bar.light .links .portal:hover { border-color: transparent; background: rgba(3,87,4,.07); }
+.n1-bar.light .links .portal { color: var(--brand); border-color: rgba(3,87,4,.25); }
+.n1-bar.light .links .portal:hover { border-color: var(--brand); }
 
-/* ---- Menu: the sections live in a full-screen menu at every width; phones fold the actions in too ---- */
-.menu-btn { margin-left: 10px; display: inline-block; border-radius: var(--glass-r); }
+/* ---- Phone menu: below the width the links need, they fold into a full-screen menu ---- */
+.menu-btn { margin-left: auto; display: none; border-radius: var(--glass-r); }
 .n1-bar.light .menu-btn { color: var(--brand); background: #fff; border-color: rgba(3,87,4,.25); }
-@media (max-width: 560px) { .links { display: none; } .menu-btn { margin-left: auto; } }
-/* The bar shows book a call and 1NEON on wider screens, so the menu lists them only on phones */
-@media (min-width: 561px) { .menu .menu-phone { display: none; } }
+@media (max-width: 1040px) { .links { display: none; } .menu-btn { display: inline-block; } }
 .menu { position: fixed; inset: 0; z-index: 7; display: grid; place-items: center; background: rgba(13,2,8,.94); backdrop-filter: blur(6px); }
 .menu[hidden] { display: none; }
 /* Short or zoomed screens: the list scrolls inside the overlay, below the bar and its close button */

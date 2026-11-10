@@ -31,6 +31,7 @@ const block = (name) => {
 
 // The home page's sections, reached from here by full path
 const SECTIONS = [["services", "services"], ["process", "process"], ["projects", "case studies"], ["work", "projects"], ["why", "about"]]
+const navLinks = SECTIONS.map(([id, label]) => `        <li><a href="/#${id}">${label}</a></li>`).join("\n")
 const menuLinks = [...SECTIONS, ["faq", "questions"], ["contact", "contact"]]
   .map(([id, label]) => `      <li><a href="/#${id}">${label}</a></li>`).join("\n")
 
@@ -70,6 +71,8 @@ function page({ title, description, path, main, kind }) {
     <nav class="n1-inner" aria-label="Main">
       ${block("logo")}
       <ul class="links">
+${navLinks}
+        <li><a href="/knowledge/" aria-current="page">knowledge</a></li>
         ${block("actions")}
       </ul>
       ${block("menu-button")}
@@ -80,8 +83,8 @@ function page({ title, description, path, main, kind }) {
     <ul>
 ${menuLinks}
       <li><a href="/knowledge/">knowledge</a></li>
-      <li class="menu-phone"><a href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a call</a></li>
-      <li class="menu-phone"><a href="/1NEON/" data-handoff>1NEON</a></li>
+      <li><a href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a call</a></li>
+      <li><a href="/1NEON/" data-handoff>1NEON</a></li>
     </ul>
   </div>
 
