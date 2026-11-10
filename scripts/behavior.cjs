@@ -194,22 +194,25 @@ check("browser", "home: one wheel gesture from the first screen settles on servi
   } finally { await context.close(); }
 });
 
-// ---- CP-16: every tool states whether it can be used now and ends on a next step that works; a tool in
-// development offers no link that would suggest it can be opened, only a way to ask ----
-check("browser", "tools: each has a state and a working next step, and tools in development link only to contact", async () => {
-  const { page, context } = await open();
+// ---- CP-16: prose lists neon1's repositories and the tools in two folds; every row says whether it is
+// public or private, public rows open GitHub in a new tab, and private rows link nowhere ----
+check("browser", "prose: two folds open with their arrows turned, public rows open GitHub in a new tab, private rows link nowhere", async () => {
+  const { page, context, errors } = await open();
   try {
-    const tools = await page.$$eval("#work .tool", (rows) => rows.map((r) => ({
-      name: r.querySelector("h3")?.textContent.trim(), state: r.querySelector(".state")?.textContent.trim() || "",
-      links: [...r.querySelectorAll("a")].map((a) => a.getAttribute("href")),
-      next: [...r.querySelectorAll(".next a")].map((a) => a.getAttribute("href")),
-      targets: [...r.querySelectorAll('a[href^="#"]')].every((a) => !!document.getElementById(a.getAttribute("href").slice(1))),
-    })));
-    expect(tools.length >= 3, "the tools are missing", tools);
-    for (const t of tools) {
-      expect(/available now|in development/.test(t.state) && t.next.length === 1 && t.targets, "a tool lacks a state or a working next step", t);
-      if (/in development/.test(t.state)) expect(t.links.every((h) => h === "#contact"), "a tool in development links somewhere other than contact", t);
+    await page.locator("#work").scrollIntoViewIfNeeded();
+    const folds = page.locator("#work details.fold");
+    expect((await folds.count()) === 2, "there aren't two groups");
+    for (let i = 0; i < 2; i++) {
+      await folds.nth(i).locator("summary").click();
+      expect(await folds.nth(i).evaluate((d) => d.open && getComputedStyle(d.querySelector(".arr")).transform !== "none"), "a group did not open with its arrow turned");
     }
+    const rows = await page.$$eval("#work .repo", (rs) => rs.map((r) => ({ state: r.querySelector(".state").textContent, links: [...r.querySelectorAll("a")].map((a) => [a.href, a.target, a.rel]) })));
+    expect(rows.length >= 8, "rows are missing", rows);
+    for (const r of rows) {
+      if (/^public/.test(r.state)) expect(r.links.length === 1 && /^https:\/\/github\.com\/neon1llc\//.test(r.links[0][0]) && r.links[0][1] === "_blank" && /noopener/.test(r.links[0][2]), "a public row doesn't open GitHub in a new tab", r);
+      else expect(/^private/.test(r.state) && !r.links.length, "a private row links somewhere", r);
+    }
+    expect(!errors.length, "page errors", errors);
   } finally { await context.close(); }
 });
 

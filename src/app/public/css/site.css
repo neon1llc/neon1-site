@@ -310,23 +310,38 @@ body.white-rabbit-scene > :not(.white-rabbit) { visibility: hidden; }
 body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 
 /* ---- Engagement fit: five short facts beside the booking button ---- */
-.fit { max-width: 760px; margin: 0 auto 26px; display: grid; gap: 10px; text-align: left; align-content: start; }
+.fit { max-width: 760px; margin: 0 auto 26px; display: grid; gap: 10px; padding-top: 10px; border-top: 1px solid rgba(18,36,26,.12); text-align: left; align-content: start; }
 .fit div { display: grid; grid-template-columns: 90px 1fr; gap: 12px; padding-bottom: 10px; border-bottom: 1px solid rgba(18,36,26,.12); }
 .fit dt { font: 500 12px/1.9 var(--mono); color: var(--glow); }
 .fit dd { margin: 0; color: var(--ink); font-size: 16px; }
 @media (max-width: 480px) { .fit div { grid-template-columns: 1fr; gap: 2px; } }
 
 /* ---- Contact form: topic chips, common situations, fields, and the engagement facts beside them ---- */
-/* The form folds under the fit list: a dark green summary whose arrow points left when closed and down when open */
+/* Folds (.fold): a bold dark green label whose arrow sits right beside it, pointing left when closed
+   and down when open. No underline, tap flash, or text selection, so a tap only turns the arrow */
+.fold > summary { display: flex; align-items: center; gap: 4px; width: fit-content; list-style: none; cursor: pointer; font: 700 17px var(--sans); color: var(--brand); padding: 6px 0; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+.fold > summary::-webkit-details-marker { display: none; }
+.fold > summary:focus { outline: none; }
+.fold > summary:focus-visible { outline: 2px solid var(--brand); outline-offset: 4px; border-radius: 4px; }
+.fold .arr { display: inline-block; transition: transform .2s ease; }
+.fold[open] > summary .arr { transform: rotate(-90deg); }
+@media (prefers-reduced-motion: reduce) { .fold .arr { transition: none; } }
+/* The contact form's fold, centered under the fit list */
 .cfold { max-width: 760px; margin: 8px auto 0; text-align: left; }
 .cfold[hidden] { display: none; }
-.cfold > summary { display: flex; justify-content: center; align-items: center; gap: 10px; list-style: none; cursor: pointer; font: 700 17px var(--sans); color: var(--brand); padding: 6px 0; }
-.cfold > summary::-webkit-details-marker { display: none; }
-.cfold > summary:hover { text-decoration: underline; text-underline-offset: 4px; }
-.cfold > summary:focus-visible { outline: 2px solid var(--brand); outline-offset: 4px; border-radius: 4px; }
-.cfold .arr { display: inline-block; transition: transform .2s ease; }
-.cfold[open] .arr { transform: rotate(-90deg); }
-@media (prefers-reduced-motion: reduce) { .cfold .arr { transition: none; } }
+.cfold > summary { margin: 0 auto; }
+/* The prose groups: one line above and below each label, like the fit list's rows */
+.fold.group { border-top: 1px solid rgba(18,36,26,.12); }
+.fold.group:last-of-type { border-bottom: 1px solid rgba(18,36,26,.12); }
+.fold.group > summary { padding: 14px 0; }
+.fold.group > .rows { border-top: 0; margin-bottom: 8px; }
+.repos .row { padding: 12px 0; }
+.repos .row h3 { font-size: 16px; }
+.repos .row:first-child { border-top: 0; }
+.repos .row:last-child { border-bottom: 0; }
+.repos .row { grid-template-columns: 1fr 220px 2fr; }
+@media (max-width: 700px) { .repos .row { grid-template-columns: 1fr; gap: 4px; } }
+#work .spaced { letter-spacing: .32em; }
 .cfold[open] > .cform, .cfold[open] > .cdone { margin-top: 18px; }
 .cform, .cdone { display: grid; gap: 14px; }
 .cform[hidden], .cdone[hidden] { display: none; }
@@ -366,11 +381,3 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 /* The link from the process steps to the sample tour */
 .tour-link { margin: 22px 0 0; color: var(--muted); }
 
-/* ---- Tools I'm building: state, who it helps, an example, limits, and the next step for each ---- */
-.tools .row { align-items: start; }
-.tool-body p { margin: 0 0 8px; color: var(--muted); font-size: 15px; line-height: 1.5; max-width: 640px; }
-.tool-body p:last-child { margin: 0; }
-.tool-body .k { margin-right: 8px; font: 500 12px var(--mono); color: var(--glow); }
-.tool-body .next { color: var(--ink); }
-/* Phones: name, then state, then the details, each on its own line */
-@media (max-width: 700px) { .tools .row { grid-template-columns: 1fr; gap: 4px; } .tool-body { grid-column: 1 / -1; margin-top: 8px; } }
