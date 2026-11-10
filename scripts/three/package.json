@@ -1,0 +1,10 @@
+{
+  "name": "neon1-site-three-build",
+  "private": true,
+  "description": "Pinned toolchain for scripts/three/build.sh, which bundles the white rabbit's three.js. package-lock.json locks every transitive version, so make three rebuilds from the same packages.",
+  "license": "SEE LICENSE IN ../../LICENSE-CODE",
+  "dependencies": {
+    "esbuild": "0.25.12",
+    "three": "0.187.0"
+  }
+}

@@ -10,6 +10,8 @@
 #   - a file under fonts/ or media/, or a vendored bundle, is missing from the manifest, or its sha256 differs;
 #   - a file names no asset, or an asset lacks what it is, how it was made, or a consumer that exists;
 #   - a third-party asset names no source, or a source lacks its author, license, or source_url;
+#   - an unresolved item names no asset or source, or says nothing about what is missing, or an asset of
+#     unrecorded origin has no unresolved item tracking it;
 #   - a font or media path that exists in the base commit now holds different bytes. The base is
 #     $IMMUTABLE_BASE if set, else origin/main (HEAD^ when that is HEAD itself, as on a push to main).
 #     Without git history the comparison is skipped and says so.
@@ -79,6 +81,20 @@ def provenance(root, manifest):
             problems.append(f"source {name}: needs a license_url or a license_file that ships with the site")
         if not any(name in a.get("sources", []) for a in assets.values()):
             problems.append(f"source {name}: no asset uses it")
+    # Provenance still owed: each item names the assets or sources it concerns and what is missing, and
+    # every asset of unrecorded origin must be tracked here, so a gap can't sit unnoticed
+    tracked = set()
+    for i, item in enumerate(manifest.get("unresolved", [])):
+        refs = item.get("refs", [])
+        if not item.get("missing") or not refs:
+            problems.append(f"unresolved item {i}: needs refs and what is missing (missing)")
+        for r in refs:
+            if r not in assets and r not in sources:
+                problems.append(f"unresolved item {i}: unknown asset or source {r!r}")
+            tracked.add(r)
+    for name, a in assets.items():
+        if a.get("origin") == "unrecorded" and name not in tracked:
+            problems.append(f"asset {name}: origin unrecorded, but no unresolved item tracks it")
     return problems
 
 
@@ -159,7 +175,8 @@ def main():
     assets = manifest.get("assets", {})
     unrecorded = sorted(n for n, a in assets.items() if a.get("origin") == "unrecorded")
     print(f"manifest: {len(files)} files match their hashes; {len(assets)} assets and {len(manifest.get('sources', {}))} sources are recorded"
-          + (f"; origin unrecorded: {', '.join(unrecorded)}" if unrecorded else ""))
+          + (f"; origin unrecorded: {', '.join(unrecorded)}" if unrecorded else "")
+          + (f"; {len(manifest.get('unresolved', []))} provenance items tracked as unresolved" if manifest.get("unresolved") else ""))
 
 
 if __name__ == "__main__":

@@ -36,7 +36,7 @@ WELL_KNOWN  := --include ".well-known/*"
 
 # Plain make shows the help
 .DEFAULT_GOAL := help
-.PHONY: help corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf check html js links logic frame frame-check release manifest rehash models budget secrets behavior perf serve three deploy invalidate verify
+.PHONY: help corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf check html js links logic frame frame-check release manifest rehash models budget secrets behavior perf serve three icons deploy invalidate verify
 
 
 ##@ Checks
@@ -125,8 +125,9 @@ budget: ## Fail if the deployed files outside the knowledge center exceed BUDGET
 	echo "site size: $${kb} KB of $(BUDGET_KB) KB"; \
 	test "$$kb" -le "$(BUDGET_KB)"
 
-# Drives headless Chromium against a loopback copy of the site, so it needs Playwright and its browser;
-# it stays out of check until the CI runner installs them
+# Drives headless Chromium against a loopback copy of the site, so it needs Playwright and its browser.
+# It stays out of check, which needs neither; CI's check job installs them and runs it, with
+# scripts/chat_check.cjs, before the deploy job may start
 behavior: ## Check the contact form, case studies, case links, and white rabbit in a real browser
 	@command -v node >/dev/null 2>&1 || { echo "behavior: install Node.js"; exit 1; }
 	node scripts/behavior.cjs $(SITE_DIR)
@@ -153,6 +154,12 @@ serve: ## Serve the site at http://localhost:PORT
 # The white rabbit's three.js bundle is generated, so it is rebuilt rather than edited
 three: ## Rebuild the vendored three.js bundle for the white rabbit
 	scripts/three/build.sh
+
+
+# The favicons, touch icon, and square logo are drawn from the bar's mark; a redrawn logo needs a new media name
+icons: ## Redraw the square brand icons from the mark (needs Playwright), then run make rehash
+	@command -v node >/dev/null 2>&1 || { echo "icons: install Node.js"; exit 1; }
+	node scripts/icons.cjs $(SITE_DIR)
 
 
 ##@ Deploy
