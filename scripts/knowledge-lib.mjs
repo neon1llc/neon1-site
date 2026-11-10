@@ -162,3 +162,9 @@ export const TASK_PATHS = [
 // A bold label and the blank after it travel as one unit, so a line break never strands a date's blank on the next line
 const BLANK = '<span class="blank"[^>]*></span>'
 export const keepFields = (html) => html.replace(new RegExp(`(<strong>[^<]*</strong>)\\s*(${BLANK})`, "g"), '<span class="field">$1 $2</span>')
+
+
+// Templates, forms, and the examples that fill them may be completed and reused; the blank is not for republishing.
+// Other document types keep only the CC BY-ND credit line
+export const FILL_NOTE = "You may fill in, adapt, and share completed copies of this template for your own work, with or without credit. Please don't republish the blank template as your own."
+export const fillNote = (doc) => (["template", "form", "example"].includes(doc.type) ? FILL_NOTE : "")

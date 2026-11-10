@@ -11,7 +11,7 @@
 
 import { readFileSync, writeFileSync, mkdirSync, rmSync, readdirSync, statSync, existsSync } from "node:fs"
 import { join, dirname, relative } from "node:path"
-import { load, pageBody, catalogFacts, TASK_PATHS, searchIndex, esc, longDate, TYPE_LABELS, SITE, BASE } from "./knowledge-lib.mjs"
+import { load, pageBody, catalogFacts, fillNote, TASK_PATHS, searchIndex, esc, longDate, TYPE_LABELS, SITE, BASE } from "./knowledge-lib.mjs"
 
 
 const [mode, siteDir, exportDir] = process.argv.slice(2)
@@ -286,7 +286,7 @@ ${next.join("\n")}
         </ul>
       </aside>` : ""}
 
-      <p class="kc-colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit. <a class="ext" href="${esc(`https://github.com/neon1llc/neon1-corpus/blob/main/${d.source}`)}" target="_blank" rel="noopener">Source on GitHub</a>. ${d.type === "template" || d.type === "example" ? "Templates and examples are illustrations, not legal advice." : ""}</p>
+      <p class="kc-colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit. <a class="ext" href="${esc(`https://github.com/neon1llc/neon1-corpus/blob/main/${d.source}`)}" target="_blank" rel="noopener">Source on GitHub</a>. ${d.type === "template" || d.type === "example" ? "Templates and examples are illustrations, not legal advice. " : ""}${esc(fillNote(d))}</p>
     </article>`
   return page({ title: `${d.title} · neon1 knowledge center`, description: d.summary, path: d.url, main, kind: "doc" })
 }

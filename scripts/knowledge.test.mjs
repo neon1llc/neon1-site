@@ -7,7 +7,7 @@ import { join, dirname } from "node:path"
 import { tmpdir } from "node:os"
 import { spawnSync } from "node:child_process"
 import { fileURLToPath } from "node:url"
-import { TASK_PATHS, singleH1, classifyLinks, catalogFacts, keepFields, load } from "./knowledge-lib.mjs"
+import { TASK_PATHS, singleH1, classifyLinks, catalogFacts, keepFields, fillNote, FILL_NOTE, load } from "./knowledge-lib.mjs"
 import { prepare, search } from "../src/app/public/js/knowledge-search-core.js"
 
 const here = dirname(fileURLToPath(import.meta.url))
@@ -169,4 +169,15 @@ test("a printed label and its blank are wrapped as one unit", () => {
   const blank = '<span class="blank" role="img" aria-label="blank to fill in"></span>'
   assert.equal(keepFields(`<strong>Date:</strong> ${blank}`), `<span class="field"><strong>Date:</strong> ${blank}</span>`)
   assert.equal(keepFields("<strong>Note:</strong> text"), "<strong>Note:</strong> text")
+})
+
+test("only templates, forms, and examples carry the fill-in permission", () => {
+  for (const type of ["template", "form", "example"]) assert.equal(fillNote({ type }), FILL_NOTE)
+  for (const type of ["guide", "policy", "standard", "faq"]) assert.equal(fillNote({ type }), "")
+  const f = fixture()
+  f.list.find((d) => d.id === "guides-spot-phishing").type = "template"
+  writeFileSync(join(f.exp, "guides-spot-phishing.json"), JSON.stringify(f.list.find((d) => d.id === "guides-spot-phishing")))
+  build(f)
+  assert.ok(read(f, "knowledge/guides/spot-phishing/index.html").includes("Please don&#x27;t republish the blank template as your own."))
+  assert.ok(!read(f, "knowledge/guides/use-case-cloud/index.html").includes("republish the blank"))
 })
