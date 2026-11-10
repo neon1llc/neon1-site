@@ -8,7 +8,9 @@
     "here is a guessed asset page. The Blender files, recipes (blender/*.py), and the owner's photos the yard was fitted to live in the owner's",
     "private planning folder, not this repository.",
     "scripts/manifest.py checks this file (make manifest, part of make check) and refreshes the hashes (make rehash);",
-    "scripts/models.cjs checks the models against the code that names their parts (make models, part of make check)."
+    "scripts/models.cjs checks the models against the code that names their parts (make models, part of make check).",
+    "unresolved: provenance still owed, each naming the assets or sources it concerns and what is missing. None of it is guessed; an item",
+    "is closed by recording the exact origin in its source or asset, then removing the item. make manifest fails if an unrecorded asset is untracked."
   ],
   "sources": {
     "camaro": {
@@ -95,7 +97,7 @@
       "title": "three.js 0.187.0",
       "author": "three.js authors",
       "source_url": "https://www.npmjs.com/package/three/v/0.187.0",
-      "exactness": "exact package version, pinned in scripts/three/build.sh",
+      "exactness": "exact package version, locked with every dependency in scripts/three/package-lock.json",
       "license": "MIT",
       "license_file": "js/vendor/three-LICENSE.md"
     },
@@ -256,7 +258,7 @@
       "sources": [
         "three"
       ],
-      "made": "Bundled by scripts/three/build.sh (make three) with esbuild 0.25.12 from scripts/three/entry.js, minified, license comments at the end; the license file is copied from the package.",
+      "made": "Bundled by scripts/three/build.sh (make three) with esbuild 0.25.12 from scripts/three/entry.js, installed with npm ci from scripts/three/package-lock.json, minified, license comments at the end; the license file is copied from the package. A locked rebuild on 2026-11-10 reproduced the shipped bytes.",
       "consumers": [
         "js/white-rabbit-scene.js",
         "js/white-rabbit-room.js",
@@ -276,9 +278,29 @@
         "index.html",
         "js/views.js"
       ]
+    },
+    "brand-icons": {
+      "title": "Square brand icons: favicons, touch icon, and logo",
+      "origin": "first-party",
+      "made": "The neon1 mark from the bar, drawn on the brand's dark ground by scripts/icons.cjs in headless Chromium (make icons). favicon.ico holds 16, 32, and 48 px PNGs.",
+      "consumers": [
+        "index.html"
+      ]
     }
   },
   "files": {
+    "apple-touch-icon.png": {
+      "sha256": "0408d05ba095f162147b36b0944748219b9a4bba5c5b576fef21b33690d7f28f",
+      "asset": "brand-icons"
+    },
+    "favicon-48.png": {
+      "sha256": "217aa3e5d2d853472b3dcfb2541c23ba315d7decf65c220124dbdb89427a96ab",
+      "asset": "brand-icons"
+    },
+    "favicon.ico": {
+      "sha256": "0069dd4f037348e80fdaf4ed156061d7951807b17eb532b1d636b200c1a05819",
+      "asset": "brand-icons"
+    },
     "fonts/OFL-Inter.txt": {
       "sha256": "8c8fa881d9091ee315d2c80d207bb73afd4e90a66c9782ca445c5642f25db6dc",
       "asset": "font-inter"
@@ -310,6 +332,10 @@
     "js/vendor/three-LICENSE.md": {
       "asset": "three-bundle",
       "sha256": "8b378ebe60e2fe500158cb0ac71cb5e8b7d92953c2abcc63a0eb90499653b5bc"
+    },
+    "media/neon1-logo-512.png": {
+      "sha256": "ba9cd3a993ba720b5f66ce0356269ff8da026762b05d20299c02fbde80aac3db",
+      "asset": "brand-icons"
     },
     "media/og-card-1.png": {
       "sha256": "7a06a3a04aecf5533a9fe7ecf72b76fda7f37e5f0b8423230db9a60dfbddd06f",
@@ -487,5 +513,49 @@
       "sha256": "00f1237aabd88ddbf69521d679a4a5b37ae2a4c5298abcf70a159fb3ed414bd1",
       "asset": "yard-garden"
     }
-  }
+  },
+  "unresolved": [
+    {
+      "refs": [
+        "far-trees"
+      ],
+      "missing": "What the far tree line was made from. It was made in the owner's private planning folder and its sources are not recorded here."
+    },
+    {
+      "refs": [
+        "inter",
+        "jetbrains-mono"
+      ],
+      "missing": "The exact font releases the WOFF2 subsets were taken from, and how they were subset."
+    },
+    {
+      "refs": [
+        "motion"
+      ],
+      "missing": "The package file motion-11.18.2.min.js was copied from; only the version in its name is known."
+    },
+    {
+      "refs": [
+        "camaro",
+        "sunflower",
+        "tomato",
+        "squash",
+        "rose"
+      ],
+      "missing": "The exact Sketchfab model pages and download records; only each creator's profile is recorded."
+    },
+    {
+      "refs": [
+        "polyhaven-trees",
+        "polyhaven-plants"
+      ],
+      "missing": "The asset pages for the Poly Haven IDs that CREDITS.txt names."
+    },
+    {
+      "refs": [
+        "polyhaven-textures"
+      ],
+      "missing": "The Poly Haven asset IDs and pages for the textures CREDITS.txt names by material."
+    }
+  ]
 }

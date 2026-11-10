@@ -20,24 +20,42 @@
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="The neon1 mark and name in glowing green on a dark card, with cloud, AI, IT, New York, and 1 is glad to be of service" />
   <meta name="twitter:card" content="summary_large_image" />
-  <!-- Who runs the practice, as shown on the page -->
+  <!-- Who runs the practice, as shown on the page, and the site's name for search results. Only facts
+       the page itself states; the @id values are stable names other pages can point at -->
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "ProfessionalService",
-      "name": "neon1",
-      "legalName": "neon1 LLC",
-      "url": "https://neon1.tech/",
-      "logo": "https://neon1.tech/media/og-card-1.png",
-      "slogan": "1 is glad to be of service.",
-      "description": "A one-person technology practice: cloud and AI engineering, business automation, networks, and cameras.",
-      "email": "hello@neon1.tech",
-      "telephone": "+1-424-326-3661",
-      "founder": { "@type": "Person", "name": "Pradeep Tathineni", "sameAs": "https://www.linkedin.com/in/pradeep-tathineni/" },
-      "sameAs": ["https://github.com/neon1llc", "https://www.linkedin.com/company/neon1llc"]
+      "@graph": [
+        {
+          "@type": "ProfessionalService",
+          "@id": "https://neon1.tech/#organization",
+          "name": "neon1",
+          "legalName": "neon1 LLC",
+          "url": "https://neon1.tech/",
+          "logo": { "@type": "ImageObject", "@id": "https://neon1.tech/#logo", "url": "https://neon1.tech/media/neon1-logo-512.png", "width": 512, "height": 512 },
+          "image": "https://neon1.tech/media/og-card-1.png",
+          "slogan": "1 is glad to be of service.",
+          "description": "A one-person technology practice: cloud and AI engineering, business automation, networks, and cameras.",
+          "email": "hello@neon1.tech",
+          "telephone": "+1-424-326-3661",
+          "founder": { "@type": "Person", "name": "Pradeep Tathineni", "sameAs": "https://www.linkedin.com/in/pradeep-tathineni/" },
+          "sameAs": ["https://github.com/neon1llc", "https://www.linkedin.com/company/neon1llc"]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://neon1.tech/#website",
+          "name": "neon1",
+          "alternateName": "neon1 LLC",
+          "url": "https://neon1.tech/",
+          "publisher": { "@id": "https://neon1.tech/#organization" }
+        }
+      ]
     }
   </script>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22 fill=%22none%22 stroke=%22%2300B84F%22 stroke-width=%225%22 stroke-linecap=%22round%22><path d=%22M6 6a24 24 0 0 1 24 24v30M6 18a12 12 0 0 1 12 12v30M34 6a24 24 0 0 1 24 24v30M34 18a12 12 0 0 1 12 12v30%22/></svg>" />
+  <!-- Square icons at stable URLs, drawn from the bar's mark by scripts/icons.cjs, so crawlers can fetch them -->
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
   <!-- Shared with 1NEON: fonts, brand tokens, rain layers, glass, and rain controls -->
   <link rel="stylesheet" href="/shared/neon1.css" />
@@ -74,8 +92,8 @@
       <ul class="links">
         <li><a href="#services">services</a></li>
         <li><a href="#process">process</a></li>
-        <li><a href="#projects">case studies</a></li>
-        <li><a href="#work">projects</a></li>
+        <li><a href="#projects">client work</a></li>
+        <li><a href="#work">tools I'm building</a></li>
         <li><a href="#why">about</a></li>
         <li><a href="/knowledge/">knowledge</a></li>
         <!-- frame:actions -->
@@ -96,14 +114,14 @@
     <ul>
       <li><a href="#services">services</a></li>
       <li><a href="#process">process</a></li>
-      <li><a href="#projects">case studies</a></li>
-      <li><a href="#work">projects</a></li>
+      <li><a href="#projects">client work</a></li>
+      <li><a href="#work">tools I'm building</a></li>
       <li><a href="#why">about</a></li>
       <li><a href="#faq">questions</a></li>
       <li><a href="#contact">contact</a></li>
       <li><a href="/knowledge/">knowledge</a></li>
       <li><a href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a call</a></li>
-      <li><a href="/1NEON/" data-handoff>1NEON</a></li>
+      <li><a href="/1NEON/" data-handoff>1NEON client portal</a></li>
     </ul>
   </div>
 
@@ -112,6 +130,11 @@
       <div class="glass glass-pane hero-pane">
         <h1 class="brand" aria-label="neon1"><span class="ne dec" aria-hidden="true">neon</span><span class="one dec" aria-hidden="true">1</span></h1>
         <p class="tagline reveal d1">1 is glad to be of service.</p>
+        <!-- The plain offer and the one way to start, so the first screen says what, for whom, and how to begin.
+             The link settles on the contact view, which has the form, email, phone, and booking -->
+        <p class="offer reveal d2">Practical technology help for small businesses, teams, and homes.</p>
+        <p class="offer-sub reveal d2">Connect the tools you use, reduce repetitive work, and leave with a setup you can run.</p>
+        <p class="start reveal d3"><a class="btn btn-primary" href="#contact">Talk through your project</a><span class="start-note">Free 15-minute introduction</span></p>
       </div>
       <!-- The white rabbit's way in from the keyboard: off screen until focused, like the skip link,
            and shown only once js/white-rabbit.js runs -->
@@ -157,10 +180,10 @@
     </section>
 
     <section id="projects" class="view" aria-labelledby="projects-h">
-      <h2 id="projects-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>case studies</h2>
+      <h2 id="projects-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>client work</h2>
       <p class="lead intro reveal-on">From cloud systems to a grandparent's email, every one runs the same way: <span class="stages"><b class="nl">N</b>eeds, <b class="nl">E</b>xecute, <b class="nl">O</b>bserve, <b class="nl">N</b>ormalize.</span></p>
       <div class="rail-wrap">
-        <div class="cases" id="cases" tabindex="0" aria-label="Case studies, scroll sideways">
+        <div class="cases" id="cases" tabindex="0" aria-label="Client work case studies, scroll sideways">
         <!-- corpus:case-studies generated by scripts/corpus.mjs from neon1-corpus. Edit there, then run make corpus -->
         <article class="case reveal-on" id="case-accounting">
           <p class="idx">accounting firm · cloud &amp; AI</p>
@@ -218,22 +241,40 @@
     </section>
 
     <section id="work" class="view" aria-labelledby="work-h">
-      <h2 id="work-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>projects</h2>
-      <div class="rows">
-        <a class="row reveal-on" href="https://github.com/neon1llc/aws-clip" target="_blank" rel="noopener">
-          <h3>AWS CLIP <span class="go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></span></h3>
-          <p class="state">public · pre-release</p>
-          <p><b>AWS CLI Plus.</b> A wrapper around the AWS CLI that checks which account you're in, explains what a command will do before it runs, and hides secrets in its output.</p>
-        </a>
-        <div class="row reveal-on">
-          <h3>DeployOps <span class="lock" tabindex="0" role="img" aria-label="currently private"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span></h3>
-          <p class="state dim">private · pre-release</p>
-          <p><b>Deploy pipelines for any cloud.</b> Pipelines for infrastructure and applications on AWS, Azure, Google Cloud, or several at once. It sets up CI/CD for one repo or many, works with the IaC you already use, and adds checks, approvals, rollback, monitoring, and alerts where your team will see them.</p>
+      <h2 id="work-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>tools I'm building</h2>
+      <!-- Each tool says whether it can be used now, who it helps, one example, its limits, and the honest next step.
+           Nothing here links to a product that isn't available. Claims follow each tool's current README or plan -->
+      <p class="lead intro reveal-on">One can be tried now; two are still in development. Status as of November 2026.</p>
+      <div class="rows tools">
+        <div class="row tool reveal-on">
+          <h3>AWS CLIP</h3>
+          <p class="state">available now · public pre-release</p>
+          <div class="tool-body">
+            <p><b>Account guards and approval checks around the AWS CLI.</b> For people who work across several AWS accounts from a terminal.</p>
+            <p><span class="k">example</span> Bind a production profile to its account, and a command that resolves to a different account stops before it runs. Changes still ask for approval.</p>
+            <p><span class="k">limits</span> Built from source with Go. Account checks always run in its workflows, but on single commands only when a profile or account guard is set. Its previews leave out argument values, and AWS's own output is shown unchanged, so it can contain sensitive data.</p>
+            <p class="next"><a class="ext" href="https://github.com/neon1llc/aws-clip" target="_blank" rel="noopener">Read the README on GitHub</a></p>
+          </div>
         </div>
-        <div class="row reveal-on">
+        <div class="row tool reveal-on">
+          <h3>DeployOps <span class="lock" tabindex="0" role="img" aria-label="currently private"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span></h3>
+          <p class="state dim">in development · private</p>
+          <div class="tool-body">
+            <p><b>Deploy pipelines for one cloud or several.</b> For teams shipping infrastructure and applications on AWS, Azure, or Google Cloud.</p>
+            <p><span class="k">example</span> The plan is to add checks, approvals, rollback, and alerts to the pipeline of a repo that already uses Terraform.</p>
+            <p><span class="k">limits</span> Not available to use or try yet, and what it covers may change before it is.</p>
+            <p class="next">Pipeline work today is part of my cloud engineering. <a class="ext" href="#contact">Ask about your deploys</a></p>
+          </div>
+        </div>
+        <div class="row tool reveal-on">
           <h3>Ready, Secure, Go <span class="lock" tabindex="0" role="img" aria-label="currently private"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span></h3>
-          <p class="state dim">private · pre-release</p>
-          <p><b>Security steps for each kind of space.</b> Plain-language guidance for a phone, a home network, a classroom, a small office, or a company heading into SOC 2: five things worth doing first, then what's next.</p>
+          <p class="state dim">in development · private</p>
+          <div class="tool-body">
+            <p><b>Security steps for each kind of space.</b> For households, classrooms, small offices, and companies heading into SOC 2.</p>
+            <p><span class="k">example</span> For a home network, the five things worth doing first, then what comes next.</p>
+            <p><span class="k">limits</span> Not published yet. Until it is, the same guidance comes through my security sessions.</p>
+            <p class="next"><a class="ext" href="#contact">Ask about a session</a></p>
+          </div>
         </div>
       </div>
     </section>
@@ -380,9 +421,16 @@
       </div>
       <p class="white-rabbit-grass" role="status"></p>
     </div>
-    <!-- While caught, only for screen readers: how to move and how to leave. Nothing on screen explains the scene;
-         keyboard entry focuses this line so it is read out -->
+    <!-- While caught, only for screen readers: how to move and how to leave. Keyboard entry focuses this line
+         so it is read out -->
     <p class="white-rabbit-how" id="whiteRabbitHow" tabindex="-1">Scroll down or press the down arrow to follow it. Up goes back, and Esc leaves.</p>
+    <!-- While caught, a small cluster on screen: a way out (the same as Esc), the sound switch (the scene only;
+         the card is silent), and a movement hint that fades after the first move. js/white-rabbit.js runs it -->
+    <div class="white-rabbit-ctl" role="group" aria-label="White rabbit">
+      <p class="white-rabbit-hint" aria-hidden="true">scroll or swipe down to follow</p>
+      <button class="white-rabbit-btn" type="button" data-rabbit="exit">exit <span class="white-rabbit-key" aria-hidden="true">esc</span></button>
+      <button class="white-rabbit-btn" type="button" data-rabbit="sound" aria-pressed="true">sound on</button>
+    </div>
   </div>
 
   <!-- Deferred scripts run in order, so Motion loads before the views and case studies -->

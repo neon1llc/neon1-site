@@ -140,6 +140,80 @@ check("browser", "contact: missing fields are named and nothing is sent; a refus
 });
 
 
+// PS-02: a send that never answers ends in an uncertain-outcome message within the deadline, keeps the
+// draft, sends once, and leaves retrying to the visitor. The page clock is faked, so no real wait
+check("browser", "contact: a send that never answers stops waiting, keeps the draft, and sends only once", async () => {
+  const { page, context, errors } = await open();
+  try {
+    await page.clock.install();
+    let calls = 0;
+    await page.route("**/1NEON/api/contact", () => { calls++; }); // never fulfilled
+    await page.locator("#contact").scrollIntoViewIfNeeded();
+    await fillForm(page);
+    await page.locator('#cform [type="submit"]').click();
+    await page.locator("[name=email]").press("Enter"); // a second submit while the first is pending
+    expect(await page.locator('#cform [type="submit"]').isDisabled(), "the send button stays enabled while pending");
+    await page.clock.runFor(14000);
+    expect(/Sending/.test(await page.locator("#cstatus").textContent()), "gave up before the deadline");
+    await page.clock.runFor(2000);
+    await page.waitForFunction(() => /couldn't confirm/.test(document.getElementById("cstatus").textContent));
+    const after = await page.evaluate(() => ({ today: document.querySelector("[name=today]").value, email: document.querySelector("[name=email]").value,
+      disabled: document.querySelector('#cform [type="submit"]').disabled, hidden: document.getElementById("cform").hidden }));
+    expect(after.today.includes(MARK) && after.email === "dana@example.com" && !after.disabled && !after.hidden, "the draft or the form was not kept", after);
+    expect(/hello@neon1.tech/.test(await page.locator("#cstatus").textContent()), "the message does not name the email address");
+    expect(calls === 1, "the message was sent more than once", calls);
+    expect(!errors.length, "page errors", errors);
+  } finally { await context.close(); }
+});
+
+// ---- CP-10: the first screen says what, for whom, and how to start, and the views still snap ----
+for (const [label, viewport] of [["phone", { width: 390, height: 844 }], ["wide", { width: 1280, height: 800 }]]) {
+  check("browser", `home: the offer and its start link fit the first screen, and the start link settles on contact (motion, ${label})`, async () => {
+    const { page, context, errors } = await open({ viewport, reducedMotion: "no-preference" });
+    try {
+      await page.waitForLoadState("load");
+      const first = await page.evaluate(() => {
+        const inView = (el) => { const r = el && el.getBoundingClientRect(); return !!r && r.width > 0 && r.top >= 0 && r.bottom <= innerHeight; };
+        return { offer: inView(document.querySelector(".hero .offer")), start: inView(document.querySelector(".hero .start a")),
+          href: document.querySelector(".hero .start a")?.getAttribute("href"), wide: document.documentElement.scrollWidth <= innerWidth };
+      });
+      expect(first.offer && first.start && first.href === "#contact" && first.wide, "the offer or its start link is off the first screen", first);
+      await page.locator(".hero .start a").click();
+      await page.waitForFunction(() => Math.abs(document.getElementById("contact").getBoundingClientRect().top - 64) < 3, null, { timeout: 5000 });
+      expect(!errors.length, "page errors", errors);
+    } finally { await context.close(); }
+  });
+}
+
+check("browser", "home: one wheel gesture from the first screen settles on services (motion, wide)", async () => {
+  const { page, context } = await open({ reducedMotion: "no-preference" });
+  try {
+    await page.waitForLoadState("load");
+    await page.mouse.move(640, 450);
+    for (let i = 0; i < 6; i++) { await page.mouse.wheel(0, 30); await page.waitForTimeout(20); }
+    await page.waitForFunction(() => Math.abs(document.getElementById("services").getBoundingClientRect().top - 64) < 3, null, { timeout: 5000 });
+  } finally { await context.close(); }
+});
+
+// ---- CP-16: every tool states whether it can be used now and ends on a next step that works; a tool in
+// development offers no link that would suggest it can be opened, only a way to ask ----
+check("browser", "tools: each has a state and a working next step, and tools in development link only to contact", async () => {
+  const { page, context } = await open();
+  try {
+    const tools = await page.$$eval("#work .tool", (rows) => rows.map((r) => ({
+      name: r.querySelector("h3")?.textContent.trim(), state: r.querySelector(".state")?.textContent.trim() || "",
+      links: [...r.querySelectorAll("a")].map((a) => a.getAttribute("href")),
+      next: [...r.querySelectorAll(".next a")].map((a) => a.getAttribute("href")),
+      targets: [...r.querySelectorAll('a[href^="#"]')].every((a) => !!document.getElementById(a.getAttribute("href").slice(1))),
+    })));
+    expect(tools.length >= 3, "the tools are missing", tools);
+    for (const t of tools) {
+      expect(/available now|in development/.test(t.state) && t.next.length === 1 && t.targets, "a tool lacks a state or a working next step", t);
+      if (/in development/.test(t.state)) expect(t.links.every((h) => h === "#contact"), "a tool in development links somewhere other than contact", t);
+    }
+  } finally { await context.close(); }
+});
+
 // ---- SITE-05: a case study owns the screen while open ----
 // Where focus is, whether it sits inside the panel, and whether the page behind is inert
 const caseState = (page) => page.evaluate(() => {
@@ -284,13 +358,18 @@ for (const motion of ["reduce", "no-preference"]) {
 const rabbit = (page) => page.evaluate(() => {
   const root = document.getElementById("whiteRabbit"), a = document.activeElement;
   const how = root.querySelector(".white-rabbit-how");
-  // Anything on screen that could be pressed or read as a control: there should never be one over the scene or the card
+  // Controls on screen: the cluster (exit, sound, hint) is expected while caught; anything else that could be
+  // pressed over the scene or the card is a stray and counts in controls
   const shown = (el) => { const r = el.getBoundingClientRect(), c = getComputedStyle(el); return r.width > 1 && r.height > 1 && c.visibility === "visible" && c.display !== "none"; };
+  const ctl = root.querySelector(".white-rabbit-ctl");
+  const btn = (name) => root.querySelector(`[data-rabbit="${name}"]`);
   return {
     state: root.dataset.state, mode: root.dataset.mode, progress: root.dataset.progress,
     canvases: document.querySelectorAll(".white-rabbit-gl").length,
-    focus: a.id || a.tagName,
-    controls: [...root.querySelectorAll("button, a, [role=group], .chip")].filter(shown).length,
+    focus: a.dataset?.rabbit || a.id || a.tagName,
+    controls: [...root.querySelectorAll("button, a, [role=group], .chip")].filter((el) => !(ctl && ctl.contains(el)) && el !== ctl).filter(shown).length,
+    exitShown: !!btn("exit") && shown(btn("exit")), soundShown: !!btn("sound") && shown(btn("sound")),
+    sound: btn("sound")?.getAttribute("aria-pressed"), hint: root.dataset.hint,
     howShown: !!how && shown(how), howText: how ? how.textContent : "",
   };
 });
@@ -313,21 +392,28 @@ async function tabToRabbit(page) {
   throw new Error("Tab never reached the white rabbit's way in");
 }
 
-check("browser", "rabbit: keyboard entry, no controls on screen, Tab, Esc, and focus back (reduced motion card)", async () => {
+check("browser", "rabbit: keyboard entry, exit and hint on screen, Tab cycles them, Esc, and focus back (reduced motion card)", async () => {
   const { page, context, errors } = await open({ init: COUNT_FRAMES });
   try {
     await tabToRabbit(page);
     await page.keyboard.press("Enter");
     let r = await rabbit(page);
     expect(r.state === "caught" && r.mode === "card" && r.focus === "whiteRabbitHow", "Enter did not catch and focus the line that says how to move", r);
-    expect(!r.howShown && /Esc leaves/.test(r.howText) && r.controls === 0, "something explains or controls the scene on screen", r);
+    expect(!r.howShown && /Esc leaves/.test(r.howText) && r.controls === 0, "a stray control showed, or the screen reader line is visible", r);
+    expect(r.exitShown && !r.soundShown && r.hint === "on", "exit or the hint is missing, or the silent card offers sound", r);
     for (let i = 0; i < 6; i++) await page.keyboard.press("PageDown");
     r = await rabbit(page);
     expect(r.state === "playing" || r.state === "done", "the down keys did not play the card", r);
-    expect(r.controls === 0, "a control showed over the card", r);
-    await page.keyboard.press("Tab"); await page.keyboard.press("Shift+Tab");
+    expect(r.controls === 0 && r.exitShown && r.hint === "off", "a stray control showed, exit went, or the hint stayed after moving", r);
+    await page.keyboard.press("Tab");
+    r = await rabbit(page);
+    expect(r.focus === "exit", "Tab did not reach exit", r);
+    await page.keyboard.press("Tab");
     r = await rabbit(page);
     expect(r.focus === "whiteRabbitHow", "Tab left the rabbit while the page is covered", r);
+    await page.keyboard.press("Shift+Tab");
+    expect((await rabbit(page)).focus === "exit", "Shift+Tab did not go back to exit");
+    await page.keyboard.press("Shift+Tab");
     await page.keyboard.press("Escape");
     expect(await isState(page, "idle"), "Esc did not end the entry", await rabbit(page));
     r = await rabbit(page);
@@ -338,6 +424,14 @@ check("browser", "rabbit: keyboard entry, no controls on screen, Tab, Esc, and f
     await page.keyboard.press("Escape");
     r = await rabbit(page);
     expect(r.state === "idle" && r.focus === "whiteRabbitIn", "Esc while caught did not leave and restore focus", r);
+    expect(!r.exitShown, "exit stayed on screen after leaving", r);
+    // Exit pressed from the keyboard leaves like Esc and gives focus back
+    await page.keyboard.press("Enter");
+    await page.keyboard.press("Tab");
+    expect((await rabbit(page)).focus === "exit", "Tab while caught did not reach exit");
+    await page.keyboard.press("Enter");
+    r = await rabbit(page);
+    expect(r.state === "idle" && r.focus === "whiteRabbitIn", "exit did not leave and restore focus", r);
     expect(!(await sceneFrames(page)), "the card started the scene loop");
     expect(!errors.length, "page errors", errors);
   } finally { await context.close(); }
@@ -347,7 +441,8 @@ check("browser", "rabbit: a touch screen leaves the card by swiping back up", as
   const { page, context } = await open({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }, "/?rabbit=p0.5");
   try {
     expect(await isState(page, "playing"), "the test flag did not catch a rabbit", await rabbit(page));
-    expect((await rabbit(page)).controls === 0, "a control showed over the card", await rabbit(page));
+    const at = await rabbit(page);
+    expect(at.controls === 0 && at.exitShown, "a stray control showed over the card, or exit is missing", at);
     const cdp = await context.newCDPSession(page);
     const touch = (type, y) => cdp.send("Input.dispatchTouchEvent", { type, touchPoints: type === "touchEnd" ? [] : [{ x: 195, y }] });
     for (let i = 0; i < 40 && (await rabbit(page)).state !== "idle"; i++) {
@@ -375,15 +470,31 @@ check("gpu", "rabbit: turning on reduced motion mid-scene switches to the still 
   } finally { await context.close(); }
 });
 
-check("gpu", "rabbit: nothing to press shows at the window, and Tab stays on the rabbit", async () => {
-  const { page, context, errors } = await open(SMALL, "/?rabbit=p0.7");
+check("gpu", "rabbit: at the window only exit and sound show, sound switches off and on, a tap on exit leaves, and Tab stays on the rabbit", async () => {
+  // Every audio device the page opens, so the check can see the switch close it
+  const AUDIO = () => {
+    const AC = window.AudioContext; const all = (window.__audio = []);
+    window.AudioContext = class extends AC { constructor(...a) { super(...a); all.push(this); } };
+  };
+  const { page, context, errors } = await open({ ...SMALL, init: `(${COUNT_FRAMES})(); (${AUDIO})();` }, "/?rabbit=p0.7");
   try {
     expect(await until(page, () => !!document.getElementById("whiteRabbit").dataset.progress, null, 90000), "the scene never rendered", await rabbit(page));
     let r = await rabbit(page);
-    expect(r.controls === 0 && !r.howShown, "something to press showed over the scene at the window", r);
-    await page.keyboard.press("Tab");
+    expect(r.controls === 0 && !r.howShown && r.exitShown && r.soundShown && r.sound === "true", "a stray control showed, or exit or sound is missing over the scene", r);
+    await page.locator('[data-rabbit="sound"]').click();
     r = await rabbit(page);
-    expect(r.focus === "whiteRabbitHow", "Tab left the rabbit while the scene covers the page", r);
+    const live = () => page.evaluate(() => window.__audio.filter((c) => c.state !== "closed").length);
+    expect(r.sound === "false" && /off/.test(await page.locator('[data-rabbit="sound"]').textContent()), "the switch did not turn sound off", r);
+    expect(await until(page, () => window.__audio.every((c) => c.state === "closed"), null, 3000), "an audio device stayed open with sound off", await live());
+    await page.locator('[data-rabbit="sound"]').click();
+    expect((await rabbit(page)).sound === "true" && (await live()) === 1, "the switch did not turn sound back on", await live());
+    expect(r.state !== "idle" && (await rabbit(page)).state !== "idle", "the sound switch left the scene");
+    await page.keyboard.press("Tab");
+    expect(["whiteRabbitHow", "exit", "sound"].includes((await rabbit(page)).focus), "Tab left the rabbit while the scene covers the page", await rabbit(page));
+    await page.locator('[data-rabbit="exit"]').click();
+    expect(await isState(page, "idle"), "exit did not play back out", await rabbit(page));
+    expect(await until(page, () => window.__audio.every((c) => c.state === "closed"), null, 3000), "audio kept running after exit", await live());
+    expect(!(await sceneFrames(page)), "the scene loop kept running after exit");
     expect(!errors.length, "page errors", errors);
   } finally { await context.close(); }
 });

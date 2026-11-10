@@ -32,13 +32,13 @@ The generated blocks are committed, so the deploy stays a plain copy of `src/app
 
 CloudFront serves the page with a strict policy: scripts, styles, fonts, and connections only from neon1.tech, and images from neon1.tech or `data:` URLs. Keep scripts and styles in their own files, since inline `<script>`, `<style>`, `style=""` attributes, and `on…` handlers are blocked. Setting styles from JavaScript (`el.style.x = …`) is fine. A new outside origin needs a change to the policy in neon1-aws-infrastructure first.
 
-`robots.txt`, `sitemap.xml`, and `.well-known/security.txt` are published with the page. Update the security contact's `Expires` date before it passes.
+`robots.txt`, `sitemap.xml`, and `.well-known/security.txt` are published with the page, and so are the square icons at fixed URLs: `/favicon.ico`, `/favicon-48.png`, and `/apple-touch-icon.png`. The structured data names `/media/neon1-logo-512.png` as the logo and keeps the wide link-preview card for `og:image`. `make icons` redraws all four from the bar's mark. Update the security contact's `Expires` date before it passes.
 
 ## The white rabbit
 
 Now and then a white rabbit drops into the rain on the landing. Catching it stops the rain, and scrolling down pulls back out of an old TV into a sunlit room that ends on "go touch grass". Scrolling up plays it back. The controller is `js/white-rabbit.js`. The 3D scene in `js/white-rabbit-scene.js` and the three.js bundle in `js/vendor/` load only after a catch. Reduced motion, or a browser without WebGL, gets a still card instead, and turning on reduced motion mid-scene switches to the card.
 
-From the keyboard, "follow the white rabbit" sits after the bar's links, off screen until it has focus, like the skip link. While a rabbit is caught, nothing on screen explains it: focus moves to a line only screen readers read (how to move, and that Esc leaves), Tab stays there, and focus goes back where it was when it ends. Each catch is its own entry: the scene is built at most once per entry, and its loop stops on every way out.
+From the keyboard, "follow the white rabbit" sits after the bar's links, off screen until it has focus, like the skip link. While a rabbit is caught, a small cluster at the bottom offers exit (the same as Esc), a sound switch in the 3D scene (the card is silent), and a hint to scroll or swipe that fades after the first move. Focus moves to a line only screen readers read (how to move, and that Esc leaves), Tab cycles between that line and the cluster, and focus goes back where it was when it ends. Turning sound off lasts until the page reloads and isn't stored. Each catch is its own entry: the scene is built at most once per entry, and its loop stops on every way out.
 
 Two query flags help with testing, and in production they only add rabbits:
 
@@ -47,13 +47,13 @@ Two query flags help with testing, and in production they only add rabbits:
 
 `make perf` enters the scene in headless Chromium on a desktop viewport and an emulated phone, records three.js's draw calls, triangles, geometries, textures, and shader programs at six fixed points of the walk, and fails if any goes past `scripts/perf-budget.json`. `docs/perf-report.md` has the last numbers and how the budget was set; `PERF_REPORT=docs/perf-report.md make perf` rewrites it. Headless WebGL is software-rendered, so its frame times are only for comparing runs on one machine.
 
-`make three` rebuilds the bundle from `scripts/three/entry.js` with pinned three.js and esbuild versions.
+`make three` rebuilds the bundle from `scripts/three/entry.js` with `npm ci` from `scripts/three/package-lock.json`, so every package version is locked, and says whether the result matches the hash in the asset manifest.
 
-The scene's models and images are in `media/white-rabbit/`, with their credits in `media/white-rabbit/CREDITS.txt`. `src/app/asset-manifest.json` records every shipped third-party or baked asset, fonts and vendored bundles included: its sha256, its source and license, how it was made, and which files load it. Where only a creator's profile or a library's home page is known, it says so. The Blender files, recipes, and photos behind the scene stay in the owner's private planning folder. `make models` builds the room in Node and fails if `room.glb`, its baked maps in `lm/`, or the car's material names no longer match the code, so a geometry change that would misplace the baked light fails loudly. The car model is based on "2019 Chevrolet Camaro" by IsaacOldton (CC BY 4.0), modified: unbranded, recolored, and optimized. The trees and photographed textures come from Poly Haven (CC0).
+The scene's models and images are in `media/white-rabbit/`, with their credits in `media/white-rabbit/CREDITS.txt`. `src/app/asset-manifest.json` records every shipped third-party or baked asset, fonts and vendored bundles included: its sha256, its source and license, how it was made, and which files load it. Where only a creator's profile or a library's home page is known, it says so, and its `unresolved` list tracks each piece of provenance still owed (the far trees' origin, the font releases, exact model pages), which `make manifest` keeps from going untracked. The Blender files, recipes, and photos behind the scene stay in the owner's private planning folder. `make models` builds the room in Node and fails if `room.glb`, its baked maps in `lm/`, or the car's material names no longer match the code, so a geometry change that would misplace the baked light fails loudly. The car model is based on "2019 Chevrolet Camaro" by IsaacOldton (CC BY 4.0), modified: unbranded, recolored, and optimized. The trees and photographed textures come from Poly Haven (CC0).
 
 ## Deploy
 
-Pushing to `main` runs the checks and then deploys from GitHub Actions. The workflow assumes an AWS role through OIDC, so the repo holds no AWS keys. The role ARN is the repository variable `AWS_DEPLOY_ROLE_ARN`.
+Pushing to `main` runs the checks and then deploys from GitHub Actions. The `check` job runs `make check`, then `make behavior` and `scripts/chat_check.cjs` in headless Chromium with every API stubbed, and the deploy job starts only after all three pass. The workflow assumes an AWS role through OIDC, so the repo holds no AWS keys. The role ARN is the repository variable `AWS_DEPLOY_ROLE_ARN`.
 
 To deploy by hand:
 

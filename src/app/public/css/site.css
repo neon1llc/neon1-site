@@ -56,6 +56,17 @@ a.card { text-decoration: none; }
 
 .hero { position: relative; }
 
+/* The offer under the tagline: plain sans text and one primary action, kept inside the same glass pane
+   so the wordmark and rain still lead the first screen */
+.reveal.d2 { animation-delay: .8s; }
+.reveal.d3 { animation-delay: 1.1s; }
+.offer { margin: clamp(22px, 4vh, 34px) auto 0; max-width: 560px; font: 600 clamp(18px, 2.2vw, 24px)/1.3 var(--sans); letter-spacing: -.012em; color: #e9ffee; }
+.offer-sub { margin: 10px auto 0; max-width: 520px; font: 400 clamp(15px, 1.6vw, 17px)/1.5 var(--sans); color: rgba(233,255,238,.82); }
+.start { margin: clamp(18px, 3vh, 26px) 0 0; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px 16px; }
+.start .btn { font: 600 15px var(--sans); color: var(--void); background: var(--neon); border-color: var(--neon); text-decoration: none; }
+.start .btn:hover, .start .btn:focus-visible { box-shadow: 0 0 24px rgba(108,255,168,.55); }
+.start-note { font: 13px var(--mono); color: var(--neon); opacity: .85; }
+
 /* ---- Steps ---- */
 .steps { counter-reset: s; display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
 .steps div { counter-increment: s; border-left: 2px solid var(--mid); padding: 4px 0 4px 18px; }
@@ -304,10 +315,29 @@ body.white-rabbit-scene > :not(.white-rabbit) { visibility: hidden; }
   font: 500 13px var(--mono); color: var(--neon); background: rgba(13,2,8,.86); border: 1px solid rgba(0,255,65,.3); cursor: pointer; }
 .white-rabbit-in:focus { bottom: max(24px, env(safe-area-inset-bottom)); }
 
-/* While caught: how to move, for screen readers only; nothing on screen explains the scene */
+/* While caught: how to move, for screen readers only; the small cluster below is what shows on screen */
 .white-rabbit-how { position: absolute; width: 1px; height: 1px; margin: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 /* The layer stays hidden until something covers the page, so the line opts back in on its own while caught */
 body.white-rabbit-on .white-rabbit-how { visibility: visible; }
+
+/* The cluster while caught: exit, sound, and a hint, small and low at the bottom center, over the scene and the card.
+   Like the line above, it opts back in while the layer itself is still hidden (caught, before the first move) */
+.white-rabbit-ctl { position: absolute; left: 50%; bottom: max(18px, env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 1;
+  display: none; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; width: max-content; max-width: calc(100vw - 32px); }
+body.white-rabbit-on .white-rabbit-ctl { display: flex; visibility: visible; pointer-events: auto; }
+.white-rabbit-btn { min-height: 36px; padding: 6px 12px; border-radius: var(--glass-r); font: 500 12px var(--mono); color: #e9ffee; cursor: pointer;
+  background: rgba(13,2,8,.55); border: 1px solid rgba(233,255,238,.28); opacity: .7; transition: opacity .2s; }
+.white-rabbit-btn:hover, .white-rabbit-btn:focus-visible { opacity: 1; }
+.white-rabbit-btn:focus-visible { outline: 2px solid var(--neon); outline-offset: 2px; }
+.white-rabbit-key { margin-left: 4px; opacity: .65; }
+/* Touch screens have no Esc key to name */
+@media (pointer: coarse) { .white-rabbit-key { display: none; } }
+/* The card is silent, so it has no sound switch */
+.white-rabbit[data-mode="card"] [data-rabbit="sound"] { display: none; }
+.white-rabbit-hint { flex-basis: 100%; margin: 0 0 2px; text-align: center; font: 12px var(--mono); color: #e9ffee; opacity: .75;
+  text-shadow: 0 1px 4px rgba(0,0,0,.6); transition: opacity .8s; }
+.white-rabbit[data-hint="off"] .white-rabbit-hint { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .white-rabbit-hint, .white-rabbit-btn { transition: none; } }
 
 /* ---- Engagement fit: five short facts beside the booking button ---- */
 .fit { max-width: 760px; margin: 0 auto 26px; display: grid; gap: 10px; text-align: left; align-content: start; }
@@ -353,3 +383,12 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 
 /* The link from the process steps to the sample tour */
 .tour-link { margin: 22px 0 0; color: var(--muted); }
+
+/* ---- Tools I'm building: state, who it helps, an example, limits, and the next step for each ---- */
+.tools .row { align-items: start; }
+.tool-body p { margin: 0 0 8px; color: var(--muted); font-size: 15px; line-height: 1.5; max-width: 640px; }
+.tool-body p:last-child { margin: 0; }
+.tool-body .k { margin-right: 8px; font: 500 12px var(--mono); color: var(--glow); }
+.tool-body .next { color: var(--ink); }
+/* Phones: name, then state, then the details, each on its own line */
+@media (max-width: 700px) { .tools .row { grid-template-columns: 1fr; gap: 4px; } .tool-body { grid-column: 1 / -1; margin-top: 8px; } }
