@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.45.1
+
+### Changed
+- 1NEON help and the terms use the same wording as the portal for signing in, the demos, and option scores, from neon1-corpus v0.23.1.
+
 ## v0.45.0
 
 ### Added
