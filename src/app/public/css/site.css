@@ -56,6 +56,17 @@ a.card { text-decoration: none; }
 
 .hero { position: relative; }
 
+/* The offer under the tagline: plain sans text and one primary action, kept inside the same glass pane
+   so the wordmark and rain still lead the first screen */
+.reveal.d2 { animation-delay: .8s; }
+.reveal.d3 { animation-delay: 1.1s; }
+.offer { margin: clamp(22px, 4vh, 34px) auto 0; max-width: 560px; font: 600 clamp(18px, 2.2vw, 24px)/1.3 var(--sans); letter-spacing: -.012em; color: #e9ffee; }
+.offer-sub { margin: 10px auto 0; max-width: 520px; font: 400 clamp(15px, 1.6vw, 17px)/1.5 var(--sans); color: rgba(233,255,238,.82); }
+.start { margin: clamp(18px, 3vh, 26px) 0 0; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px 16px; }
+.start .btn { font: 600 15px var(--sans); color: var(--void); background: var(--neon); border-color: var(--neon); text-decoration: none; }
+.start .btn:hover, .start .btn:focus-visible { box-shadow: 0 0 24px rgba(108,255,168,.55); }
+.start-note { font: 13px var(--mono); color: var(--neon); opacity: .85; }
+
 /* ---- Steps ---- */
 .steps { counter-reset: s; display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
 .steps div { counter-increment: s; border-left: 2px solid var(--mid); padding: 4px 0 4px 18px; }
