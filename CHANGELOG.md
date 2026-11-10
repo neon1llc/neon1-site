@@ -2,6 +2,12 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.43.3
+
+### Changed
+- About ends after its two paragraphs; the link to where the name comes from is gone.
+- More questions uses the site's usual bold link style.
+
 ## v0.43.2
 
 ### Changed
