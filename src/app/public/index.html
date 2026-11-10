@@ -20,24 +20,42 @@
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="The neon1 mark and name in glowing green on a dark card, with cloud, AI, IT, New York, and 1 is glad to be of service" />
   <meta name="twitter:card" content="summary_large_image" />
-  <!-- Who runs the practice, as shown on the page -->
+  <!-- Who runs the practice, as shown on the page, and the site's name for search results. Only facts
+       the page itself states; the @id values are stable names other pages can point at -->
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "ProfessionalService",
-      "name": "neon1",
-      "legalName": "neon1 LLC",
-      "url": "https://neon1.tech/",
-      "logo": "https://neon1.tech/media/og-card-1.png",
-      "slogan": "1 is glad to be of service.",
-      "description": "A one-person technology practice: cloud and AI engineering, business automation, networks, and cameras.",
-      "email": "hello@neon1.tech",
-      "telephone": "+1-424-326-3661",
-      "founder": { "@type": "Person", "name": "Pradeep Tathineni", "sameAs": "https://www.linkedin.com/in/pradeep-tathineni/" },
-      "sameAs": ["https://github.com/neon1llc", "https://www.linkedin.com/company/neon1llc"]
+      "@graph": [
+        {
+          "@type": "ProfessionalService",
+          "@id": "https://neon1.tech/#organization",
+          "name": "neon1",
+          "legalName": "neon1 LLC",
+          "url": "https://neon1.tech/",
+          "logo": { "@type": "ImageObject", "@id": "https://neon1.tech/#logo", "url": "https://neon1.tech/media/neon1-logo-512.png", "width": 512, "height": 512 },
+          "image": "https://neon1.tech/media/og-card-1.png",
+          "slogan": "1 is glad to be of service.",
+          "description": "A one-person technology practice: cloud and AI engineering, business automation, networks, and cameras.",
+          "email": "hello@neon1.tech",
+          "telephone": "+1-424-326-3661",
+          "founder": { "@type": "Person", "name": "Pradeep Tathineni", "sameAs": "https://www.linkedin.com/in/pradeep-tathineni/" },
+          "sameAs": ["https://github.com/neon1llc", "https://www.linkedin.com/company/neon1llc"]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://neon1.tech/#website",
+          "name": "neon1",
+          "alternateName": "neon1 LLC",
+          "url": "https://neon1.tech/",
+          "publisher": { "@id": "https://neon1.tech/#organization" }
+        }
+      ]
     }
   </script>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22 fill=%22none%22 stroke=%22%2300B84F%22 stroke-width=%225%22 stroke-linecap=%22round%22><path d=%22M6 6a24 24 0 0 1 24 24v30M6 18a12 12 0 0 1 12 12v30M34 6a24 24 0 0 1 24 24v30M34 18a12 12 0 0 1 12 12v30%22/></svg>" />
+  <!-- Square icons at stable URLs, drawn from the bar's mark by scripts/icons.cjs, so crawlers can fetch them -->
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
   <!-- Shared with 1NEON: fonts, brand tokens, rain layers, glass, and rain controls -->
   <link rel="stylesheet" href="/shared/neon1.css" />
