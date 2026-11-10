@@ -140,6 +140,32 @@ check("browser", "contact: missing fields are named and nothing is sent; a refus
 });
 
 
+// PS-02: a send that never answers ends in an uncertain-outcome message within the deadline, keeps the
+// draft, sends once, and leaves retrying to the visitor. The page clock is faked, so no real wait
+check("browser", "contact: a send that never answers stops waiting, keeps the draft, and sends only once", async () => {
+  const { page, context, errors } = await open();
+  try {
+    await page.clock.install();
+    let calls = 0;
+    await page.route("**/1NEON/api/contact", () => { calls++; }); // never fulfilled
+    await page.locator("#contact").scrollIntoViewIfNeeded();
+    await fillForm(page);
+    await page.locator('#cform [type="submit"]').click();
+    await page.locator("[name=email]").press("Enter"); // a second submit while the first is pending
+    expect(await page.locator('#cform [type="submit"]').isDisabled(), "the send button stays enabled while pending");
+    await page.clock.runFor(14000);
+    expect(/Sending/.test(await page.locator("#cstatus").textContent()), "gave up before the deadline");
+    await page.clock.runFor(2000);
+    await page.waitForFunction(() => /couldn't confirm/.test(document.getElementById("cstatus").textContent));
+    const after = await page.evaluate(() => ({ today: document.querySelector("[name=today]").value, email: document.querySelector("[name=email]").value,
+      disabled: document.querySelector('#cform [type="submit"]').disabled, hidden: document.getElementById("cform").hidden }));
+    expect(after.today.includes(MARK) && after.email === "dana@example.com" && !after.disabled && !after.hidden, "the draft or the form was not kept", after);
+    expect(/hello@neon1.tech/.test(await page.locator("#cstatus").textContent()), "the message does not name the email address");
+    expect(calls === 1, "the message was sent more than once", calls);
+    expect(!errors.length, "page errors", errors);
+  } finally { await context.close(); }
+});
+
 // ---- SITE-05: a case study owns the screen while open ----
 // Where focus is, whether it sits inside the panel, and whether the page behind is inert
 const caseState = (page) => page.evaluate(() => {
