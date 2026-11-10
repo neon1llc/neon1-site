@@ -36,7 +36,7 @@ WELL_KNOWN  := --include ".well-known/*"
 
 # Plain make shows the help
 .DEFAULT_GOAL := help
-.PHONY: help corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf check html js links logic frame frame-check release manifest rehash models budget secrets behavior perf serve three deploy invalidate verify
+.PHONY: help corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf check html js links logic frame frame-check release manifest rehash models budget secrets behavior perf serve three icons deploy invalidate verify
 
 
 ##@ Checks
@@ -152,6 +152,12 @@ serve: ## Serve the site at http://localhost:PORT
 # The white rabbit's three.js bundle is generated, so it is rebuilt rather than edited
 three: ## Rebuild the vendored three.js bundle for the white rabbit
 	scripts/three/build.sh
+
+
+# The favicons, touch icon, and square logo are drawn from the bar's mark; a redrawn logo needs a new media name
+icons: ## Redraw the square brand icons from the mark (needs Playwright), then run make rehash
+	@command -v node >/dev/null 2>&1 || { echo "icons: install Node.js"; exit 1; }
+	node scripts/icons.cjs $(SITE_DIR)
 
 
 ##@ Deploy
