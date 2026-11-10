@@ -15,8 +15,9 @@
 // its composing, the rain's halt) checks that its entry is still the current one before it acts, so a
 // rabbit caught, left, and caught again before the scene loads builds one scene, not two.
 // Keyboard: "follow the white rabbit" (#whiteRabbitIn, hidden until focused, like the skip link)
-// catches one; while caught, a short help line and a "back to the page" button stay on screen,
-// Tab moves between that button and the car's, and focus returns where it was when the entry ends.
+// catches one and focuses a line, read only by screen readers, that says how to move and leave; nothing on
+// screen explains the scene, Tab stays on that line while the page is covered, Esc always leaves, and focus
+// returns where it was when the entry ends. The car on the sill starts when clicked, inside the scene itself.
 // Testing: ?rabbit=now keeps a rabbit on the landing and notes its cell center on root
 // as data-spot; ?rabbit=p0.5 catches one and jumps to that progress. Both only add
 // rabbits, so they are harmless in production.
@@ -46,9 +47,9 @@ export function whiteRabbit({ rain, root }) {
   const menu = document.getElementById("menu");
   const pauseBtn = document.querySelector('[data-rain="pause"]');
   const page = () => document.querySelectorAll("header, .top, .awake, .rainctl");
-  // The keyboard way in, and the help line with its buttons; the way in shows only with this script
+  // The keyboard way in, and the line that says how to move (screen readers only); the way in shows only with this script
   const inBtn = document.getElementById("whiteRabbitIn");
-  const leaveBtn = root.querySelector('[data-rabbit="leave"]'), carBtn = root.querySelector('[data-rabbit="car"]');
+  const how = root.querySelector(".white-rabbit-how");
   if (inBtn) inBtn.hidden = false;
 
   // Progress: wanted and rendered, with the spring's velocity
@@ -173,7 +174,6 @@ export function whiteRabbit({ rain, root }) {
     target = p = v = 0; halted = prepared = handed = false; escape = null; cardP = 0;
     mode = reduce.matches ? "card" : "scene";
     root.dataset.mode = mode;
-    showCar(false);
     openAudio();
     rain.halt((kind, ms) => sound && sound.glitch(kind, ms)).then(() => { if (g !== gen) return; halted = true; prepare(); });
     if (mode === "scene") load(); else drop(); // a scene kept from the last entry isn't needed by the card
@@ -184,7 +184,7 @@ export function whiteRabbit({ rain, root }) {
     if (state !== "idle" || !menu.hidden || body.classList.contains("case-open")) return;
     if (scrollY >= 8) scrollTo({ top: 0, behavior: "instant" });
     catchIt();
-    if (leaveBtn) leaveBtn.focus();
+    if (how) how.focus();
   }
 
   // The one construction owner: the module is imported once per page and the scene built at most
@@ -218,7 +218,7 @@ export function whiteRabbit({ rain, root }) {
     if (state === "idle" || mode === "card") return;
     if (state === "exiting") { drop(); return; } // the landing is already back; nothing to hand over
     mode = "card";
-    stop(); closeAudio(); drop(); showCar(false);
+    stop(); closeAudio(); drop();
     root.dataset.mode = mode;
     if (state === "caught") return;
     const leaving = !!escape;
@@ -246,7 +246,7 @@ export function whiteRabbit({ rain, root }) {
     gen++;
     if (handed && scene) scene.render(0, { still: true });
     handed = false; escape = null;
-    cover(false); announce(false); showCar(false);
+    cover(false); announce(false);
     set("exiting");
     rain.resume(); closeAudio();
     stop();
@@ -264,7 +264,7 @@ export function whiteRabbit({ rain, root }) {
   }
 
   // The entry's end: idle and unlocked, the scene freed shortly after (a quick second catch reuses
-  // it), and focus back where it was if it was left on the help line or nowhere
+  // it), and focus back where it was if it was left on the line that says how to move, or nowhere
   function rest() {
     set("idle"); lock(false);
     disposeTimer = setTimeout(drop, 1000);
@@ -337,20 +337,16 @@ export function whiteRabbit({ rain, root }) {
   }, { capture: true });
 
   // Keys: arrows nudge, paging and Space step, Home and End go to the ends, Esc always leaves.
-  // Once the page is covered, Tab moves only between the help line's buttons; Space and Enter press
-  // whichever of them has focus
-  const helpButtons = () => [leaveBtn, carBtn].filter((b) => b && !b.hidden);
+  // Once the page is covered there is nothing to Tab to, so Tab keeps focus on the line that says how to move
   addEventListener("keydown", (e) => {
     if (!active() || e.altKey || e.ctrlKey || e.metaKey) return;
     const k = e.key, space = k === " ";
     if (k === "Escape") { e.preventDefault(); e.stopPropagation(); bail(); return; }
     if (k === "Tab" && state !== "caught") {
       e.preventDefault();
-      const b = helpButtons(), i = b.indexOf(document.activeElement);
-      if (b.length) b[(i + (e.shiftKey ? -1 : 1) + b.length) % b.length].focus();
+      if (how) how.focus();
       return;
     }
-    if (space && e.target.closest && e.target.closest("[data-rabbit]")) return;
     if (!space && !DOWN.includes(k) && !UP.includes(k)) return;
     e.preventDefault(); e.stopPropagation();
     if (state === "caught" && (UP.includes(k) || (space && e.shiftKey))) return;
@@ -360,7 +356,7 @@ export function whiteRabbit({ rain, root }) {
     step((DOWN.includes(k) || (space && !e.shiftKey)) ? size : -size);
   }, { capture: true });
 
-  // Esc, or "back to the page": straight out when caught; otherwise the scene plays back to the start
+  // Esc: straight out when caught; otherwise the scene plays back to the start
   function bail() {
     if (state === "idle") return;
     if (state === "caught") { leave(); return; }
@@ -370,17 +366,10 @@ export function whiteRabbit({ rain, root }) {
     escape = { from: Math.min(target, 1), t0: performance.now() };
   }
 
-  // Clicks: on the rabbit (or the keyboard way in), a catch; the help line's buttons leave or start the car;
+  // Clicks: on the rabbit (or the keyboard way in), a catch; on the car in the scene, its engine;
   // while caught, the pause button leaves and other controls leave and carry on
   addEventListener("click", (e) => {
-    const own = e.target.closest && e.target.closest("[data-rabbit], #whiteRabbitIn");
-    if (own) {
-      e.preventDefault(); e.stopPropagation();
-      if (own === inBtn) enter();
-      else if (own.dataset.rabbit === "leave") bail();
-      else if (scene && handed && mode === "scene") { scene.toggleCar(); carLabel(); }
-      return;
-    }
+    if (inBtn && inBtn.contains(e.target)) { e.preventDefault(); e.stopPropagation(); enter(); return; }
     if (state === "idle") {
       if (!ready() || !rain.rabbitAt(e.clientX, e.clientY)) return;
       e.preventDefault(); e.stopPropagation();
@@ -388,7 +377,7 @@ export function whiteRabbit({ rain, root }) {
       return;
     }
     if (state !== "caught") {
-      if (scene && handed && mode === "scene" && state !== "exiting" && scene.pick(e.clientX, e.clientY)) { e.preventDefault(); e.stopPropagation(); carLabel(); }
+      if (scene && handed && mode === "scene" && state !== "exiting" && scene.pick(e.clientX, e.clientY)) { e.preventDefault(); e.stopPropagation(); }
       return;
     }
     if (pauseBtn && pauseBtn.contains(e.target)) { e.preventDefault(); e.stopPropagation(); leave(); return; }
@@ -414,10 +403,6 @@ export function whiteRabbit({ rain, root }) {
   // Reduced motion turned on during an entry: the still card takes over at once, silently. Turned off,
   // the card stays until the entry ends; the next catch reads the preference again
   reduce.addEventListener("change", (e) => { if (e.matches) fallback(); });
-
-  // ---- The car's button: the same start and stop as clicking the car, while the car is in view ----
-  function showCar(on) { if (carBtn && carBtn.hidden === on) carBtn.hidden = !on; }
-  function carLabel() { if (carBtn && scene) carBtn.textContent = scene.carOn ? "stop the car" : "start the car"; }
 
   // ---- The card (reduced motion and fallbacks) ----
   // Scroll-linked and reversible, with nothing moving on its own: the page goes dark, the window and
@@ -464,7 +449,6 @@ export function whiteRabbit({ rain, root }) {
     scene.render(q, { speed: Math.abs(v) });
     if (sound) sound.update(scene.beat, scene.facing, scene.wind, scene.open);
     root.dataset.progress = q.toFixed(3);
-    showCar(q > 0.6 && q < 0.94); // from the glance at the sill until the walk out through the window
     grass.parentElement.style.opacity = smooth(0.993, 1, q).toFixed(3);
     if (q > 0.995) announce(true);
     if (state !== "done" && target >= 1 && p > 0.999 && Math.abs(v) < 0.01) set("done");
