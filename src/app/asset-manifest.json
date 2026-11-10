@@ -8,7 +8,9 @@
     "here is a guessed asset page. The Blender files, recipes (blender/*.py), and the owner's photos the yard was fitted to live in the owner's",
     "private planning folder, not this repository.",
     "scripts/manifest.py checks this file (make manifest, part of make check) and refreshes the hashes (make rehash);",
-    "scripts/models.cjs checks the models against the code that names their parts (make models, part of make check)."
+    "scripts/models.cjs checks the models against the code that names their parts (make models, part of make check).",
+    "unresolved: provenance still owed, each naming the assets or sources it concerns and what is missing. None of it is guessed; an item",
+    "is closed by recording the exact origin in its source or asset, then removing the item. make manifest fails if an unrecorded asset is untracked."
   ],
   "sources": {
     "camaro": {
@@ -95,7 +97,7 @@
       "title": "three.js 0.187.0",
       "author": "three.js authors",
       "source_url": "https://www.npmjs.com/package/three/v/0.187.0",
-      "exactness": "exact package version, pinned in scripts/three/build.sh",
+      "exactness": "exact package version, locked with every dependency in scripts/three/package-lock.json",
       "license": "MIT",
       "license_file": "js/vendor/three-LICENSE.md"
     },
@@ -256,7 +258,7 @@
       "sources": [
         "three"
       ],
-      "made": "Bundled by scripts/three/build.sh (make three) with esbuild 0.25.12 from scripts/three/entry.js, minified, license comments at the end; the license file is copied from the package.",
+      "made": "Bundled by scripts/three/build.sh (make three) with esbuild 0.25.12 from scripts/three/entry.js, installed with npm ci from scripts/three/package-lock.json, minified, license comments at the end; the license file is copied from the package. A locked rebuild on 2026-11-10 reproduced the shipped bytes.",
       "consumers": [
         "js/white-rabbit-scene.js",
         "js/white-rabbit-room.js",
@@ -511,5 +513,49 @@
       "sha256": "00f1237aabd88ddbf69521d679a4a5b37ae2a4c5298abcf70a159fb3ed414bd1",
       "asset": "yard-garden"
     }
-  }
+  },
+  "unresolved": [
+    {
+      "refs": [
+        "far-trees"
+      ],
+      "missing": "What the far tree line was made from. It was made in the owner's private planning folder and its sources are not recorded here."
+    },
+    {
+      "refs": [
+        "inter",
+        "jetbrains-mono"
+      ],
+      "missing": "The exact font releases the WOFF2 subsets were taken from, and how they were subset."
+    },
+    {
+      "refs": [
+        "motion"
+      ],
+      "missing": "The package file motion-11.18.2.min.js was copied from; only the version in its name is known."
+    },
+    {
+      "refs": [
+        "camaro",
+        "sunflower",
+        "tomato",
+        "squash",
+        "rose"
+      ],
+      "missing": "The exact Sketchfab model pages and download records; only each creator's profile is recorded."
+    },
+    {
+      "refs": [
+        "polyhaven-trees",
+        "polyhaven-plants"
+      ],
+      "missing": "The asset pages for the Poly Haven IDs that CREDITS.txt names."
+    },
+    {
+      "refs": [
+        "polyhaven-textures"
+      ],
+      "missing": "The Poly Haven asset IDs and pages for the textures CREDITS.txt names by material."
+    }
+  ]
 }
