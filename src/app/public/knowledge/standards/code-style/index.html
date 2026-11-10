@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.44.0" />
+  <meta name="version" content="0.45.0" />
   <title>Code style · neon1 knowledge center</title>
   <meta name="description" content="How neon1 code reads: names, comments, file headers, formatting, and layout, in every language and configuration format." />
   <meta name="theme-color" content="#F2F4F2" />
@@ -16,7 +16,9 @@
   <meta property="og:url" content="https://neon1.tech/knowledge/standards/code-style/" />
   <meta property="og:image" content="https://neon1.tech/media/og-card-1.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22 fill=%22none%22 stroke=%22%2300B84F%22 stroke-width=%225%22 stroke-linecap=%22round%22><path d=%22M6 6a24 24 0 0 1 24 24v30M6 18a12 12 0 0 1 12 12v30M34 6a24 24 0 0 1 24 24v30M34 18a12 12 0 0 1 12 12v30%22/></svg>" />
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="stylesheet" href="/shared/neon1.css" />
   <link rel="stylesheet" href="/css/frame.css" />
   <link rel="stylesheet" href="/css/knowledge.css" />
@@ -81,8 +83,9 @@
         <p class="kc-summary">How neon1 code reads: names, comments, file headers, formatting, and layout, in every language and configuration format.</p>
         <dl class="kc-facts">
           <div><dt>Type</dt><dd>Standard</dd></div>
-          <div><dt>Edition</dt><dd>1.0</dd></div>
-          <div><dt>Updated</dt><dd>November 9, 2026</dd></div>
+          <div><dt>Edition</dt><dd>2.0</dd></div>
+          <div><dt>First written</dt><dd>November 9, 2026</dd></div>
+          <div><dt>Updated</dt><dd>November 10, 2026</dd></div>
           <div><dt>For</dt><dd>Developers</dd></div>
         </dl>
         <div class="kc-actions">
@@ -95,20 +98,24 @@
 <h2 id="names">Names</h2>
 <ul><li>Use the shortest name that keeps the meaning clear: <code>retryLimit</code>, not <code>rl</code> or <code>maximumNumberOfRetryAttemptsAllowed</code>.</li><li>Name things for what they mean to the reader, not how they're built: <code>unpaidInvoices</code>, not <code>filteredList</code>.</li><li>Use the project's existing words for its concepts. If the interface says "workspace," the code says <code>workspace</code> too.</li><li>When renaming, rename every use in the same change, and keep public interfaces stable or version the change.</li></ul>
 <h2 id="comments">Comments</h2>
-<ul><li><strong>Explain why, not what.</strong> A comment gives the purpose, a constraint, an invariant, or a reason that isn't visible in the code. It doesn't narrate the next line.</li><li><strong>Put a short comment before each function, class, and meaningful group of lines</strong>, usually one or two lines, without a closing period on single-line comments.</li><li><strong>Start with the meaning.</strong> Don't repeat the function's name or open with "This function." For example, <code>// Invalid records are rejected before anything is written</code>.</li><li><strong>Keep comments true.</strong> A comment that no longer matches the code is a bug. Update or remove it in the same change.</li><li>Use each language's native documentation format where tools read it: docstrings in Python, doc comments in Go, JSDoc where a project uses it. Document parameters, results, and errors only when they add something the signature doesn't say.</li></ul>
+<ul><li><strong>Explain why, not what.</strong> A comment gives the purpose, a constraint, an invariant, or a reason that isn't visible in the code. It doesn't narrate the next line.</li><li><strong>Comment at every semantic junction</strong>: section boundaries, exported or public functions, classes, and components, non-obvious invariants, security and tenancy rules, and configuration blocks. Usually one or two lines, without a closing period on single-line comments. Between junctions, code that already says plainly what it does needs no comment of its own.</li><li><strong>Start with the meaning.</strong> Don't repeat the function's name or open with "This function." For example, <code>// Invalid records are rejected before anything is written</code>.</li><li><strong>Keep comments true.</strong> A comment that no longer matches the code is a bug. Update or remove it in the same change.</li><li><strong>Judge comments by usefulness and truth, not by count.</strong> A review asks whether each comment tells a reader something they need and whether it's still accurate. Adding comments to reach a number, or a test that counts them, doesn't make code clearer.</li><li>Use each language's native documentation format where tools read it: docstrings in Python, doc comments in Go, JSDoc where a project uses it. Document parameters, results, and errors only when they add something the signature doesn't say.</li></ul>
 <h2 id="file-headers">File headers</h2>
 <p>Every source file starts with a one-line header saying what it is and what it's for, after any line that must come first (a shebang, a license, or a directive):</p>
 <pre><code>#!/usr/bin/env node
 
 // tools/export.mjs - Writes the bundle a consumer reads.
 // Usage: node tools/export.mjs --target chat|site|knowledge|ai</code></pre>
-<p>The header uses sentence case and a period. A <code>Usage:</code> line follows when the file can be run, showing a real invocation without closing punctuation. Full help belongs in <code>--help</code>, not the header.</p>
+<p>The header uses sentence case and a period.</p>
+<p>The header and junction rules apply to files people write and maintain. See the exceptions below. A <code>Usage:</code> line follows when the file can be run, showing a real invocation without closing punctuation. Full help belongs in <code>--help</code>, not the header.</p>
 <h2 id="layout-and-whitespace">Layout and whitespace</h2>
 <ul><li>Let the formatter decide what it can: Prettier, Black, gofmt, <code>terraform fmt</code>.</li><li>Two blank lines between top-level definitions and major sections, one between related groups inside them.</li><li>Break long lines at meaningful points, one argument or item per line when a call gets long.</li><li>Keep a file about one thing. When a file grows a second purpose, split it.</li></ul>
 <h2 id="structure">Structure</h2>
 <ul><li>Prefer plain functions and data over frameworks and abstractions until a pattern repeats at least three times.</li><li>Keep business logic separate from input, output, and presentation, so it can be tested on its own.</li><li>Validate input where it enters the system, and trust it after that.</li><li>Fail loudly with a clear message. Never swallow an error silently.</li><li>Configuration comes from the environment or a config file, never from values hard-coded in several places.</li></ul>
 <h2 id="dependencies">Dependencies</h2>
 <ul><li>Prefer the platform's built-in features, then small, well-maintained libraries.</li><li>Pin exact versions in lock files, including CI actions pinned to a commit.</li><li>Each new dependency needs a reason: what it does that would be costly to write and maintain.</li><li>Check its license for the way it will be used.</li></ul>
+<h2 id="exceptions">Exceptions</h2>
+<p>These don't get added headers or comments:</p>
+<ul><li><strong>Generated files</strong>, such as compiled output, generated clients, and build artifacts. Document the generator and its inputs instead, and regenerate rather than editing by hand.</li><li><strong>Vendored code</strong> copied from another project. Leave it as its authors wrote it, and record where it came from and which version in the nearest README or notice file.</li><li><strong>Lock files</strong>, such as <code>package-lock.json</code> or <code>go.sum</code>. Their tools own them.</li><li><strong>Formats with their own authoritative description</strong>, such as a JSON Schema with <code>description</code> fields, an OpenAPI document, or a migration tracked by its tool. The description fields are where the explanation goes.</li></ul>
 <h2 id="formats-without-comments">Formats without comments</h2>
 <p>Strict JSON and similar formats can't hold comments. Don't invent them. Put the explanation in the nearest file that can hold it, such as the README or the code that reads the file.</p>
       </div>
@@ -158,7 +165,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.44.0</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.45.0</a>
       </span>
     </div>
   </footer>
