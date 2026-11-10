@@ -2,6 +2,12 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.47.2
+
+### Changed
+- Versioning and releases (edition 1.2) in the Knowledge Center says how a project that shipped before it was tagged marks its earlier milestones, from neon1-corpus v0.24.2.
+- neon1 prose shows 1NEON at v0.1.1 and the corpus at v0.24.2.
+
 ## v0.47.1
 
 ### Changed
