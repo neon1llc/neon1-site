@@ -421,16 +421,9 @@
       </div>
       <p class="white-rabbit-grass" role="status"></p>
     </div>
-    <!-- While caught, only for screen readers: how to move and how to leave. Keyboard entry focuses this line
-         so it is read out -->
+    <!-- While caught, only for screen readers: how to move and how to leave. Nothing on screen explains the scene;
+         keyboard entry focuses this line so it is read out -->
     <p class="white-rabbit-how" id="whiteRabbitHow" tabindex="-1">Scroll down or press the down arrow to follow it. Up goes back, and Esc leaves.</p>
-    <!-- While caught, a small cluster on screen: a way out (the same as Esc), the sound switch (the scene only;
-         the card is silent), and a movement hint that fades after the first move. js/white-rabbit.js runs it -->
-    <div class="white-rabbit-ctl" role="group" aria-label="White rabbit">
-      <p class="white-rabbit-hint" aria-hidden="true">scroll or swipe down to follow</p>
-      <button class="white-rabbit-btn" type="button" data-rabbit="exit">exit <span class="white-rabbit-key" aria-hidden="true">esc</span></button>
-      <button class="white-rabbit-btn" type="button" data-rabbit="sound" aria-pressed="true">sound on</button>
-    </div>
   </div>
 
   <!-- Deferred scripts run in order, so Motion loads before the views and case studies -->
