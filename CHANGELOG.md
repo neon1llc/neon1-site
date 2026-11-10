@@ -2,6 +2,24 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.42.0
+
+### Added
+- A contact form. Pick what it's about, start from a common situation if one fits, and send. Messages go straight to neon1's inbox. Each common situation links to the closest case study.
+- A More questions link under the home questions, and neon1.tech/faqs, which opens the full list in the knowledge center.
+
+### Changed
+- The top bar is quieter. It keeps book a call, 1NEON (now its rings and name with no box), and the menu. Every section is in the menu, at every width.
+- The about section is two short paragraphs. Where the name comes from moved to the knowledge center, linked from about.
+- Section snapping pushes back less. It still settles on one section per screen.
+- The rain's grid and character switches are back beside pause.
+
+### Removed
+- The services helper and the optional pre-call brief. The contact form covers both.
+
+### Fixed
+- Scrolling without pause no longer stalls at the edge of a section. Before, the page waited for the scroll to stop before moving on.
+
 ## v0.41.0
 
 - Fewer controls to work out. The rain on the home page keeps only its pause button, and the grid and character switches are gone.

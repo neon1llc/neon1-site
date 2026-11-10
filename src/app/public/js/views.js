@@ -27,7 +27,7 @@
   }
 
   // ---- Case links: a link to one card lands on that card ----
-  // The service chooser's "see how a similar one went" links point at single cards (#case-home). Its
+  // Case links, such as the contact form's "a similar project", point at single cards (#case-home). Its
   // section comes into view, the row slides sideways to the card, the card is marked, and focus goes
   // to its open button, so keyboard and screen reader users arrive where the link said. Each case link
   // is a history entry: Back returns to where the link was, and Forward comes back to the card. Opening
@@ -84,9 +84,9 @@
 
   // Gesture feel and easing curves
   const HEADER = 64;
-  const THRESHOLD = 70;    // input distance (px) needed to move to the next view
-  const GIVE = 0.6;        // how far the page moves per px of input while resisting
-  const MAX_GIVE = 48;     // the most the page gives before it settles
+  const THRESHOLD = 40;    // input distance (px) needed to move to the next view
+  const GIVE = 0.7;        // how far the page moves per px of input while resisting
+  const MAX_GIVE = 32;     // the most the page gives before it settles
   const IDLE = 160;        // ms without input that ends a gesture
   const settleEase = [0.22, 1, 0.36, 1];
   const enterEase = [0.19, 1, 0.22, 1];
@@ -152,6 +152,8 @@
   let pull = 0, pullDir = 0, pullIndex = 0, pullBase = 0;
   let settling = null;
   let lastInput = 0, gestureFromEdge = false, blockUntilIdle = false, idleTimer = 0;
+  // Momentum fades, a person scrolling doesn't: two steps in a row that don't shrink count as a push
+  let prevAbs = 0, steady = 0;
 
   // Eases the page toward the target every frame, except while a settle runs
   // The loop stops once the page is at rest, and input wakes it, so a still page costs nothing
@@ -211,14 +213,23 @@
   // One step of input, positive is down
   // Direct input, from touch, moves the page at once instead of easing
   function input(d, direct) {
-    if (settling || paused() || !d) return;
-    wake();
+    if (paused() || !d) return;
     const now = performance.now();
     const newGesture = now - lastInput > IDLE;
     lastInput = now;
+    const abs = Math.abs(d);
+    // A sudden jump in speed is a new flick starting before the last one has faded
+    const jump = abs > prevAbs * 1.5 + 4;
+    steady = newGesture || direct || jump ? 2 : abs >= 2 && abs >= prevAbs ? steady + 1 : 0;
+    prevAbs = abs;
+    const pushing = steady >= 2;
     clearTimeout(idleTimer);
     idleTimer = setTimeout(() => { blockUntilIdle = false; release(); }, IDLE);
-    if (blockUntilIdle) return; // swallow trailing momentum after a settle
+    if (settling) return; // a settle runs to the end, and its input still counts toward idle
+    wake();
+    // Fading momentum after a settle is swallowed, but someone still scrolling carries on at once
+    if (blockUntilIdle && !pushing) return;
+    blockUntilIdle = false;
 
     // Inside a view the input scrolls; past its edge, resistance begins
     if (!pullDir) {
@@ -236,8 +247,8 @@
       if (!pull) { release(); return; }
     } else pull += Math.abs(d);
 
-    // Momentum that runs into an edge is held back; a fresh push from the edge carries on
-    if (newGesture) gestureFromEdge = true;
+    // Momentum that runs into an edge is held back; a fresh push, or scrolling that keeps going, carries on
+    if (newGesture || pushing) gestureFromEdge = true;
     if (!gestureFromEdge) pull = Math.min(pull, THRESHOLD * 0.6);
     const t = Math.min(1, pull / THRESHOLD);
     target = pullBase + pullDir * Math.min(MAX_GIVE, pull * GIVE);
