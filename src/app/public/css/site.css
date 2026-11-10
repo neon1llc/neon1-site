@@ -164,7 +164,7 @@ h2 .pr { display: inline-block; width: .7ex; height: 1ex; margin-right: .3em; ve
 /* Whole card opens its case study; the corner arrow opens it, the panel arrow closes it */
 .case { position: relative; cursor: pointer; transition: box-shadow .2s, border-color .2s; }
 .case:hover { border-color: rgba(3,87,4,.35); box-shadow: 0 8px 24px rgba(18,36,26,.08); }
-/* The card a case link (the service chooser's) landed on, so the eye finds it too (js/views.js) */
+/* The card a case link (from the contact form or elsewhere) landed on, so the eye finds it too (js/views.js) */
 .case.is-target { border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand) inset; }
 .open, .case-close { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; background: none; cursor: pointer; color: var(--brand); }
 .open svg, .case-close svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s; }
@@ -215,9 +215,11 @@ html.case-lock { overflow: hidden; }
 /* Views set their own spacing; the about story reads as one column */
 .story { display: block; max-width: 720px; }
 .story p { font-size: 18px; line-height: 1.65; margin: 0 0 18px; }
-.story .sign { font: 500 clamp(17px, 1.8vw, 21px)/1.6 var(--mono); color: var(--brand); margin-top: 28px; }
-/* The closing line stays on one line past the column, except on narrow screens */
-@media (min-width: 760px) { .story .sign { white-space: nowrap; } }
+/* "More" links: a bold link with an arrow that leads to the full story elsewhere */
+.more a { font-weight: 600; color: var(--brand); text-decoration: none; }
+.more a::after { content: " \2192"; display: inline-block; transition: transform .15s; }
+.more a:hover { text-decoration: underline; }
+.more a:hover::after { transform: translateX(3px); }
 .row p b { color: var(--ink); font-weight: 600; }
 
 /* Process view centers as a grid */
@@ -317,58 +319,47 @@ body.white-rabbit-on .white-rabbit-help { visibility: visible; pointer-events: a
    that shifted them would land beside its target); the button keeps them as its description */
 .white-rabbit:not([data-state="caught"]) .white-rabbit-help p { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
-/* ---- Service chooser: radios reveal the next question and the answer, with no script ---- */
-.choose { max-width: 860px; margin: 26px 0 0; border-top: 1px solid rgba(18,36,26,.12); border-bottom: 1px solid rgba(18,36,26,.12); }
-.choose summary { cursor: pointer; list-style: none; padding: 18px 32px 18px 0; position: relative; font: 500 17px/1.35 var(--sans); color: var(--ink); }
-.choose summary::-webkit-details-marker { display: none; }
-.choose summary::after { content: "+"; position: absolute; right: 4px; top: 15px; font: 400 22px var(--mono); color: var(--glow); transition: transform .2s; }
-.choose[open] summary::after { transform: rotate(45deg); }
-.choose-body { padding: 0 0 20px; display: grid; gap: 16px; }
-.choose fieldset { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
-.choose legend { font: 500 12px var(--mono); color: var(--glow); margin-bottom: 8px; padding: 0; }
-.choose .pick { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid rgba(18,36,26,.18); border-radius: var(--glass-r); cursor: pointer; font-size: 15px; color: var(--ink); background: #fff; }
-.choose .pick:has(input:checked) { border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand) inset; }
-.choose .pick:has(input:focus-visible) { outline: 2px solid var(--brand); outline-offset: 2px; }
-.choose .pick input { accent-color: var(--brand); margin: 0; }
-.choose-needs, .choose-result { display: none !important; }
-.choose-result { margin: 0; max-width: 720px; color: var(--ink); font-size: 16px; }
-.choose-result a { color: var(--brand); font-weight: 600; }
-.choose:has(#fit-biz:checked) .choose-needs[data-area="biz"] { display: flex !important; }
-.choose:has(#fit-biz:checked):has(#fit-retype:checked) .choose-result[data-need="retype"] { display: block !important; }
-.choose:has(#fit-biz:checked):has(#fit-connect:checked) .choose-result[data-need="connect"] { display: block !important; }
-.choose:has(#fit-cloud:checked) .choose-needs[data-area="cloud"] { display: flex !important; }
-.choose:has(#fit-cloud:checked):has(#fit-find:checked) .choose-result[data-need="find"] { display: block !important; }
-.choose:has(#fit-cloud:checked):has(#fit-servers:checked) .choose-result[data-need="servers"] { display: block !important; }
-.choose:has(#fit-space:checked) .choose-needs[data-area="space"] { display: flex !important; }
-.choose:has(#fit-space:checked):has(#fit-wifi:checked) .choose-result[data-need="wifi"] { display: block !important; }
-.choose:has(#fit-space:checked):has(#fit-cameras:checked) .choose-result[data-need="cameras"] { display: block !important; }
-.choose:has(#fit-safe:checked) .choose-needs[data-area="safe"] { display: flex !important; }
-.choose:has(#fit-safe:checked):has(#fit-phish:checked) .choose-result[data-need="phish"] { display: block !important; }
-.choose:has(#fit-safe:checked):has(#fit-audit:checked) .choose-result[data-need="audit"] { display: block !important; }
-
 /* ---- Engagement fit: five short facts beside the booking button ---- */
-.fit { max-width: 760px; margin: 0 auto 26px; display: grid; gap: 10px; text-align: left; }
-.fit div { display: grid; grid-template-columns: 110px 1fr; gap: 12px; padding-bottom: 10px; border-bottom: 1px solid rgba(18,36,26,.12); }
+.fit { max-width: 760px; margin: 0 auto 26px; display: grid; gap: 10px; text-align: left; align-content: start; }
+.fit div { display: grid; grid-template-columns: 90px 1fr; gap: 12px; padding-bottom: 10px; border-bottom: 1px solid rgba(18,36,26,.12); }
 .fit dt { font: 500 12px/1.9 var(--mono); color: var(--glow); }
 .fit dd { margin: 0; color: var(--ink); font-size: 16px; }
 @media (max-width: 480px) { .fit div { grid-template-columns: 1fr; gap: 2px; } }
 
-/* ---- Optional brief: plain fields, a live preview, and copy or save ---- */
-.brief-wrap { max-width: 760px; margin: 26px auto 0; text-align: left; border-top: 1px solid rgba(18,36,26,.12); }
-.brief-wrap summary { cursor: pointer; list-style: none; padding: 16px 32px 16px 0; position: relative; font: 500 16px/1.4 var(--sans); color: var(--ink); }
-.brief-wrap summary::-webkit-details-marker { display: none; }
-.brief-wrap summary::after { content: "+"; position: absolute; right: 4px; top: 13px; font: 400 22px var(--mono); color: var(--glow); transition: transform .2s; }
-.brief-wrap[open] summary::after { transform: rotate(45deg); }
-.brief { display: grid; gap: 14px; padding-bottom: 20px; }
-.brief label { display: grid; gap: 6px; font: 500 14px var(--sans); color: var(--ink); }
-.brief textarea, .brief input { font: 15px/1.45 var(--sans); color: var(--ink); background: #fff; border: 1px solid rgba(18,36,26,.2); border-radius: var(--glass-r); padding: 9px 11px; width: 100%; box-sizing: border-box; }
-.brief textarea:focus-visible, .brief input:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
-.brief-note { margin: 0; font-size: 13px; color: var(--muted); }
-.brief-out { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 13px/1.5 var(--mono); color: var(--ink); background: rgba(18,36,26,.04); border-radius: var(--glass-r); padding: 12px; }
-.brief-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-.brief-actions[hidden] { display: none; }
-.brief-actions .btn:disabled { opacity: .45; cursor: default; }
-.brief-done { font-size: 13px; color: var(--brand); }
+/* ---- Contact form: topic chips, common situations, fields, and the engagement facts beside them ---- */
+.contact-grid { max-width: 1040px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 40px; text-align: left; align-items: start; }
+.contact-grid .fit { margin: 6px 0 0; }
+@media (max-width: 860px) { .contact-grid { grid-template-columns: 1fr; gap: 28px; } }
+.cform, .cdone { display: grid; gap: 14px; }
+.cform[hidden], .cdone[hidden], .cstarts[hidden] { display: none; }
+.cform label { display: grid; gap: 6px; font: 500 14px var(--sans); color: var(--ink); }
+.cform .opt { font: 400 12px var(--mono); color: var(--muted); }
+.cform textarea, .cform input, .cform select { font: 15px/1.45 var(--sans); color: var(--ink); background: #fff; border: 1px solid rgba(18,36,26,.2); border-radius: var(--glass-r); padding: 9px 11px; width: 100%; box-sizing: border-box; min-height: 44px; }
+.cform :is(textarea, input, select):focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
+.cform [aria-invalid="true"] { border-color: #a12b1f; }
+.crow { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 520px) { .crow { grid-template-columns: 1fr; } }
+.ctopic { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.ctopic legend { font: 500 14px var(--sans); color: var(--ink); margin-bottom: 8px; padding: 0; }
+.ctopic .pick { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 6px 12px; border: 1px solid rgba(18,36,26,.18); border-radius: var(--glass-r); cursor: pointer; font: 15px var(--sans); color: var(--ink); background: #fff; }
+.ctopic .pick:has(input:checked) { border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand) inset; }
+.ctopic .pick:has(input:focus-visible) { outline: 2px solid var(--brand); outline-offset: 2px; }
+.ctopic .pick input { accent-color: var(--brand); margin: 0; width: auto; min-height: 0; }
+.cstarts p { margin: 0 0 8px; font-size: 14px; color: var(--muted); }
+.cstart-list { display: grid; gap: 8px; }
+.cstart { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
+.cstart button { font: 15px/1.4 var(--sans); color: var(--brand); background: rgba(3,87,4,.06); border: 1px dashed rgba(3,87,4,.35); border-radius: var(--glass-r); padding: 8px 12px; text-align: left; cursor: pointer; }
+.cstart button:hover { background: rgba(3,87,4,.1); }
+.cstart a { font-size: 13px; color: var(--muted); }
+.hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.cnote { margin: 0; font-size: 13px; color: var(--muted); }
+.cactions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+.cactions .btn:disabled { opacity: .6; cursor: default; }
+.cstatus { margin: 0; font-size: 14px; color: var(--brand); }
+.cstatus.err { color: #a12b1f; }
+.cdone { padding: 20px; border: 1px solid rgba(3,87,4,.3); border-radius: var(--glass-r); background: #fff; justify-items: start; }
+.cdone p { margin: 0; font-size: 17px; color: var(--ink); }
+.cdone:focus { outline: none; }
 
 /* The link from the process steps to the sample tour */
 .tour-link { margin: 22px 0 0; color: var(--muted); }
