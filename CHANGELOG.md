@@ -2,6 +2,15 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.51.0
+
+### Added
+- Knowledge Center: How neon1.tech works, a plain walk through every part of the site, 1NEON, Neo, and how a change goes live (neon1-corpus v0.26.0).
+
+### Changed
+- Every Knowledge Center document and PDF shows when it was published, and when it was last updated if that's later.
+- The p.r.o.s.e rows show the current releases of neon1-corpus, neon1-aws-infrastructure, and neon1-1NEON.
+
 ## v0.50.2
 
 ### Fixed
