@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.55.1
+
+### Fixed
+- Every outbound link's arrow is the same drawn arrow, sized to its text, in the site, the Knowledge Center, and Neo's window. It was a font character, so the footer's monospace links showed a smaller, different arrow.
+
 ## v0.55.0
 
 ### Added
