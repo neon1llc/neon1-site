@@ -299,10 +299,13 @@ body.white-rabbit-scene > :not(.white-rabbit) { visibility: hidden; }
   border-radius: 3px 3px 9px 9px / 3px 3px 12px 12px; box-shadow: 0 7px 10px rgba(0,0,0,.4); position: relative; }
 .white-rabbit-sill::after { content: ""; position: absolute; left: 14px; right: 14px; top: 100%; height: 7px; background: #E4E1D6; border-radius: 0 0 4px 4px; }
 
-/* The keyboard way in: below the screen until focused, then a chip over the rain, like the skip link */
-.white-rabbit-in { position: fixed; left: 50%; bottom: -64px; z-index: 8; transform: translateX(-50%); padding: 10px 16px; border-radius: var(--glass-r);
-  font: 500 13px var(--mono); color: var(--neon); background: rgba(13,2,8,.86); border: 1px solid rgba(0,255,65,.3); cursor: pointer; }
-.white-rabbit-in:focus { bottom: max(24px, env(safe-area-inset-bottom)); }
+/* The keyboard way in: a chip over the rain only while it has keyboard focus, like the skip link. Otherwise it is
+   clipped to nothing and transparent, not just moved below the screen: phone browsers draw the page under a
+   see-through bottom bar, where a chip parked off the bottom still showed, over the landing and the sections below */
+.white-rabbit-in { position: fixed; left: 50%; bottom: max(24px, env(safe-area-inset-bottom)); z-index: 8; transform: translateX(-50%); padding: 10px 16px; border-radius: var(--glass-r);
+  font: 500 13px var(--mono); color: var(--neon); background: rgba(13,2,8,.86); border: 1px solid rgba(0,255,65,.3); cursor: pointer;
+  opacity: 0; clip-path: inset(50%); pointer-events: none; }
+.white-rabbit-in:focus-visible { opacity: 1; clip-path: none; pointer-events: auto; }
 
 /* While caught: how to move, for screen readers only; nothing on screen explains the scene */
 .white-rabbit-how { position: absolute; width: 1px; height: 1px; margin: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }

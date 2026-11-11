@@ -23,8 +23,15 @@
 // rabbits, so they are harmless in production.
 
 
-// Feel: scroll length for one pass, spring, rubber band, and gesture idle time
-const PASS = 16;           // viewport heights of input for the whole walk
+// Feel: how much input the whole walk takes on each kind of device, spring, top speed, rubber band, and gesture idle
+// time. The scene spends that input evenly on how much the view changes (see PACE there), so fewer scrolls never
+// means a fast turn rushes by. A finger drags about seven screen heights (ten or so quick swipes); a touchpad or
+// any smooth pixel wheel scrolls nine; a notched mouse wheel takes about 45 clicks; arrows 25 presses
+const PASS_TOUCH = 7;      // viewport heights of finger travel for the whole walk
+const PASS_WHEEL = 9;      // viewport heights of touchpad or smooth wheel scrolling
+const NOTCH = 1 / 45;      // one click of a notched mouse wheel
+const FLICK = 320;         // ms of a flick's speed carried on after the finger lifts
+const TOP = 0.45;          // the most of the walk shown per second, so a burst of input can't spin the view
 const STIFF = 90;          // spring stiffness, per second squared
 const DAMP = 2 * Math.sqrt(STIFF);
 const BAND = 0.02;         // the most input can pull past the end
@@ -300,18 +307,23 @@ export function whiteRabbit({ rain, root }) {
     idleTimer = setTimeout(() => { target = Math.min(target, 1); }, IDLE);
   }
 
-  // Pixels of scroll to progress
-  const px = (d) => step(d / (PASS * innerHeight));
+  // Pixels of scroll to progress, for a finger and for a touchpad or smooth wheel
+  const touchPx = (d) => step(d / (PASS_TOUCH * innerHeight));
+  const wheelPx = (d) => step(d / (PASS_WHEEL * innerHeight));
   const active = () => state !== "idle";
 
-  // Wheel: lines and pages become pixels, as in views.js
+  // Wheel: a notched mouse wheel (lines, or the legacy wheelDelta in steps of 120) moves a fixed step per click; a
+  // touchpad or smooth wheel, in pixels, moves with its distance; pages step a tenth of the walk
   addEventListener("wheel", (e) => {
     if (!active() || e.ctrlKey) return;
     e.preventDefault(); e.stopPropagation();
-    px(e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? innerHeight : 1));
+    const legacy = e.wheelDeltaY, notched = e.deltaMode === 1 || (legacy && legacy % 120 === 0 && Math.abs(e.deltaY) >= 50);
+    if (e.deltaMode === 2) step(Math.sign(e.deltaY) * 0.1);
+    else if (notched) step(Math.sign(e.deltaY) * NOTCH * Math.max(1, Math.round(Math.abs(legacy || 120) / 120)));
+    else wheelPx(e.deltaY);
   }, { capture: true, passive: false });
 
-  // Touch: the first 6px pick the axis, and a flick keeps going for 260ms of its speed
+  // Touch: the first 6px pick the axis, and a flick keeps going for FLICK ms of its speed
   let tY = 0, tX = 0, axis = null, vel = 0, tLast = 0;
   addEventListener("touchstart", (e) => {
     if (!active() || e.touches.length !== 1) return;
@@ -329,11 +341,11 @@ export function whiteRabbit({ rain, root }) {
     if (axis === "x") return;
     const now = performance.now();
     vel = dy / Math.max(1, now - tLast); tLast = now; tY = cy; tX = cx;
-    px(dy);
+    touchPx(dy);
   }, { capture: true, passive: false });
   addEventListener("touchend", () => {
     if (!active() || axis !== "y") return;
-    if (Math.abs(vel) > 0.3 && performance.now() - tLast < 100) px(vel * 260);
+    if (Math.abs(vel) > 0.3 && performance.now() - tLast < 100) touchPx(vel * FLICK);
   }, { capture: true });
 
   // Keys: arrows nudge, paging and Space step, Home and End go to the ends, Esc always leaves.
@@ -352,7 +364,7 @@ export function whiteRabbit({ rain, root }) {
     if (state === "caught" && (UP.includes(k) || (space && e.shiftKey))) return;
     if (k === "Home") { step(-2); return; }
     if (k === "End") { step(Math.max(0.001, 1 - target)); return; }
-    const size = k.startsWith("Arrow") ? 0.04 : 0.2;
+    const size = k.startsWith("Arrow") ? 0.04 : 0.15;
     step((DOWN.includes(k) || (space && !e.shiftKey)) ? size : -size);
   }, { capture: true });
 
@@ -443,6 +455,7 @@ export function whiteRabbit({ rain, root }) {
     for (let t = dt; t > 0; t -= 1 / 120) {
       const h = Math.min(t, 1 / 120);
       v += (STIFF * (target - p) - DAMP * v) * h;
+      if (!escape) v = clamp(v, -TOP, TOP);
       p += v * h;
     }
     const q = clamp(p, 0, 1);

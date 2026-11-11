@@ -2,6 +2,15 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.48.0
+
+### Changed
+- The white rabbit's walk takes about half the scrolling: about ten quick swipes on a phone, either way. The scroll is spent in proportion to how much the view changes, so the turn to the window, getting up, and the walk over take more of it and the calm glide back from the TV less, and every swipe moves the view about the same amount. The pauses at the window and on the yard still take a real stretch of scrolling.
+- Each kind of input has its own measure: a finger, a touchpad or smooth wheel, and a notched mouse wheel (a fixed step per click). The view never turns faster than a set top speed, however hard the flick.
+
+### Fixed
+- "follow the white rabbit" no longer shows behind a phone's bottom bar after leaving the rabbit, or over the sections below. It is hidden unless it has keyboard focus.
+
 ## v0.47.2
 
 ### Changed
