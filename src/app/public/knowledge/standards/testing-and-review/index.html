@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.52.0" />
+  <meta name="version" content="0.53.0" />
   <title>Testing and review · neon1 knowledge center</title>
   <meta name="description" content="What neon1 tests, how changes are checked and reviewed before they ship, and what done means." />
   <meta name="theme-color" content="#F2F4F2" />
@@ -86,7 +86,7 @@
         <p class="kc-summary">What neon1 tests, how changes are checked and reviewed before they ship, and what done means.</p>
         <dl class="kc-facts">
           <div><dt>Type</dt><dd>Standard</dd></div>
-          <div><dt>Edition</dt><dd>2.1</dd></div>
+          <div><dt>Edition</dt><dd>2.2</dd></div>
           <div><dt>Published</dt><dd>November 9, 2026</dd></div>
           <div><dt>Updated</dt><dd>November 11, 2026</dd></div>
           <div><dt>For</dt><dd>Developers</dd></div>
@@ -117,7 +117,7 @@
 <table><thead><tr><th>Check</th><th>What it catches</th><th>When it runs</th></tr></thead><tbody><tr><td>Formatting and linting</td><td>Style drift and simple mistakes</td><td>Every commit, locally and in CI</td></tr><tr><td>Unit tests</td><td>Logic errors in one piece</td><td>Every commit</td></tr><tr><td>Integration tests</td><td>Pieces that don't fit together</td><td>Every pull request or merge</td></tr><tr><td>End-to-end and browser tests</td><td>Broken user paths</td><td>Before every release</td></tr><tr><td>Security scans</td><td>Leaked secrets, known vulnerable dependencies</td><td>Every push</td></tr><tr><td>Accessibility checks</td><td>Missing labels, contrast, keyboard traps</td><td>Before every release that changes an interface</td></tr><tr><td>Live checks</td><td>The deployed version isn't the one built</td><td>After every deploy</td></tr></tbody></table>
 <p>Checks run the same way on a laptop and in CI, from one command, such as <code>make check</code>. A check that can't run somewhere says so, rather than passing quietly.</p>
 <h2 id="review">Review</h2>
-<p>Every change gets read in full before it merges, as a diff, by its author at minimum. Once a repository deploys to production or holds client data, from its first live release and whatever its version number, its required checks must pass and someone other than the author reviews each change when a second person is available. While neon1 is one person, the <a href="/knowledge/standards/version-control/#how-this-works-today">version control standard</a> describes the sole-maintainer exception. A review asks:</p>
+<p>Every change gets read in full before it merges, as a diff, by its author at minimum. Once a repository deploys to production or holds client data, from its first live release and whatever its version number, its required checks must pass and someone other than the author reviews each change when a second person is available. While neon1 has one maintainer, the <a href="/knowledge/standards/version-control/#how-this-works-today">version control standard</a> describes the sole-maintainer exception. A review asks:</p>
 <ol><li>Does it do what it says, and only that?</li><li>Is anything unsafe: secrets, permissions, data loss, irreversible actions?</li><li>Are the tests about the promise, and do they pass?</li><li>Is it as simple as it can be?</li><li>Is it readable, with names and comments that follow the <a href="/knowledge/standards/code-style/">code style</a>?</li><li>Are the docs, changelog, and version updated?</li></ol>
 <p>AI review tools can help find problems. They don't approve changes. A person decides.</p>
 <h2 id="definition-of-done">Definition of done</h2>
@@ -188,7 +188,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.52.0</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.53.0</a>
       </span>
     </div>
   </footer>
@@ -197,5 +197,6 @@
 
   <script type="module" src="/js/frame.js"></script>
   <script type="module" src="/js/knowledge.js"></script>
+  <script type="module" src="/js/knowledge-toc.js"></script>
 </body>
 </html>
