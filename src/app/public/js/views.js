@@ -26,6 +26,30 @@
       b.addEventListener("click", () => rail.scrollBy({ left: step() * +b.dataset.rail, behavior: reduce.matches ? "auto" : "smooth" })));
   }
 
+  // ---- Folds open in place ----
+  // Views center their content, so a fold opening in the middle of one pushed everything above it up by
+  // half its height, and the browser scrolled to make up for it, leaving the page outside the view it
+  // was in; the next scroll then jumped. Before the first fold in a view opens, its content is pinned
+  // where it already sits and grows downward instead. Clicks, Enter, and Space all arrive as a click
+  function pin(v) {
+    if (v.dataset.pinned) return;
+    const first = v.firstElementChild;
+    if (!first) return;
+    const top = first.getBoundingClientRect().top - v.getBoundingClientRect().top - (parseFloat(getComputedStyle(first).marginTop) || 0);
+    v.style.paddingTop = `${Math.max(0, top)}px`;
+    v.style.justifyContent = "flex-start";
+    v.style.alignContent = "start";
+    v.dataset.pinned = "1";
+  }
+  const unpin = (v) => { v.style.paddingTop = v.style.justifyContent = v.style.alignContent = ""; delete v.dataset.pinned; };
+  document.addEventListener("click", (e) => {
+    const s = e.target instanceof Element && e.target.closest("summary");
+    const v = s && s.closest(".view");
+    if (v) pin(v);
+  }, true);
+  // A new screen size centers again any view whose folds are all closed
+  addEventListener("resize", () => document.querySelectorAll(".view[data-pinned]").forEach((v) => { if (!v.querySelector("details[open]")) unpin(v); }));
+
   // ---- Case links: a link to one card lands on that card ----
   // Case links, such as the contact form's "a similar project", point at single cards (#case-home). Its
   // section comes into view, the row slides sideways to the card, the card is marked, and focus goes
@@ -84,9 +108,9 @@
 
   // Gesture feel and easing curves
   const HEADER = 64;
-  const THRESHOLD = 40;    // input distance (px) needed to move to the next view
+  const THRESHOLD = 55;    // input distance (px) needed to move to the next view (40 felt too easy to tip over)
   const GIVE = 0.7;        // how far the page moves per px of input while resisting
-  const MAX_GIVE = 32;     // the most the page gives before it settles
+  const MAX_GIVE = 40;     // the most the page gives before it settles
   const IDLE = 160;        // ms without input that ends a gesture
   const settleEase = [0.22, 1, 0.36, 1];
   const enterEase = [0.19, 1, 0.22, 1];
@@ -360,6 +384,33 @@
     if (!a.dataset.view) window.n1focus?.(id);
   });
 
+  // ---- Keyboard focus: Tab and Shift+Tab ----
+  // Focus moving into a section shows it at once (an entrance still waiting would leave the focused
+  // control invisible) and settles the page so the control is in view below the bar, with the same
+  // eased move as scrolling. Within a tall section only the smallest move that shows the control is made
+  // Only focus moved by Tab counts; a click, a script (a case card's button), or Back leaves the page be
+  let tabAt = -1e9;
+  addEventListener("keydown", (e) => { if (e.key === "Tab") tabAt = performance.now(); }, true);
+  document.addEventListener("focusin", (e) => {
+    const t = e.target;
+    if (off || performance.now() - tabAt > 600 || !(t instanceof Element) || t.closest("header, .menu, .n1chat, .case-panel, .skip")) return;
+    const v = t.closest(".view, .hero"), i = views.indexOf(v);
+    if (i < 0) return;
+    if (v !== hero) {
+      visited.add(v);
+      v.style.opacity = "1";
+      parts(v).forEach((el) => { el.style.opacity = "1"; el.style.transform = "none"; });
+    }
+    // Positions come from where the page is drawn right now (the browser may already have scrolled to it)
+    const [top, bottom] = range(i), r = t.getBoundingClientRect();
+    const elTop = scrollY + r.top, elBottom = elTop + r.height;
+    let dest = indexAt(scrollY) === i ? scrollY : top;
+    if (elBottom > dest + vh() - 16) dest = elBottom - vh() + 32;
+    if (elTop < dest + HEADER + 8) dest = elTop - HEADER - 16;
+    dest = Math.max(top, Math.min(bottom, dest));
+    if (Math.abs(dest - scrollY) > 2) goTo(i, { y: dest });
+  });
+
   // ---- Keep in step with scrolls the page didn't start (focus, find in page) ----
   function sync() {
     y = target = scrollY;
@@ -367,7 +418,11 @@
     if (!visited.has(v)) enter(v);
     else v.style.opacity = "1";
   }
-  addEventListener("scroll", () => { if (!settling && !pullDir && Math.abs(scrollY - y) > 2) sync(); }, { passive: true });
+  addEventListener("scroll", () => {
+    // Opened at a #section: the browser's own jump to it, which can come late, is put back on the view's top
+    if (landing()) { land(); return; }
+    if (!settling && !pullDir && Math.abs(scrollY - y) > 2) sync();
+  }, { passive: true });
 
   // A resize keeps the position inside the current view
   addEventListener("resize", () => {
@@ -386,9 +441,14 @@
   const start = views.indexOf(first ? first.closest(".view") : document.getElementById(location.hash.slice(1)));
   history.scrollRestoration = "manual";
   // Fonts can change heights after the first paint, so land again until the visitor scrolls
-  const land = () => { if (start > 0 && !lastInput && !settling) { scrollTo(0, range(start)[0]); sync(); } };
+  // The first few seconds of a visit opened at a #section, until the visitor scrolls, clicks, or types
+  let touched = false;
+  for (const ev of ["pointerdown", "keydown", "touchstart", "popstate", "hashchange"]) addEventListener(ev, () => { touched = true; }, { capture: true, once: true });
+  const landing = () => start > 0 && !lastInput && !touched && !settling && performance.now() < 4000 && Math.abs(scrollY - range(start)[0]) > 2;
+  const land = () => { if (start > 0 && !lastInput && !touched && !settling) { scrollTo(0, range(start)[0]); sync(); } };
   land();
-  addEventListener("load", land);
+  // The browser's own jump to the #fragment can run after load and land 72px low, so land once more after it
+  addEventListener("load", () => { land(); requestAnimationFrame(() => setTimeout(land, 0)); });
   if (document.fonts) document.fonts.ready.then(land);
   if (window.ResizeObserver) new ResizeObserver(land).observe(document.body);
 
