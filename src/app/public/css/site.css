@@ -344,7 +344,6 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 .repos .row:last-child { border-bottom: 0; }
 .repos .row { grid-template-columns: 1fr 220px 2fr; }
 @media (max-width: 700px) { .repos .row { grid-template-columns: 1fr; gap: 4px; } }
-#work .spaced { letter-spacing: .32em; }
 .cfold[open] > .cform, .cfold[open] > .cdone { margin-top: 18px; }
 .cform, .cdone { display: grid; gap: 14px; }
 .cform[hidden], .cdone[hidden] { display: none; }

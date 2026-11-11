@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.48.1
+
+### Changed
+- "neon1 p r o s e" is now written "neon1 p.r.o.s.e", in the heading and the menu, and its line reads "Purposeful, repeatable, open-source engineering."
+
 ## v0.48.0
 
 ### Changed
