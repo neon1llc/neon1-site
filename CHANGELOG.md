@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.54.1
+
+### Changed
+- The tab icon is the neon1 mark on a transparent background, in brand green when the browser is light and matrix green when it's dark (`favicon.svg`). `favicon-awake.svg` and `favicon-matrix.svg` are fixed versions for 1NEON, which follows its own theme. Browsers without SVG icons keep the dark square.
+
 ## v0.54.0
 
 ### Changed
