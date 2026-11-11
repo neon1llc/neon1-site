@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## Unreleased
+
+### Added
+- Knowledge Center: Mission and promise, a capability statement, and a care plan template (neon1-corpus v0.30.0). About on the home page links to the mission.
+
 ## v0.56.1
 
 ### Fixed
