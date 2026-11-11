@@ -204,7 +204,7 @@ html.case-lock { overflow: hidden; }
 
 /* Views: each section is a "view". Motion (js/motion) runs the entrances; without JS everything is visible */
 .motion-ready .view h2, .motion-ready .view .reveal-on { opacity: 0; }
-.view { min-height: calc(var(--vh, 100svh) - 64px); display: flex; flex-direction: column; justify-content: center; scroll-margin-top: 64px;
+.view { min-height: calc(var(--vh, 100svh) - 64px); display: flex; flex-direction: column; justify-content: center; scroll-margin-top: 0; /* the page's scroll-padding already clears the bar; both together landed 72px low */
   padding-top: clamp(28px, 5vh, 56px); padding-bottom: clamp(28px, 5vh, 56px); }
 .view > .btn { align-self: center; }
 
@@ -224,6 +224,8 @@ html.case-lock { overflow: hidden; }
 
 /* Script scrolling replaces smooth scrolling; reduced motion keeps the header still */
 .glide, .glide body { scroll-behavior: auto; }
+/* The page steers itself; the browser's own scroll anchoring would fight it when content changes size */
+.glide { overflow-anchor: none; }
 
 /* Case studies intro line, with the four stages on a line of their own */
 .intro { margin: -6px 0 clamp(18px, 3vh, 30px); }
