@@ -92,7 +92,9 @@ knowledge-check: knowledge-export ## Fail if the knowledge center differs from t
 	@node scripts/knowledge.mjs check $(SITE_DIR) .corpus/export/knowledge
 
 # Chromium through Playwright prints each document with knowledge/print.css. The deploy job runs it; PDFs aren't committed
+# Chromium draws the running footer in a frame that only sees installed fonts, so Figtree is installed for this user first
 knowledge-pdf: knowledge-export ## Print the knowledge center's PDFs next to their pages (needs Playwright)
+	@mkdir -p $(HOME)/.local/share/fonts && cp knowledge/fonts/*.ttf $(HOME)/.local/share/fonts/ && (fc-cache -f >/dev/null 2>&1 || true)
 	@node scripts/knowledge-pdf.mjs $(SITE_DIR) .corpus/export/knowledge
 
 # The version meta on every page, the footer link, the CHANGELOG's top entry, and any literal ?v=

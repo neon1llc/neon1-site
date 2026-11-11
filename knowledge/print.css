@@ -1,14 +1,22 @@
 /* knowledge/print.css - neon1 print styles for the Knowledge Center PDFs printed by scripts/knowledge-pdf.mjs.
    The Awake look on paper, in the manner of neon1's own letters and proposals: a white page, the green mark and
    wordmark as a letterhead, the title set right in brand green, solid green bars for sections, green arrows for
-   points, and a centered footer with the slogan. Aptos where it's installed (Microsoft 365), Inter elsewhere. */
+   points, and a centered footer with the slogan. Set in Figtree, bundled so every PDF looks the same wherever it's printed. */
 
 
 /* ---- Fonts: bundled, both under the SIL Open Font License ---- */
 @font-face {
-  font-family: "Inter";
-  src: url("../src/app/public/fonts/inter-latin-wght-normal.woff2") format("woff2");
-  font-weight: 100 900;
+  font-family: "Figtree";
+  src: url("../src/app/public/fonts/figtree-latin-wght-normal.woff2") format("woff2");
+  font-weight: 300 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Figtree";
+  src: url("../src/app/public/fonts/figtree-latin-wght-italic.woff2") format("woff2");
+  font-weight: 300 900;
+  font-style: italic;
 }
 
 @font-face {
@@ -31,7 +39,7 @@
   --wash-2: #f7faf7;
   --alarm: #9b1c1c;
   --alarm-wash: #fbeeee;
-  --body: "Aptos", "Inter", "Segoe UI", system-ui, sans-serif;
+  --body: "Figtree", "Segoe UI", system-ui, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
 }
 
