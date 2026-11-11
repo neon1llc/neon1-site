@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.49.3
+
+### Changed
+- In neon1 p.r.o.s.e, the business list starts with neon1-corpus, then neon1-aws-infrastructure.
+
 ## v0.49.2
 
 ### Changed
