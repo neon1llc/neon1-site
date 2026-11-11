@@ -265,7 +265,8 @@ function docPage(d) {
   const body = pageBody(d, corpus)
   // On this page: the document's sections, for documents with three or more. Wide screens keep it beside the text;
   // narrower ones fold it under the actions. Both are plain links, so it works without JavaScript
-  const heads = d.sections.filter((x) => x.heading && x.key)
+  // Only sections whose heading made it into the page: a "## " line inside a code sample is not a section
+  const heads = d.sections.filter((x) => x.heading && x.key && body.includes(`id="${x.key}"`))
   const tocLinks = heads.map((x) => `            <li><a href="#${esc(x.key)}">${esc(x.heading)}</a></li>`).join("\n")
   const toc = heads.length >= 3 ? {
     side: `

@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.51.0" />
+  <meta name="version" content="0.52.0" />
   <title>Code style · neon1 knowledge center</title>
   <meta name="description" content="How neon1 code reads: names, comments, file headers, formatting, and layout, in every language and configuration format." />
   <meta name="theme-color" content="#F2F4F2" />
@@ -86,16 +86,16 @@
         <p class="kc-summary">How neon1 code reads: names, comments, file headers, formatting, and layout, in every language and configuration format.</p>
         <dl class="kc-facts">
           <div><dt>Type</dt><dd>Standard</dd></div>
-          <div><dt>Edition</dt><dd>2.0</dd></div>
+          <div><dt>Edition</dt><dd>2.1</dd></div>
           <div><dt>Published</dt><dd>November 9, 2026</dd></div>
-          <div><dt>Updated</dt><dd>November 10, 2026</dd></div>
+          <div><dt>Updated</dt><dd>November 11, 2026</dd></div>
           <div><dt>For</dt><dd>Developers</dd></div>
         </dl>
         <div class="kc-actions">
           <a class="btn btn-primary" href="/knowledge/standards/code-style/neon1-code-style.pdf" download><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Download PDF</a>
         </div>
         <details class="kc-toc kc-toc-fold">
-          <summary>On this page <span>8 sections</span></summary>
+          <summary>On this page <span>9 sections</span></summary>
           <ol>
             <li><a href="#names">Names</a></li>
             <li><a href="#comments">Comments</a></li>
@@ -105,6 +105,7 @@
             <li><a href="#dependencies">Dependencies</a></li>
             <li><a href="#exceptions">Exceptions</a></li>
             <li><a href="#formats-without-comments">Formats without comments</a></li>
+            <li><a href="#sources">Sources</a></li>
           </ol>
         </details>
       </header>
@@ -134,6 +135,8 @@
 <ul><li><strong>Generated files</strong>, such as compiled output, generated clients, and build artifacts. Document the generator and its inputs instead, and regenerate rather than editing by hand.</li><li><strong>Vendored code</strong> copied from another project. Leave it as its authors wrote it, and record where it came from and which version in the nearest README or notice file.</li><li><strong>Lock files</strong>, such as <code>package-lock.json</code> or <code>go.sum</code>. Their tools own them.</li><li><strong>Formats with their own authoritative description</strong>, such as a JSON Schema with <code>description</code> fields, an OpenAPI document, or a migration tracked by its tool. The description fields are where the explanation goes.</li></ul>
 <h2 id="formats-without-comments">Formats without comments</h2>
 <p>Strict JSON and similar formats can't hold comments. Don't invent them. Put the explanation in the nearest file that can hold it, such as the README or the code that reads the file.</p>
+<h2 id="sources">Sources</h2>
+<ul><li><a class="ext" href="https://google.github.io/styleguide/" target="_blank" rel="noopener">Google style guides</a>, Google: naming, comments, and layout conventions for many languages.</li><li><a class="ext" href="https://peps.python.org/pep-0008/" target="_blank" rel="noopener">PEP 8</a>, the Python community: the style guide for Python code.</li><li><a class="ext" href="https://prettier.io/docs/en/rationale" target="_blank" rel="noopener">Prettier rationale</a>, the Prettier project: why formatting is best left to a tool.</li><li><a class="ext" href="https://editorconfig.org/" target="_blank" rel="noopener">EditorConfig</a>, the EditorConfig project: one file that keeps indentation and line endings the same in every editor.</li></ul>
       </div>
 
       <aside class="kc-next" aria-labelledby="kc-next-h">
@@ -158,6 +161,7 @@
             <li><a href="#dependencies">Dependencies</a></li>
             <li><a href="#exceptions">Exceptions</a></li>
             <li><a href="#formats-without-comments">Formats without comments</a></li>
+            <li><a href="#sources">Sources</a></li>
       </ol>
     </nav>
     </div>
@@ -195,7 +199,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.51.0</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.52.0</a>
       </span>
     </div>
   </footer>
