@@ -100,6 +100,7 @@ ${main}
 
   <script type="module" src="/js/frame.js"></script>
   <script type="module" src="/js/knowledge.js"></script>
+  <script type="module" src="/js/knowledge-toc.js"></script>
 </body>
 </html>
 `
