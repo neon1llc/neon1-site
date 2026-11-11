@@ -2,6 +2,15 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.55.0
+
+### Added
+- Knowledge Center: Preview PDF opens a document's PDF in a new tab, in the browser's own viewer, where it can be read, printed, or saved.
+
+### Changed
+- Figtree is the reading and interface typeface in place of Inter, on the site, the Knowledge Center, 1NEON, and the PDFs. JetBrains Mono stays for the wordmark, navigation, labels, and code.
+- PDFs are set entirely in bundled Figtree and JetBrains Mono, including the running footer, so every printed copy looks the same.
+
 ## v0.54.1
 
 ### Changed

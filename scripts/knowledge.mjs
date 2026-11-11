@@ -35,6 +35,8 @@ const navLinks = SECTIONS.map(([id, label]) => `        <li><a href="/#${id}">${
 const menuLinks = [...SECTIONS, ["faq", "questions"], ["contact", "contact"]]
   .map(([id, label]) => `      <li><a href="/#${id}">${label}</a></li>`).join("\n")
 
+// An open page: the PDF opens in the browser's own viewer, which can save or print it from there
+const ICON_VIEW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5H5V6h5"/></svg>'
 const ICON_PDF = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>'
 
 
@@ -299,7 +301,8 @@ ${tocLinks}
 ${facts.map(([k, v]) => `          <div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("\n")}
         </dl>
         <div class="kc-actions">
-          ${d.pdf ? `<a class="btn btn-primary" href="${d.pdf}" download>${ICON_PDF}Download PDF</a>` : ""}
+          ${d.pdf ? `<a class="btn btn-primary" href="${d.pdf}" download>${ICON_PDF}Download PDF</a>
+          <a class="btn btn-outline" href="${d.pdf}" target="_blank" rel="noopener">${ICON_VIEW}Preview PDF<span class="kc-sr"> (opens in a new tab)</span></a>` : ""}
         </div>${toc.fold}
       </header>
 

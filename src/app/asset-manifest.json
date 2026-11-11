@@ -108,6 +108,14 @@
       "exactness": "library home and the version in the file name; the package file it was copied from is not recorded",
       "license": "MIT",
       "license_file": "js/motion-LICENSE.md"
+    },
+    "figtree": {
+      "title": "Figtree",
+      "author": "The Figtree Project Authors",
+      "source_url": "https://github.com/erikdkennedy/figtree",
+      "exactness": "@fontsource-variable/figtree 5.3.0 from npm (latin, wght, normal and italic)",
+      "license": "SIL OFL 1.1",
+      "license_file": "fonts/OFL-Figtree.txt"
     }
   },
   "assets": {
@@ -286,6 +294,17 @@
       "consumers": [
         "index.html"
       ]
+    },
+    "font-figtree": {
+      "title": "Figtree, Latin subset, variable weight, upright and italic",
+      "origin": "third-party",
+      "sources": [
+        "figtree"
+      ],
+      "made": "The WOFF2 files from @fontsource-variable/figtree 5.3.0, unchanged.",
+      "consumers": [
+        "shared/neon1.css"
+      ]
     }
   },
   "files": {
@@ -301,6 +320,10 @@
       "sha256": "0069dd4f037348e80fdaf4ed156061d7951807b17eb532b1d636b200c1a05819",
       "asset": "brand-icons"
     },
+    "fonts/OFL-Figtree.txt": {
+      "sha256": "ee23e6c84000126692e112ff067b456470493349f993ceaa8b4d3766dd6fad5d",
+      "asset": "font-figtree"
+    },
     "fonts/OFL-Inter.txt": {
       "sha256": "8c8fa881d9091ee315d2c80d207bb73afd4e90a66c9782ca445c5642f25db6dc",
       "asset": "font-inter"
@@ -308,6 +331,14 @@
     "fonts/OFL-JetBrainsMono.txt": {
       "sha256": "bb1c26eb6fe1839e3759548777c8a35b9495ce4878a4b833b1b63d43ff313a4b",
       "asset": "font-jetbrains-mono"
+    },
+    "fonts/figtree-latin-wght-italic.woff2": {
+      "sha256": "7242fa62d13d46172816b266f03c027999faa3755a52c2124bc2c440f6f4b983",
+      "asset": "font-figtree"
+    },
+    "fonts/figtree-latin-wght-normal.woff2": {
+      "sha256": "4ba7d3d096695818fe0686be4f1e82c6b05134e18a22260336130335027462dd",
+      "asset": "font-figtree"
     },
     "fonts/inter-latin-wght-normal.woff2": {
       "sha256": "f052ee44c3728dfd23aba8a4567150bc314d23903026fbb6ad089422c2df56af",
