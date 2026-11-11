@@ -41,7 +41,7 @@
     v.style.alignContent = "start";
     v.dataset.pinned = "1";
   }
-  const unpin = (v) => { v.style.paddingTop = v.style.justifyContent = v.style.alignContent = ""; delete v.dataset.pinned; };
+  const unpin = (v) => { v.style.paddingTop = v.style.justifyContent = v.style.alignContent = ""; delete v.dataset.pinned; delete v.dataset.top; };
   document.addEventListener("click", (e) => {
     const s = e.target instanceof Element && e.target.closest("summary");
     const v = s && s.closest(".view");
@@ -108,7 +108,14 @@
 
   // Gesture feel and easing curves
   const HEADER = 64;
-  const THRESHOLD = 55;    // input distance (px) needed to move to the next view (40 felt too easy to tip over)
+  const THRESHOLD = 55;    // touch: finger travel (px) needed to move to the next view (40 felt too easy to tip over)
+  // Wheel and trackpad: a mouse notch is about 100px and a trackpad flick sends hundreds, so 55px tipped
+  // over on a single notch. The wheel needs more travel, each event counts for at most WHEEL_STEP, and a
+  // pull holds for WHEEL_HOLD ms between notches, so it takes about three deliberate notches or a real
+  // swipe, never one stray notch or a flick's tail
+  const WHEEL_THRESHOLD = 150;
+  const WHEEL_STEP = 50;
+  const WHEEL_HOLD = 380;
   const GIVE = 0.7;        // how far the page moves per px of input while resisting
   const MAX_GIVE = 40;     // the most the page gives before it settles
   const IDLE = 160;        // ms without input that ends a gesture
@@ -188,7 +195,7 @@
   let settling = null;
   let lastInput = 0, gestureFromEdge = false, blockUntilIdle = false, idleTimer = 0;
   // Momentum fades, a person scrolling doesn't: two steps in a row that don't shrink count as a push
-  let prevAbs = 0, steady = 0;
+  let prevAbs = 0, steady = 0, lastDirect = false;
 
   // Eases the page toward the target every frame, except while a settle runs
   // The loop stops once the page is at rest, and input wakes it, so a still page costs nothing
@@ -248,7 +255,7 @@
   // One step of input, positive is down
   // Direct input, from touch, moves the page at once instead of easing
   function input(d, direct) {
-    if (paused() || !d) return;
+    if (paused() || !d || folding) return;
     const now = performance.now();
     const newGesture = now - lastInput > IDLE;
     lastInput = now;
@@ -259,7 +266,12 @@
     prevAbs = abs;
     const pushing = steady >= 2;
     clearTimeout(idleTimer);
-    idleTimer = setTimeout(() => { blockUntilIdle = false; release(); }, IDLE);
+    // A wheel pull under way holds a little longer, so slow notches add up instead of springing back
+    lastDirect = direct;
+    idleTimer = setTimeout(function idle() {
+      if (!lastDirect && pullDir && performance.now() - lastInput < WHEEL_HOLD) { idleTimer = setTimeout(idle, 40); return; }
+      blockUntilIdle = false; release();
+    }, IDLE);
     if (settling) return; // a settle runs to the end, and its input still counts toward idle
     wake();
     // Fading momentum after a settle is swallowed, but someone still scrolling carries on at once
@@ -280,17 +292,97 @@
     if (Math.sign(d) !== pullDir) { // reversing while resisting
       pull = Math.max(0, pull - Math.abs(d));
       if (!pull) { release(); return; }
-    } else pull += Math.abs(d);
+    } else pull += direct ? Math.abs(d) : Math.min(WHEEL_STEP, Math.abs(d));
 
     // Momentum that runs into an edge is held back; a fresh push, or scrolling that keeps going, carries on
+    const need = direct ? THRESHOLD : WHEEL_THRESHOLD;
     if (newGesture || pushing) gestureFromEdge = true;
-    if (!gestureFromEdge) pull = Math.min(pull, THRESHOLD * 0.6);
-    const t = Math.min(1, pull / THRESHOLD);
+    if (!gestureFromEdge) pull = Math.min(pull, need * 0.6);
+    const t = Math.min(1, pull / need);
     target = pullBase + pullDir * Math.min(MAX_GIVE, pull * GIVE);
     setFade(views[pullIndex], 1 - 0.5 * t);
     setFade(views[pullIndex + pullDir], t);
-    if (pull >= THRESHOLD) goTo(pullIndex + pullDir);
+    if (pull >= need) goTo(pullIndex + pullDir);
   }
+
+  // ---- Folds: eased open and close, and the view makes room ----
+  // A fold (the p.r.o.s.e groups, the questions, the contact form) opens with its height eased from the
+  // label to the full content, and closes the same way back. On the first fold opened in a view, the
+  // view glides from centered to its top, so its heading sits just under the bar with the usual spacing
+  // and the opened content runs down from there. A view taller than the screen then scrolls inside
+  // itself first, and only past its bottom edge does the pull to the next view begin. Closing the last
+  // open fold glides the view back to centered. Input waits while a fold moves (folding)
+  let folding = 0;
+  const FOLD_TIME = 0.42;
+  const TOP_GAP = 28; // the view's spacing above its heading once it sits at the top
+  const viewOf = (d) => d.closest(".view");
+  const centeredPad = (v) => {
+    // Where the content sits when centered: measured with the pin lifted, then put straight back
+    const keep = v.style.cssText;
+    unpin(v);
+    const first = v.firstElementChild;
+    const pad = first.getBoundingClientRect().top - v.getBoundingClientRect().top - (parseFloat(getComputedStyle(first).marginTop) || 0);
+    v.style.cssText = keep; v.dataset.pinned = "1";
+    return Math.max(0, pad);
+  };
+  function toggleFold(d) {
+    const v = viewOf(d), i = views.indexOf(v);
+    const opening = !d.open;
+    const s = d.querySelector(":scope > summary");
+    folding++;
+    const done = () => { folding = Math.max(0, folding - 1); y = target = scrollY; };
+    const h0 = d.getBoundingClientRect().height;
+    d.style.overflow = "hidden";
+    if (opening) {
+      d.open = true;
+      const h1 = d.getBoundingClientRect().height;
+      d.style.height = `${h0}px`;
+      const runs = [animate(d, { height: [`${h0}px`, `${h1}px`] }, { duration: FOLD_TIME, ease: settleEase })];
+      // The first fold opened in a centered view: the view glides to its top while the fold opens
+      if (v && v.dataset.pinned && !v.dataset.top) {
+        v.dataset.top = "1";
+        const from = parseFloat(v.style.paddingTop) || 0;
+        runs.push(animate(v, { paddingTop: [`${from}px`, `${TOP_GAP}px`] }, { duration: FOLD_TIME, ease: settleEase }));
+        // The page lines up with the view's top in the same move, if it wasn't already there
+        const top = range(i)[0];
+        if (Math.abs(scrollY - top) > 2) runs.push(animate(scrollY, top, { duration: FOLD_TIME, ease: settleEase, onUpdate: (p) => scrollTo(0, p) }));
+      }
+      Promise.all(runs.map((r) => r.finished ?? r)).then(() => {
+        d.style.height = d.style.overflow = "";
+        // An opened fold's label stays in view: if it sits under the bar, the page eases to it
+        const r = s.getBoundingClientRect();
+        if (r.top < HEADER + 8) goTo(i, { y: scrollY + r.top - HEADER - TOP_GAP });
+        done();
+      }, done);
+    } else {
+      const h1 = s.getBoundingClientRect().height + (parseFloat(getComputedStyle(d).paddingTop) || 0) + (parseFloat(getComputedStyle(d).paddingBottom) || 0);
+      const last = v && v.querySelectorAll("details[open]").length === 1;
+      const runs = [animate(d, { height: [`${h0}px`, `${h1}px`] }, { duration: FOLD_TIME * 0.85, ease: settleEase })];
+      Promise.all(runs.map((r) => r.finished ?? r)).then(() => {
+        d.open = false;
+        d.style.height = d.style.overflow = "";
+        if (last && v.dataset.top) {
+          // Back to centered: the page returns to the view's top while the content glides down to center
+          delete v.dataset.top;
+          const to = centeredPad(v), from = parseFloat(v.style.paddingTop) || 0;
+          const moves = [animate(v, { paddingTop: [`${from}px`, `${to}px`] }, { duration: FOLD_TIME, ease: settleEase })];
+          const top = range(i)[0];
+          if (Math.abs(scrollY - top) > 2) moves.push(animate(scrollY, top, { duration: FOLD_TIME, ease: settleEase, onUpdate: (p) => scrollTo(0, p) }));
+          Promise.all(moves.map((r) => r.finished ?? r)).then(() => { unpin(v); done(); }, done);
+        } else done();
+      }, done);
+    }
+  }
+  // Clicks, Enter, and Space all arrive as a click on the summary; the browser's own instant toggle is
+  // replaced by the eased one. The pin listener above has already fixed where the content sits
+  document.addEventListener("click", (e) => {
+    const s = e.target instanceof Element && e.target.closest("summary");
+    const d = s && s.parentElement;
+    if (!d || d.tagName !== "DETAILS" || !viewOf(d) || off || e.defaultPrevented) return;
+    e.preventDefault();
+    if (folding && d.style.height) return; // this fold is already moving
+    toggleFold(d);
+  });
 
   // ---- Wheel and trackpad ----
   // Line and page deltas are converted to pixels
