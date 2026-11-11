@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## Unreleased
+
+### Changed
+- Deploys keep the last 5 releases for rollback instead of 10, so older release folders are removed sooner.
+
 ## v0.57.0
 
 ### Fixed
