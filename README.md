@@ -59,12 +59,14 @@ To deploy by hand:
 
 ```bash
 export AWS_PROFILE=neon1
-make deploy invalidate verify
+make deploy verify
 ```
 
-`make deploy` compares file hashes with the bucket and syncs only when something differs. Fonts and media are cached for a year and everything else revalidates on each visit. `make invalidate` clears CloudFront only after a deploy that changed files. Add `FORCE=1` to clear it anyway. `make verify` checks that neon1.tech and www.neon1.tech return the version in the local `index.html`.
+`make deploy` ships the site as one release, so nobody ever gets a new page with an old script. Pages, scripts, and styles go up whole to `releases/<id>/` in the bucket, where the id is a hash of their content. Then one write to the `neon1-site-release` key value store makes it the live release, and neon1.tech's router serves every visitor from that folder (see neon1-aws-infrastructure's `site/`). The same content gives the same id, so a deploy with nothing new changes nothing. Fonts, media, and `.well-known` are shared at the bucket's top. Fonts and media are cached for a year, and everything else revalidates on each visit. A new folder means new cache keys, so no invalidation is needed. The last 10 releases are kept.
 
-`BUCKET`, `DISTRIBUTION` and `VERIFY_URLS` can be overridden on the command line.
+`make rollback` switches back to the release before the live one, in seconds, without uploading anything. `RELEASE=<id>` picks a specific one. `make invalidate` clears CloudFront, which is needed only if a shared file was changed in place. `make verify` checks that neon1.tech and www.neon1.tech return the version in the local `index.html`.
+
+`BUCKET`, `DISTRIBUTION`, `RELEASE_STORE`, and `VERIFY_URLS` can be overridden on the command line.
 
 ### Fonts and media never change in place
 

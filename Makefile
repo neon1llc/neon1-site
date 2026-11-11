@@ -13,7 +13,8 @@ VERIFY_URLS  ?= https://neon1.tech/ https://www.neon1.tech/
 AWS_REGION   ?= us-east-1
 PORT         ?= 8000
 BUDGET_KB    ?= 8192
-CHANGES      ?= .deploy-changes
+# The key value store whose "release" key names the live release folder (neon1-aws-infrastructure site/)
+RELEASE_STORE ?= neon1-site-release
 # neon1-corpus holds the case studies and questions. A tag pins it; CORPUS_DIR can point at a local checkout instead
 CORPUS_TAG   ?= v0.24.6
 CORPUS_REPO  ?= https://github.com/neon1llc/neon1-corpus
@@ -26,17 +27,10 @@ export AWS_REGION
 HTML_VALIDATE  := html-validate@11.17.0
 GITLEAKS_IMAGE := ghcr.io/gitleaks/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f
 
-# Fonts and media keep their names, so a changed file needs a new name to reach
-# browsers that already cached it (make manifest enforces it). Everything else revalidates on each visit.
-LONG_CACHE  := public, max-age=31536000, immutable
-SHORT_CACHE := no-cache
-DOTFILES    := --exclude ".*" --exclude "*/.*"
-# .well-known is the one dot folder the site publishes (security.txt, mta-sts.txt)
-WELL_KNOWN  := --include ".well-known/*"
 
 # Plain make shows the help
 .DEFAULT_GOAL := help
-.PHONY: help corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf check html js links logic frame frame-check release manifest rehash models budget secrets behavior perf serve three icons deploy invalidate verify
+.PHONY: help corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf check html js links logic frame frame-check release rollback manifest rehash models budget secrets behavior perf serve three icons deploy invalidate verify
 
 
 ##@ Checks
@@ -164,37 +158,24 @@ icons: ## Redraw the square brand icons from the mark (needs Playwright), then r
 
 ##@ Deploy
 
-# Two passes set the cache headers: long for fonts and media, short for the rest. Fonts and media go
-# first, so a page never points at a file that isn't there yet, and without --delete: a page left
-# open from an older release may still ask for a file this release renamed or dropped
-deploy: ## Sync the site to the bucket when its content differs
+# Each release goes up whole under releases/<id>/, then one write to the release store switches every
+# visitor to it (scripts/deploy.py). Fonts and media are shared and never deleted, so a page left
+# open from an older release can still load them. New folders mean new cache keys: no invalidation
+deploy: ## Upload the site as one release, switch to it, and keep the last 10
 	@test -n "$(BUCKET)" || { echo "deploy: BUCKET is empty"; exit 1; }
 	@test -f "$(SITE_DIR)/index.html" || { echo "deploy: no $(SITE_DIR)/index.html, refusing to sync"; exit 1; }
-	@aws s3api list-objects-v2 --bucket "$(BUCKET)" --query 'Contents[].[Key,ETag]' --output json \
-		| python3 scripts/changes.py $(SITE_DIR) > $(CHANGES)
-	@if [ ! -s $(CHANGES) ]; then echo "s3://$(BUCKET) already matches $(SITE_DIR)"; exit 0; fi; \
-	cat $(CHANGES); \
-	set -e; \
-	aws s3 sync $(SITE_DIR) "s3://$(BUCKET)" --no-progress \
-		--exclude "*" --include "fonts/*" --include "media/*" $(DOTFILES) \
-		--cache-control "$(LONG_CACHE)"; \
-	aws s3 sync $(SITE_DIR) "s3://$(BUCKET)" --delete --no-progress \
-		--exclude "fonts/*" --exclude "media/*" $(DOTFILES) $(WELL_KNOWN) \
-		--cache-control "$(SHORT_CACHE)"
+	python3 scripts/deploy.py deploy $(SITE_DIR) $(BUCKET) $(RELEASE_STORE)
 
-# One wildcard path is billed as a single path, and HTML and JS revalidate anyway,
-# so purging everything after a real change is simpler than listing paths
-invalidate: ## Invalidate CloudFront after a deploy that changed files (FORCE=1 always)
-	@case "$(FORCE)" in \
-		1|true) ;; \
-		*) if [ ! -s $(CHANGES) ]; then echo "No deployed changes, skipping invalidation"; exit 0; fi ;; \
-	esac; \
-	set -e; \
+rollback: ## Switch back to the release before the live one (RELEASE=<id> for a specific one)
+	python3 scripts/deploy.py rollback $(BUCKET) $(RELEASE_STORE) $(RELEASE)
+
+# Releases never need it; kept for a file changed in place at the bucket's top (fonts, media, .well-known)
+invalidate: ## Invalidate the whole CloudFront cache
+	@set -e; \
 	id=$$(aws cloudfront create-invalidation --distribution-id "$(DISTRIBUTION)" \
 		--paths "/*" --query Invalidation.Id --output text); \
 	echo "Waiting for invalidation $$id"; \
-	aws cloudfront wait invalidation-completed --distribution-id "$(DISTRIBUTION)" --id "$$id"; \
-	rm -f $(CHANGES)
+	aws cloudfront wait invalidation-completed --distribution-id "$(DISTRIBUTION)" --id "$$id"
 
 # Retries for about a minute while the CDN picks up the new version. curl's own exit status is
 # checked before the version (a cut-off transfer fails), and the page must arrive whole

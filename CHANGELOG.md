@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.50.0
+
+### Changed
+- Deploys switch the whole site at once. Each release goes up complete under its own folder, then neon1.tech moves every visitor to it in one step, so a page opened mid-deploy can no longer mix a new page with old scripts and come up blank. No CDN invalidation is needed, the last 10 releases are kept, and `make rollback` switches back in seconds.
+
 ## v0.49.5
 
 ### Changed
