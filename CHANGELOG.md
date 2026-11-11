@@ -2,6 +2,15 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.56.0
+
+### Added
+- Knowledge Center: State registration, neon1 LLC's public record with the New York Department of State, with how to search it and a facts-checked date (neon1-corpus v0.28.0).
+- The footer's copyright line links to the state registration.
+
+### Changed
+- neon1 is the name used throughout, and the legal name appears only in the copyright line and legal text.
+
 ## v0.55.1
 
 ### Fixed
