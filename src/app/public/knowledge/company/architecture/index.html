@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.56.0" />
+  <meta name="version" content="0.56.1" />
   <title>How neon1 is built · neon1 knowledge center</title>
   <meta name="description" content="Diagrams of the website, the 1NEON portal, Neo, and how a change reaches them." />
   <meta name="theme-color" content="#F2F4F2" />
@@ -113,61 +113,16 @@
 <p>neon1 runs on a small set of AWS services, sized to cost a few dollars a month while it's quiet. Everything below is defined in code in public repositories on <a class="ext" href="https://github.com/neon1llc" target="_blank" rel="noopener">GitHub</a>, so each box here matches something you can read. The diagrams are drawn from Mermaid text, and each one has its source underneath it.</p>
 <h2 id="the-whole-picture">The whole picture</h2>
 <p>One CloudFront distribution serves neon1.tech. It sends each address to the part of the system that owns it: the website, the 1NEON portal and its API, or Neo's API. Storage stays private, and only CloudFront can read the buckets. Every visit uses HTTPS, with strict security headers.</p>
-<figure class="diagram"><div class="diagram-scroll"><img src="/knowledge/diagrams/a3fd17a6a492.svg" width="2055" height="1660" alt="Architecture diagram. Visitors reach Route 53 DNS and then one CloudFront distribution in AWS us-east-1, with an ACM certificate, edge functions, and a release store. CloudFront sends the website to a private S3 bucket, the 1NEON app to a second private bucket, the 1NEON API to API Gateway and Lambda, which use DynamoDB, an S3 documents bucket, Cognito, SES, and SMS, and Neo's API to API Gateway and Lambda, which use Amazon Bedrock and DynamoDB. CloudWatch alarms reach Pradeep by email through SNS. Google Workspace handles neon1.tech mail." loading="lazy" decoding="async"></div><p class="diagram-open"><a href="/knowledge/diagrams/a3fd17a6a492.svg">Open full size</a></p><details><summary>Diagram source (Mermaid)</summary><pre><code class="language-mermaid">%% alt: Architecture diagram. Visitors reach Route 53 DNS and then one CloudFront distribution in AWS us-east-1, with an ACM certificate, edge functions, and a release store. CloudFront sends the website to a private S3 bucket, the 1NEON app to a second private bucket, the 1NEON API to API Gateway and Lambda, which use DynamoDB, an S3 documents bucket, Cognito, SES, and SMS, and Neo's API to API Gateway and Lambda, which use Amazon Bedrock and DynamoDB. CloudWatch alarms reach Pradeep by email through SNS. Google Workspace handles neon1.tech mail.
-flowchart LR
-  visitor(["Visitor's browser"]):::person
-  subgraph aws["AWS · us-east-1"]
-    direction LR
-    dns["Route 53&lt;br/&gt;neon1.tech DNS, DNSSEC"]:::network
-    subgraph edge["Edge"]
-      cf["CloudFront&lt;br/&gt;neon1.tech · www · mta-sts"]:::network
-      acm["ACM certificate&lt;br/&gt;neon1.tech, *.neon1.tech"]:::security
-      fn["CloudFront Functions&lt;br/&gt;site router · portal router"]:::compute
-      kvs["Key value store&lt;br/&gt;live site release"]:::storage
-    end
-    subgraph site["Website"]
-      s3site[("S3 · site bucket&lt;br/&gt;releases, fonts, media")]:::storage
-    end
-    subgraph portal["1NEON portal"]
-      s3app[("S3 · app bucket")]:::storage
-      apigw["API Gateway&lt;br/&gt;/1NEON/api"]:::network
-      api["Lambda · 1NEON API&lt;br/&gt;and its outbox, every minute"]:::compute
-      ddb[("DynamoDB&lt;br/&gt;projects, people, records")]:::storage
-      docs[("S3 · documents&lt;br/&gt;malware-scanned uploads")]:::storage
-      cognito["Cognito&lt;br/&gt;auth.neon1.tech sign-in"]:::security
-      ses["SES&lt;br/&gt;notify.neon1.tech mail"]:::comms
-      sms["End User Messaging&lt;br/&gt;toll-free texts"]:::comms
-    end
-    subgraph chat["Neo, the chat"]
-      chatgw["API Gateway&lt;br/&gt;/chat/api"]:::network
-      chatfn["Lambda · Neo"]:::compute
-      bedrock["Amazon Bedrock&lt;br/&gt;language model"]:::ai
-      limits[("DynamoDB&lt;br/&gt;rate limits")]:::storage
-    end
-    alarms["CloudWatch alarms&lt;br/&gt;and budgets"]:::ops
-    sns["SNS"]:::ops
-  end
-  gws["Google Workspace&lt;br/&gt;neon1.tech mail"]:::external
-  pradeep(["Pradeep"]):::person
-
-  visitor --&gt; dns --&gt; cf
-  acm -.- cf
-  cf --- fn
-  fn -.-&gt;|reads| kvs
-  cf --&gt;|"/ and files"| s3site
-  cf --&gt;|"/1NEON"| s3app
-  cf --&gt;|"/1NEON/api"| apigw --&gt; api
-  api --&gt; ddb
-  api --&gt; docs
-  api --&gt; ses
-  api --&gt; sms
-  visitor -.-&gt;|sign in| cognito
-  visitor -.-&gt;|"uploads, presigned"| docs
-  cf --&gt;|"/chat/api"| chatgw --&gt; chatfn
-  chatfn --&gt; bedrock
-  chatfn --&gt; limits
-  alarms --&gt; sns --&gt;|email| pradeep
-  gws -.-&gt;|mail| pradeep
+<figure class="diagram"><div class="diagram-scroll"><img src="/knowledge/diagrams/9bcf508eb088.svg" width="616" height="463" alt="Overview diagram of AWS us-east-1. A visitor's browser looks up neon1.tech in Route 53 and reaches one CloudFront distribution, secured by an ACM certificate. CloudFront Functions route each request, reading the live site release from a key value store. CloudFront sends each address to its owner: the website's private S3 bucket, the 1NEON portal, or Neo, the chat." loading="lazy" decoding="async"></div><p class="diagram-open"><a href="/knowledge/diagrams/9bcf508eb088.svg">Open full size</a></p><details><summary>Diagram source (Mermaid)</summary><pre><code class="language-mermaid">%% alt: Overview diagram of AWS us-east-1. A visitor's browser looks up neon1.tech in Route 53 and reaches one CloudFront distribution, secured by an ACM certificate. CloudFront Functions route each request, reading the live site release from a key value store. CloudFront sends each address to its owner: the website's private S3 bucket, the 1NEON portal, or Neo, the chat.
+flowchart TB
+  visitor(["Visitor's browser"]):::person --&gt; dns["Route 53&lt;br/&gt;neon1.tech DNS"]:::network
+  kvs["Key value store&lt;br/&gt;live site release"]:::storage -.-&gt;|read by| fn
+  dns --&gt; cf["CloudFront&lt;br/&gt;neon1.tech"]:::network
+  acm["ACM certificate&lt;br/&gt;HTTPS"]:::security -.- cf
+  fn["CloudFront Functions&lt;br/&gt;routers"]:::compute -.- cf
+  cf --&gt;|"/ and files"| site[("Website&lt;br/&gt;S3 site bucket")]:::storage
+  cf --&gt;|"/1NEON"| portal["1NEON portal&lt;br/&gt;app, API, sign-in"]:::compute
+  cf --&gt;|"/chat/api"| neo["Neo, the chat&lt;br/&gt;API, Lambda, Bedrock"]:::ai
 
   classDef person fill:#ffffff,stroke:#16201a,stroke-width:1.5px,color:#16201a
   classDef network fill:#efe9fb,stroke:#7a4fd0,color:#2b1a52
@@ -180,26 +135,44 @@ flowchart LR
   classDef external fill:#f1f3f5,stroke:#7b8794,color:#1f2933</code></pre></details></figure>
 <p>The colours follow AWS's own groups: purple for networking, orange for compute, green for storage, red for security, pink for messaging, and teal for machine learning.</p>
 <ul><li><strong>Website.</strong> Plain HTML, CSS, and JavaScript, with no framework and no tracking. The page loads only its own files, and its security policy blocks everything else.</li><li><strong>1NEON.</strong> A single-page app with its own API. Sign-in uses email codes, passkeys, authenticator apps, or Google, through Cognito. Data is kept per organization, and files go straight from the browser to a private documents bucket, where every upload is scanned for malware.</li><li><strong>Neo.</strong> A small function that answers questions from neon1's public documents, using a language model on Amazon Bedrock. Amazon doesn't keep the questions or answers, or train on them. Per-visitor limits keep it fair and cheap.</li><li><strong>Watching it.</strong> Alarms and monthly budgets email Pradeep when something fails or costs more than expected.</li></ul>
+<h3 id="inside-1neon">Inside 1NEON</h3>
+<p>The portal's own pieces, from the browser's two direct paths (sign-in and file uploads) to the API's storage and messages.</p>
+<figure class="diagram"><div class="diagram-scroll"><img src="/knowledge/diagrams/c262189acce8.svg" width="785" height="571" alt="Diagram of 1NEON. CloudFront serves the 1NEON app from a private S3 bucket and sends /1NEON/api to API Gateway and the 1NEON API Lambda function. The API reads and writes DynamoDB and the S3 documents bucket, sends email through SES, and sends texts through End User Messaging. The browser signs in with Cognito directly and uploads files straight to the documents bucket with a presigned link, where each one is scanned for malware." loading="lazy" decoding="async"></div><p class="diagram-open"><a href="/knowledge/diagrams/c262189acce8.svg">Open full size</a></p><details><summary>Diagram source (Mermaid)</summary><pre><code class="language-mermaid">%% alt: Diagram of 1NEON. CloudFront serves the 1NEON app from a private S3 bucket and sends /1NEON/api to API Gateway and the 1NEON API Lambda function. The API reads and writes DynamoDB and the S3 documents bucket, sends email through SES, and sends texts through End User Messaging. The browser signs in with Cognito directly and uploads files straight to the documents bucket with a presigned link, where each one is scanned for malware.
+flowchart TB
+  browser(["Browser"]):::person --&gt; cf["CloudFront"]:::network
+  cf --&gt;|"/1NEON"| app[("S3 app bucket&lt;br/&gt;the 1NEON app")]:::storage
+  cf --&gt;|"/1NEON/api"| gw["API Gateway"]:::network --&gt; api["1NEON API, Lambda&lt;br/&gt;and its outbox"]:::compute
+  browser -.-&gt;|sign in| cognito["Cognito&lt;br/&gt;auth.neon1.tech"]:::security
+  browser -.-&gt;|"uploads, presigned"| docs[("S3 documents&lt;br/&gt;malware-scanned")]:::storage
+  api --&gt; ddb[("DynamoDB&lt;br/&gt;projects, people")]:::storage
+  api --&gt; docs
+  api --&gt; ses["SES&lt;br/&gt;email"]:::comms
+  api --&gt; sms["End User Messaging&lt;br/&gt;texts"]:::comms
+
+  classDef person fill:#ffffff,stroke:#16201a,stroke-width:1.5px,color:#16201a
+  classDef network fill:#efe9fb,stroke:#7a4fd0,color:#2b1a52
+  classDef compute fill:#fff1e3,stroke:#e07b14,color:#4a2700
+  classDef storage fill:#e8f5ea,stroke:#3b8f4a,color:#123d1b
+  classDef security fill:#fdecec,stroke:#c83b3b,color:#4d1010
+  classDef comms fill:#fde9f3,stroke:#c2408a,color:#4a1030</code></pre></details></figure>
 <h2 id="visiting-neon1-tech">Visiting neon1.tech</h2>
 <p>What happens between typing the address and seeing the page. Each deploy uploads the whole site into a new folder, and one small switch, the release store, tells CloudFront which folder is live. So every file in a visit comes from the same release, even while a deploy is running.</p>
-<figure class="diagram"><div class="diagram-scroll"><img src="/knowledge/diagrams/e9c1e16dc850.svg" width="1769" height="909" alt="Sequence diagram of a visit. The browser asks Route 53 for neon1.tech and gets CloudFront's address. It requests the page from CloudFront. The site router function reads the live release from the release store and rewrites the address into that release's folder. CloudFront returns a cached copy or fetches it from the private S3 bucket, adding security headers. The browser then loads the page's scripts, styles, fonts, and media the same way, all from the same release, and starts the matrix rain." loading="lazy" decoding="async"></div><p class="diagram-open"><a href="/knowledge/diagrams/e9c1e16dc850.svg">Open full size</a></p><details><summary>Diagram source (Mermaid)</summary><pre><code class="language-mermaid">%% alt: Sequence diagram of a visit. The browser asks Route 53 for neon1.tech and gets CloudFront's address. It requests the page from CloudFront. The site router function reads the live release from the release store and rewrites the address into that release's folder. CloudFront returns a cached copy or fetches it from the private S3 bucket, adding security headers. The browser then loads the page's scripts, styles, fonts, and media the same way, all from the same release, and starts the matrix rain.
+<figure class="diagram"><div class="diagram-scroll"><img src="/knowledge/diagrams/965fe1c61411.svg" width="1079" height="893" alt="Sequence diagram of a visit. The browser opens neon1.tech. It asks Route 53 for the address and gets CloudFront's address. It requests the page from CloudFront. The site router function reads the live release from the release store and rewrites the address into that release's folder. CloudFront returns a cached copy or fetches it from the private S3 bucket, adding security headers. The browser then loads the page's scripts, styles, fonts, and media the same way, all from the same release, and draws the page." loading="lazy" decoding="async"></div><p class="diagram-open"><a href="/knowledge/diagrams/965fe1c61411.svg">Open full size</a></p><details><summary>Diagram source (Mermaid)</summary><pre><code class="language-mermaid">%% alt: Sequence diagram of a visit. The browser opens neon1.tech. It asks Route 53 for the address and gets CloudFront's address. It requests the page from CloudFront. The site router function reads the live release from the release store and rewrites the address into that release's folder. CloudFront returns a cached copy or fetches it from the private S3 bucket, adding security headers. The browser then loads the page's scripts, styles, fonts, and media the same way, all from the same release, and draws the page.
 sequenceDiagram
   autonumber
-  actor V as Visitor
-  participant B as Browser
+  actor B as Browser
   participant R as Route 53
   participant C as CloudFront
   participant F as Site router
   participant K as Release store
   participant S as S3 site bucket
-  V-&gt;&gt;B: open neon1.tech
   B-&gt;&gt;R: where is neon1.tech?
   R--&gt;&gt;B: CloudFront's address
   B-&gt;&gt;C: GET / over HTTPS
   C-&gt;&gt;F: route the request
   F-&gt;&gt;K: which release is live?
   K--&gt;&gt;F: release id
-  F--&gt;&gt;C: /releases/&lt;id&gt;/index.html
+  F--&gt;&gt;C: that release's page
   alt cached at the edge
     C--&gt;&gt;B: page, with security headers
   else not cached yet
@@ -208,23 +181,23 @@ sequenceDiagram
     C--&gt;&gt;B: page, with security headers
   end
   B-&gt;&gt;C: scripts, styles, fonts, media
-  Note over C,S: the same release for every file, so a page and its scripts always match
+  Note over C,S: every file comes from the same release, so a page and its scripts always match
   C--&gt;&gt;B: files
-  B--&gt;&gt;V: the page, and the matrix rain starts</code></pre></details></figure>
+  Note over B: the page draws</code></pre></details></figure>
 <h2 id="asking-neo">Asking Neo</h2>
 <p>Neo only knows what's in neon1's public documents. Each question goes through CloudFront, which adds a secret header so the API answers only through neon1.tech, and through a check of the visitor's limits before the model sees it.</p>
-<figure class="diagram"><div class="diagram-scroll"><img src="/knowledge/diagrams/e95269a9f242.svg" width="1490" height="669" alt="Sequence diagram of a Neo question. The browser sends the question to CloudFront at /chat/api. CloudFront adds a secret header and forwards it to API Gateway and the Neo Lambda function. The function checks the header and the visitor's rate limit in DynamoDB. If the visitor is over the limit, it answers with a short cooldown message. Otherwise it sends neon1's public documents and the question to Amazon Bedrock, gets an answer, and returns it to the browser." loading="lazy" decoding="async"></div><p class="diagram-open"><a href="/knowledge/diagrams/e95269a9f242.svg">Open full size</a></p><details><summary>Diagram source (Mermaid)</summary><pre><code class="language-mermaid">%% alt: Sequence diagram of a Neo question. The browser sends the question to CloudFront at /chat/api. CloudFront adds a secret header and forwards it to API Gateway and the Neo Lambda function. The function checks the header and the visitor's rate limit in DynamoDB. If the visitor is over the limit, it answers with a short cooldown message. Otherwise it sends neon1's public documents and the question to Amazon Bedrock, gets an answer, and returns it to the browser.
+<figure class="diagram"><div class="diagram-scroll"><img src="/knowledge/diagrams/038e94f7e28a.svg" width="907" height="684" alt="Sequence diagram of a Neo question. The browser sends the question to CloudFront at /chat/api. CloudFront adds a secret header and forwards it to API Gateway and the Neo Lambda function. The function checks the header and the visitor's rate limit in DynamoDB. If the visitor is over the limit, it answers with a short cooldown message. Otherwise it sends neon1's public documents and the question to Amazon Bedrock, gets an answer, and returns it to the browser." loading="lazy" decoding="async"></div><p class="diagram-open"><a href="/knowledge/diagrams/038e94f7e28a.svg">Open full size</a></p><details><summary>Diagram source (Mermaid)</summary><pre><code class="language-mermaid">%% alt: Sequence diagram of a Neo question. The browser sends the question to CloudFront at /chat/api. CloudFront adds a secret header and forwards it to API Gateway and the Neo Lambda function. The function checks the header and the visitor's rate limit in DynamoDB. If the visitor is over the limit, it answers with a short cooldown message. Otherwise it sends neon1's public documents and the question to Amazon Bedrock, gets an answer, and returns it to the browser.
 sequenceDiagram
   autonumber
   actor V as Visitor
   participant C as CloudFront
-  participant N as Neo · Lambda
+  participant N as Neo Lambda
   participant D as DynamoDB limits
   participant M as Amazon Bedrock
-  V-&gt;&gt;C: POST /chat/api with a question
-  C-&gt;&gt;N: forward, with a secret header only CloudFront adds
-  N-&gt;&gt;N: check the header
-  N-&gt;&gt;D: count this visitor's recent questions
+  V-&gt;&gt;C: POST a question
+  C-&gt;&gt;N: forward, with CloudFront's secret header
+  N-&gt;&gt;N: check header
+  N-&gt;&gt;D: count recent questions
   alt over the limit
     D--&gt;&gt;N: too many
     N--&gt;&gt;V: a short cooldown, then try again
@@ -236,43 +209,38 @@ sequenceDiagram
   end</code></pre></details></figure>
 <h2 id="signing-in-to-1neon">Signing in to 1NEON</h2>
 <p>The portal has no passwords. Here is the email-code sign-in, the one the guided walkthrough shows. Passkeys and authenticator apps work the same way, with the code coming from the device.</p>
-<figure class="diagram"><div class="diagram-scroll"><img src="/knowledge/diagrams/171cb44467d8.svg" width="1995" height="835" alt="Sequence diagram of 1NEON sign-in. The person enters their email in the 1NEON app. The app asks Cognito to start a sign-in. Cognito runs 1NEON's trigger, which writes the branded message, and emails an 8-digit code through SES. The person reads the code in their inbox and enters it. Cognito checks the code and returns tokens. The app calls the 1NEON API through CloudFront with the token, and the API verifies it and returns the person's Home page data from DynamoDB." loading="lazy" decoding="async"></div><p class="diagram-open"><a href="/knowledge/diagrams/171cb44467d8.svg">Open full size</a></p><details><summary>Diagram source (Mermaid)</summary><pre><code class="language-mermaid">%% alt: Sequence diagram of 1NEON sign-in. The person enters their email in the 1NEON app. The app asks Cognito to start a sign-in. Cognito runs 1NEON's trigger, which writes the branded message, and emails an 8-digit code through SES. The person reads the code in their inbox and enters it. Cognito checks the code and returns tokens. The app calls the 1NEON API through CloudFront with the token, and the API verifies it and returns the person's Home page data from DynamoDB.
+<figure class="diagram"><div class="diagram-scroll"><img src="/knowledge/diagrams/a6fee82f62f2.svg" width="1076" height="697" alt="Sequence diagram of 1NEON sign-in. The person enters their email in the 1NEON app. The app asks Cognito to start a sign-in. Cognito emails a branded message with an 8-digit code through SES. The person reads the code and enters it. Cognito checks the code and returns tokens. The app calls the 1NEON API through CloudFront with the token, and the API verifies it and returns the person's Home page data from DynamoDB." loading="lazy" decoding="async"></div><p class="diagram-open"><a href="/knowledge/diagrams/a6fee82f62f2.svg">Open full size</a></p><details><summary>Diagram source (Mermaid)</summary><pre><code class="language-mermaid">%% alt: Sequence diagram of 1NEON sign-in. The person enters their email in the 1NEON app. The app asks Cognito to start a sign-in. Cognito emails a branded message with an 8-digit code through SES. The person reads the code and enters it. Cognito checks the code and returns tokens. The app calls the 1NEON API through CloudFront with the token, and the API verifies it and returns the person's Home page data from DynamoDB.
 sequenceDiagram
   autonumber
   actor P as Person
   participant A as 1NEON app
   participant G as Cognito
-  participant T as Trigger · Lambda
   participant E as SES
-  participant I as Inbox
   participant X as 1NEON API
   participant D as DynamoDB
   P-&gt;&gt;A: email, then Continue
   A-&gt;&gt;G: start sign-in
-  G-&gt;&gt;T: write the code email
-  T--&gt;&gt;G: the branded message
-  G-&gt;&gt;E: send the code
-  E-&gt;&gt;I: "Your 1NEON sign-in code"
-  P-&gt;&gt;I: read the 8-digit code
+  G-&gt;&gt;E: email the code
+  E--&gt;&gt;P: "Your 1NEON sign-in code", 8 digits
   P-&gt;&gt;A: paste the code, Enter
   A-&gt;&gt;G: answer with the code
   G--&gt;&gt;A: tokens
   A-&gt;&gt;X: GET Home, with the token
-  X-&gt;&gt;X: verify the token and the organization
-  X-&gt;&gt;D: what needs them, what's coming up, what's new
+  X-&gt;&gt;X: verify token
+  X-&gt;&gt;D: read Home records
   D--&gt;&gt;X: records
   X--&gt;&gt;A: Home
   A--&gt;&gt;P: signed in</code></pre></details></figure>
 <h2 id="how-a-change-ships">How a change ships</h2>
 <p>Every repository deploys itself from its main branch. GitHub Actions signs in to AWS with short-lived credentials (OpenID Connect), so no repository holds AWS keys. Each deploy runs its checks first, confirms the live version afterwards, and tags the release.</p>
-<figure class="diagram"><div class="diagram-scroll"><img src="/knowledge/diagrams/8df57cf251e0.svg" width="519" height="1307" alt="Flowchart of a site deploy. A change is merged to main on GitHub. GitHub Actions runs the checks: HTML, links, the asset manifest, and browser tests. If any fail, nothing is deployed. If they pass, the job gets short-lived AWS credentials through OpenID Connect, uploads shared fonts and media, uploads the whole release into its own folder, and then switches the release store to it, so every visitor moves at once. It confirms the live site serves the new version, tags the release, and keeps the last ten releases for a one-step rollback." loading="lazy" decoding="async"></div><p class="diagram-open"><a href="/knowledge/diagrams/8df57cf251e0.svg">Open full size</a></p><details><summary>Diagram source (Mermaid)</summary><pre><code class="language-mermaid">%% alt: Flowchart of a site deploy. A change is merged to main on GitHub. GitHub Actions runs the checks: HTML, links, the asset manifest, and browser tests. If any fail, nothing is deployed. If they pass, the job gets short-lived AWS credentials through OpenID Connect, uploads shared fonts and media, uploads the whole release into its own folder, and then switches the release store to it, so every visitor moves at once. It confirms the live site serves the new version, tags the release, and keeps the last ten releases for a one-step rollback.
+<figure class="diagram"><div class="diagram-scroll"><img src="/knowledge/diagrams/d7b685e91eb1.svg" width="519" height="1229" alt="Flowchart of a site deploy. A change is merged to main on GitHub. GitHub Actions runs the checks: HTML, links, the asset manifest, and browser tests. If any fail, nothing is deployed. If they pass, the job gets short-lived AWS credentials through OpenID Connect, uploads shared fonts and media, uploads the whole release into its own folder, and then switches the release store to it, so every visitor moves at once. It confirms the live site serves the new version, tags the release, and keeps the last ten releases for a one-step rollback." loading="lazy" decoding="async"></div><p class="diagram-open"><a href="/knowledge/diagrams/d7b685e91eb1.svg">Open full size</a></p><details><summary>Diagram source (Mermaid)</summary><pre><code class="language-mermaid">%% alt: Flowchart of a site deploy. A change is merged to main on GitHub. GitHub Actions runs the checks: HTML, links, the asset manifest, and browser tests. If any fail, nothing is deployed. If they pass, the job gets short-lived AWS credentials through OpenID Connect, uploads shared fonts and media, uploads the whole release into its own folder, and then switches the release store to it, so every visitor moves at once. It confirms the live site serves the new version, tags the release, and keeps the last ten releases for a one-step rollback.
 flowchart TD
   merge["Merge to main"]:::step --&gt; checks{"Checks pass?&lt;br/&gt;HTML, links, assets,&lt;br/&gt;browser tests"}:::decision
   checks --&gt;|no| stop["Nothing deploys"]:::stop
   checks --&gt;|yes| oidc["Short-lived AWS role&lt;br/&gt;through OpenID Connect"]:::security
   oidc --&gt; shared["Upload shared fonts and media"]:::step
   shared --&gt; release["Upload the whole release&lt;br/&gt;to releases/&amp;lt;id&amp;gt;/"]:::step
-  release --&gt; switch["Switch the release store&lt;br/&gt;every visitor moves at once"]:::network
+  release --&gt; switch["Switch the release store,&lt;br/&gt;so every visitor moves at once"]:::network
   switch --&gt; verify{"Live site serves&lt;br/&gt;the new version?"}:::decision
   verify --&gt;|yes| tag["Tag vX.Y.Z on GitHub"]:::step
   verify --&gt;|no| rollback["make rollback:&lt;br/&gt;back in seconds"]:::stop
@@ -286,25 +254,24 @@ flowchart TD
 <p>The other repositories follow the same pattern. 1NEON uploads its versioned files first and its page last. Infrastructure changes are planned and applied by Terraform, except permissions, which Pradeep applies by hand, so a deploy can never widen its own access.</p>
 <h2 id="one-source-for-every-word">One source for every word</h2>
 <p>The website, the Knowledge Center, 1NEON's guide, and Neo all read from neon1-corpus, a repository of Markdown documents. Each tagged release of the corpus publishes a bundle for each reader, so a correction made once reaches all of them.</p>
-<figure class="diagram"><div class="diagram-scroll"><img src="/knowledge/diagrams/e60b55306b44.svg" width="1140" height="442" alt="Flowchart of the corpus. Markdown documents in neon1-corpus are checked by a linter for front matter, links, and anything private. A tagged release exports a bundle for each reader. The site bundle feeds the case studies and questions on neon1.tech. The knowledge bundle feeds the Knowledge Center and its PDFs. The chat bundle feeds Neo, refreshed weekly. The portal bundle feeds the 1NEON guide used by Neo inside 1NEON." loading="lazy" decoding="async"></div><p class="diagram-open"><a href="/knowledge/diagrams/e60b55306b44.svg">Open full size</a></p><details><summary>Diagram source (Mermaid)</summary><pre><code class="language-mermaid">%% alt: Flowchart of the corpus. Markdown documents in neon1-corpus are checked by a linter for front matter, links, and anything private. A tagged release exports a bundle for each reader. The site bundle feeds the case studies and questions on neon1.tech. The knowledge bundle feeds the Knowledge Center and its PDFs. The chat bundle feeds Neo, refreshed weekly. The portal bundle feeds the 1NEON guide used by Neo inside 1NEON.
-flowchart LR
-  md["neon1-corpus&lt;br/&gt;Markdown documents"]:::source --&gt; lint{"Lint: front matter,&lt;br/&gt;links, nothing private"}:::decision
+<figure class="diagram"><div class="diagram-scroll"><img src="/knowledge/diagrams/a689fc108393.svg" width="776" height="453" alt="Flowchart of the corpus. Markdown documents in neon1-corpus are checked by a linter for front matter, links, and anything private. A tagged release exports a bundle for each reader. The site bundle feeds the case studies and questions on neon1.tech. The knowledge bundle feeds the Knowledge Center and its PDFs. The chat bundle feeds Neo, refreshed weekly. The portal bundle feeds the 1NEON guide used by Neo inside 1NEON." loading="lazy" decoding="async"></div><p class="diagram-open"><a href="/knowledge/diagrams/a689fc108393.svg">Open full size</a></p><details><summary>Diagram source (Mermaid)</summary><pre><code class="language-mermaid">%% alt: Flowchart of the corpus. Markdown documents in neon1-corpus are checked by a linter for front matter, links, and anything private. A tagged release exports a bundle for each reader. The site bundle feeds the case studies and questions on neon1.tech. The knowledge bundle feeds the Knowledge Center and its PDFs. The chat bundle feeds Neo, refreshed weekly. The portal bundle feeds the 1NEON guide used by Neo inside 1NEON.
+flowchart TB
+  md["neon1-corpus&lt;br/&gt;Markdown documents"]:::source --&gt; lint["Lint checks&lt;br/&gt;front matter, links,&lt;br/&gt;nothing private"]:::check
   lint --&gt; tag["Tagged release&lt;br/&gt;vX.Y.Z"]:::step
-  tag --&gt; b1["site bundle"]:::bundle --&gt; site["neon1.tech&lt;br/&gt;case studies, questions"]:::reader
-  tag --&gt; b2["knowledge bundle"]:::bundle --&gt; kc["Knowledge Center&lt;br/&gt;pages and PDFs"]:::reader
-  tag --&gt; b3["chat bundle"]:::bundle --&gt; neo["Neo&lt;br/&gt;refreshed weekly"]:::reader
-  tag --&gt; b4["portal bundle"]:::bundle --&gt; guide["1NEON guide&lt;br/&gt;for Neo in the portal"]:::reader
+  tag --&gt;|site bundle| site["neon1.tech&lt;br/&gt;case studies,&lt;br/&gt;questions"]:::reader
+  tag --&gt;|knowledge bundle| kc["Knowledge Center&lt;br/&gt;pages and PDFs"]:::reader
+  tag --&gt;|chat bundle| neo["Neo&lt;br/&gt;refreshed weekly"]:::reader
+  tag --&gt;|portal bundle| guide["1NEON guide&lt;br/&gt;for Neo&lt;br/&gt;in the portal"]:::reader
 
   classDef source fill:#e8f5ea,stroke:#3b8f4a,color:#123d1b
-  classDef decision fill:#fff8e6,stroke:#d9b44a,color:#3d2f05
+  classDef check fill:#fff8e6,stroke:#d9b44a,color:#3d2f05
   classDef step fill:#efe9fb,stroke:#7a4fd0,color:#2b1a52
-  classDef bundle fill:#f1f3f5,stroke:#7b8794,color:#1f2933
   classDef reader fill:#fff1e3,stroke:#e07b14,color:#4a2700</code></pre></details></figure>
 <h2 id="a-project-in-1neon">A project in 1NEON</h2>
 <p>Every project moves through the same four layers, and the work in each one follows the way a project runs: listen, propose, decide, build, and hand over.</p>
-<figure class="diagram"><div class="diagram-scroll"><img src="/knowledge/diagrams/e4d211d24622.svg" width="1439" height="177" alt="State diagram of a 1NEON project. It starts in Needs, where Pradeep listens, proposes options, and the client's decision maker decides. An approved option moves the project to Execute, where the work is built and shown as it lands. Then Observe, where results are measured against what was agreed. Then Normalize, where the work is handed over and becomes part of normal operations. From Normalize, a new need starts the cycle again." loading="lazy" decoding="async"></div><p class="diagram-open"><a href="/knowledge/diagrams/e4d211d24622.svg">Open full size</a></p><details><summary>Diagram source (Mermaid)</summary><pre><code class="language-mermaid">%% alt: State diagram of a 1NEON project. It starts in Needs, where Pradeep listens, proposes options, and the client's decision maker decides. An approved option moves the project to Execute, where the work is built and shown as it lands. Then Observe, where results are measured against what was agreed. Then Normalize, where the work is handed over and becomes part of normal operations. From Normalize, a new need starts the cycle again.
+<figure class="diagram"><div class="diagram-scroll"><img src="/knowledge/diagrams/fcb80e0947a3.svg" width="432" height="790" alt="State diagram of a 1NEON project. It starts in Needs, where Pradeep listens, proposes options, and the client's decision maker decides. An approved option moves the project to Execute, where the work is built and shown as it lands. Then Observe, where results are measured against what was agreed. Then Normalize, where the work is handed over and becomes part of normal operations. From Normalize, a new need starts the cycle again." loading="lazy" decoding="async"></div><p class="diagram-open"><a href="/knowledge/diagrams/fcb80e0947a3.svg">Open full size</a></p><details><summary>Diagram source (Mermaid)</summary><pre><code class="language-mermaid">%% alt: State diagram of a 1NEON project. It starts in Needs, where Pradeep listens, proposes options, and the client's decision maker decides. An approved option moves the project to Execute, where the work is built and shown as it lands. Then Observe, where results are measured against what was agreed. Then Normalize, where the work is handed over and becomes part of normal operations. From Normalize, a new need starts the cycle again.
 stateDiagram-v2
-  direction LR
+  direction TB
   [*] --&gt; Needs
   state Needs {
     direction LR
@@ -380,7 +347,7 @@ stateDiagram-v2
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.56.0</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.56.1</a>
       </span>
     </div>
   </footer>
