@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.49.4
+
+### Changed
+- About says more about where the work comes from: about 15 years of curiosity and passion for technology and automation.
+
 ## v0.49.3
 
 ### Changed
