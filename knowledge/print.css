@@ -1,10 +1,10 @@
-/* knowledge/print.css - neon1 print styles for the knowledge center PDFs printed by scripts/knowledge-pdf.mjs.
-   Adapted from Ready, Secure, Go (documents/document.css), so every neon1 document prints the same way. */
-/* */
-/* Aptos is used where it's installed (Microsoft 365 and recent Windows). Elsewhere Inter, which ships in documents/fonts, stands in. */
+/* knowledge/print.css - neon1 print styles for the Knowledge Center PDFs printed by scripts/knowledge-pdf.mjs.
+   The Awake look on paper, in the manner of neon1's own letters and proposals: a white page, the green mark and
+   wordmark as a letterhead, the title set right in brand green, solid green bars for sections, green arrows for
+   points, and a centered footer with the slogan. Aptos where it's installed (Microsoft 365), Inter elsewhere. */
 
 
-/* Bundled fonts, both under the SIL Open Font License */
+/* ---- Fonts: bundled, both under the SIL Open Font License ---- */
 @font-face {
   font-family: "Inter";
   src: url("../src/app/public/fonts/inter-latin-wght-normal.woff2") format("woff2");
@@ -18,19 +18,17 @@
 }
 
 
-/* neon1 brand tokens, matching neon1.tech */
+/* ---- Tokens: brand green from neon1's letterhead, ink and rules from the Awake theme ---- */
 :root {
-  --void: #0d0208;
-  --deep: #003b00;
-  --mid: #008f11;
-  --glow: #00e676;
-  --neon: #6cffa8;
   --brand: #035704;
-  --mark: #327641;
-  --paper: #f2f4f2;
-  --ink: #12241a;
-  --muted: #56665c;
-  --wash: #e6efe7;
+  --brand-2: #327641;
+  --glow: #00a651;
+  --ink: #1b1f1c;
+  --muted: #59625c;
+  --rule: #cfd7d1;
+  --rule-strong: #9fb0a4;
+  --wash: #eef4ef;
+  --wash-2: #f7faf7;
   --alarm: #9b1c1c;
   --alarm-wash: #fbeeee;
   --body: "Aptos", "Inter", "Segoe UI", system-ui, sans-serif;
@@ -38,10 +36,11 @@
 }
 
 
-/* Page box. Margins leave room for the footer Chromium draws. */
+/* ---- Page box: margins leave room for the footer Chromium draws. The pagination script in
+   knowledge-pdf.mjs measures with the same width (7in) and height (9.5in) ---- */
 @page {
   size: Letter;
-  margin: 0.7in 0.75in 0.8in;
+  margin: 0.65in 0.75in 0.85in;
 }
 
 * {
@@ -57,175 +56,244 @@ body {
   margin: 0;
   color: var(--ink);
   background: #fff;
-  font: 10.5pt/1.55 var(--body);
+  font: 10.5pt/1.5 var(--body);
+  font-variant-numeric: lining-nums;
+  hyphens: manual;
+  orphans: 3;
+  widows: 3;
 }
 
 
-/* Header band with the mark, wordmark and document kind */
-.band {
-  display: flex;
-  align-items: center;
-  gap: 10pt;
-  padding: 12pt 16pt;
-  border-radius: 6pt;
-  background: var(--deep);
-  color: var(--neon);
+/* ---- Letterhead: the mark and wordmark on the left, the title block set right ---- */
+.letterhead {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: end;
+  gap: 18pt;
+  padding-bottom: 10pt;
+  border-bottom: 2pt solid var(--brand);
 }
 
-.band svg {
-  width: 26pt;
-  height: 26pt;
+.brand {
+  display: grid;
+  justify-items: center;
+  gap: 3pt;
+  color: var(--brand);
 }
 
-.band .wordmark {
-  font: 700 14pt var(--mono);
-  letter-spacing: 0.06em;
+.brand svg {
+  width: 46pt;
+  height: 46pt;
 }
 
-.band .kind {
-  margin-left: auto;
-  font: 500 8.5pt var(--mono);
-  letter-spacing: 0.08em;
+.brand .wordmark {
+  font: 600 13pt/1 var(--mono);
+  letter-spacing: 0.14em;
+}
+
+.titles {
+  text-align: right;
+}
+
+.titles .kind {
+  margin: 0 0 3pt;
+  font: 700 8pt var(--body);
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--paper);
-  opacity: 0.85;
+  color: var(--brand-2);
 }
 
-
-/* Title block */
 h1 {
-  margin: 18pt 0 6pt;
-  font: 700 21pt/1.2 var(--body);
-  color: var(--deep);
+  margin: 0;
+  font: 700 21pt/1.15 var(--body);
+  color: var(--brand);
+}
+
+.titles .dates {
+  margin: 5pt 0 0;
+  font: 700 9pt var(--body);
+  color: var(--ink);
 }
 
 .summary {
-  margin: 0 0 12pt;
-  font-size: 12pt;
+  margin: 12pt 0 10pt;
+  font-size: 11.5pt;
+  line-height: 1.45;
   color: var(--muted);
 }
 
 
-/* At-a-glance facts under the title */
-.glance {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4pt 18pt;
-  margin: 0 0 14pt;
-  padding: 8pt 12pt;
-  border-left: 3pt solid var(--glow);
-  background: var(--wash);
-  font-size: 9.5pt;
+/* ---- Document facts: a small bordered table under a green bar, like a proposal's "Design for" block ---- */
+.facts {
+  width: 100%;
+  margin: 0 0 16pt;
+  border: 0.75pt solid var(--rule-strong);
+  border-collapse: collapse;
+  font-size: 9pt;
+  break-inside: avoid;
 }
 
-.glance b {
-  margin-right: 4pt;
-  font: 600 7.5pt var(--mono);
-  letter-spacing: 0.08em;
+.facts caption {
+  padding: 3pt 7pt;
+  background: var(--brand);
+  color: #fff;
+  font: 700 7.5pt var(--body);
+  letter-spacing: 0.12em;
+  text-align: left;
   text-transform: uppercase;
-  color: var(--mark);
 }
 
-.glance .for {
-  flex-basis: 100%;
+.facts th, .facts td {
+  padding: 3.5pt 7pt;
+  border: 0.75pt solid var(--rule);
+  background: #fff;
+  text-align: left;
+  vertical-align: top;
+}
+
+.facts th {
+  width: 1.05in;
+  background: var(--wash-2);
+  font: 600 8pt var(--body);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--muted);
 }
 
 
-/* Section headings */
+/* ---- Sections: a solid green bar, white small capitals, as on neon1's proposals ---- */
 h2 {
-  margin: 18pt 0 6pt;
-  padding-bottom: 3pt;
-  border-bottom: 1.5pt solid var(--glow);
-  font: 700 13.5pt/1.25 var(--body);
-  color: var(--brand);
+  margin: 16pt 0 8pt;
+  padding: 3.5pt 8pt;
+  background: var(--brand);
+  color: #fff;
+  font: 700 9.5pt/1.3 var(--body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   break-after: avoid;
 }
 
 h3 {
   margin: 12pt 0 4pt;
-  font: 700 11.5pt var(--body);
-  color: var(--deep);
+  font: 700 11pt/1.3 var(--body);
+  color: var(--brand);
   break-after: avoid;
+}
+
+h4 {
+  margin: 10pt 0 3pt;
+  font: 700 10pt var(--body);
+  color: var(--ink);
+  break-after: avoid;
+}
+
+/* A section moved to a new page starts flush at the top */
+.sec.fresh > h2:first-child,
+.sub.fresh > h3:first-child {
+  margin-top: 0;
+}
+
+.sec.fresh {
+  break-before: page;
+}
+
+.sub.fresh {
+  break-before: page;
 }
 
 p {
   margin: 0 0 7pt;
 }
 
+/* A short lead-in sentence stays with the list or table it introduces */
+p:has(+ ul), p:has(+ ol), p:has(+ table) {
+  break-after: avoid;
+}
+
 a {
   color: var(--brand);
   text-decoration: underline;
-  text-decoration-color: var(--glow);
+  text-decoration-color: var(--rule-strong);
   text-underline-offset: 2pt;
 }
 
 strong {
-  color: var(--deep);
+  color: var(--ink);
+  font-weight: 700;
 }
 
 code {
   padding: 0 2pt;
   border-radius: 2pt;
   background: var(--wash);
-  font: 9pt var(--mono);
+  font: 8.75pt var(--mono);
 }
 
 
-/* Numbered steps become badges with a rule between steps */
-ol {
+/* ---- Lists: green arrows for points, green numerals for steps ---- */
+ul, ol {
   margin: 0 0 8pt;
   padding: 0;
   list-style: none;
+}
+
+li {
+  position: relative;
+  margin: 0 0 3pt;
+  padding-left: 17pt;
+}
+
+ul > li::before {
+  content: "⇒";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--brand);
+  font-weight: 700;
+}
+
+li > ul {
+  margin: 3pt 0 2pt;
+}
+
+li > ul > li {
+  padding-left: 13pt;
+}
+
+li > ul > li::before {
+  content: "◦";
+  left: 2pt;
+  font-weight: 400;
+}
+
+ol {
   counter-reset: step;
 }
 
 ol > li {
-  position: relative;
-  margin: 0;
-  padding: 6pt 0 6pt 28pt;
-  border-bottom: 0.5pt solid #d5e2d7;
   counter-increment: step;
   break-inside: avoid;
 }
 
-ol > li:last-child {
-  border-bottom: 0;
-}
-
 ol > li::before {
-  content: counter(step);
+  content: counter(step) ".";
   position: absolute;
   left: 0;
-  top: 6pt;
-  width: 18pt;
-  height: 18pt;
-  border-radius: 50%;
-  background: var(--brand);
-  color: #fff;
-  font: 700 9pt/18pt var(--mono);
-  text-align: center;
+  top: 0;
+  min-width: 13pt;
+  color: var(--brand);
+  font-weight: 700;
 }
 
-ol > li > p:last-child {
+li > p:last-child {
   margin-bottom: 0;
 }
 
-ul {
-  margin: 0 0 8pt;
-  padding-left: 14pt;
-}
 
-li {
-  margin: 2pt 0;
-}
-
-
-/* Checklists print as empty boxes to tick by hand */
+/* ---- Checklists print as empty boxes to tick by hand ---- */
 li.task, li.task-list-item {
-  list-style: none;
-  margin-left: -14pt;
   padding-left: 18pt;
-  position: relative;
+  break-inside: avoid;
 }
 
 li.task input, li.task-list-item input {
@@ -234,37 +302,51 @@ li.task input, li.task-list-item input {
 
 li.task::before, li.task-list-item::before {
   content: "";
-  position: absolute;
-  left: 0;
-  top: 3pt;
+  top: 2.5pt;
   width: 9pt;
   height: 9pt;
   border: 1pt solid var(--brand);
-  border-radius: 2pt;
+  border-radius: 1.5pt;
+}
+
+/* Checked boxes in filled-in examples */
+li.task:has(input[checked])::after {
+  content: "";
+  position: absolute;
+  left: 3pt;
+  top: 3.5pt;
+  width: 3pt;
+  height: 6pt;
+  border: solid var(--brand);
+  border-width: 0 1.5pt 1.5pt 0;
+  transform: rotate(45deg);
+}
+
+/* Keep a checklist whole, with the sentence that introduces it */
+ul:has(> li.task) {
+  break-inside: avoid;
 }
 
 
-/* Callouts for questions, checks and the attacker's view */
+/* ---- Callouts: a green rule on the left and a light wash ---- */
 .callout {
   margin: 10pt 0;
-  padding: 8pt 12pt;
-  border: 1pt solid var(--mark);
-  border-left-width: 4pt;
-  border-radius: 4pt;
+  padding: 7pt 11pt;
+  border-left: 3pt solid var(--brand);
   background: var(--wash);
   break-inside: avoid;
 }
 
 .callout-title {
-  margin: 0 0 4pt;
-  font: 600 8.5pt var(--mono);
-  letter-spacing: 0.06em;
+  margin: 0 0 3pt;
+  font: 700 8pt var(--body);
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--brand);
 }
 
-.callout.success {
-  border-color: var(--glow);
+.callout > :last-child {
+  margin-bottom: 0;
 }
 
 .callout.danger {
@@ -276,32 +358,52 @@ li.task::before, li.task-list-item::before {
   color: var(--alarm);
 }
 
-.callout > :last-child {
-  margin-bottom: 0;
+aside.callout.warning {
+  border-color: #b07800;
+  background: #fff8e6;
+}
+
+aside.callout.warning .callout-title {
+  color: #6e4b00;
+}
+
+aside.callout.example {
+  border-color: #6f58b0;
+  background: #f5f2fc;
+}
+
+aside.callout.example .callout-title {
+  color: #46307f;
 }
 
 
-/* Tables */
+/* ---- Tables: thin rules, a green header row, rows that never split ---- */
 table {
   width: 100%;
-  margin: 6pt 0 10pt;
+  margin: 4pt 0 10pt;
+  border: 0.75pt solid var(--rule-strong);
   border-collapse: collapse;
-  font-size: 9.5pt;
+  font-size: 9.25pt;
+  line-height: 1.4;
+}
+
+thead {
+  display: table-header-group;
 }
 
 th {
-  padding: 4pt 6pt;
-  border-bottom: 1.5pt solid var(--brand);
+  padding: 4pt 7pt;
+  border: 0.75pt solid var(--brand);
+  background: var(--brand);
+  color: #fff;
   text-align: left;
-  font: 600 8pt var(--mono);
+  font: 700 8pt/1.3 var(--body);
   letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--brand);
 }
 
 td {
-  padding: 4pt 6pt;
-  border-bottom: 0.5pt solid #d5e2d7;
+  padding: 4pt 7pt;
+  border: 0.75pt solid var(--rule);
   vertical-align: top;
 }
 
@@ -310,35 +412,43 @@ tr {
 }
 
 tbody tr:nth-child(even) td {
-  background: #f6f9f6;
+  background: var(--wash-2);
+}
+
+td > p:last-child {
+  margin-bottom: 0;
 }
 
 blockquote {
   margin: 8pt 0;
   padding-left: 10pt;
-  border-left: 3pt solid var(--glow);
+  border-left: 2pt solid var(--rule-strong);
   color: var(--muted);
+  font-style: italic;
+}
+
+/* Diagrams: whole, centered, and never split */
+figure, img, svg.diagram {
+  max-width: 100%;
+  break-inside: avoid;
+}
+
+figure {
+  margin: 8pt 0 12pt;
+  text-align: center;
 }
 
 
-/* Reference block at the end: sources and framework IDs */
+/* ---- Reference block at the end: sources and framework IDs ---- */
 .refs {
-  margin-top: 18pt;
-  padding-top: 8pt;
-  border-top: 0.5pt solid var(--mark);
-  font-size: 8.5pt;
+  margin-top: 16pt;
+  font-size: 8.75pt;
   color: var(--muted);
   break-inside: avoid;
 }
 
 .refs h2 {
   margin-top: 0;
-  border: 0;
-  font-size: 10pt;
-}
-
-.refs ul {
-  padding-left: 12pt;
 }
 
 .refs .maps span {
@@ -347,30 +457,22 @@ blockquote {
 
 .refs .maps b {
   font: 600 7.5pt var(--mono);
-  color: var(--mark);
+  color: var(--brand-2);
 }
 
+/* The closing line under the last section */
 .colophon {
-  margin-top: 14pt;
+  margin-top: 16pt;
+  padding-top: 7pt;
+  border-top: 0.75pt solid var(--rule);
   font-size: 8pt;
+  line-height: 1.45;
   color: var(--muted);
+  break-inside: avoid;
 }
 
 
-/* Checked boxes in filled-out examples */
-li.task:has(input[checked])::after {
-  content: "";
-  position: absolute;
-  left: 3pt;
-  top: 4pt;
-  width: 3pt;
-  height: 6pt;
-  border: solid var(--brand);
-  border-width: 0 1.5pt 1.5pt 0;
-  transform: rotate(45deg);
-}
-
-/* Lines to write on */
+/* ---- Fill-in documents: lines to write on, with room ---- */
 .blank {
   display: inline-block;
   min-width: 2.2in;
@@ -383,8 +485,7 @@ td .blank {
   min-width: 0.9in;
 }
 
-/* A label and its blank never split across lines; when several share a paragraph their blanks are a little
-   shorter so two or three fit on a line, and the one that doesn't fit moves down whole */
+/* A label and its blank never split across lines; several in one paragraph get shorter blanks */
 .field {
   white-space: nowrap;
 }
@@ -393,43 +494,6 @@ p:has(.field ~ .field) .blank {
   min-width: 1.6in;
 }
 
-/* Callouts from the corpus: note, tip, warning, example */
-aside.callout.warning {
-  border-color: #c98a00;
-  background: #fff8e6;
-}
-
-aside.callout.warning .callout-title {
-  color: #7a5200;
-}
-
-aside.callout.example {
-  border-color: #8f74c8;
-  background: #f6f2fd;
-}
-
-aside.callout.example .callout-title {
-  color: #4b2f8a;
-}
-
-/* Fictional flag beside the title of an example */
-.flag {
-  display: inline-block;
-  margin: 14pt 0 0;
-  padding: 2pt 7pt;
-  border-radius: 3pt;
-  background: #fff4d6;
-  color: #6b4e00;
-  font: 600 7.5pt var(--mono);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.flag + h1 {
-  margin-top: 6pt;
-}
-
-/* Forms leave room to write */
 body.fillable p {
   margin-bottom: 10pt;
 }
@@ -438,23 +502,22 @@ body.fillable li.task {
   margin: 4pt 0;
 }
 
-/* A blank on its own line is a full-width line to write on, with room above it */
+/* A blank on its own line is a full-width line to write on */
 p > .blank:only-child {
   display: block;
   width: 100%;
   height: 20pt;
 }
 
-/* Keep a checklist with the sentence and heading that introduce it: the list stays whole, the sentence before it
-   stays with it, and h2 already stays with what follows. Text size is unchanged; a long list may still split */
-li.task {
-  break-inside: avoid;
-}
-
-ul:has(> li.task) {
-  break-inside: avoid;
-}
-
-p:has(+ ul > li.task) {
-  break-after: avoid;
+/* Fictional flag above the title of an example */
+.flag {
+  display: inline-block;
+  margin: 0 0 4pt;
+  padding: 1.5pt 6pt;
+  border: 0.75pt solid #b07800;
+  background: #fff8e6;
+  color: #6e4b00;
+  font: 700 7pt var(--body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }

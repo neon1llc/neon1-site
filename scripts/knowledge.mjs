@@ -263,9 +263,31 @@ function docPage(d) {
   ]
 
   const body = pageBody(d, corpus)
+  // On this page: the document's sections, for documents with three or more. Wide screens keep it beside the text;
+  // narrower ones fold it under the actions. Both are plain links, so it works without JavaScript
+  // Only sections whose heading made it into the page: a "## " line inside a code sample is not a section
+  const heads = d.sections.filter((x) => x.heading && x.key && body.includes(`id="${x.key}"`))
+  const tocLinks = heads.map((x) => `            <li><a href="#${esc(x.key)}">${esc(x.heading)}</a></li>`).join("\n")
+  const toc = heads.length >= 3 ? {
+    side: `
+    <nav class="kc-toc kc-toc-side" aria-label="On this page">
+      <p class="kc-toc-title">On this page</p>
+      <ol>
+${tocLinks}
+      </ol>
+    </nav>`,
+    fold: `
+        <details class="kc-toc kc-toc-fold">
+          <summary>On this page <span>${heads.length} sections</span></summary>
+          <ol>
+${tocLinks}
+          </ol>
+        </details>`,
+  } : { side: "", fold: "" }
   const fictional = d.data.fictional ? '<p class="kc-flag">Fictional example</p>' : ""
 
-  const main = `    <article class="kc-doc">
+  const main = `    <div class="kc-doc-wrap${toc.side ? " has-toc" : ""}">
+    <article class="kc-doc">
       <header class="kc-doc-head">
         <nav class="kc-crumbs" aria-label="Breadcrumb"><a href="${BASE}">Knowledge center</a><span aria-hidden="true">/</span><a href="${BASE}#${d.section}">${esc(shelf.label)}</a></nav>
         ${fictional}<h1>${esc(d.title)}</h1>
@@ -275,7 +297,7 @@ ${facts.map(([k, v]) => `          <div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></di
         </dl>
         <div class="kc-actions">
           ${d.pdf ? `<a class="btn btn-primary" href="${d.pdf}" download>${ICON_PDF}Download PDF</a>` : ""}
-        </div>
+        </div>${toc.fold}
       </header>
 
       <div class="kc-text">
@@ -290,7 +312,8 @@ ${next.join("\n")}
       </aside>` : ""}
 
       <p class="kc-colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit. <a class="ext" href="${esc(`https://github.com/neon1llc/neon1-corpus/blob/main/${d.source}`)}" target="_blank" rel="noopener">Source on GitHub</a>. ${d.type === "template" || d.type === "example" ? "Templates and examples are illustrations, not legal advice. " : ""}${esc(fillNote(d))}</p>
-    </article>`
+    </article>${toc.side}
+    </div>`
   return page({ title: `${d.title} · neon1 knowledge center`, description: d.summary, path: d.url, main, kind: "doc" })
 }
 
