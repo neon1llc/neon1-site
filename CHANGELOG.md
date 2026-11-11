@@ -2,6 +2,13 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.54.0
+
+### Changed
+- Opening a fold on the home page (p.r.o.s.e, services, and the rest) eases it open, and the section glides up until its heading sits at the top of the screen, so a long fold reads straight down. Scrolling inside an open fold reads it; the next section waits until the fold is closed or read to its end.
+- On a desktop, the mouse wheel or trackpad needs a deliberate push to change sections, so a small scroll no longer jumps a whole screen.
+- The p.r.o.s.e list shows 1NEON v0.3.0.
+
 ## v0.53.0
 
 ### Added
