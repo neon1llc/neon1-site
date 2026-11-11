@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.50.1
+
+### Changed
+- The footer's contact LinkedIn link goes to neon1's company page, which anyone can read without signing in. Pradeep's own profile moves to "elsewhere", and About still links it.
+
 ## v0.50.0
 
 ### Added
