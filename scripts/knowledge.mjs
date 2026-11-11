@@ -299,6 +299,9 @@ const want = new Map([["knowledge/index.html", indexPage()]])
 for (const d of corpus.docs) want.set(`${d.url.slice(1)}index.html`, docPage(d))
 // The search index sits beside the shelves and is fetched only when someone searches
 want.set("knowledge/search-index.json", JSON.stringify(searchIndex(corpus)) + "\n")
+// Diagrams the documents draw (neon1-corpus tools/diagrams.mjs), served beside them as image files
+const diagramsDir = join(exportDir, "diagrams")
+if (existsSync(diagramsDir)) for (const f of readdirSync(diagramsDir)) if (f.endsWith(".svg")) want.set(`knowledge/diagrams/${f}`, readFileSync(join(diagramsDir, f), "utf8"))
 
 // The sitemap lists every knowledge center page between its <!-- knowledge --> markers, with each document's updated date
 const sitemapFile = join(siteDir, "sitemap.xml")

@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
     inputs:
       force_invalidation:
-        description: Invalidate CloudFront even if no files changed
+        description: Also invalidate CloudFront (releases don't need it; for a font, media, or .well-known file changed in place)
         type: boolean
         default: false
 
@@ -76,7 +76,7 @@ jobs:
       group: deploy-site
       cancel-in-progress: false
 
-    # Sync, purge the CDN, then confirm the live version
+    # Upload the release, switch to it, then confirm the live version
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -103,10 +103,9 @@ jobs:
 
       - run: make deploy
 
-      - name: make invalidate
-        env:
-          FORCE: ${{ inputs.force_invalidation && '1' || '' }}
-        run: make invalidate FORCE="$FORCE"
+      # Releases switch whole and get new cache keys; a purge only on request
+      - if: inputs.force_invalidation
+        run: make invalidate
 
       - run: make verify
 
