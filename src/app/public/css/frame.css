@@ -124,6 +124,11 @@ footer { position: relative; z-index: 2; border-top: 1px solid var(--line); back
 .legal a { color: inherit; text-decoration: none; } .legal a:hover { color: var(--glow); }
 .legal .policies { display: flex; gap: 8px; flex-wrap: wrap; align-items: baseline; }
 .legal .sep { opacity: .6; }
+/* The copyright line ends with the company's public state record, an internal link with a small forward arrow */
+.legal .owner { display: inline-flex; gap: 8px; flex-wrap: wrap; align-items: baseline; }
+.legal .go { display: inline-block; margin-left: .3em; transition: transform .15s ease; }
+.legal a:hover .go, .legal a:focus-visible .go { transform: translateX(2px); }
+@media (prefers-reduced-motion: reduce) { .legal .go { transition: none; } }
 
 /* Running-text links (about, contact, case studies, the legal line), after the footer's plain links so they win: brand green, bold, and a small
    arrow instead of an underline; the arrow nudges out on hover and focus */
