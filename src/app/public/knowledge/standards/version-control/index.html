@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.51.0" />
+  <meta name="version" content="0.52.0" />
   <title>Version control · neon1 knowledge center</title>
   <meta name="description" content="How neon1 uses git: branch names, commit messages, merges, protected branches, and the history rules, and which safeguards production and client data require." />
   <meta name="theme-color" content="#F2F4F2" />
@@ -78,6 +78,7 @@
 
   <div class="top awake kc-page">
   <main id="main">
+    <div class="kc-doc-wrap has-toc">
     <article class="kc-doc">
       <header class="kc-doc-head">
         <nav class="kc-crumbs" aria-label="Breadcrumb"><a href="/knowledge/">Knowledge center</a><span aria-hidden="true">/</span><a href="/knowledge/#standards">How I work</a></nav>
@@ -85,14 +86,30 @@
         <p class="kc-summary">How neon1 uses git: branch names, commit messages, merges, protected branches, and the history rules, and which safeguards production and client data require.</p>
         <dl class="kc-facts">
           <div><dt>Type</dt><dd>Standard</dd></div>
-          <div><dt>Edition</dt><dd>2.0</dd></div>
+          <div><dt>Edition</dt><dd>2.1</dd></div>
           <div><dt>Published</dt><dd>November 8, 2026</dd></div>
-          <div><dt>Updated</dt><dd>November 10, 2026</dd></div>
+          <div><dt>Updated</dt><dd>November 11, 2026</dd></div>
           <div><dt>For</dt><dd>Developers</dd></div>
         </dl>
         <div class="kc-actions">
           <a class="btn btn-primary" href="/knowledge/standards/version-control/neon1-version-control.pdf" download><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Download PDF</a>
         </div>
+        <details class="kc-toc kc-toc-fold">
+          <summary>On this page <span>11 sections</span></summary>
+          <ol>
+            <li><a href="#before-you-commit">Before you commit</a></li>
+            <li><a href="#branch-names">Branch names</a></li>
+            <li><a href="#commit-messages">Commit messages</a></li>
+            <li><a href="#commit-boundaries">Commit boundaries</a></li>
+            <li><a href="#authorship">Authorship</a></li>
+            <li><a href="#merging">Merging</a></li>
+            <li><a href="#history">History</a></li>
+            <li><a href="#before-anything-is-live">Before anything is live</a></li>
+            <li><a href="#from-the-first-live-release-or-when-client-data-is-at-stake">From the first live release, or when client data is at stake</a></li>
+            <li><a href="#tags">Tags</a></li>
+            <li><a href="#sources">Sources</a></li>
+          </ol>
+        </details>
       </header>
 
       <div class="kc-text">
@@ -132,7 +149,7 @@ Optional footers, such as BREAKING CHANGE: what breaks and how to move.</code></
 <h2 id="tags">Tags</h2>
 <p>Every released version has an annotated tag on the commit it was built from, named exactly <code>vX.Y.Z</code>. Tags are never moved or deleted once pushed. See <a href="/knowledge/standards/versioning/">versioning and releases</a> for when to tag.</p>
 <h2 id="sources">Sources</h2>
-<ul><li><a class="ext" href="https://www.conventionalcommits.org/en/v1.0.0/" target="_blank" rel="noopener">Conventional Commits 1.0.0</a></li><li><a class="ext" href="https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell" target="_blank" rel="noopener">Pro Git, Git Branching</a></li><li><a class="ext" href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches" target="_blank" rel="noopener">GitHub, About protected branches</a></li></ul>
+<ul><li><a class="ext" href="https://www.conventionalcommits.org/en/v1.0.0/" target="_blank" rel="noopener">Conventional Commits 1.0.0</a>: the commit message format.</li><li><a class="ext" href="https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell" target="_blank" rel="noopener">Pro Git: branches in a nutshell</a>, Scott Chacon and Ben Straub: how branches and merges work.</li><li><a class="ext" href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches" target="_blank" rel="noopener">About protected branches</a>, GitHub: the rules that guard a main branch.</li></ul>
       </div>
 
       <aside class="kc-next" aria-labelledby="kc-next-h">
@@ -146,6 +163,23 @@ Optional footers, such as BREAKING CHANGE: what breaks and how to move.</code></
 
       <p class="kc-colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit. <a class="ext" href="https://github.com/neon1llc/neon1-corpus/blob/main/corpus/standards/version-control.md" target="_blank" rel="noopener">Source on GitHub</a>. </p>
     </article>
+    <nav class="kc-toc kc-toc-side" aria-label="On this page">
+      <p class="kc-toc-title">On this page</p>
+      <ol>
+            <li><a href="#before-you-commit">Before you commit</a></li>
+            <li><a href="#branch-names">Branch names</a></li>
+            <li><a href="#commit-messages">Commit messages</a></li>
+            <li><a href="#commit-boundaries">Commit boundaries</a></li>
+            <li><a href="#authorship">Authorship</a></li>
+            <li><a href="#merging">Merging</a></li>
+            <li><a href="#history">History</a></li>
+            <li><a href="#before-anything-is-live">Before anything is live</a></li>
+            <li><a href="#from-the-first-live-release-or-when-client-data-is-at-stake">From the first live release, or when client data is at stake</a></li>
+            <li><a href="#tags">Tags</a></li>
+            <li><a href="#sources">Sources</a></li>
+      </ol>
+    </nav>
+    </div>
   </main>
 
   <!-- frame:footer -->
@@ -180,7 +214,7 @@ Optional footers, such as BREAKING CHANGE: what breaks and how to move.</code></
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.51.0</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.52.0</a>
       </span>
     </div>
   </footer>

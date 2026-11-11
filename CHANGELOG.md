@@ -2,6 +2,16 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.52.0
+
+### Added
+- Knowledge Center: Where I learn from, the standards bodies and guides behind neon1's practice, and Sources on every standard (neon1-corpus v0.27.0).
+- Long documents have an "On this page" index: a column beside the text on wide screens, and a fold under the document's actions on narrower ones.
+
+### Changed
+- PDFs follow neon1's letters and proposals: the mark and title as a letterhead, green section bars, green arrows for points, a facts table, and a footer with the slogan and page number. A section that fits on one page moves to the next page instead of splitting, when that wastes little space.
+- Tables use the full width on larger screens, long outside links wrap on phones, and document cards on phones are tighter.
+
 ## v0.51.0
 
 ### Added

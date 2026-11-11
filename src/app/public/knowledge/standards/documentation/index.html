@@ -4,15 +4,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.51.0" />
+  <meta name="version" content="0.52.0" />
   <title>Documentation · neon1 knowledge center</title>
-  <meta name="description" content="The documents every neon1 project keeps, what each one is for, and how they stay true: READMEs, changelogs, decision records, and runbooks." />
+  <meta name="description" content="The documents every neon1 project keeps and how they stay true, and how the documents in this Knowledge Center are built, dated, shared, and credited." />
   <meta name="theme-color" content="#F2F4F2" />
   <link rel="canonical" href="https://neon1.tech/knowledge/standards/documentation/" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="neon1" />
   <meta property="og:title" content="Documentation · neon1 knowledge center" />
-  <meta property="og:description" content="The documents every neon1 project keeps, what each one is for, and how they stay true: READMEs, changelogs, decision records, and runbooks." />
+  <meta property="og:description" content="The documents every neon1 project keeps and how they stay true, and how the documents in this Knowledge Center are built, dated, shared, and credited." />
   <meta property="og:url" content="https://neon1.tech/knowledge/standards/documentation/" />
   <meta property="og:image" content="https://neon1.tech/media/og-card-1.png" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -78,20 +78,34 @@
 
   <div class="top awake kc-page">
   <main id="main">
+    <div class="kc-doc-wrap has-toc">
     <article class="kc-doc">
       <header class="kc-doc-head">
         <nav class="kc-crumbs" aria-label="Breadcrumb"><a href="/knowledge/">Knowledge center</a><span aria-hidden="true">/</span><a href="/knowledge/#standards">How I work</a></nav>
         <h1>Documentation</h1>
-        <p class="kc-summary">The documents every neon1 project keeps, what each one is for, and how they stay true: READMEs, changelogs, decision records, and runbooks.</p>
+        <p class="kc-summary">The documents every neon1 project keeps and how they stay true, and how the documents in this Knowledge Center are built, dated, shared, and credited.</p>
         <dl class="kc-facts">
           <div><dt>Type</dt><dd>Standard</dd></div>
-          <div><dt>Edition</dt><dd>1.0</dd></div>
+          <div><dt>Edition</dt><dd>1.1</dd></div>
           <div><dt>Published</dt><dd>November 9, 2026</dd></div>
+          <div><dt>Updated</dt><dd>November 11, 2026</dd></div>
           <div><dt>For</dt><dd>Developers</dd></div>
         </dl>
         <div class="kc-actions">
           <a class="btn btn-primary" href="/knowledge/standards/documentation/neon1-documentation.pdf" download><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Download PDF</a>
         </div>
+        <details class="kc-toc kc-toc-fold">
+          <summary>On this page <span>7 sections</span></summary>
+          <ol>
+            <li><a href="#every-project-has">Every project has</a></li>
+            <li><a href="#write-by-purpose">Write by purpose</a></li>
+            <li><a href="#decision-records">Decision records</a></li>
+            <li><a href="#runbooks">Runbooks</a></li>
+            <li><a href="#keeping-docs-true">Keeping docs true</a></li>
+            <li><a href="#documents-in-this-knowledge-center">Documents in this Knowledge Center</a></li>
+            <li><a href="#sources">Sources</a></li>
+          </ol>
+        </details>
       </header>
 
       <div class="kc-text">
@@ -110,6 +124,19 @@
 <p>Prerequisites come first, then commands in the order they're run, each with what you should see and what to do if you don't. Commands are copied exactly and tested. A runbook nobody has followed is a draft.</p>
 <h2 id="keeping-docs-true">Keeping docs true</h2>
 <ul><li>Docs change in the same commit as the behavior they describe.</li><li>A checked fact beats a remembered one. Commands in a README should be run before a release.</li><li>One source for each fact. Link to it instead of copying it, so it can't drift. That's why neon1's public words live once, in <a class="ext" href="https://github.com/neon1llc/neon1-corpus" target="_blank" rel="noopener">neon1-corpus</a>.</li></ul>
+<h2 id="documents-in-this-knowledge-center">Documents in this Knowledge Center</h2>
+<p>Everything here is written once in <a class="ext" href="https://github.com/neon1llc/neon1-corpus" target="_blank" rel="noopener">neon1-corpus</a>, as Markdown, and read from there by the website, the Knowledge Center and its PDFs, and Neo. Each document is built the same way, so a reader always knows where to look.</p>
+<h3 id="what-every-document-carries">What every document carries</h3>
+<table><thead><tr><th>Part</th><th>What it says</th><th>Where readers see it</th></tr></thead><tbody><tr><td>Title</td><td>What the document is, in plain words</td><td>The page heading and the PDF's title</td></tr><tr><td>Summary</td><td>One sentence on what it covers and who it helps</td><td>Under the title, on its card, and in search results</td></tr><tr><td>Type</td><td>Which kind of document it is (below)</td><td>The facts under the title</td></tr><tr><td>Edition</td><td><code>X.Y</code>, raised as described in <a href="/knowledge/standards/versioning/">versioning</a></td><td>The facts, and the PDF's footer</td></tr><tr><td>Published</td><td>When the content first appeared, from its real history</td><td>The facts</td></tr><tr><td>Updated</td><td>When it last changed in substance, shown once it differs from Published</td><td>The facts, and the date at the top of the PDF</td></tr><tr><td>For</td><td>Who it's written for, when that isn't everyone</td><td>The facts</td></tr></tbody></table>
+<p>Dates are never moved to look newer or older than they are. A typo fix doesn't change Updated or the edition.</p>
+<h3 id="kinds-of-document">Kinds of document</h3>
+<table><thead><tr><th>Type</th><th>Its job</th><th>Shape</th></tr></thead><tbody><tr><td>Page</td><td>Say what neon1 is or offers</td><td>Short sections, in the order a newcomer asks</td></tr><tr><td>Standard</td><td>Say how neon1 works and why</td><td>What I do, then the reason, then Sources</td></tr><tr><td>Guide</td><td>Help someone finish a task</td><td>Who it's for, steps, what to do when it goes wrong, Sources</td></tr><tr><td>Case study</td><td>Show real work honestly</td><td>Needs, Execute, Observe, Normalize, with limits stated</td></tr><tr><td>FAQ</td><td>Answer the questions people ask</td><td>One question per heading, the answer in its first sentence</td></tr><tr><td>Policy</td><td>Say what's done with information, and rights</td><td>Short version first, then sections by question</td></tr><tr><td>Template and form</td><td>Be filled in</td><td>Labeled blanks and checkboxes, no advice mixed in</td></tr><tr><td>Example</td><td>Show a template or form filled in</td><td>Marked fictional, linked to its blank</td></tr><tr><td>Comparison</td><td>Point to other good options</td><td>Who each fits, and when another provider is better</td></tr></tbody></table>
+<h3 id="sharing-and-reuse">Sharing and reuse</h3>
+<ul><li><strong>Link to the page.</strong> Every document has a fixed address under <code>neon1.tech/knowledge/</code>, and each section has its own anchor, so a link can point at the exact part.</li><li><strong>Hand over the PDF.</strong> Documents marked for it print to a PDF with the same text, dated, with its edition in the footer and a link back to the live version, since a PDF travels on its own.</li><li><strong>Copy word for word.</strong> Documents are shared under CC BY-ND 4.0, credited "© neon1 LLC (neon1.tech)". Blank templates and forms may also be filled in and adapted for your own work.</li></ul>
+<h3 id="credit-where-it-s-due">Credit where it's due</h3>
+<p>Most of the practice described here comes from standards bodies, government guides, and practitioners who published what they learned. Documents name them where they're used and list them under Sources, following the <a href="/knowledge/standards/writing/">writing standard</a>. <a href="/knowledge/company/sources/">Where I learn from</a> gathers them in one place.</p>
+<h2 id="sources">Sources</h2>
+<ul><li><a class="ext" href="https://diataxis.fr/" target="_blank" rel="noopener">Diátaxis</a>, by Daniele Procida: four kinds of documentation, each with its own job.</li><li><a class="ext" href="https://www.writethedocs.org/guide/" target="_blank" rel="noopener">Write the Docs guide</a>, from the Write the Docs community: docs as code, and keeping documentation next to what it describes.</li><li><a class="ext" href="https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions" target="_blank" rel="noopener">Documenting architecture decisions</a>, by Michael Nygard: the short decision record this standard uses.</li><li><a class="ext" href="https://keepachangelog.com/en/1.1.0/" target="_blank" rel="noopener">Keep a Changelog 1.1.0</a>: changelogs written for people, newest first.</li><li><a class="ext" href="https://sre.google/workbook/table-of-contents/" target="_blank" rel="noopener">Google SRE workbook</a>, from Google: runbooks and on-call practice for services that must keep running.</li></ul>
       </div>
 
       <aside class="kc-next" aria-labelledby="kc-next-h">
@@ -123,6 +150,19 @@
 
       <p class="kc-colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit. <a class="ext" href="https://github.com/neon1llc/neon1-corpus/blob/main/corpus/standards/documentation.md" target="_blank" rel="noopener">Source on GitHub</a>. </p>
     </article>
+    <nav class="kc-toc kc-toc-side" aria-label="On this page">
+      <p class="kc-toc-title">On this page</p>
+      <ol>
+            <li><a href="#every-project-has">Every project has</a></li>
+            <li><a href="#write-by-purpose">Write by purpose</a></li>
+            <li><a href="#decision-records">Decision records</a></li>
+            <li><a href="#runbooks">Runbooks</a></li>
+            <li><a href="#keeping-docs-true">Keeping docs true</a></li>
+            <li><a href="#documents-in-this-knowledge-center">Documents in this Knowledge Center</a></li>
+            <li><a href="#sources">Sources</a></li>
+      </ol>
+    </nav>
+    </div>
   </main>
 
   <!-- frame:footer -->
@@ -157,7 +197,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.51.0</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.52.0</a>
       </span>
     </div>
   </footer>

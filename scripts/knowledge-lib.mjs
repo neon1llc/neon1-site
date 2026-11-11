@@ -136,6 +136,8 @@ export function htmlToText(html) {
 // One small JSON file the browser fetches on first use: for each document its title, summary, shelf, and sections
 // as plain text with the anchor each heading has on the page. Matching, weights, and synonyms live in the
 // browser module, so the file holds only text.
+const CITATION_LISTS = new Set(["company-sources"])
+
 export function searchIndex(corpus) {
   return {
     v: 1,
@@ -145,8 +147,12 @@ export function searchIndex(corpus) {
       s: d.summary,
       sh: corpus.manifest.shelves[d.section].label,
       ty: TYPE_LABELS[d.type] ?? d.type,
-      // [anchor id, heading, text]; the lead has no heading
-      k: d.sections.map((x) => [x.heading ? x.key : "", x.heading || "", htmlToText(x.html)]).filter((x) => x[2] || x[1]),
+      // [anchor id, heading, text]; the lead has no heading. Citations say where a method comes from, not what a
+      // document is about, so a Sources section and the reading list's entries stay out of search; the reading
+      // list is still found by its title, summary, and lead
+      k: d.sections
+        .filter((x) => x.heading !== "Sources" && !(CITATION_LISTS.has(d.id) && x.heading))
+        .map((x) => [x.heading ? x.key : "", x.heading || "", htmlToText(x.html)]).filter((x) => x[2] || x[1]),
     })),
   }
 }

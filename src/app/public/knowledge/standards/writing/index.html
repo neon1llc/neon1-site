@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.51.0" />
+  <meta name="version" content="0.52.0" />
   <title>Writing · neon1 knowledge center</title>
   <meta name="description" content="How everything neon1 writes is written, from policies and proposals to READMEs, commit messages, code comments, and interface text." />
   <meta name="theme-color" content="#F2F4F2" />
@@ -78,6 +78,7 @@
 
   <div class="top awake kc-page">
   <main id="main">
+    <div class="kc-doc-wrap has-toc">
     <article class="kc-doc">
       <header class="kc-doc-head">
         <nav class="kc-crumbs" aria-label="Breadcrumb"><a href="/knowledge/">Knowledge center</a><span aria-hidden="true">/</span><a href="/knowledge/#standards">How I work</a></nav>
@@ -85,13 +86,26 @@
         <p class="kc-summary">How everything neon1 writes is written, from policies and proposals to READMEs, commit messages, code comments, and interface text.</p>
         <dl class="kc-facts">
           <div><dt>Type</dt><dd>Standard</dd></div>
-          <div><dt>Edition</dt><dd>1.1</dd></div>
+          <div><dt>Edition</dt><dd>1.2</dd></div>
           <div><dt>Published</dt><dd>November 1, 2026</dd></div>
-          <div><dt>Updated</dt><dd>November 9, 2026</dd></div>
+          <div><dt>Updated</dt><dd>November 11, 2026</dd></div>
         </dl>
         <div class="kc-actions">
           <a class="btn btn-primary" href="/knowledge/standards/writing/neon1-writing.pdf" download><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Download PDF</a>
         </div>
+        <details class="kc-toc kc-toc-fold">
+          <summary>On this page <span>8 sections</span></summary>
+          <ol>
+            <li><a href="#the-core-rules">The core rules</a></li>
+            <li><a href="#voice">Voice</a></li>
+            <li><a href="#patterns-to-avoid">Patterns to avoid</a></li>
+            <li><a href="#mechanics">Mechanics</a></li>
+            <li><a href="#structure-from-a-line-to-a-whole-document">Structure, from a line to a whole document</a></li>
+            <li><a href="#each-kind-of-writing">Each kind of writing</a></li>
+            <li><a href="#checking-a-draft">Checking a draft</a></li>
+            <li><a href="#sources">Sources</a></li>
+          </ol>
+        </details>
       </header>
 
       <div class="kc-text">
@@ -108,15 +122,26 @@
 <p>Lists, the passive voice, and formal words aren't errors on their own. Judge them by whether they help the reader.</p>
 <h2 id="mechanics">Mechanics</h2>
 <ul><li><strong>neon1</strong> is always lowercase, even at the start of a sentence. The company is <strong>neon1 LLC</strong>.</li><li>Serial comma: "email, spreadsheets, and POS."</li><li>Sentence case for titles and headings.</li><li>Numbers: words for one to nine in prose, numerals for 10 and up, and numerals for measurements, money, versions, and dates in tables.</li><li>Dates: "November 9, 2026" in prose, <code>2026-11-09</code> in data and file names.</li><li>Times: "8am to 8pm, Eastern time."</li><li>Links say where they go ("see the <a href="/knowledge/policies/privacy/">privacy policy</a>"), never "click here."</li><li>Code, commands, file names, and identifiers go in <code>code formatting</code>, copied exactly.</li></ul>
+<h2 id="structure-from-a-line-to-a-whole-document">Structure, from a line to a whole document</h2>
+<p>Readers scan before they read. Most look at the start of each heading, paragraph, and list item and decide from there whether to go on. Structure is what lets that work, at four sizes.</p>
+<p><strong>A line.</strong> One fact, step, or instruction. Put the word the reader is looking for first. In a list that's scanned by label, the label goes in bold and ends with a period, and the rest of the line explains it. A line that needs a second idea becomes two lines.</p>
+<p><strong>A group.</strong> Lines that belong together, shown in the form that matches how they relate:</p>
+<table><thead><tr><th>When the items are</th><th>Use</th><th>Because</th></tr></thead><tbody><tr><td>Parallel and in no order</td><td>A bulleted list</td><td>Each one can be read on its own</td></tr><tr><td>Steps that happen in order</td><td>A numbered list</td><td>The number says what comes next</td></tr><tr><td>Several items compared on two or more facts</td><td>A table</td><td>The reader can read across and down</td></tr><tr><td>An argument, a cause, or a tradeoff</td><td>A paragraph</td><td>The reasoning is in the connecting words</td></tr></tbody></table>
+<p>Keep the items in a group grammatically alike, so they all start with a verb or all name a thing. Two to seven items read easily. A longer group usually hides two groups, and splitting it under small headings helps more than any formatting. A table earns its place when it has at least two columns of facts and three rows. Smaller than that, a sentence or a list reads better.</p>
+<p><strong>A section.</strong> A heading that names the topic in the reader's words, a lead sentence that says what the section settles, then the groups. One section does one job. If a heading needs "and" to describe what's under it, it's probably two sections. Headings are labels, not slogans, and they don't repeat the document's title.</p>
+<p><strong>A document.</strong> It opens with its summary, so a reader knows in one sentence whether it's the right one. Sections follow in the order the reader needs them: what to do or know first, details and exceptions after, background last. It ends with its sources and where to go next. Each kind of document has its own shape, listed below, and the <a href="/knowledge/standards/documentation/">documentation standard</a> says how the Knowledge Center's documents are put together.</p>
+<h3 id="attribution">Attribution</h3>
+<p>Most of what neon1 practices was worked out first by someone else: standards bodies, government guides, and practitioners who wrote down what they learned. Every document that relies on one says so.</p>
+<ul><li>A method, rule, or number taken from somewhere names its source, in the text where it's used or in the document's Sources section.</li><li>Link the primary source, such as the standard itself or the agency's own guide, rather than an article about it. Link the page that says the thing, not a home page, when one exists.</li><li>Each source gets a few words on what it is, so a reader can decide whether to follow it.</li><li>Say where neon1 differs from a source, or uses only part of it.</li><li>Sources is the last section of the body, before anything a page adds around it.</li></ul>
 <h2 id="each-kind-of-writing">Each kind of writing</h2>
 <p>Different documents have different jobs. The structure follows the job.</p>
 <table><thead><tr><th>Kind</th><th>Its job</th><th>Structure</th></tr></thead><tbody><tr><td>Policy</td><td>Tell people what's done with their information and their rights</td><td>Short version first, then sections by question. Dated "Last updated." Plain prose, no marketing</td></tr><tr><td>Agreement or template</td><td>Record obligations exactly</td><td>Defined terms, numbered sections, blanks to fill, an "example, not legal advice" note when it is one</td></tr><tr><td>Standard</td><td>Say how neon1 works and why</td><td>What I do, then the reason. Present tense. No claims of certification or results</td></tr><tr><td>Guide or how-to</td><td>Help someone finish a task</td><td>Who it's for, what they need, numbered steps, what to do when it goes wrong</td></tr><tr><td>Reference</td><td>Be looked up, not read through</td><td>Tables and short entries, exact values, consistent order</td></tr><tr><td>Explanation</td><td>Help someone understand a topic</td><td>One idea per section, in the order the reader needs them</td></tr><tr><td>Proposal</td><td>Help a client decide</td><td>Their problem, the result, what's in and out, price, schedule, acceptance, next step</td></tr><tr><td>Case study</td><td>Show real work honestly</td><td>Needs, Execute, Observe, Normalize, with scope and limits stated</td></tr><tr><td>Form</td><td>Capture facts</td><td>Labeled blanks and checkboxes. An empty field is an open question</td></tr><tr><td>README</td><td>Help someone use or contribute to a project</td><td>What it is, who it's for, status, how to run, deploy, and contribute, license</td></tr><tr><td>Changelog</td><td>Tell people what changed for them</td><td>Newest first, grouped by version, written for users</td></tr><tr><td>Commit message</td><td>Explain one change to future readers</td><td>Type and scope, then a plain summary. A body when the reason isn't obvious</td></tr><tr><td>Code comment</td><td>Explain intent the code can't</td><td>Why, constraints, and invariants, never a narration of the next line</td></tr><tr><td>Interface text</td><td>Help someone act in the moment</td><td>Short labels, verbs on buttons, errors that say what happened and how to fix it</td></tr><tr><td>Email or message</td><td>Get something done with someone</td><td>The ask or answer first, context after, one clear next step</td></tr></tbody></table>
 <p>The guide and reference split follows the <a class="ext" href="https://diataxis.fr/" target="_blank" rel="noopener">Diátaxis</a> framework for documentation. The <a href="/knowledge/standards/documentation/">documentation standard</a> covers READMEs, changelogs, and decision records in more detail, and the <a href="/knowledge/standards/code-style/">code style standard</a> covers comments and names.</p>
 <h2 id="checking-a-draft">Checking a draft</h2>
-<ol><li>Read it as the intended reader. Can they act on it?</li><li>Compare it claim by claim with the sources. Nothing added, nothing overstated.</li><li>Remove anything from the "avoid" list.</li><li>Check names, numbers, dates, links, and code exactly.</li><li>Read it aloud. Rewrite any sentence that's hard to say.</li></ol>
+<ol><li>Read it as the intended reader. Can they act on it?</li><li>Read only the headings and the first words of each paragraph and list item. Do they tell the story on their own?</li><li>Check each group's form: lists that should be tables, tables that should be a sentence, and lists that mix kinds of item.</li><li>Compare it claim by claim with the sources. Nothing added, nothing overstated, and every borrowed idea credited.</li><li>Remove anything from the "avoid" list.</li><li>Check names, numbers, dates, links, and code exactly. Open every link.</li><li>Read it aloud. Rewrite any sentence that's hard to say.</li></ol>
 <p>Good writing that already works stays as it is. Shorter is only better when the meaning survives.</p>
 <h2 id="sources">Sources</h2>
-<ul><li><a class="ext" href="https://www.plainlanguage.gov/guidelines/" target="_blank" rel="noopener">plainlanguage.gov guidelines</a></li><li><a class="ext" href="https://www.gov.uk/guidance/style-guide" target="_blank" rel="noopener">GOV.UK style guide</a></li><li><a class="ext" href="https://developers.google.com/style" target="_blank" rel="noopener">Google developer documentation style guide</a></li><li><a class="ext" href="https://diataxis.fr/" target="_blank" rel="noopener">Diátaxis</a>, a framework for technical documentation</li></ul>
+<ul><li><a class="ext" href="https://www.plainlanguage.gov/guidelines/" target="_blank" rel="noopener">Federal plain language guidelines</a>, from the Plain Language Action and Information Network: the core rules on audience, plain words, and organization.</li><li><a class="ext" href="https://www.gov.uk/guidance/content-design/writing-for-gov-uk" target="_blank" rel="noopener">Writing for GOV.UK</a> and the <a class="ext" href="https://www.gov.uk/guidance/style-guide" target="_blank" rel="noopener">GOV.UK style guide</a>, from the UK Government Digital Service: front-loading, short sentences, and words people use.</li><li><a class="ext" href="https://www.nngroup.com/articles/how-users-read-on-the-web/" target="_blank" rel="noopener">How users read on the web</a> and <a class="ext" href="https://www.nngroup.com/articles/f-shaped-pattern-reading-web-content/" target="_blank" rel="noopener">the F-shaped pattern</a>, from Nielsen Norman Group: the research behind putting key words first.</li><li><a class="ext" href="https://developers.google.com/style" target="_blank" rel="noopener">Google developer documentation style guide</a>: conventions for lists, tables, procedures, and code in technical writing.</li><li><a class="ext" href="https://www.chicagomanualofstyle.org/home.html" target="_blank" rel="noopener">The Chicago Manual of Style</a>: the serial comma and other points of mechanics.</li><li><a class="ext" href="https://diataxis.fr/" target="_blank" rel="noopener">Diátaxis</a>, by Daniele Procida: the split between tutorials, how-to guides, reference, and explanation.</li></ul>
       </div>
 
       <aside class="kc-next" aria-labelledby="kc-next-h">
@@ -130,6 +155,20 @@
 
       <p class="kc-colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit. <a class="ext" href="https://github.com/neon1llc/neon1-corpus/blob/main/corpus/standards/writing.md" target="_blank" rel="noopener">Source on GitHub</a>. </p>
     </article>
+    <nav class="kc-toc kc-toc-side" aria-label="On this page">
+      <p class="kc-toc-title">On this page</p>
+      <ol>
+            <li><a href="#the-core-rules">The core rules</a></li>
+            <li><a href="#voice">Voice</a></li>
+            <li><a href="#patterns-to-avoid">Patterns to avoid</a></li>
+            <li><a href="#mechanics">Mechanics</a></li>
+            <li><a href="#structure-from-a-line-to-a-whole-document">Structure, from a line to a whole document</a></li>
+            <li><a href="#each-kind-of-writing">Each kind of writing</a></li>
+            <li><a href="#checking-a-draft">Checking a draft</a></li>
+            <li><a href="#sources">Sources</a></li>
+      </ol>
+    </nav>
+    </div>
   </main>
 
   <!-- frame:footer -->
@@ -164,7 +203,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.51.0</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.52.0</a>
       </span>
     </div>
   </footer>
