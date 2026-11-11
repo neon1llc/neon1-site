@@ -231,9 +231,9 @@ html.case-lock { overflow: hidden; }
 .intro { margin: -6px 0 clamp(18px, 3vh, 30px); }
 .intro .stages { display: block; }
 
-/* Notched phones in landscape: the page runs edge to edge, with content kept inside the safe area */
+/* Notched phones in landscape: the page runs edge to edge, with content kept inside the safe area
+   (the rain controls and Neo keep clear of it in shared/neon1.css and shared/chat.css) */
 section { padding-left: max(24px, env(safe-area-inset-left)); padding-right: max(24px, env(safe-area-inset-right)); }
-.rainctl { right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); }
 
 /* Open source: a public project shows the case-study arrow on hover, a private one a lock that explains itself */
 .row h3 { display: flex; align-items: center; gap: 8px; }

@@ -2,6 +2,13 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.50.2
+
+### Fixed
+- Neo's button and the rain controls share one line at the bottom of the screen, 16px from the edges or clear of the iPhone's home indicator and notch, so neither covers the 1NEON sign-in box in Safari, DuckDuckGo, or Chrome on iPhone.
+- On the narrowest phones, the rain controls tighten so they stay clear of "ask Neo" while it shows its label.
+- On light pages, Neo's button has a soft shadow, so it reads as floating over the text instead of hiding it.
+
 ## v0.50.1
 
 ### Changed
