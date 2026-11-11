@@ -77,13 +77,21 @@ const WALK = [0.59, 0.72], STEPS = 7;
 // part is kept short, so the first scrolls already move the view and never feel stuck)
 // onto that timeline (the room appearing, the window coming into view, the white-out)
 const LEGACY = [[0, 0], [0.035, 0.28], [0.17, 0.4], [0.33, 0.6], [0.64, 0.82], [0.89, 0.94], [0.985, 0.95], [1, 1]];
-// The scroll's whole span (q) runs the walk (its progress, pr) straight through to the yard, then holds the
-// view outside for a pause of scrolling (HOLD), and the last stretch whitens
-const HOLD = [0.94, 0.975];
+// How much scrolling each stretch takes: the scroll's whole span (q) is spent in proportion to how much the view
+// changes, so a fast turn or a long move takes more scroll and a calm glide less, and every scroll moves the view
+// about the same amount. Each stretch of progress costs BASE (so nothing rushes by, even the screen's own effects),
+// plus its turning in degrees (the look, the roll of getting up, and the zoom), plus METER for each meter moved. The
+// pauses cost their DWELL on top, as they change nothing: [from, to, cost]. path() adds it up into PACE
+const BASE = 100, METER = 12;
+const DWELL = [[0, 0.035, 8], [0.49, 0.51, 12], [0.85, 0.88, 24], [0.955, 0.985, 40], [0.985, 1, 14]];
+const PACE_STEPS = 1000;
+let PACE = null;  // PACE[i]: the share of the scroll spent by progress i / PACE_STEPS
 function progress(q) {
-  if (q <= HOLD[0]) return (q / HOLD[0]) * 0.97;
-  if (q <= HOLD[1]) return 0.97 + ((q - HOLD[0]) / (HOLD[1] - HOLD[0])) * 0.015;
-  return 0.985 + ((q - HOLD[1]) / (1 - HOLD[1])) * 0.015;
+  if (!PACE || q <= 0) return Math.max(0, q);
+  if (q >= 1) return 1;
+  let lo = 0, hi = PACE_STEPS;
+  while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (PACE[mid] <= q) lo = mid; else hi = mid; }
+  return (lo + (q - PACE[lo]) / (PACE[hi] - PACE[lo] || 1)) / PACE_STEPS;
 }
 
 // Monotone cubic through [key, value] pairs (Fritsch and Carlson): it passes through every beat, never swings past
@@ -593,7 +601,25 @@ export function createScene({ onLost, onSound = () => {} }) {
     posAt = (pr, out) => out.set(px(pr), py(pr), pz(pr));
     dirAt = (pr, out) => out.set(dx(pr), dy(pr), dz(pr)).normalize();
     fovAt = monotone(KEYS, FOV);
+    pace();
     screenU.uScanCount.value = Math.round(fit.lines / 3);
+  }
+
+  // Adds up how much the view changes along the walk into PACE (see BASE), once per fit
+  function pace() {
+    const p0 = new T.Vector3(), p1 = new T.Vector3(), d0 = new T.Vector3(), d1 = new T.Vector3(), cost = [0];
+    posAt(0, p0); dirAt(0, d0);
+    let f0 = fovAt(0), r0 = 0, total = 0;
+    for (let i = 1; i <= PACE_STEPS; i++) {
+      const pr = i / PACE_STEPS, f1 = fovAt(pr), r1 = ramp(pr, ROLL);
+      posAt(pr, p1); dirAt(pr, d1);
+      const turn = T.MathUtils.radToDeg(d0.angleTo(d1) + Math.abs(r1 - r0)) + Math.abs(f1 - f0);
+      let step = BASE / PACE_STEPS + turn + METER * p0.distanceTo(p1);
+      for (const [a, b, c] of DWELL) if (pr > a && pr <= b) step += (c * (1 / PACE_STEPS)) / (b - a);
+      total += step; cost.push(total);
+      p0.copy(p1); d0.copy(d1); f0 = f1; r0 = r1;
+    }
+    PACE = cost.map((c) => c / total);
   }
 
   // ---- One frame ----
