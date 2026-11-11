@@ -4,6 +4,9 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## v0.50.0
 
+### Added
+- How neon1 is built, in the Knowledge Center: an AWS-style architecture diagram, sequence diagrams for a visit, a Neo question, and a 1NEON sign-in, the deploy pipeline, the corpus's flow, and a project's four layers (neon1-corpus v0.25.0). Each diagram has alt text, opens full size, and shows its Mermaid source.
+
 ### Changed
 - Deploys switch the whole site at once. Each release goes up complete under its own folder, then neon1.tech moves every visitor to it in one step, so a page opened mid-deploy can no longer mix a new page with old scripts and come up blank. No CDN invalidation is needed, the last 10 releases are kept, and `make rollback` switches back in seconds.
 
