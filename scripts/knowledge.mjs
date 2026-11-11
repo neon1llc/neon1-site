@@ -59,6 +59,8 @@ function page({ title, description, path, main, kind }) {
   <meta property="og:url" content="${url}" />
   <meta property="og:image" content="${SITE}/media/og-card-1.png" />
   <meta name="twitter:card" content="summary_large_image" />
+  <!-- Transparent, and green to match the browser: brand green when light, matrix green when dark -->
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="any" />
   <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
   <link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
