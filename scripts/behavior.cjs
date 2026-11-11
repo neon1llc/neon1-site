@@ -393,6 +393,8 @@ async function tabToRabbit(page) {
       const box = await page.locator("#whiteRabbitIn").boundingBox();
       const vp = page.viewportSize();
       expect(box && box.y >= 0 && box.y + box.height <= vp.height, "the focused way in is not on screen", box);
+      const shown = await page.evaluate(() => getComputedStyle(document.getElementById("whiteRabbitIn")).opacity === "1");
+      expect(shown, "the focused way in is not visible");
       return;
     }
   }
@@ -426,6 +428,20 @@ check("browser", "rabbit: keyboard entry, no controls on screen, Tab, Esc, and f
     expect(r.state === "idle" && r.focus === "whiteRabbitIn", "Esc while caught did not leave and restore focus", r);
     expect(!(await sceneFrames(page)), "the card started the scene loop");
     expect(!errors.length, "page errors", errors);
+  } finally { await context.close(); }
+});
+
+check("browser", "rabbit: the keyboard way in shows only with keyboard focus, never after a touch entry", async () => {
+  const { page, context } = await open({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }, "/?rabbit=p0.5");
+  try {
+    const seen = () => page.evaluate(() => { const c = getComputedStyle(document.getElementById("whiteRabbitIn")); return c.opacity !== "0" && c.clipPath === "none"; });
+    expect(!(await seen()), "the way in shows before anyone tabs to it");
+    expect(await isState(page, "playing"), "the test flag did not catch a rabbit", await rabbit(page));
+    await page.keyboard.press("Escape");
+    expect(await isState(page, "idle"), "Esc did not leave", await rabbit(page));
+    await page.evaluate(() => scrollTo(0, innerHeight * 2));
+    await page.waitForTimeout(300);
+    expect(!(await seen()), "the way in shows after leaving, or over the sections below");
   } finally { await context.close(); }
 });
 
