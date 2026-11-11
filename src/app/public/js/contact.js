@@ -44,14 +44,31 @@ if (fold && form) {
     };
   }
 
+  // Each invalid field carries its own message, linked by aria-describedby, so a screen reader hears it on
+  // every visit, not only in the one summary announcement. Typing in the field clears its mark (AS-09)
+  function fieldError(el, text) {
+    const id = `cerr-${el.name}`;
+    let note = document.getElementById(id);
+    if (!text) { note?.remove(); el.removeAttribute("aria-invalid"); el.removeAttribute("aria-describedby"); return; }
+    if (!note) { note = document.createElement("span"); note.id = id; note.className = "cerr"; el.after(note); }
+    note.textContent = text;
+    el.setAttribute("aria-invalid", "true");
+    el.setAttribute("aria-describedby", id);
+  }
+  form.addEventListener("input", (e) => { if (e.target.getAttribute?.("aria-invalid") === "true") fieldError(e.target, ""); });
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    form.querySelectorAll("[aria-invalid]").forEach((el) => el.removeAttribute("aria-invalid"));
+    form.querySelectorAll("[aria-invalid]").forEach((el) => (el.name ? fieldError(el, "") : el.removeAttribute("aria-invalid")));
     const bad = problems();
     if (bad.length) {
       status.textContent = bad.map(([, m]) => m).join(" ");
       status.className = "cstatus err";
-      for (const [name] of bad) form.querySelectorAll(`[name="${name}"]`).forEach((el) => el.setAttribute("aria-invalid", "true"));
+      for (const [name, m] of bad) {
+        const fields = form.querySelectorAll(`[name="${name}"]`);
+        if (fields.length === 1) fieldError(fields[0], m);
+        else fields.forEach((el) => el.setAttribute("aria-invalid", "true"));
+      }
       form.querySelector(`[name="${bad[0][0]}"]`).focus();
       return;
     }

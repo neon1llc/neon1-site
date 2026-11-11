@@ -277,7 +277,22 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
   }
   launcher.addEventListener("click", () => open(true));
   close.addEventListener("click", () => open(false));
-  panel.addEventListener("keydown", (e) => e.key === "Escape" && open(false));
+  panel.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") return open(false);
+    // On a narrow screen the window covers the page, so it behaves as a modal there: Tab and Shift+Tab
+    // wrap inside it rather than moving focus to links hidden behind it. Wider screens stay nonmodal
+    if (e.key !== "Tab" || !narrow.matches) return;
+    const stops = [...panel.querySelectorAll("button, a[href], textarea, input")].filter((n) => !n.disabled && n.offsetParent !== null);
+    if (!stops.length) return;
+    const first = stops[0], last = stops[stops.length - 1], at = document.activeElement;
+    if (e.shiftKey && (at === first || at === panel)) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && at === last) { e.preventDefault(); first.focus(); }
+  });
+  // aria-modal follows the same width rule, so assistive technology hears what the keyboard gets
+  const narrow = matchMedia("(max-width: 600px)");
+  const modality = () => panel.setAttribute("aria-modal", String(narrow.matches));
+  modality();
+  narrow.addEventListener?.("change", modality);
   // Turning motion off midway ends the animation at once rather than waiting out the timer
   motion.addEventListener?.("change", () => finish?.());
 
@@ -334,9 +349,10 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
     chips.hidden = false;
   });
 
-  // Enter sends, Shift+Enter adds a line
+  // Enter sends, Shift+Enter adds a line. The Enter that confirms an input method's candidate (Japanese,
+  // Chinese, Korean, and others) belongs to the composition, not to Send
   input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey && !e.isComposing && e.keyCode !== 229) {
       e.preventDefault();
       form.requestSubmit();
     }
@@ -427,7 +443,10 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
       if (back) input.value = q;
       say(`${trouble(res, data, late)}${back ? " Your question is back in the box." : ""}`, "bot");
     }
-    input.focus({ preventScroll: true });
+    // Back to the box only if the visitor is still in the window (or nowhere): a reply that arrives
+    // after they moved on to the page, a menu, or a case study leaves their focus where it is
+    const now = document.activeElement;
+    if (!panel.hidden && (!now || now === document.body || panel.contains(now))) input.focus({ preventScroll: true });
   }
 
   return { open: () => open(true), close: () => open(false) };

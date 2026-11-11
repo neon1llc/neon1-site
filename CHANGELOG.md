@@ -2,6 +2,24 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.49.0
+
+### Changed
+- On-site work is within about 30 miles of Queens, NY, on the home page and in the Knowledge Center (neon1-corpus v0.24.3).
+- The Knowledge Center's search jumps in with Ctrl+K (Cmd+K on a Mac) instead of a bare "/", which caught speech input and other single keys.
+- Checkboxes on forms, templates, and examples are printed marks: they show their state but no longer take focus or clicks, since the page saves nothing.
+- On a phone-width screen, Neo's window keeps Tab and Shift+Tab inside it, since it covers the page there.
+
+### Fixed
+- The menu scrolls at every screen height (1024 by 600, zoomed text), so every link and the close button are reachable.
+- Choosing a section in the menu puts keyboard focus on that section, so the next Tab continues there. Widening the window with the menu open moves focus to the same link in the bar, not to nothing.
+- Focus rings use the color that reads on each surface: brand green on the light bar and the case study window, neon on the dark menu.
+- The contact link in "Where neon1 started" opened a missing file. It now closes the case study and goes to the contact section, with focus there.
+- Scrolling inside the contact message box scrolls the box, not the page, until it reaches its end.
+- Each field the contact form flags carries its own message, so a screen reader hears it on every visit.
+- A late answer from Neo no longer pulls focus back from wherever you went meanwhile, and the Enter that confirms an input method's candidate no longer sends the question.
+- Search lists every document it counts, clearing the box by any means clears the address too, and a search index that failed to load tries again on the next keystroke.
+
 ## v0.48.1
 
 ### Changed

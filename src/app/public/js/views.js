@@ -104,6 +104,17 @@
   const paused = () => off || !menu.hidden || document.body.classList.contains("case-open") || document.body.classList.contains("white-rabbit-on");
   // The ask neon1 window scrolls on its own; page steering never takes its wheel, touch, or keys
   const inChat = (node) => node instanceof Element && !!node.closest(".n1chat");
+  // A box that scrolls on its own (the contact message, a long answer) keeps the wheel or finger while it
+  // can still move that way; at its edge the page takes over (AS-03)
+  function innerScrolls(node, dy) {
+    for (let n = node instanceof Element ? node : null; n && n !== document.body && n !== root; n = n.parentElement) {
+      if (n.scrollHeight <= n.clientHeight + 1) continue;
+      const oy = getComputedStyle(n).overflowY;
+      if (n.tagName !== "TEXTAREA" && oy !== "auto" && oy !== "scroll") continue;
+      if (dy > 0 ? n.scrollTop + n.clientHeight < n.scrollHeight - 1 : n.scrollTop > 0) return true;
+    }
+    return false;
+  }
 
   // ---- Layout: where each view starts and how far it scrolls inside ----
   const vh = () => (window.visualViewport ? visualViewport.height : innerHeight);
@@ -262,6 +273,7 @@
   addEventListener("wheel", (e) => {
     if (e.ctrlKey || paused() || inChat(e.target)) return; // pinch zoom, open menu or case study, the chat
     if (rail && rail.contains(e.target) && (Math.abs(e.deltaX) > Math.abs(e.deltaY) || e.shiftKey)) return; // sideways through the cards
+    if (innerScrolls(e.target, e.deltaY)) return;
     e.preventDefault();
     const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? vh() : 1;
     input(e.deltaY * unit);
@@ -270,9 +282,9 @@
   // ---- Touch ----
   // The last touch point, the locked axis, and vertical velocity in px per ms
   let tY = 0, tX = 0, axis = null, vel = 0, tLast = 0;
-  let chatTouch = false;
+  let chatTouch = false, touchAt = null;
   addEventListener("touchstart", (e) => {
-    chatTouch = inChat(e.target);
+    chatTouch = inChat(e.target); touchAt = e.target;
     if (e.touches.length !== 1) return;
     tY = e.touches[0].clientY; tX = e.touches[0].clientX; axis = null; vel = 0; tLast = performance.now();
   }, { passive: true });
@@ -287,6 +299,7 @@
       axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
     }
     if (axis === "x") return; // sideways, e.g. the work cards
+    if (innerScrolls(touchAt, dy)) { tY = cy; tX = cx; return; } // the box scrolls itself
     e.preventDefault();
     const now = performance.now();
     vel = dy / Math.max(1, now - tLast);
@@ -343,6 +356,8 @@
     if (!menu.hidden) document.getElementById("menuBtn").click();
     history.replaceState(null, "", a.dataset.view ? "/" : a.getAttribute("href"));
     goTo(i, { link: true });
+    // Keyboard focus follows the view, so the next Tab continues inside it (AS-02); the logo keeps its own
+    if (!a.dataset.view) window.n1focus?.(id);
   });
 
   // ---- Keep in step with scrolls the page didn't start (focus, find in page) ----

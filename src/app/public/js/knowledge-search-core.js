@@ -19,7 +19,8 @@ const STOP = new Set(["a", "an", "the", "and", "or", "of", "to", "for", "in", "o
 
 // Where a match counts most: the title, then a heading, then the summary, then the body
 export const WEIGHTS = { title: 10, heading: 6, summary: 4, body: 1 }
-export const MAX_RESULTS = 25
+// Above the catalog's size, so every document a search counts is also listed (AS-10)
+export const MAX_RESULTS = 200
 
 // Lowercase, drop apostrophes, and turn every other run of punctuation into one space
 export function normalize(text) {

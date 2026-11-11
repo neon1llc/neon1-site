@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.48.1" />
+  <meta name="version" content="0.49.0" />
   <title>Business associate agreement request, filled in · neon1 knowledge center</title>
   <meta name="description" content="The BAA questionnaire completed for a fictional physical therapy practice, showing how the decision gets made." />
   <meta name="theme-color" content="#F2F4F2" />
@@ -99,14 +99,14 @@
 <p><strong>Contact and title:</strong> Dana Reyes, owner <strong>Date:</strong> March 10</p>
 <p><strong>Privacy or compliance officer:</strong> Dana Reyes</p>
 <h2 id="part-1-are-you-a-covered-entity">Part 1: Are you a covered entity?</h2>
-<ul><li class="task"><label><input type="checkbox" checked> Health care provider that bills electronically (practice, clinic, therapist, pharmacy, lab)</label></li><li class="task"><label><input type="checkbox"> Health plan</label></li><li class="task"><label><input type="checkbox"> Health care clearinghouse</label></li><li class="task"><label><input type="checkbox"> A business associate of one of the above, looking for a subcontractor</label></li><li class="task"><label><input type="checkbox"> None of these (a business associate agreement probably isn't needed)</label></li><li class="task"><label><input type="checkbox"> Not sure</label></li></ul>
+<ul><li class="task"><label><input type="checkbox" checked disabled> Health care provider that bills electronically (practice, clinic, therapist, pharmacy, lab)</label></li><li class="task"><label><input type="checkbox" disabled> Health plan</label></li><li class="task"><label><input type="checkbox" disabled> Health care clearinghouse</label></li><li class="task"><label><input type="checkbox" disabled> A business associate of one of the above, looking for a subcontractor</label></li><li class="task"><label><input type="checkbox" disabled> None of these (a business associate agreement probably isn't needed)</label></li><li class="task"><label><input type="checkbox" disabled> Not sure</label></li></ul>
 <h2 id="part-2-the-project-and-the-data">Part 2: The project and the data</h2>
 <p><strong>What the project is about:</strong> Route new patient requests from the website form and the shared inbox into one queue, then into the practice management system, without retyping.</p>
 <p><strong>Systems neon1 would work in:</strong> The website form, the practice's business email, and the practice management system's intake import.</p>
 <p><strong>Would neon1 see, store, or move any of these?</strong></p>
-<ul><li class="task"><label><input type="checkbox" checked> Patient names with appointment, treatment, or billing details</label></li><li class="task"><label><input type="checkbox"> Medical records, notes, or images</label></li><li class="task"><label><input type="checkbox" checked> Insurance or claims information</label></li><li class="task"><label><input type="checkbox" checked> Intake forms or messages from patients</label></li><li class="task"><label><input type="checkbox"> Backups or exports that contain any of the above</label></li><li class="task"><label><input type="checkbox"> None of these</label></li></ul>
+<ul><li class="task"><label><input type="checkbox" checked disabled> Patient names with appointment, treatment, or billing details</label></li><li class="task"><label><input type="checkbox" disabled> Medical records, notes, or images</label></li><li class="task"><label><input type="checkbox" checked disabled> Insurance or claims information</label></li><li class="task"><label><input type="checkbox" checked disabled> Intake forms or messages from patients</label></li><li class="task"><label><input type="checkbox" disabled> Backups or exports that contain any of the above</label></li><li class="task"><label><input type="checkbox" disabled> None of these</label></li></ul>
 <p><strong>Could the work be done with synthetic or de-identified data instead?</strong></p>
-<ul><li class="task"><label><input type="checkbox"> Yes, entirely</label></li><li class="task"><label><input type="checkbox" checked> Partly: building and testing use made-up patients. Go-live checks need to see a few real requests.</label></li><li class="task"><label><input type="checkbox"> No, because</label></li></ul>
+<ul><li class="task"><label><input type="checkbox" disabled> Yes, entirely</label></li><li class="task"><label><input type="checkbox" checked disabled> Partly: building and testing use made-up patients. Go-live checks need to see a few real requests.</label></li><li class="task"><label><input type="checkbox" disabled> No, because</label></li></ul>
 <p><strong>Smallest amount of health information the work needs:</strong> Name, contact details, referring provider, insurance carrier, and reason for visit, during go-live checks only.</p>
 <h2 id="part-3-systems-and-vendors">Part 3: Systems and vendors</h2>
 <table><thead><tr><th>System or vendor</th><th>What it holds</th><th>Has its own BAA with you?</th></tr></thead><tbody><tr><td>Business email provider</td><td>Intake emails</td><td>☒ Yes ☐ No ☐ Unsure</td></tr><tr><td>Practice management system</td><td>Patient records and scheduling</td><td>☒ Yes ☐ No ☐ Unsure</td></tr><tr><td>Website form service</td><td>Form submissions</td><td>☐ Yes ☐ No ☒ Unsure</td></tr></tbody></table>
@@ -117,9 +117,9 @@
 <p><strong>Subcontractors you'd approve:</strong> None</p>
 <p><strong>State laws or contract terms that add requirements:</strong> New York's SHIELD Act, which counsel will confirm.</p>
 <p><strong>Your template, or neon1's example as a starting point:</strong></p>
-<ul><li class="task"><label><input type="checkbox"> We'll send ours</label></li><li class="task"><label><input type="checkbox" checked> Start from neon1's example</label></li></ul>
+<ul><li class="task"><label><input type="checkbox" disabled> We'll send ours</label></li><li class="task"><label><input type="checkbox" checked disabled> Start from neon1's example</label></li></ul>
 <h2 id="part-5-result">Part 5: Result</h2>
-<ul><li class="task"><label><input type="checkbox"> No PHI involved. No business associate agreement needed. Safeguards noted in the proposal.</label></li><li class="task"><label><input type="checkbox" checked> PHI involved. Agreement to be signed before any access.</label></li><li class="task"><label><input type="checkbox"> PHI can be avoided by redesigning the work:</label></li></ul>
+<ul><li class="task"><label><input type="checkbox" disabled> No PHI involved. No business associate agreement needed. Safeguards noted in the proposal.</label></li><li class="task"><label><input type="checkbox" checked disabled> PHI involved. Agreement to be signed before any access.</label></li><li class="task"><label><input type="checkbox" disabled> PHI can be avoided by redesigning the work:</label></li></ul>
 <p><strong>Also found:</strong> the website form service may not offer a BAA. The proposal includes moving the form to a service that does, or to the practice management system's own patient form.</p>
 <p><strong>Reviewed by (client):</strong> Dana Reyes <strong>Date:</strong> March 10</p>
 <p><strong>Reviewed by (neon1):</strong> Pradeep Tathineni <strong>Date:</strong> March 10</p>
@@ -168,7 +168,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.48.1</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.49.0</a>
       </span>
     </div>
   </footer>
