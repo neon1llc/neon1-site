@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.49.5
+
+### Changed
+- The Knowledge Center's About page uses the same 15-years sentence as the home page (neon1-corpus v0.24.6).
+
 ## v0.49.4
 
 ### Changed
