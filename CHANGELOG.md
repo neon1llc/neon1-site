@@ -2,6 +2,14 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.53.0
+
+### Added
+- Knowledge Center: "On this page" marks the section you're reading as you scroll. On phones and narrower screens, the folded index docks under the top bar once you scroll past it, easing out to the full width and naming the current section, and eases back into place when you scroll above it.
+
+### Changed
+- Knowledge Center documents describe neon1's practice and scope plainly, without underselling it (neon1-corpus v0.27.1).
+
 ## v0.52.0
 
 ### Added
