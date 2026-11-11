@@ -45,8 +45,9 @@ function glance(d) {
   const facts = [
     ["Type", TYPE_LABELS[d.type] ?? d.type],
     d.data.edition ? ["Edition", d.data.edition] : null,
-    d.data.created && d.data.created !== d.data.updated ? ["First written", longDate(d.data.created)] : null,
-    ["Updated", longDate(d.data.updated)],
+    // Published is when the content first appeared; Updated shows only once it has changed since
+    d.data.created ? ["Published", longDate(d.data.created)] : null,
+    !d.data.created || d.data.created !== d.data.updated ? ["Updated", longDate(d.data.updated)] : null,
     d.data.reviewed ? ["Facts checked", longDate(d.data.reviewed)] : null,
     d.data.audience ? ["For", d.data.audience] : null,
   ].filter(Boolean)
