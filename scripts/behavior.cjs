@@ -629,6 +629,9 @@ check("browser", "AS-03: the wheel over a long contact message scrolls the box, 
   try {
     await page.waitForTimeout(1200);
     await page.locator("#cfold > summary").click();
+    // The fold eases open while its view glides to the top; the check starts once both have settled
+    await page.waitForFunction(() => document.getElementById("cfold").open && !document.getElementById("cfold").style.height);
+    await page.waitForTimeout(100);
     const box = page.locator("[name=today]");
     await box.fill(Array.from({ length: 40 }, (_, i) => `synthetic line ${i}`).join("\n"));
     await box.evaluate((t) => (t.scrollTop = 0));
