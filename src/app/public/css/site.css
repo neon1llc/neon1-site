@@ -346,6 +346,8 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 @media (max-width: 700px) { .repos .row { grid-template-columns: 1fr; gap: 4px; } }
 .cfold[open] > .cform, .cfold[open] > .cdone { margin-top: 18px; }
 .cform, .cdone { display: grid; gap: 14px; }
+/* A field's own error, under it, in the same dark red as the summary */
+.cerr { display: block; margin-top: 4px; font-size: 13px; color: #a12b1f; }
 .cform[hidden], .cdone[hidden] { display: none; }
 .cform label { display: grid; gap: 6px; font: 500 14px var(--sans); color: var(--ink); }
 .cform .opt { font: 400 12px var(--mono); color: var(--muted); }
