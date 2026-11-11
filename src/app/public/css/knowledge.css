@@ -177,3 +177,17 @@ body.kc { background: var(--paper); }
 .kc-none li a { display: inline-block; padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; color: var(--brand); text-decoration: none; }
 .kc-none a { color: var(--brand); }
 .kc-found[hidden], .kc-none[hidden], #kc-browse[hidden] { display: none; }
+
+/* --- Diagrams (drawn by neon1-corpus tools/diagrams.mjs): a white card that scrolls sideways on narrow
+   screens rather than shrinking labels past reading, with the Mermaid source folded beneath --- */
+.diagram { margin: 24px 0; }
+.diagram-scroll { overflow-x: auto; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+.diagram-scroll img { display: block; max-width: none; height: auto; margin: 0 auto; }
+/* Wide screens fit the drawing to the column; narrower ones keep it readable (up to 820px wide) and scroll */
+@media (min-width: 900px) { .diagram-scroll img { max-width: 100%; } }
+@media (max-width: 899px) { .diagram-scroll img { max-width: 820px; } }
+.diagram details { margin-top: 8px; }
+.diagram summary { cursor: pointer; font: 13px var(--mono); color: var(--brand); min-height: 32px; display: inline-flex; align-items: center; }
+.diagram pre { overflow-x: auto; padding: 12px; border-radius: 8px; background: #f4f6f5; font: 12px/1.5 var(--mono); }
+.diagram-open { margin: 8px 0 0; font: 13px var(--mono); }
+.diagram-open a { color: var(--brand); }
