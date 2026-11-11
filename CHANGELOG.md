@@ -2,6 +2,17 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.49.2
+
+### Changed
+- DeployOps and Ready, Secure, Go are public: their rows link to GitHub with their versions (v0.14.0 and v0.1.0), AWS CLIP shows v0.1.0, and 1NEON shows v0.2.2. The Knowledge Center uses neon1-corpus v0.24.5.
+- Moving between sections takes a firmer push (about a third more), on desktop and phones.
+
+### Fixed
+- Opening or closing a fold in a section, such as business and tools in neon1 p.r.o.s.e, no longer jumps the page; folds open downward in place.
+- A link to a section opened in a new visit lands on the section's top, like the menu, instead of 136px down (72px with reduced motion, as before, now from one offset instead of two).
+- Tab and Shift+Tab show each section as focus enters it and ease the page to the focused control, instead of focusing controls that were still invisible.
+
 ## v0.49.1
 
 ### Changed
