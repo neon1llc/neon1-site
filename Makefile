@@ -31,7 +31,7 @@ GITLEAKS_IMAGE := ghcr.io/gitleaks/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79
 LONG_CACHE  := public, max-age=31536000, immutable
 SHORT_CACHE := no-cache
 DOTFILES    := --exclude ".*" --exclude "*/.*"
-# .well-known is the one dot folder the site publishes (security.txt)
+# .well-known is the one dot folder the site publishes (security.txt, mta-sts.txt)
 WELL_KNOWN  := --include ".well-known/*"
 
 # Plain make shows the help
