@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.56.1
+
+### Fixed
+- Knowledge Center: architecture diagrams opened on their own now show their colours and labels in every browser, including DuckDuckGo and Safari on phones, and they're narrower and simpler to read on a small screen (neon1-corpus v0.28.1).
+
 ## v0.56.0
 
 ### Added
