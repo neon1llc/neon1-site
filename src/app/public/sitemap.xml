@@ -4,10 +4,10 @@
   <url><loc>https://neon1.tech/</loc></url>
   <!-- /1NEON/example is left out until it is pre-rendered with its own content; the canonical 1NEON help is /knowledge/faq/1neon-help/, listed below -->
   <!-- knowledge -->
-  <url><loc>https://neon1.tech/knowledge/</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/</loc><lastmod>2026-11-11</lastmod></url>
   <url><loc>https://neon1.tech/knowledge/company/about/</loc><lastmod>2026-11-09</lastmod></url>
   <url><loc>https://neon1.tech/knowledge/company/charter/</loc><lastmod>2026-11-09</lastmod></url>
-  <url><loc>https://neon1.tech/knowledge/company/contact/</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/company/contact/</loc><lastmod>2026-11-11</lastmod></url>
   <url><loc>https://neon1.tech/knowledge/company/glossary/</loc><lastmod>2026-11-10</lastmod></url>
   <url><loc>https://neon1.tech/knowledge/company/names/</loc><lastmod>2026-11-09</lastmod></url>
   <url><loc>https://neon1.tech/knowledge/company/process/</loc><lastmod>2026-11-09</lastmod></url>
@@ -39,7 +39,7 @@
   <url><loc>https://neon1.tech/knowledge/guides/use-case-security-awareness/</loc><lastmod>2026-11-10</lastmod></url>
   <url><loc>https://neon1.tech/knowledge/guides/use-case-workflows/</loc><lastmod>2026-11-09</lastmod></url>
   <url><loc>https://neon1.tech/knowledge/faq/1neon-help/</loc><lastmod>2026-11-10</lastmod></url>
-  <url><loc>https://neon1.tech/knowledge/faq/working-with-neon1/</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/faq/working-with-neon1/</loc><lastmod>2026-11-11</lastmod></url>
   <url><loc>https://neon1.tech/knowledge/case-studies/answers-in-seconds/</loc><lastmod>2026-11-10</lastmod></url>
   <url><loc>https://neon1.tech/knowledge/case-studies/intake-out-of-the-inbox/</loc><lastmod>2026-11-09</lastmod></url>
   <url><loc>https://neon1.tech/knowledge/case-studies/two-offices-off-local-servers/</loc><lastmod>2026-11-09</lastmod></url>

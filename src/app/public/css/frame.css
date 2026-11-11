@@ -19,6 +19,11 @@ body { margin: 0; background: var(--void); color: var(--text); font: 16px/1.65 v
 body.woke { background-color: var(--paper); }
 a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3px; }
 :focus-visible { outline: 2px solid var(--glow); outline-offset: 3px; border-radius: 6px; }
+/* Focus rings take the color that reads on the surface they sit on: brand green on the light bar and the
+ * white case panel, neon on the dark menu (and the bar while the menu is open over a light page) */
+.n1-bar.light :focus-visible, .case-panel :focus-visible { outline-color: var(--brand); }
+.menu :focus-visible, .n1-bar.light.menu-open :focus-visible { outline-color: var(--neon); }
+@media (forced-colors: active) { :focus-visible { outline-color: Highlight; } }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
 /* Skip link: hidden above the bar until it gets keyboard focus */
@@ -74,11 +79,12 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 .menu-btn { margin-left: auto; display: none; border-radius: var(--glass-r); }
 .n1-bar.light .menu-btn { color: var(--brand); background: #fff; border-color: rgba(3,87,4,.25); }
 @media (max-width: 1040px) { .links { display: none; } .menu-btn { display: inline-block; } }
-.menu { position: fixed; inset: 0; z-index: 7; display: grid; place-items: center; background: rgba(13,2,8,.94); backdrop-filter: blur(6px); }
+/* The overlay always scrolls below the bar and its close button. The list's auto margins center it when
+ * it fits and let it start at the top when it doesn't, so no height breakpoint decides (1024x600, zoom) */
+.menu { position: fixed; inset: 0; z-index: 7; display: grid; overflow-y: auto; overscroll-behavior: contain;
+  padding: calc(80px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom)); background: rgba(13,2,8,.94); backdrop-filter: blur(6px); }
 .menu[hidden] { display: none; }
-/* Short or zoomed screens: the list scrolls inside the overlay, below the bar and its close button */
-@media (max-height: 520px) { .menu { place-items: start center; overflow-y: auto; overscroll-behavior: contain; padding: 80px 16px 24px; } }
-.menu ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 18px; text-align: center; }
+.menu ul { list-style: none; margin: auto; padding: 0; display: grid; gap: 18px; text-align: center; }
 /* Menu links in the logo's neon, glowing brighter under a finger or focus */
 .menu a { font: 500 clamp(24px, 4vw, 40px) var(--mono); color: var(--neon); text-shadow: 0 0 8px rgba(108,255,168,.3); text-decoration: none; transition: color .2s, text-shadow .2s; }
 .menu a:hover, .menu a:focus-visible { color: #e9ffee; text-shadow: 0 0 14px rgba(108,255,168,.75); }

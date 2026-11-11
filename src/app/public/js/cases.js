@@ -111,6 +111,14 @@
     backstop = setTimeout(finish, 700);
   }
 
+  // A link in the story to a section of this page (contact) closes the panel at once, before the page's
+  // own link handling (js/views.js) scrolls there and focuses it: captured, so the order doesn't depend
+  // on which module registered first, and settled without the shrink or a refocus of the card (RC-C1)
+  document.addEventListener("click", (e) => {
+    if (state === "closed" || !e.target.closest('.case-panel a[href^="#"]')) return;
+    settle(false);
+  }, true);
+
   // Card buttons open their case study; the scrim and close button close it
   document.addEventListener("click", (e) => {
     const b = e.target.closest("[data-case]");

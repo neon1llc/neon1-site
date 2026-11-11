@@ -7,6 +7,8 @@ body.kc { background: var(--paper); }
 .kc-page { background: var(--paper); min-height: 100vh; }
 .kc main { padding-top: calc(64px + env(safe-area-inset-top)); }
 .kc :focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; border-radius: 4px; }
+/* The dark parts of a knowledge page (the phone menu, the band, and the dark bar) take the neon ring */
+.kc .menu :focus-visible, .kc .kc-band :focus-visible, .kc .n1-bar:not(.light) :focus-visible { outline-color: var(--neon); }
 
 /* ---- The band: dark, like the top of a neon1 PDF ---- */
 .kc-band { background: var(--void); color: #d6f5dc; border-bottom: 1px solid rgba(0, 230, 118, .25);
