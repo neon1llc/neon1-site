@@ -10,6 +10,7 @@
 
 import { readFileSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
+import { bindExtArrows } from "./knowledge-lib.mjs"
 
 
 const [mode, siteDir, exportDir] = process.argv.slice(2)
@@ -31,12 +32,12 @@ const esc = (text) => String(text).replace(/[&<>"']/g, (c) => ESC[c])
 // Links between corpus documents name their Markdown sources (../company/contact.md). On the home page the contact
 // document is the contact section itself, and every other document is its Knowledge Center page (RC-C1)
 const forPage = (html) =>
-  html
+  bindExtArrows(html
     .replace(/<a href="(?:\.\.\/)+company\/contact\.md">/g, '<a href="#contact">')
     .replace(/<a href="(?:\.\.\/)+([a-z0-9-]+)\/([a-z0-9-]+)\.md">/g, '<a href="/knowledge/$1/$2/">')
     .replace(/<a href="(https?:[^"]+)">/g, '<a class="ext" href="$1" target="_blank" rel="noopener">')
     .replace(/<\/?(thead|tbody)>/g, "")
-    .replace(/<(h[1-6]) id="[^"]*">/g, "<$1>")
+    .replace(/<(h[1-6]) id="[^"]*">/g, "<$1>"))
 
 const ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>'
 const STAGES = ["needs", "execute", "observe", "normalize"]

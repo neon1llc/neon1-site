@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.56.1" />
+  <meta name="version" content="0.57.0" />
   <title>How neon1 is built · neon1 knowledge center</title>
   <meta name="description" content="Diagrams of the website, the 1NEON portal, Neo, and how a change reaches them." />
   <meta name="theme-color" content="#F2F4F2" />
@@ -110,7 +110,7 @@
       </header>
 
       <div class="kc-text">
-<p>neon1 runs on a small set of AWS services, sized to cost a few dollars a month while it's quiet. Everything below is defined in code in public repositories on <a class="ext" href="https://github.com/neon1llc" target="_blank" rel="noopener">GitHub</a>, so each box here matches something you can read. The diagrams are drawn from Mermaid text, and each one has its source underneath it.</p>
+<p>neon1 runs on a small set of AWS services, sized to cost a few dollars a month while it's quiet. Everything below is defined in code in public repositories on <a class="ext" href="https://github.com/neon1llc" target="_blank" rel="noopener"><span class="ext-end">GitHub</span></a>, so each box here matches something you can read. The diagrams are drawn from Mermaid text, and each one has its source underneath it.</p>
 <h2 id="the-whole-picture">The whole picture</h2>
 <p>One CloudFront distribution serves neon1.tech. It sends each address to the part of the system that owns it: the website, the 1NEON portal and its API, or Neo's API. Storage stays private, and only CloudFront can read the buckets. Every visit uses HTTPS, with strict security headers.</p>
 <figure class="diagram"><div class="diagram-scroll"><img src="/knowledge/diagrams/9bcf508eb088.svg" width="616" height="463" alt="Overview diagram of AWS us-east-1. A visitor's browser looks up neon1.tech in Route 53 and reaches one CloudFront distribution, secured by an ACM certificate. CloudFront Functions route each request, reading the live site release from a key value store. CloudFront sends each address to its owner: the website's private S3 bucket, the 1NEON portal, or Neo, the chat." loading="lazy" decoding="async"></div><p class="diagram-open"><a href="/knowledge/diagrams/9bcf508eb088.svg">Open full size</a></p><details><summary>Diagram source (Mermaid)</summary><pre><code class="language-mermaid">%% alt: Overview diagram of AWS us-east-1. A visitor's browser looks up neon1.tech in Route 53 and reaches one CloudFront distribution, secured by an ACM certificate. CloudFront Functions route each request, reading the live site release from a key value store. CloudFront sends each address to its owner: the website's private S3 bucket, the 1NEON portal, or Neo, the chat.
@@ -293,11 +293,11 @@ stateDiagram-v2
   Normalize --&gt; Needs: a new need
   Normalize --&gt; [*]</code></pre></details></figure>
 <h2 id="where-to-read-more">Where to read more</h2>
-<ul><li><a class="ext" href="https://github.com/neon1llc/neon1-aws-infrastructure" target="_blank" rel="noopener">neon1-aws-infrastructure</a>: the DNS, the CloudFront distribution, its routers and release store, and the deploy permissions.</li><li><a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">neon1-site</a>: the website and the Knowledge Center.</li><li><a class="ext" href="https://github.com/neon1llc/neon1-1NEON" target="_blank" rel="noopener">neon1-1NEON</a>: the portal, its API, and its infrastructure.</li><li><a class="ext" href="https://github.com/neon1llc/neon1-chat" target="_blank" rel="noopener">neon1-chat</a>: Neo.</li><li><a class="ext" href="https://github.com/neon1llc/neon1-corpus" target="_blank" rel="noopener">neon1-corpus</a>: every document, and these diagrams.</li></ul>
+<ul><li><a class="ext" href="https://github.com/neon1llc/neon1-aws-infrastructure" target="_blank" rel="noopener">neon1-aws-infrastruc<span class="ext-end">ture</span></a>: the DNS, the CloudFront distribution, its routers and release store, and the deploy permissions.</li><li><a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener"><span class="ext-end">neon1-site</span></a>: the website and the Knowledge Center.</li><li><a class="ext" href="https://github.com/neon1llc/neon1-1NEON" target="_blank" rel="noopener"><span class="ext-end">neon1-1NEON</span></a>: the portal, its API, and its infrastructure.</li><li><a class="ext" href="https://github.com/neon1llc/neon1-chat" target="_blank" rel="noopener"><span class="ext-end">neon1-chat</span></a>: Neo.</li><li><a class="ext" href="https://github.com/neon1llc/neon1-corpus" target="_blank" rel="noopener"><span class="ext-end">neon1-corpus</span></a>: every document, and these diagrams.</li></ul>
       </div>
 
 
-      <p class="kc-colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit. <a class="ext" href="https://github.com/neon1llc/neon1-corpus/blob/main/corpus/company/architecture.md" target="_blank" rel="noopener">Source on GitHub</a>. </p>
+      <p class="kc-colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit. <a class="ext" href="https://github.com/neon1llc/neon1-corpus/blob/main/corpus/company/architecture.md" target="_blank" rel="noopener">Source on <span class="ext-end">GitHub</span></a>. </p>
     </article>
     <nav class="kc-toc kc-toc-side" aria-label="On this page">
       <p class="kc-toc-title">On this page</p>
@@ -347,7 +347,7 @@ stateDiagram-v2
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.56.1</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener"><span class="ext-end">v0.57.0</span></a>
       </span>
     </div>
   </footer>

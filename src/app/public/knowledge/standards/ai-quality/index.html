@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.56.1" />
+  <meta name="version" content="0.57.0" />
   <title>AI quality and oversight · neon1 knowledge center</title>
   <meta name="description" content="When neon1 uses AI, how it&#x27;s tested before anyone relies on it, and where a person stays in charge." />
   <meta name="theme-color" content="#F2F4F2" />
@@ -117,7 +117,7 @@
 <p>I use AI when it makes a defined task better after counting the errors, the review time, privacy, cost, and upkeep. A smooth demo is useful for exploring. It doesn't show that something is dependable. So I start with AI that a person can check and correct, and earn more autonomy with evidence.</p>
 <h2 id="whether-ai-belongs-in-the-solution">Whether AI belongs in the solution</h2>
 <p>I compare the current process, a simple rule or search, an existing product, and a narrow AI approach. Ordinary software wins when the rules are clear and mistakes are costly. AI tends to help with drafting, sorting messy text, summarizing documents you're allowed to share, and finding the right passage. You still need to know when to double-check.</p>
-<p>I use the <a class="ext" href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener">NIST AI Risk Management Framework</a> and its <a class="ext" href="https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf" target="_blank" rel="noopener">generative AI profile</a> as prompts for who's responsible, what the task is, how it's tested, and what risk is left. They don't certify anything.</p>
+<p>I use the <a class="ext" href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener">NIST AI Risk Management <span class="ext-end">Framework</span></a> and its <a class="ext" href="https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf" target="_blank" rel="noopener">generative AI <span class="ext-end">profile</span></a> as prompts for who's responsible, what the task is, how it's tested, and what risk is left. They don't certify anything.</p>
 <h2 id="one-page-on-intended-use">One page on intended use</h2>
 <p>Before choosing a model we write down the user, the task, the approved data, the output, the actions it may take, the decisions it may not make, who reviews, and the fallback. We also decide whether the output is a draft, a search aid, a recommendation, or an action, since each needs different checks.</p>
 <p>A document-search assistant can find an invoice or a policy passage. That doesn't make it fit to give accounting or legal conclusions, and the interface should make that plain. We also set a spending limit, a response time, and how much review effort is acceptable.</p>
@@ -128,7 +128,7 @@
 <p>Correctness, evidence, access boundaries, refusals, actions, speed, cost, and human effort are checked separately, and the same cases run against the old way. For search-based assistants I look at what was retrieved and what was claimed, because a plausible citation isn't proof. For data extraction I check fields, units, dates, amounts, and IDs against rules. For classification I look at results per category, since an overall score can hide failure on the rare ones that matter.</p>
 <p>Evaluation tools that use another model as the judge get checked against a small set graded by a person.</p>
 <h2 id="permissions-live-outside-the-model">Permissions live outside the model</h2>
-<p>Access is enforced by the application and the search layer, never by a prompt asking the model to behave. Retrieved documents, emails, web pages, and tool output are treated as untrusted input, since <a class="ext" href="https://genai.owasp.org/llmrisk/llm01-prompt-injection/" target="_blank" rel="noopener">prompt injection</a> is a real risk even with retrieval.</p>
+<p>Access is enforced by the application and the search layer, never by a prompt asking the model to behave. Retrieved documents, emails, web pages, and tool output are treated as untrusted input, since <a class="ext" href="https://genai.owasp.org/llmrisk/llm01-prompt-injection/" target="_blank" rel="noopener">prompt <span class="ext-end">injection</span></a> is a real risk even with retrieval.</p>
 <p>Tools start read-only. Sending messages, spending money, changing permissions, or deleting anything needs a person to review the actual recipient, content, or change first. An approve button doesn't protect much if you can't see what it approves. Run time, retries, output size, and spend all have limits.</p>
 <h2 id="releasing-in-stages">Releasing in stages</h2>
 <ol><li><strong>Offline.</strong> Tested on permitted examples, away from live data.</li><li><strong>Shadow.</strong> Runs alongside the normal process without changing anything, so we can compare.</li><li><strong>Assisted pilot.</strong> Named people use the output on a limited task, with a fallback and a way to report problems.</li><li><strong>Controlled use.</strong> Expanded only when you accept the evidence, the remaining risks, and the running cost.</li></ol>
@@ -139,9 +139,9 @@
 <p>We track task success, corrections, review minutes, cost per successful task, and speed, and look for groups the change might be failing. Any change to the model, prompt, documents, or tool permissions means rerunning the test set. A provider's benchmark doesn't tell us how it does on your documents.</p>
 <h2 id="what-i-ll-say-publicly">What I'll say publicly</h2>
 <p>Only scoped statements with their conditions: "In a twenty-case test using made-up records, it completed eighteen without correction," if that's what happened. Never "reliable AI for every business."</p>
-<p>Neo, the chat on this site, answers only from neon1's public documents, is run against a set of test questions before each change, and has its directives published in <a class="ext" href="https://github.com/neon1llc/neon1-corpus/blob/main/corpus/neo/chat.md" target="_blank" rel="noopener">the corpus</a>.</p>
+<p>Neo, the chat on this site, answers only from neon1's public documents, is run against a set of test questions before each change, and has its directives published in <a class="ext" href="https://github.com/neon1llc/neon1-corpus/blob/main/corpus/neo/chat.md" target="_blank" rel="noopener">the <span class="ext-end">corpus</span></a>.</p>
 <h2 id="sources">Sources</h2>
-<ul><li><a class="ext" href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener">AI Risk Management Framework</a>, NIST: mapping, measuring, and managing the risks of an AI system.</li><li><a class="ext" href="https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf" target="_blank" rel="noopener">Generative AI profile, NIST AI 600-1</a>, NIST: risks particular to language models, with suggested actions.</li><li><a class="ext" href="https://genai.owasp.org/llm-top-10/" target="_blank" rel="noopener">Top 10 for LLM applications</a>, OWASP: the common ways AI features are misused, starting with prompt injection.</li></ul>
+<ul><li><a class="ext" href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener">AI Risk Management <span class="ext-end">Framework</span></a>, NIST: mapping, measuring, and managing the risks of an AI system.</li><li><a class="ext" href="https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf" target="_blank" rel="noopener">Generative AI profile, NIST AI <span class="ext-end">600-1</span></a>, NIST: risks particular to language models, with suggested actions.</li><li><a class="ext" href="https://genai.owasp.org/llm-top-10/" target="_blank" rel="noopener">Top 10 for LLM <span class="ext-end">applications</span></a>, OWASP: the common ways AI features are misused, starting with prompt injection.</li></ul>
       </div>
 
       <aside class="kc-next" aria-labelledby="kc-next-h">
@@ -153,7 +153,7 @@
         </ul>
       </aside>
 
-      <p class="kc-colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit. <a class="ext" href="https://github.com/neon1llc/neon1-corpus/blob/main/corpus/standards/ai-quality.md" target="_blank" rel="noopener">Source on GitHub</a>. </p>
+      <p class="kc-colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit. <a class="ext" href="https://github.com/neon1llc/neon1-corpus/blob/main/corpus/standards/ai-quality.md" target="_blank" rel="noopener">Source on <span class="ext-end">GitHub</span></a>. </p>
     </article>
     <nav class="kc-toc kc-toc-side" aria-label="On this page">
       <p class="kc-toc-title">On this page</p>
@@ -205,7 +205,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.56.1</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener"><span class="ext-end">v0.57.0</span></a>
       </span>
     </div>
   </footer>

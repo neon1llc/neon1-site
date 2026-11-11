@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.56.1" />
+  <meta name="version" content="0.57.0" />
   <title>Reliability and recovery · neon1 knowledge center</title>
   <meta name="description" content="How neon1 sets service targets, plans for failure, and tests that backups restore." />
   <meta name="theme-color" content="#F2F4F2" />
@@ -120,7 +120,7 @@
 <p>Dependencies such as sign-in, email delivery, payments, and your own internet connection are listed, with which failures the design survives.</p>
 <h2 id="the-vocabulary">The vocabulary</h2>
 <table><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td><strong>SLI</strong> (service level indicator)</td><td>What we observe, such as the share of valid requests stored and acknowledged within a set time</td></tr><tr><td><strong>SLO</strong> (service level objective)</td><td>The target value for that indicator over a stated window</td></tr><tr><td><strong>SLA</strong> (service level agreement)</td><td>A contractual promise with consequences. An internal target isn't automatically one</td></tr><tr><td><strong>Response time</strong></td><td>Time to a real person's first useful reply, separate from time to fix</td></tr><tr><td><strong>RTO</strong> (recovery time objective)</td><td>The intended longest time to restore the service after a defined disruption</td></tr><tr><td><strong>RPO</strong> (recovery point objective)</td><td>How much recent data you can afford to lose, measured in time</td></tr></tbody></table>
-<p>Definitions follow <a class="ext" href="https://sre.google/sre-book/service-level-objectives/" target="_blank" rel="noopener">Google's SRE guidance</a> and <a class="ext" href="https://csrc.nist.gov/pubs/sp/800/34/r1/upd1/final" target="_blank" rel="noopener">NIST SP 800-34</a>.</p>
+<p>Definitions follow <a class="ext" href="https://sre.google/sre-book/service-level-objectives/" target="_blank" rel="noopener">Google's SRE <span class="ext-end">guidance</span></a> and <a class="ext" href="https://csrc.nist.gov/pubs/sp/800/34/r1/upd1/final" target="_blank" rel="noopener">NIST SP <span class="ext-end">800-34</span></a>.</p>
 <h2 id="what-a-percentage-costs">What a percentage costs</h2>
 <table><thead><tr><th>Availability target</th><th>Allowed downtime in 30 days</th></tr></thead><tbody><tr><td>99%</td><td>7 hours 12 minutes</td></tr><tr><td>99.5%</td><td>3 hours 36 minutes</td></tr><tr><td>99.9%</td><td>43 minutes</td></tr><tr><td>99.99%</td><td>4 minutes</td></tr></tbody></table>
 <p>Each extra nine needs faster detection, faster response, and usually more money. A person who's unavailable until the weekend can't meet 99.9% for anything that needs a human to fix it. So I don't sell targets that the coverage can't back up.</p>
@@ -129,7 +129,7 @@
 <h2 id="recoverable-data-is-more-than-a-schedule">Recoverable data is more than a schedule</h2>
 <p>An hourly backup doesn't guarantee an hour of data loss at most. Jobs fail, copies come out incomplete, credentials get lost, and corruption is found late. Recovery also needs uploaded files, configuration, and the keys to decrypt it all.</p>
 <aside class="callout example"><p class="callout-title">Counting data loss</p><p>Trouble starts at 10:15. The last backup finished at 9:00, but the data in it only goes up to 8:30. You've lost an hour and forty-five minutes of work, not an hour and fifteen.</p></aside>
-<p>Replication copies deletions and corruption too, and file sync spreads unwanted changes. I keep an independent copy that matches the threat, following the 3-2-1 idea (several copies, different places, one off site) plus an offline or locked copy and regular test restores, as <a class="ext" href="https://www.cisa.gov/stopransomware/ransomware-guide" target="_blank" rel="noopener">CISA recommends</a>.</p>
+<p>Replication copies deletions and corruption too, and file sync spreads unwanted changes. I keep an independent copy that matches the threat, following the 3-2-1 idea (several copies, different places, one off site) plus an offline or locked copy and regular test restores, as <a class="ext" href="https://www.cisa.gov/stopransomware/ransomware-guide" target="_blank" rel="noopener">CISA <span class="ext-end">recommends</span></a>.</p>
 <h2 id="matching-recovery-to-the-stakes">Matching recovery to the stakes</h2>
 <table><thead><tr><th>Situation</th><th>The question</th><th>How neon1 fits</th></tr></thead><tbody><tr><td>A brochure site with nothing unique stored</td><td>Can versioned source and a documented deploy rebuild it?</td><td>A good fit</td></tr><tr><td>Ordinary intake with a workable manual fallback</td><td>Can you keep taking requests and catch up afterward?</td><td>A fit when ownership, backup, and support terms are explicit</td></tr><tr><td>Essential daily data</td><td>How much loss and downtime before real harm?</td><td>Needs proven recovery and coverage beyond appointment-based help</td></tr><tr><td>Continuous payments or critical operations</td><td>Who responds right away?</td><td>I refer you to a provider with the right operations team</td></tr></tbody></table>
 <h2 id="a-real-restore-test">A real restore test</h2>
@@ -141,7 +141,7 @@
 <h2 id="what-ongoing-care-covers">What ongoing care covers</h2>
 <p>Ongoing care with neon1 is scheduled attention to a named workflow within an agreed allowance. It isn't a help desk, round-the-clock security monitoring, an unlimited repair fund, or insurance against vendor outages. If the work regularly outgrows the allowance, we change the scope or the price.</p>
 <h2 id="sources">Sources</h2>
-<ul><li><a class="ext" href="https://sre.google/sre-book/service-level-objectives/" target="_blank" rel="noopener">Service level objectives</a>, Google: targets, error budgets, and what a percentage really allows.</li><li><a class="ext" href="https://sre.google/sre-book/postmortem-culture/" target="_blank" rel="noopener">Postmortem culture</a>, Google: reviews that look for causes, not someone to blame.</li><li><a class="ext" href="https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html" target="_blank" rel="noopener">Reliability pillar</a>, Amazon Web Services: designing cloud systems to recover from failure.</li><li><a class="ext" href="https://csrc.nist.gov/pubs/sp/800/34/r1/upd1/final" target="_blank" rel="noopener">Contingency planning guide, SP 800-34</a>, NIST: recovery objectives and plans that get tested.</li><li><a class="ext" href="https://www.cisa.gov/stopransomware/ransomware-guide" target="_blank" rel="noopener">Ransomware guide</a>, US Cybersecurity and Infrastructure Security Agency: offline backups, and what to do first.</li></ul>
+<ul><li><a class="ext" href="https://sre.google/sre-book/service-level-objectives/" target="_blank" rel="noopener">Service level <span class="ext-end">objectives</span></a>, Google: targets, error budgets, and what a percentage really allows.</li><li><a class="ext" href="https://sre.google/sre-book/postmortem-culture/" target="_blank" rel="noopener">Postmortem <span class="ext-end">culture</span></a>, Google: reviews that look for causes, not someone to blame.</li><li><a class="ext" href="https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html" target="_blank" rel="noopener">Reliability <span class="ext-end">pillar</span></a>, Amazon Web Services: designing cloud systems to recover from failure.</li><li><a class="ext" href="https://csrc.nist.gov/pubs/sp/800/34/r1/upd1/final" target="_blank" rel="noopener">Contingency planning guide, SP <span class="ext-end">800-34</span></a>, NIST: recovery objectives and plans that get tested.</li><li><a class="ext" href="https://www.cisa.gov/stopransomware/ransomware-guide" target="_blank" rel="noopener">Ransomware <span class="ext-end">guide</span></a>, US Cybersecurity and Infrastructure Security Agency: offline backups, and what to do first.</li></ul>
       </div>
 
       <aside class="kc-next" aria-labelledby="kc-next-h">
@@ -153,7 +153,7 @@
         </ul>
       </aside>
 
-      <p class="kc-colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit. <a class="ext" href="https://github.com/neon1llc/neon1-corpus/blob/main/corpus/standards/reliability-and-recovery.md" target="_blank" rel="noopener">Source on GitHub</a>. </p>
+      <p class="kc-colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit. <a class="ext" href="https://github.com/neon1llc/neon1-corpus/blob/main/corpus/standards/reliability-and-recovery.md" target="_blank" rel="noopener">Source on <span class="ext-end">GitHub</span></a>. </p>
     </article>
     <nav class="kc-toc kc-toc-side" aria-label="On this page">
       <p class="kc-toc-title">On this page</p>
@@ -205,7 +205,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.56.1</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener"><span class="ext-end">v0.57.0</span></a>
       </span>
     </div>
   </footer>

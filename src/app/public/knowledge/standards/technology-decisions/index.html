@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.56.1" />
+  <meta name="version" content="0.57.0" />
   <title>Technology decisions · neon1 knowledge center</title>
   <meta name="description" content="How neon1 chooses tools and architecture, counts the full cost, and checks licenses." />
   <meta name="theme-color" content="#F2F4F2" />
@@ -122,9 +122,9 @@
 <h2 id="count-the-whole-cost">Count the whole cost</h2>
 <p>First-year cost includes setup, subscriptions, computing, storage, data transfer, backups, monitoring, AI usage, payment fees, migration, training, upkeep, and the cost of leaving later.</p>
 <aside class="callout example"><p class="callout-title">Why the license price isn't the price</p><p>A free tool on a $12 a month server that needs an hour of someone's time each month, valued here at $75, costs at least $1,044 a year before setup, backups, or incidents. A $25 a month managed service costs $300 a year in fees before its own admin time and limits. Neither is automatically better, and the license price is only part of the cost.</p></aside>
-<p>I follow the <a class="ext" href="https://www.finops.org/framework/" target="_blank" rel="noopener">FinOps</a> idea at a small scale: a budget, an owner, a regular look at the bill, and a cost per useful result.</p>
+<p>I follow the <a class="ext" href="https://www.finops.org/framework/" target="_blank" rel="noopener"><span class="ext-end">FinOps</span></a> idea at a small scale: a budget, an owner, a regular look at the bill, and a cost per useful result.</p>
 <h2 id="architecture-that-fits-a-small-business">Architecture that fits a small business</h2>
-<ul><li>A brochure website is usually a static site on managed hosting with versioned source and a documented redeploy.</li><li>Client workflows use a few clearly owned parts and supported integrations. A modular app or a managed workflow usually beats microservices or Kubernetes at this size.</li><li>Infrastructure as code is worth it when repeatability and recovery justify the setup.</li><li>The <a class="ext" href="https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html" target="_blank" rel="noopener">AWS Well-Architected</a> pillars (operations, security, reliability, performance, cost, sustainability) are a useful lens even when nothing runs on AWS.</li></ul>
+<ul><li>A brochure website is usually a static site on managed hosting with versioned source and a documented redeploy.</li><li>Client workflows use a few clearly owned parts and supported integrations. A modular app or a managed workflow usually beats microservices or Kubernetes at this size.</li><li>Infrastructure as code is worth it when repeatability and recovery justify the setup.</li><li>The <a class="ext" href="https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html" target="_blank" rel="noopener">AWS <span class="ext-end">Well-Architected</span></a> pillars (operations, security, reliability, performance, cost, sustainability) are a useful lens even when nothing runs on AWS.</li></ul>
 <h2 id="integrations-that-don-t-break-quietly">Integrations that don't break quietly</h2>
 <ul><li>Supported APIs over screen scraping.</li><li>API limits, paging, time zones, currencies, and ID formats written down.</li><li>Incoming data validated. Each business action gets a stable ID, so a retry doesn't send a second invoice or make a second booking.</li><li>Temporary failures retry a limited number of times with a delay. Permanent ones go somewhere a person will see them.</li><li>Partial success is kept. If a record saves but its email fails, the record stays and the failed email shows up. Reconciliation checks make missing or duplicate results visible.</li></ul>
 <h2 id="knowing-when-it-s-broken">Knowing when it's broken</h2>
@@ -135,7 +135,7 @@
 <ol><li>Confirm it's maintained, the current release, known limits, how security issues are reported, and the license for your use.</li><li>Read the install, upgrade, export, backup, and recovery docs.</li><li>Test one real task with sample or approved data somewhere isolated.</li><li>Test a failure, an access attempt that should fail, an export, and a restore.</li><li>Measure setup effort, upkeep, ongoing cost, and how easily you can use it.</li><li>Record the evidence and gaps, then adopt, keep testing, defer, or reject.</li><li>Name the owner, update policy, review date, and exit before it goes live.</li></ol>
 <p>Lots of stars or a recent commit isn't enough. A mature project can change rarely, and a busy one can be unstable.</p>
 <h2 id="sources">Sources</h2>
-<ul><li><a class="ext" href="https://www.finops.org/framework/" target="_blank" rel="noopener">FinOps Framework</a>, FinOps Foundation: understanding and managing what the cloud costs.</li><li><a class="ext" href="https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html" target="_blank" rel="noopener">The pillars of the Well-Architected Framework</a>, Amazon Web Services: the tradeoffs a cloud design has to weigh.</li><li><a class="ext" href="https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions" target="_blank" rel="noopener">Documenting architecture decisions</a>, Michael Nygard: recording why a big choice was made.</li><li><a class="ext" href="https://choosealicense.com/" target="_blank" rel="noopener">Choose a License</a>, GitHub: what common open source licenses allow.</li><li><a class="ext" href="https://spdx.org/licenses/" target="_blank" rel="noopener">SPDX license list</a>, the Linux Foundation: exact names for every common license.</li></ul>
+<ul><li><a class="ext" href="https://www.finops.org/framework/" target="_blank" rel="noopener">FinOps <span class="ext-end">Framework</span></a>, FinOps Foundation: understanding and managing what the cloud costs.</li><li><a class="ext" href="https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html" target="_blank" rel="noopener">The pillars of the Well-Architected <span class="ext-end">Framework</span></a>, Amazon Web Services: the tradeoffs a cloud design has to weigh.</li><li><a class="ext" href="https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions" target="_blank" rel="noopener">Documenting architecture <span class="ext-end">decisions</span></a>, Michael Nygard: recording why a big choice was made.</li><li><a class="ext" href="https://choosealicense.com/" target="_blank" rel="noopener">Choose a <span class="ext-end">License</span></a>, GitHub: what common open source licenses allow.</li><li><a class="ext" href="https://spdx.org/licenses/" target="_blank" rel="noopener">SPDX license <span class="ext-end">list</span></a>, the Linux Foundation: exact names for every common license.</li></ul>
       </div>
 
       <aside class="kc-next" aria-labelledby="kc-next-h">
@@ -147,7 +147,7 @@
         </ul>
       </aside>
 
-      <p class="kc-colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit. <a class="ext" href="https://github.com/neon1llc/neon1-corpus/blob/main/corpus/standards/technology-decisions.md" target="_blank" rel="noopener">Source on GitHub</a>. </p>
+      <p class="kc-colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit. <a class="ext" href="https://github.com/neon1llc/neon1-corpus/blob/main/corpus/standards/technology-decisions.md" target="_blank" rel="noopener">Source on <span class="ext-end">GitHub</span></a>. </p>
     </article>
     <nav class="kc-toc kc-toc-side" aria-label="On this page">
       <p class="kc-toc-title">On this page</p>
@@ -198,7 +198,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.56.1</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener"><span class="ext-end">v0.57.0</span></a>
       </span>
     </div>
   </footer>

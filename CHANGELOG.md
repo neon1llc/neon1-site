@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.57.0
+
+### Fixed
+- A link's northeast arrow never wraps onto the next line by itself. The arrow is drawn on the link's last word, and that word and the arrow stay together while the rest of a long link wraps as text does. This holds on the home page, in the Knowledge Center, and in Neo's replies.
+
 ## v0.56.1
 
 ### Fixed
