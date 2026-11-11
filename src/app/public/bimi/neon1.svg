@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- bimi/neon1.svg - neon1's mark for BIMI (SVG Tiny PS): square, solid background, the mark inset for a round crop. -->
+<svg xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny-ps" viewBox="0 0 64 64">
+  <title>neon1</title>
+  <rect width="64" height="64" fill="#0d0208"/>
+  <g transform="translate(13 13) scale(0.6)" fill="none" stroke="#6cffa8" stroke-width="2.4" stroke-linecap="round">
+    <path d="M6 6a24 24 0 0 1 24 24v30M6 12a18 18 0 0 1 18 18v30M6 18a12 12 0 0 1 12 12v30M6 24a6 6 0 0 1 6 6v30"/>
+    <path d="M34 6a24 24 0 0 1 24 24v30M34 12a18 18 0 0 1 18 18v30M34 18a12 12 0 0 1 12 12v30M34 24a6 6 0 0 1 6 6v30"/>
+  </g>
+</svg>
