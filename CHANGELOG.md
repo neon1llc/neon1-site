@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.49.1
+
+### Changed
+- The Knowledge Center and the site's questions use neon1-corpus v0.24.4: the privacy policy says plainly that Amazon Bedrock doesn't keep Neo's questions or use them to train models, and the 1NEON help says the guided walkthrough takes about two minutes.
+
 ## v0.49.0
 
 ### Changed
