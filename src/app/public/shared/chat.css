@@ -3,8 +3,9 @@
 
 /* ---- The launcher: a round mark, styled like "book a call", that stretches to "ask Neo" ---- */
 /* --n1chat-bottom is the clearance above any fixed bottom bar; a host page with one (1NEON's phone tab
- * bar) raises it, and the launcher and the window both sit above it */
-.n1chat-launch { position: fixed; left: 16px; bottom: var(--n1chat-bottom, 16px); z-index: 10; display: inline-flex; align-items: center;
+ * bar) raises it, and the launcher and the window both sit above it. Without one they keep 16px from the
+ * edges and clear the home indicator and notch, on the same baseline as the rain controls */
+.n1chat-launch { position: fixed; left: max(16px, env(safe-area-inset-left)); bottom: var(--n1chat-bottom, max(16px, env(safe-area-inset-bottom))); z-index: 10; display: inline-flex; align-items: center;
   height: 48px; min-width: 48px; padding: 0 12px; border-radius: 24px; cursor: pointer;
   font: 500 13px var(--mono); letter-spacing: .02em; color: var(--neon); background: transparent;
   border: 1px solid var(--neon); transition: background-color .25s, color .25s, border-color .25s, box-shadow .25s; }
@@ -14,7 +15,8 @@
   transition: max-width .35s ease, opacity .25s ease, margin-left .35s ease; }
 .n1chat-launch:hover .n1chat-label, .n1chat-launch:focus-visible .n1chat-label, .n1chat-launch.n1chat-peek .n1chat-label {
   max-width: 80px; opacity: 1; margin-left: 8px; }
-.n1chat-launch.n1chat-light { color: var(--brand); background: var(--paper); border-color: var(--brand); }
+/* On light pages the launcher floats over text of the same paper color, so a soft shadow lifts it off */
+.n1chat-launch.n1chat-light { color: var(--brand); background: var(--paper); border-color: var(--brand); box-shadow: 0 4px 14px rgba(18, 36, 26, .16); }
 .n1chat-launch.n1chat-light:hover { background: #fff; }
 .n1chat-hidden { display: none; }
 
@@ -22,7 +24,7 @@
 .n1chat { --bg: rgba(13, 2, 8, .96); --fg: #d8f5e1; --line: rgba(0, 230, 118, .45); --soft: rgba(0, 230, 118, .2);
   --bot: rgba(0, 59, 0, .45); --you: rgba(108, 255, 168, .14); --muted: #84a98c; --accent: var(--neon);
   --accent-ink: var(--void); --field: rgba(255, 255, 255, .04); --link: var(--neon);
-  position: fixed; left: 16px; bottom: var(--n1chat-bottom, 16px); z-index: 10; width: min(380px, calc(100vw - 32px));
+  position: fixed; left: max(16px, env(safe-area-inset-left)); bottom: var(--n1chat-bottom, max(16px, env(safe-area-inset-bottom))); z-index: 10; width: min(380px, calc(100vw - 32px));
   height: min(540px, calc(100dvh - 80px - var(--n1chat-bottom, 16px))); display: flex; flex-direction: column;
   background: var(--bg); color: var(--fg); border: 1px solid var(--line); border-radius: var(--glass-r);
   box-shadow: 0 12px 40px rgba(0, 0, 0, .35); font: 14px/1.55 var(--sans);
@@ -101,7 +103,7 @@
   to { clip-path: inset(0 0 0 0 round var(--glass-r)); }
 }
 /* Anchored bottom-right (1NEON, clear of its side rail): the same motion from the other corner */
-.n1chat-launch.n1chat-right, .n1chat.n1chat-right { left: auto; right: 16px; }
+.n1chat-launch.n1chat-right, .n1chat.n1chat-right { left: auto; right: max(16px, env(safe-area-inset-right)); }
 .n1chat-right.n1chat-grow { animation-name: n1chat-grow-right; }
 .n1chat-right.n1chat-fold { animation-name: n1chat-grow-right; }
 @keyframes n1chat-grow-right {
