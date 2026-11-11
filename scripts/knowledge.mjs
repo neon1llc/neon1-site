@@ -245,8 +245,9 @@ function docPage(d) {
   const facts = [
     ["Type", TYPE_LABELS[d.type] ?? d.type],
     d.data.edition ? ["Edition", d.data.edition] : null,
-    d.data.created && d.data.created !== d.data.updated ? ["First written", longDate(d.data.created)] : null,
-    ["Updated", longDate(d.data.updated)],
+    // Published is when the content first appeared; Updated shows only once it has changed since
+    d.data.created ? ["Published", longDate(d.data.created)] : null,
+    !d.data.created || d.data.created !== d.data.updated ? ["Updated", longDate(d.data.updated)] : null,
     d.data.reviewed ? ["Facts checked", longDate(d.data.reviewed)] : null,
     d.data.audience ? ["For", d.data.audience] : null,
   ].filter(Boolean)
@@ -317,9 +318,10 @@ const walk = (dir) => (existsSync(dir) ? readdirSync(dir).flatMap((f) => (statSy
 const have = walk(join(siteDir, "knowledge")).map((f) => relative(siteDir, f)).filter((f) => !f.endsWith(".pdf"))
 
 // Each page stays light: the text of one document plus the shared frame
-// The search index is the one file that holds every document's text, so it has its own cap
+// The search index is the one file that holds every document's text, so it has its own cap. CloudFront
+// compresses it to about a third on the wire, and it's fetched once, on the first search
 const PAGE_MAX = 120 * 1024
-const INDEX_MAX = 256 * 1024
+const INDEX_MAX = 384 * 1024
 for (const [path, html] of want) if (Buffer.byteLength(html) > (path.endsWith(".json") ? INDEX_MAX : PAGE_MAX)) {
   console.error(`knowledge: ${path} is ${Math.round(Buffer.byteLength(html) / 1024)} KB, over its limit`)
   process.exit(1)
