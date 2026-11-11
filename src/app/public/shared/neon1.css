@@ -2,7 +2,10 @@
  * layers, glass panes, and the rain controls. Pages add their own layout on top. */
 
 /* Fonts: self-hosted, SIL OFL (see /fonts) */
-@font-face { font-family: "Inter"; src: url(/fonts/inter-latin-wght-normal.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
+/* Figtree for reading and interface text, JetBrains Mono for the wordmark, labels, and code. Inter's file stays in
+   /fonts for pages that still preload it */
+@font-face { font-family: "Figtree"; src: url(/fonts/figtree-latin-wght-normal.woff2) format("woff2"); font-weight: 300 900; font-style: normal; font-display: swap; }
+@font-face { font-family: "Figtree"; src: url(/fonts/figtree-latin-wght-italic.woff2) format("woff2"); font-weight: 300 900; font-style: italic; font-display: swap; }
 @font-face { font-family: "JetBrains Mono"; src: url(/fonts/jetbrains-mono-latin-wght-normal.woff2) format("woff2"); font-weight: 100 800; font-display: swap; }
 
 /* Brand tokens: the Matrix code palette (dark layer), brand greens, and the type */
@@ -17,7 +20,7 @@
   --paper: #F2F4F2;   /* very light grey: the professional surface */
   --ink: #12241A;
   --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  --sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --sans: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --glass-r: 8px;
 }
 
