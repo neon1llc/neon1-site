@@ -15,7 +15,7 @@ PORT         ?= 8000
 BUDGET_KB    ?= 8192
 CHANGES      ?= .deploy-changes
 # neon1-corpus holds the case studies and questions. A tag pins it; CORPUS_DIR can point at a local checkout instead
-CORPUS_TAG   ?= v0.24.2
+CORPUS_TAG   ?= v0.24.3
 CORPUS_REPO  ?= https://github.com/neon1llc/neon1-corpus
 CORPUS_DIR   ?= .corpus/$(CORPUS_TAG)
 

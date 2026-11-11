@@ -101,8 +101,14 @@ export function classifyLinks(html) {
 }
 
 // A document's body as the web page shows it
+// Checkboxes in forms, templates, and examples are printed marks, not controls: the page saves nothing, so
+// they show their state without taking focus or clicks (AS-08). Fill in a downloaded or printed copy
+export function staticChecks(html) {
+  return html.replace(/<input type="checkbox"( checked)?>/g, (whole, on) => `<input type="checkbox"${on ?? ""} disabled>`)
+}
+
 export function pageBody(doc, corpus) {
-  return classifyLinks(relink(singleH1(doc.html, doc.title), doc, corpus))
+  return staticChecks(classifyLinks(relink(singleH1(doc.html, doc.title), doc, corpus)))
 }
 
 // Counts and the PDF claim, read from the documents so no sentence can say more than the manifest does

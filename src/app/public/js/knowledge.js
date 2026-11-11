@@ -19,7 +19,9 @@ if (box && input && status && found && list && none && browse) {
   const load = () => {
     loading ??= fetch("/knowledge/search-index.json")
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-      .then((index) => { prepared = prepare(index); });
+      .then((index) => { prepared = prepare(index); })
+      // A failed fetch (offline for a moment) isn't kept: the next keystroke or Enter tries again (AS-10)
+      .catch((err) => { loading = null; throw err; });
     return loading;
   };
 
@@ -51,7 +53,7 @@ if (box && input && status && found && list && none && browse) {
   async function run() {
     const q = input.value.trim();
     const mine = ++token;
-    if (!q) return show(null);
+    if (!q) return clearUrl(), show(null); // Backspace to empty, the native clear, and Escape all end the same
     try { await load(); } catch {
       status.textContent = "Search couldn't load. The full list below still works.";
       return show(null, true);
@@ -89,17 +91,19 @@ if (box && input && status && found && list && none && browse) {
     a.addEventListener("click", (e) => { e.preventDefault(); input.value = a.dataset.term; input.focus(); run(); });
   }
 
+  function clearUrl() {
+    try { const url = new URL(location.href); url.searchParams.delete("q"); history.replaceState(null, "", url); } catch { /* as above */ }
+  }
   function clear() {
     input.value = "";
-    try { const url = new URL(location.href); url.searchParams.delete("q"); history.replaceState(null, "", url); } catch { /* as above */ }
     run();
   }
 
   // From the box, the arrow keys step through the results, and Escape clears the search
   addEventListener("keydown", (e) => {
-    const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName ?? "");
-    // "/" jumps to the search box, as on many documentation sites
-    if (e.key === "/" && !typing && !e.metaKey && !e.ctrlKey) { e.preventDefault(); input.focus(); return; }
+    // Ctrl+K (Cmd+K on a Mac) jumps to the search box. A bare "/" did, but a single-character shortcut
+    // catches speech input and other character keys (WCAG 2.1.4, AS-05); Tab still reaches the box
+    if (e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey) && !e.altKey && !e.shiftKey) { e.preventDefault(); input.focus(); input.select(); return; }
     if (e.key === "Escape" && document.activeElement === input && input.value) { clear(); return; }
     const links = [...list.querySelectorAll("a")];
     const at = links.indexOf(document.activeElement);

@@ -569,6 +569,94 @@ check("gpu", "rabbit: a room model that lands after leaving is dropped, and repe
 
 
 // ---- Run ----
+// ---- Review 2026-11-11: menu, focus, case links, nested scrolling, and field errors ----
+// Each check names the review finding it holds closed
+check("browser", "AS-01: at 1024x600 the menu scrolls, so its last link can be reached and seen", async () => {
+  const { page, context } = await open({ viewport: { width: 1024, height: 600 } });
+  try {
+    await page.locator("#menuBtn").click();
+    const links = page.locator("#menu a");
+    const last = links.nth((await links.count()) - 1);
+    await last.focus();
+    const box = await last.evaluate((a) => { const r = a.getBoundingClientRect(); return [r.top, r.bottom, innerHeight]; });
+    expect(box[0] >= 0 && box[1] <= box[2], "the last menu link is off screen when focused", box);
+  } finally { await context.close(); }
+});
+
+for (const motion of ["reduce", "no-preference"]) {
+  check("browser", `AS-02: menu -> contact puts focus in the contact section (motion ${motion})`, async () => {
+    const { page, context } = await open({ viewport: { width: 390, height: 844 }, reducedMotion: motion });
+    try {
+      await page.waitForTimeout(400);
+      await page.locator("#menuBtn").click();
+      await page.locator('#menu a[href="#contact"]').focus();
+      await page.keyboard.press("Enter");
+      await page.waitForTimeout(1500);
+      expect(await page.evaluate(() => !!document.activeElement.closest("#contact")), "focus is not in the contact section");
+    } finally { await context.close(); }
+  });
+}
+
+check("browser", "AS-02: widening past the menu's breakpoint leaves focus on something visible", async () => {
+  const { page, context } = await open({ viewport: { width: 1024, height: 700 } });
+  try {
+    await page.locator("#menuBtn").click();
+    await page.setViewportSize({ width: 1336, height: 700 });
+    await page.waitForTimeout(200);
+    const at = await page.evaluate(() => { const a = document.activeElement; return a !== document.body && a.offsetParent !== null; });
+    expect(at, "focus fell to the page body or a hidden element");
+  } finally { await context.close(); }
+});
+
+check("browser", "RC-C1: the community case's contact link closes the case and lands on contact", async () => {
+  const { page, context } = await open();
+  try {
+    await page.locator('#case-community [data-case]').click();
+    await page.waitForSelector("#caseLayer:not([hidden])");
+    const link = page.locator('.case-panel a[href="#contact"]');
+    expect(await link.count(), "the case has no in-page contact link");
+    expect(!(await page.locator('.case-panel a[href$=".md"]').count()), "the case still links a Markdown source");
+    await link.first().focus();
+    await page.keyboard.press("Enter");
+    await page.waitForTimeout(800);
+    const st = await page.evaluate(() => ({ hidden: document.getElementById("caseLayer").hidden, open: document.body.classList.contains("case-open"), inContact: !!document.activeElement.closest("#contact") }));
+    expect(st.hidden && !st.open && st.inContact, "the case stayed open or focus missed contact", st);
+  } finally { await context.close(); }
+});
+
+check("browser", "AS-03: the wheel over a long contact message scrolls the box, not the page", async () => {
+  const { page, context } = await open({ reducedMotion: "no-preference" }, "/#contact");
+  try {
+    await page.waitForTimeout(1200);
+    await page.locator("#cfold > summary").click();
+    const box = page.locator("[name=today]");
+    await box.fill(Array.from({ length: 40 }, (_, i) => `synthetic line ${i}`).join("\n"));
+    await box.evaluate((t) => (t.scrollTop = 0));
+    const y0 = await page.evaluate(() => scrollY);
+    const b = await box.boundingBox();
+    await page.mouse.move(b.x + 20, b.y + 20);
+    await page.mouse.wheel(0, 200);
+    await page.waitForTimeout(600);
+    const moved = (await page.evaluate(() => scrollY)) - y0, inner = await box.evaluate((t) => t.scrollTop);
+    expect(moved === 0 && inner > 0, "the page moved or the box didn't", { moved, inner });
+  } finally { await context.close(); }
+});
+
+check("browser", "AS-09: an empty send marks each required field with its own described error", async () => {
+  const { page, context } = await open();
+  try {
+    let posts = 0;
+    await page.route("**/1NEON/api/contact", (r) => { posts++; return r.fulfill({ status: 200, body: "{}" }); });
+    await page.locator("#contact").scrollIntoViewIfNeeded();
+    await page.locator("#cfold > summary").click();
+    await page.locator('#cform [type="submit"]').click();
+    const marks = await page.evaluate(() => [...document.querySelectorAll("#cform [aria-invalid=true]")].map((e) => !!document.getElementById(e.getAttribute("aria-describedby") || "")?.textContent));
+    expect(marks.length >= 3 && marks.every(Boolean), "a flagged field has no described message", marks);
+    expect(posts === 0, "an empty form was sent");
+  } finally { await context.close(); }
+});
+
+
 (async () => {
   await new Promise((r) => server.listen(0, "127.0.0.1", r));
   origin = `http://127.0.0.1:${server.address().port}`;

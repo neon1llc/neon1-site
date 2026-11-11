@@ -2,7 +2,9 @@
  * Dark over the rain, light ("awake") over the light pages, switched by .n1chat-light. */
 
 /* ---- The launcher: a round mark, styled like "book a call", that stretches to "ask Neo" ---- */
-.n1chat-launch { position: fixed; left: 16px; bottom: 16px; z-index: 10; display: inline-flex; align-items: center;
+/* --n1chat-bottom is the clearance above any fixed bottom bar; a host page with one (1NEON's phone tab
+ * bar) raises it, and the launcher and the window both sit above it */
+.n1chat-launch { position: fixed; left: 16px; bottom: var(--n1chat-bottom, 16px); z-index: 10; display: inline-flex; align-items: center;
   height: 48px; min-width: 48px; padding: 0 12px; border-radius: 24px; cursor: pointer;
   font: 500 13px var(--mono); letter-spacing: .02em; color: var(--neon); background: transparent;
   border: 1px solid var(--neon); transition: background-color .25s, color .25s, border-color .25s, box-shadow .25s; }
@@ -20,8 +22,8 @@
 .n1chat { --bg: rgba(13, 2, 8, .96); --fg: #d8f5e1; --line: rgba(0, 230, 118, .45); --soft: rgba(0, 230, 118, .2);
   --bot: rgba(0, 59, 0, .45); --you: rgba(108, 255, 168, .14); --muted: #84a98c; --accent: var(--neon);
   --accent-ink: var(--void); --field: rgba(255, 255, 255, .04); --link: var(--neon);
-  position: fixed; left: 16px; bottom: 16px; z-index: 10; width: min(380px, calc(100vw - 32px));
-  height: min(540px, calc(100dvh - 96px)); display: flex; flex-direction: column;
+  position: fixed; left: 16px; bottom: var(--n1chat-bottom, 16px); z-index: 10; width: min(380px, calc(100vw - 32px));
+  height: min(540px, calc(100dvh - 80px - var(--n1chat-bottom, 16px))); display: flex; flex-direction: column;
   background: var(--bg); color: var(--fg); border: 1px solid var(--line); border-radius: var(--glass-r);
   box-shadow: 0 12px 40px rgba(0, 0, 0, .35); font: 14px/1.55 var(--sans);
   transition: background-color .3s, color .3s, border-color .3s; }
@@ -116,7 +118,7 @@
 /* Short or zoomed screens: the window fills the height and scrolls as one, so the box, send,
    close, and the contact links are always reachable */
 @media (max-height: 480px) {
-  .n1chat { top: 8px; bottom: 8px; left: 8px; width: min(380px, calc(100vw - 16px)); height: auto; overflow-y: auto; overscroll-behavior: contain; }
+  .n1chat { top: 8px; bottom: max(8px, var(--n1chat-bottom, 8px)); left: 8px; width: min(380px, calc(100vw - 16px)); height: auto; overflow-y: auto; overscroll-behavior: contain; }
   .n1chat-log { flex: 0 0 auto; overflow: visible; }
 }
 
