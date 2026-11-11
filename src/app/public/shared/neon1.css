@@ -46,11 +46,15 @@
   text-decoration: none; font: 700 13px var(--mono); letter-spacing: .06em; text-shadow: 0 0 8px rgba(108, 255, 168, .45); }
 .n1-logo svg { width: 26px; height: 26px; }
 
-/* Rain controls: three glass chips in the bottom-right corner */
-.rainctl { position: fixed; right: 16px; bottom: 16px; z-index: 6; display: flex; gap: 8px; transition: opacity .3s; }
+/* Rain controls: three glass chips in the bottom-right corner. The row is as tall as Neo's 48px
+   launcher and shares its bottom edge, so both corners sit on one line, clear of the home indicator */
+.rainctl { position: fixed; right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); z-index: 6;
+  height: 48px; display: flex; align-items: center; gap: 8px; transition: opacity .3s; }
 .rainctl button { font: 12px var(--mono); color: #84a98c; background: transparent; border: 1px solid rgba(0, 255, 65, .16);
   border-radius: var(--glass-r); padding: 6px 12px; cursor: pointer; }
 .rainctl button:hover, .rainctl button[aria-pressed="true"] { color: var(--glow); border-color: rgba(0, 230, 118, .45); }
+/* The narrowest phones: tighter chips, so they stay clear of "ask Neo" while it shows its label */
+@media (max-width: 360px) { .rainctl { gap: 6px; } .rainctl button { padding: 6px 9px; } }
 
 /* Glitch: two offset copies of a word, neon and white, torn into slices in short bursts, as if the
    signal dropped; the word itself stays put and readable. Still under reduced motion */
