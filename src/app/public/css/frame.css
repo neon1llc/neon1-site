@@ -128,7 +128,9 @@ footer { position: relative; z-index: 2; border-top: 1px solid var(--line); back
 /* Running-text links (about, contact, case studies, the legal line), after the footer's plain links so they win: brand green, bold, and a small
    arrow instead of an underline; the arrow nudges out on hover and focus */
 a.ext { color: var(--brand); font-weight: 600; text-decoration: none; white-space: nowrap; }
-a.ext::after { content: "↗"; display: inline-block; font-size: .8em; margin-left: 2px; transition: transform .15s ease; }
+/* The outbound arrow is drawn, not a font glyph, so it looks and sizes the same in every font (Figtree has no ↗,
+   and the mono fallback drew a smaller, different one); it scales with the text and takes the link's colour */
+a.ext::after { content: ""; display: inline-block; width: .62em; height: .62em; margin-left: .18em; vertical-align: .02em; background: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12 12 4M6 4h6v6'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12 12 4M6 4h6v6'/%3E%3C/svg%3E") center / contain no-repeat; transition: transform .15s ease; }
 a.ext:hover::after, a.ext:focus-visible::after { transform: translate(1px, -1px); }
 a.ext:hover { color: var(--brand); }
 @media (prefers-reduced-motion: reduce) { a.ext::after { transition: none; } }
