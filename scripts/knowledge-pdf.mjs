@@ -7,7 +7,8 @@
 // knowledge, then npx --prefix knowledge playwright install chromium). The deploy job runs this before syncing, so
 // PDFs are never committed. Links in a PDF point at neon1.tech, since a PDF travels on its own.
 //
-// Fonts: Aptos when the machine has it (Microsoft 365), otherwise the site's own Inter, which every build has.
+// Fonts: the site's own Figtree and JetBrains Mono, bundled, so a PDF looks the same on every machine that prints it.
+// Aptos isn't licensed for bundling, and a font that's only sometimes installed would make PDFs differ by build.
 
 import { readFileSync, writeFileSync, mkdirSync, rmSync } from "node:fs"
 import { join, dirname, resolve } from "node:path"
@@ -91,10 +92,11 @@ function pageHtml(d) {
 }
 
 // Running footer on every page, as on neon1's letters: the document centered in italics, the slogan in
-// green under it, and the page number at the right. Chromium draws it in its own frame, so styles are inline
+// green under it, and the page number at the right. Chromium draws it in its own frame, so styles are inline and
+// Figtree comes from the copy make knowledge-pdf installs (knowledge/fonts)
 function footerHtml(d) {
   const edition = d.data.edition ? ` · edition ${esc(d.data.edition)}` : ""
-  return `<div style="width:100%;margin:0 0.75in;display:grid;grid-template-columns:1fr auto 1fr;align-items:end;font-family:Aptos,Inter,Helvetica,sans-serif;font-size:7.5pt;color:#59625c;">
+  return `<div style="width:100%;margin:0 0.75in;display:grid;grid-template-columns:1fr auto 1fr;align-items:end;font-family:Figtree,Helvetica,sans-serif;font-size:7.5pt;color:#59625c;">
     <span></span>
     <span style="text-align:center;line-height:1.45;"><i>neon1 · ${esc(d.title)}${edition} · neon1.tech/knowledge</i><br><b style="color:#035704;font-style:italic;">1 is glad to be of service.</b></span>
     <span style="text-align:right;font-weight:700;color:#035704;font-size:9pt;"><span class="pageNumber"></span></span>

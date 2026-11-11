@@ -92,6 +92,9 @@ body.kc { background: var(--paper); }
 .kc-facts dd { margin: 0; font-size: 14px; color: var(--ink); }
 .kc-actions { display: flex; flex-wrap: wrap; gap: 10px; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
 .kc-actions .btn { min-height: 44px; font: 600 14px var(--sans); text-decoration: none; }
+.kc-actions .btn-outline { background: #fff; color: var(--brand); border-color: rgba(3,87,4,.35); }
+.kc-actions .btn-outline:hover { border-color: var(--brand); background: #fff; }
+.kc-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .kc-actions .btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
 /* ---- On this page: beside the text on wide screens, folded under the actions on narrower ones ---- */
