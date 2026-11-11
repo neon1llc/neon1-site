@@ -94,6 +94,30 @@ body.kc { background: var(--paper); }
 .kc-actions .btn { min-height: 44px; font: 600 14px var(--sans); text-decoration: none; }
 .kc-actions .btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
+/* ---- On this page: beside the text on wide screens, folded under the actions on narrower ones ---- */
+.kc-toc ol { list-style: none; margin: 0; padding: 0; counter-reset: toc; }
+.kc-toc li { counter-increment: toc; }
+.kc-toc a { display: grid; grid-template-columns: 22px 1fr; gap: 4px; padding: 5px 0; color: var(--muted); text-decoration: none; font-size: 14px; line-height: 1.4; }
+.kc-toc a::before { content: counter(toc); font: 600 11px/20px var(--mono); color: var(--mark); }
+.kc-toc a:hover { color: var(--brand); }
+.kc-toc-title { margin: 0 0 8px; font: 600 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--mark); }
+.kc-toc-side { display: none; }
+.kc-toc-fold { margin-top: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+.kc-toc-fold > summary { display: flex; align-items: center; justify-content: space-between; min-height: 44px; padding: 0 14px; cursor: pointer; list-style: none;
+  font: 600 14px var(--sans); color: var(--brand); }
+.kc-toc-fold > summary::-webkit-details-marker { display: none; }
+.kc-toc-fold > summary span { font: 12px var(--mono); color: var(--muted); }
+.kc-toc-fold > summary span::after { content: " +"; color: var(--brand); font-weight: 700; }
+.kc-toc-fold[open] > summary span::after { content: " \2212"; }
+.kc-toc-fold ol { padding: 0 14px 10px; }
+@media (min-width: 1140px) {
+  .kc-doc-wrap.has-toc { display: grid; grid-template-columns: minmax(0, 780px) 240px; gap: 40px; justify-content: center; max-width: 1100px; margin: 0 auto; }
+  .kc-doc-wrap.has-toc .kc-doc { margin: 0; width: 100%; }
+  .kc-toc-side { display: block; position: sticky; top: calc(88px + env(safe-area-inset-top)); align-self: start; max-height: calc(100vh - 120px); overflow-y: auto;
+    margin-top: 40px; padding: 4px 0 4px 16px; border-left: 1.5px solid var(--line); }
+  .kc-toc-fold { display: none; }
+}
+
 /* The document's own text */
 .kc-text { padding-top: 12px; font-size: 16.5px; line-height: 1.7; color: var(--ink); }
 .kc-text h2 { margin: 40px 0 12px; padding-bottom: 6px; border-bottom: 1.5px solid var(--glow); font: 700 22px/1.3 var(--sans); color: var(--brand); scroll-margin-top: 90px; }
@@ -101,13 +125,17 @@ body.kc { background: var(--paper); }
 .kc-text p { margin: 0 0 14px; }
 .kc-text a { color: var(--brand); text-decoration-color: rgba(3, 87, 4, .4); }
 .kc-text a:hover { text-decoration-color: var(--brand); }
+/* Long outside links wrap like text, so a source title never widens a phone's page */
+.kc-text a.ext { white-space: normal; overflow-wrap: anywhere; }
 .kc-text strong { color: var(--deep); }
 .kc-text ul, .kc-text ol { margin: 0 0 16px; padding-left: 24px; }
 .kc-text li { margin: 4px 0; }
 .kc-text code { padding: 1px 5px; border-radius: 4px; background: #e6efe7; font: 14px var(--mono); }
 .kc-text blockquote { margin: 16px 0; padding: 4px 0 4px 16px; border-left: 3px solid var(--glow); color: var(--muted); }
 .kc-text hr { border: 0; border-top: 1px solid var(--line); margin: 28px 0; }
+/* Tables scroll sideways on phones; from tablet width up they span the column like any table */
 .kc-text table { width: 100%; margin: 12px 0 20px; border-collapse: collapse; font-size: 15px; display: block; overflow-x: auto; }
+@media (min-width: 700px) { .kc-text table { display: table; } }
 .kc-text th { padding: 8px 10px; border-bottom: 1.5px solid var(--brand); text-align: left; font: 600 12px var(--mono); letter-spacing: .04em;
   text-transform: uppercase; color: var(--brand); vertical-align: bottom; }
 .kc-text td { padding: 8px 10px; border-bottom: 1px solid #d5e2d7; vertical-align: top; }
@@ -144,10 +172,18 @@ body.kc { background: var(--paper); }
   .kc-shelves ul { padding: 10px 16px; }
   .kc-text { font-size: 16px; }
   .kc-text .blank { min-width: 8em; }
+  /* Phones list many cards, so each one is tighter: two lines of summary, the PDF tag beside the title */
+  .kc-cards { gap: 8px; }
+  .kc-card a { padding: 12px 14px; gap: 4px; display: grid; grid-template-columns: 1fr auto; column-gap: 10px; }
+  .kc-card .kc-card-title { font-size: 15.5px; }
+  .kc-card .kc-card-summary { grid-column: 1 / -1; font-size: 13.5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .kc-card .kc-tags { grid-column: 2; grid-row: 1; margin: 0; padding: 0; align-self: start; }
+  .kc-shelf { padding-top: 28px; }
+  .kc-group { padding-top: 36px; }
 }
 
 @media print {
-  .n1-bar, .menu, .kc-shelves, .kc-actions, .kc-next, footer, .skip { display: none !important; }
+  .n1-bar, .menu, .kc-shelves, .kc-actions, .kc-next, .kc-toc, footer, .skip { display: none !important; }
   .kc main { padding-top: 0; }
   .kc-doc { max-width: none; padding: 0; }
 }
