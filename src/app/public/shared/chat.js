@@ -102,7 +102,11 @@ function inline(target, text) {
   for (const m of text.matchAll(LINK)) {
     target.append(text.slice(last, m.index));
     const href = m[2] ?? m[3];
-    const a = el("a", "n1chat-link", m[1] ?? short(m[3]), { href });
+    // The last word carries the arrow and never parts from it at a line break (as css/frame.css a.ext .ext-end)
+    const label = m[1] ?? short(m[3]);
+    const cut = label.lastIndexOf(" ") + 1;
+    const a = el("a", "n1chat-link", label.slice(0, cut), { href });
+    a.append(el("span", "n1chat-end", label.slice(cut)));
     if (href.startsWith("http")) Object.assign(a, { target: "_blank", rel: "noopener" });
     target.append(a);
     last = m.index + m[0].length;

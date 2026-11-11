@@ -231,7 +231,7 @@ ${nav}
     <div class="kc-body">
 ${groups}
 
-    <p class="kc-colophon">These documents come from <a class="ext" href="https://github.com/neon1llc/neon1-corpus" target="_blank" rel="noopener">neon1-corpus</a> and are shared under CC BY-ND 4.0. Templates and examples are illustrations, not legal advice.</p>
+    <p class="kc-colophon">These documents come from <a class="ext" href="https://github.com/neon1llc/neon1-corpus" target="_blank" rel="noopener"><span class="ext-end">neon1-corpus</span></a> and are shared under CC BY-ND 4.0. Templates and examples are illustrations, not legal advice.</p>
     </div>
     </div>`
   return page({
@@ -317,7 +317,7 @@ ${next.join("\n")}
         </ul>
       </aside>` : ""}
 
-      <p class="kc-colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit. <a class="ext" href="${esc(`https://github.com/neon1llc/neon1-corpus/blob/main/${d.source}`)}" target="_blank" rel="noopener">Source on GitHub</a>. ${d.type === "template" || d.type === "example" ? "Templates and examples are illustrations, not legal advice. " : ""}${esc(fillNote(d))}</p>
+      <p class="kc-colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit. <a class="ext" href="${esc(`https://github.com/neon1llc/neon1-corpus/blob/main/${d.source}`)}" target="_blank" rel="noopener">Source on <span class="ext-end">GitHub</span></a>. ${d.type === "template" || d.type === "example" ? "Templates and examples are illustrations, not legal advice. " : ""}${esc(fillNote(d))}</p>
     </article>${toc.side}
     </div>`
   return page({ title: `${d.title} · neon1 knowledge center`, description: d.summary, path: d.url, main, kind: "doc" })

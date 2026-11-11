@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.56.1" />
+  <meta name="version" content="0.57.0" />
   <title>Intake, out of the shared inbox · neon1 knowledge center</title>
   <meta name="description" content="Intake ran through one inbox, with staff chasing documents and retyping them." />
   <meta name="theme-color" content="#F2F4F2" />
@@ -111,7 +111,7 @@
 <h2 id="needs">Needs</h2>
 <p>A newly opened practice handled intake through a shared Microsoft 365 inbox, and its sister location did the same. Patients replied with forms, insurance cards, referrals, and phone photos. Staff downloaded attachments, renamed them, tracked status in Outlook flags and a spreadsheet, then uploaded each one into a slow EHR. If something was missing, another round of emails began.</p>
 <h2 id="execute">Execute</h2>
-<p>I mapped the process with the staff using a questionnaire and conversations, separating the time patients spent waiting from the time staff spent handling documents. Then I built a Terraform-managed serverless portal, with <a class="ext" href="https://xenoss.io" target="_blank" rel="noopener">Xenoss</a> helping on design and maintenance.</p>
+<p>I mapped the process with the staff using a questionnaire and conversations, separating the time patients spent waiting from the time staff spent handling documents. Then I built a Terraform-managed serverless portal, with <a class="ext" href="https://xenoss.io" target="_blank" rel="noopener"><span class="ext-end">Xenoss</span></a> helping on design and maintenance.</p>
 <ul><li>CloudFront, WAF, and a private S3 site serve the portal. API Gateway, Cognito, and Python Lambda run the workflow.</li><li>Every intake has one clear state in DynamoDB. Documents upload straight to an encrypted S3 vault and stay locked until a malware scan passes.</li><li>Staff see one queue of what's complete and what's missing. Completed documents are filed into the EHR under the patient's ID and MRN, so they land in the right chart.</li><li>Email notifications never include patient details, and access, encryption, and audit logging were decided up front.</li></ul>
 <h2 id="observe">Observe</h2>
 <table><thead><tr><th>Measure</th><th>Before</th><th>After</th></tr></thead><tbody><tr><td>Median time to a complete intake</td><td>~2.6 business days</td><td>~3.4 hours</td></tr><tr><td>Staff time per intake</td><td>~24 min</td><td>~8 min</td></tr><tr><td>Finding and opening a document</td><td>~2 min 18 s</td><td>~12 s</td></tr><tr><td>Intakes needing a missing-document follow-up</td><td>~34%</td><td>~10%</td></tr></tbody></table>
@@ -121,7 +121,7 @@
       </div>
 
 
-      <p class="kc-colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit. <a class="ext" href="https://github.com/neon1llc/neon1-corpus/blob/main/corpus/case-studies/intake-out-of-the-inbox.md" target="_blank" rel="noopener">Source on GitHub</a>. </p>
+      <p class="kc-colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit. <a class="ext" href="https://github.com/neon1llc/neon1-corpus/blob/main/corpus/case-studies/intake-out-of-the-inbox.md" target="_blank" rel="noopener">Source on <span class="ext-end">GitHub</span></a>. </p>
     </article>
     <nav class="kc-toc kc-toc-side" aria-label="On this page">
       <p class="kc-toc-title">On this page</p>
@@ -167,7 +167,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.56.1</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener"><span class="ext-end">v0.57.0</span></a>
       </span>
     </div>
   </footer>

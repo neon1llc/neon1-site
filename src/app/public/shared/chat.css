@@ -56,8 +56,9 @@
 /* Links in replies match the site's: bold, brand colored, with the northeast arrow */
 .n1chat-link { color: var(--link); font-weight: 600; text-decoration: none; }
 /* The same drawn outbound arrow as neon1.tech's links (css/frame.css a.ext) */
-.n1chat-link::after { content: ""; display: inline-block; width: .62em; height: .62em; margin-left: .18em; vertical-align: .02em; background: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12 12 4M6 4h6v6'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12 12 4M6 4h6v6'/%3E%3C/svg%3E") center / contain no-repeat; transition: transform .15s ease; }
-.n1chat-link:hover::after, .n1chat-link:focus-visible::after { transform: translate(1px, -1px); }
+.n1chat-end { white-space: nowrap; }
+.n1chat-end::after { content: ""; display: inline-block; width: .62em; height: .62em; margin-left: .18em; vertical-align: .02em; background: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12 12 4M6 4h6v6'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12 12 4M6 4h6v6'/%3E%3C/svg%3E") center / contain no-repeat; transition: transform .15s ease; }
+.n1chat-link:hover .n1chat-end::after, .n1chat-link:focus-visible .n1chat-end::after { transform: translate(1px, -1px); }
 
 /* Suggested questions: small outlined buttons that wrap */
 .n1chat-chips { display: flex; flex-wrap: wrap; gap: 6px; }

@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.56.1" />
+  <meta name="version" content="0.57.0" />
   <title>Versioning and releases · neon1 knowledge center</title>
   <meta name="description" content="How neon1 numbers releases of code (vX.Y.Z) and editions of documents (X.Y), when each number goes up, and how tags, changelogs, and package files stay in agreement." />
   <meta name="theme-color" content="#F2F4F2" />
@@ -119,7 +119,7 @@
       <div class="kc-text">
 <p>A version number tells people what changed and whether they need to do anything about it. That only works if the numbers follow rules. neon1 uses two schemes: one for software and one for documents.</p>
 <h2 id="software-vx-y-z">Software: vX.Y.Z</h2>
-<p>Software follows <a class="ext" href="https://semver.org/" target="_blank" rel="noopener">Semantic Versioning 2.0.0</a>. A version has three numbers, <code>MAJOR.MINOR.PATCH</code>, and is written with a <code>v</code> in tags and prose, such as <code>v1.4.2</code>.</p>
+<p>Software follows <a class="ext" href="https://semver.org/" target="_blank" rel="noopener">Semantic Versioning <span class="ext-end">2.0.0</span></a>. A version has three numbers, <code>MAJOR.MINOR.PATCH</code>, and is written with a <code>v</code> in tags and prose, such as <code>v1.4.2</code>.</p>
 <table><thead><tr><th>Number</th><th>Goes up when</th><th>Example</th></tr></thead><tbody><tr><td><strong>Major</strong> (X)</td><td>Something that worked before stops working, or people must change how they use it</td><td>Removing a command, renaming a setting, changing a data format</td></tr><tr><td><strong>Minor</strong> (Y)</td><td>New capability is added and everything that worked still works</td><td>A new page, command, report, or option</td></tr><tr><td><strong>Patch</strong> (Z)</td><td>Something is corrected and nothing new is added</td><td>A bug fix, a wrong fact, a security fix that changes nothing else</td></tr></tbody></table>
 <p>When a number goes up, the numbers to its right reset to zero: <code>v1.4.2</code> then <code>v1.5.0</code>, never <code>v1.5.2</code>.</p>
 <h2 id="before-v1-0-0">Before v1.0.0</h2>
@@ -138,7 +138,7 @@
 <h2 id="when-a-project-shipped-before-it-was-tagged">When a project shipped before it was tagged</h2>
 <p>A project that ran from main before its first tag can still show how it got there. Pick the commits on main where a meaningful piece landed and tag them as pre-releases of the first tagged version, in order: <code>v0.1.0-alpha.1</code>, <code>v0.1.0-alpha.2</code>, and so on. Tag the commits as they are. Don't rebase or rewrite main to make the history look tidier. Give each one a short entry under a "Before v0.1.0" heading in the changelog, dated when it shipped, and say when the tags were added. Tags already pushed stay where they are.</p>
 <h2 id="changelogs">Changelogs</h2>
-<p>Every project keeps a <code>CHANGELOG.md</code>, newest first, following <a class="ext" href="https://keepachangelog.com/en/1.1.0/" target="_blank" rel="noopener">Keep a Changelog 1.1.0</a>:</p>
+<p>Every project keeps a <code>CHANGELOG.md</code>, newest first, following <a class="ext" href="https://keepachangelog.com/en/1.1.0/" target="_blank" rel="noopener">Keep a Changelog <span class="ext-end">1.1.0</span></a>:</p>
 <pre><code>## v1.5.0
 
 ### Added
@@ -159,7 +159,7 @@
 <p><code>1.0</code> is the first edition published as adopted, after an editing pass for accuracy, plain language, and the conventions of its kind. Below <code>1.0</code> is a draft. Each document also records when it was published and when it was last updated, taken from its real history. The published date is when the content first appeared, in whatever form, not when it moved into this collection.</p>
 <p>A collection of documents, such as neon1-corpus, is itself software and follows <code>vX.Y.Z</code>: a new document is a minor release, and a correction is a patch.</p>
 <h2 id="sources">Sources</h2>
-<ul><li><a class="ext" href="https://semver.org/" target="_blank" rel="noopener">Semantic Versioning 2.0.0</a>, Tom Preston-Werner: what a major, minor, and patch number each promise.</li><li><a class="ext" href="https://keepachangelog.com/en/1.1.0/" target="_blank" rel="noopener">Keep a Changelog 1.1.0</a>, Olivier Lacan: changelogs written for people, newest first.</li><li><a class="ext" href="https://git-scm.com/book/en/v2/Git-Basics-Tagging" target="_blank" rel="noopener">Git tagging</a>, from Pro Git by Scott Chacon and Ben Straub: annotated tags that mark a release.</li></ul>
+<ul><li><a class="ext" href="https://semver.org/" target="_blank" rel="noopener">Semantic Versioning <span class="ext-end">2.0.0</span></a>, Tom Preston-Werner: what a major, minor, and patch number each promise.</li><li><a class="ext" href="https://keepachangelog.com/en/1.1.0/" target="_blank" rel="noopener">Keep a Changelog <span class="ext-end">1.1.0</span></a>, Olivier Lacan: changelogs written for people, newest first.</li><li><a class="ext" href="https://git-scm.com/book/en/v2/Git-Basics-Tagging" target="_blank" rel="noopener">Git <span class="ext-end">tagging</span></a>, from Pro Git by Scott Chacon and Ben Straub: annotated tags that mark a release.</li></ul>
       </div>
 
       <aside class="kc-next" aria-labelledby="kc-next-h">
@@ -171,7 +171,7 @@
         </ul>
       </aside>
 
-      <p class="kc-colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit. <a class="ext" href="https://github.com/neon1llc/neon1-corpus/blob/main/corpus/standards/versioning.md" target="_blank" rel="noopener">Source on GitHub</a>. </p>
+      <p class="kc-colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit. <a class="ext" href="https://github.com/neon1llc/neon1-corpus/blob/main/corpus/standards/versioning.md" target="_blank" rel="noopener">Source on <span class="ext-end">GitHub</span></a>. </p>
     </article>
     <nav class="kc-toc kc-toc-side" aria-label="On this page">
       <p class="kc-toc-title">On this page</p>
@@ -225,7 +225,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.56.1</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener"><span class="ext-end">v0.57.0</span></a>
       </span>
     </div>
   </footer>

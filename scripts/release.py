@@ -13,7 +13,7 @@ import re
 import sys
 
 META = re.compile(r'<meta name="version" content="([^"]*)"')
-FOOTER = re.compile(r"<!-- frame:footer -->.*?>v(\d+\.\d+\.\d+)</a>.*?<!-- /frame:footer -->", re.S)
+FOOTER = re.compile(r"<!-- frame:footer -->.*?>v(\d+\.\d+\.\d+)(?:</span>)?</a>.*?<!-- /frame:footer -->", re.S)
 TOP_ENTRY = re.compile(r"^## v(\S+)\s*$", re.M)
 LITERAL_V = re.compile(r"[?&]v=(\d+\.\d+\.\d+)")
 SOURCES = ("*.html", "css/*.css", "js/*.js", "shared/*.js", "shared/*.css")

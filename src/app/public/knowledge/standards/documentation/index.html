@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.56.1" />
+  <meta name="version" content="0.57.0" />
   <title>Documentation · neon1 knowledge center</title>
   <meta name="description" content="The documents every neon1 project keeps and how they stay true, and how the documents in this Knowledge Center are built, dated, shared, and credited." />
   <meta name="theme-color" content="#F2F4F2" />
@@ -118,7 +118,7 @@
 <p>Larger projects add:</p>
 <table><thead><tr><th>File</th><th>For</th><th>Contains</th></tr></thead><tbody><tr><td><code>VCS-ETIQUETTE.md</code> or <code>CONTRIBUTING.md</code></td><td>Contributors</td><td>Any rules stricter than the <a href="/knowledge/standards/version-control/">version control standard</a></td></tr><tr><td>Decision records</td><td>Future maintainers</td><td>Why a significant choice was made, the options considered, and what would change it</td></tr><tr><td>Runbooks</td><td>Whoever operates it</td><td>Step-by-step tasks such as deploy, roll back, restore, and rotate a secret</td></tr></tbody></table>
 <h2 id="write-by-purpose">Write by purpose</h2>
-<p>Following <a class="ext" href="https://diataxis.fr/" target="_blank" rel="noopener">Diátaxis</a>, each document does one of four jobs, and doesn't mix them:</p>
+<p>Following <a class="ext" href="https://diataxis.fr/" target="_blank" rel="noopener"><span class="ext-end">Diátaxis</span></a>, each document does one of four jobs, and doesn't mix them:</p>
 <ul><li><strong>Tutorial:</strong> learning by doing, for a newcomer.</li><li><strong>How-to:</strong> steps to finish a specific task.</li><li><strong>Reference:</strong> exact facts to look up, such as commands, settings, and fields.</li><li><strong>Explanation:</strong> why things are the way they are.</li></ul>
 <p>A README usually holds a short version of each and links out when one grows.</p>
 <h2 id="decision-records">Decision records</h2>
@@ -126,9 +126,9 @@
 <h2 id="runbooks">Runbooks</h2>
 <p>Prerequisites come first, then commands in the order they're run, each with what you should see and what to do if you don't. Commands are copied exactly and tested. A runbook nobody has followed is a draft.</p>
 <h2 id="keeping-docs-true">Keeping docs true</h2>
-<ul><li>Docs change in the same commit as the behavior they describe.</li><li>A checked fact beats a remembered one. Commands in a README should be run before a release.</li><li>One source for each fact. Link to it instead of copying it, so it can't drift. That's why neon1's public words live once, in <a class="ext" href="https://github.com/neon1llc/neon1-corpus" target="_blank" rel="noopener">neon1-corpus</a>.</li></ul>
+<ul><li>Docs change in the same commit as the behavior they describe.</li><li>A checked fact beats a remembered one. Commands in a README should be run before a release.</li><li>One source for each fact. Link to it instead of copying it, so it can't drift. That's why neon1's public words live once, in <a class="ext" href="https://github.com/neon1llc/neon1-corpus" target="_blank" rel="noopener"><span class="ext-end">neon1-corpus</span></a>.</li></ul>
 <h2 id="documents-in-this-knowledge-center">Documents in this Knowledge Center</h2>
-<p>Everything here is written once in <a class="ext" href="https://github.com/neon1llc/neon1-corpus" target="_blank" rel="noopener">neon1-corpus</a>, as Markdown, and read from there by the website, the Knowledge Center and its PDFs, and Neo. Each document is built the same way, so a reader always knows where to look.</p>
+<p>Everything here is written once in <a class="ext" href="https://github.com/neon1llc/neon1-corpus" target="_blank" rel="noopener"><span class="ext-end">neon1-corpus</span></a>, as Markdown, and read from there by the website, the Knowledge Center and its PDFs, and Neo. Each document is built the same way, so a reader always knows where to look.</p>
 <h3 id="what-every-document-carries">What every document carries</h3>
 <table><thead><tr><th>Part</th><th>What it says</th><th>Where readers see it</th></tr></thead><tbody><tr><td>Title</td><td>What the document is, in plain words</td><td>The page heading and the PDF's title</td></tr><tr><td>Summary</td><td>One sentence on what it covers and who it helps</td><td>Under the title, on its card, and in search results</td></tr><tr><td>Type</td><td>Which kind of document it is (below)</td><td>The facts under the title</td></tr><tr><td>Edition</td><td><code>X.Y</code>, raised as described in <a href="/knowledge/standards/versioning/">versioning</a></td><td>The facts, and the PDF's footer</td></tr><tr><td>Published</td><td>When the content first appeared, from its real history</td><td>The facts</td></tr><tr><td>Updated</td><td>When it last changed in substance, shown once it differs from Published</td><td>The facts, and the date at the top of the PDF</td></tr><tr><td>For</td><td>Who it's written for, when that isn't everyone</td><td>The facts</td></tr></tbody></table>
 <p>Dates are never moved to look newer or older than they are. A typo fix doesn't change Updated or the edition.</p>
@@ -139,7 +139,7 @@
 <h3 id="credit-where-it-s-due">Credit where it's due</h3>
 <p>The practice described here builds on standards bodies, government guides, and practitioners who published what they learned. Documents name them where they're used and list them under Sources, following the <a href="/knowledge/standards/writing/">writing standard</a>. <a href="/knowledge/company/sources/">Where I learn from</a> gathers them in one place.</p>
 <h2 id="sources">Sources</h2>
-<ul><li><a class="ext" href="https://diataxis.fr/" target="_blank" rel="noopener">Diátaxis</a>, by Daniele Procida: four kinds of documentation, each with its own job.</li><li><a class="ext" href="https://www.writethedocs.org/guide/" target="_blank" rel="noopener">Write the Docs guide</a>, from the Write the Docs community: docs as code, and keeping documentation next to what it describes.</li><li><a class="ext" href="https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions" target="_blank" rel="noopener">Documenting architecture decisions</a>, by Michael Nygard: the short decision record this standard uses.</li><li><a class="ext" href="https://keepachangelog.com/en/1.1.0/" target="_blank" rel="noopener">Keep a Changelog 1.1.0</a>: changelogs written for people, newest first.</li><li><a class="ext" href="https://sre.google/workbook/table-of-contents/" target="_blank" rel="noopener">Google SRE workbook</a>, from Google: runbooks and on-call practice for services that must keep running.</li></ul>
+<ul><li><a class="ext" href="https://diataxis.fr/" target="_blank" rel="noopener"><span class="ext-end">Diátaxis</span></a>, by Daniele Procida: four kinds of documentation, each with its own job.</li><li><a class="ext" href="https://www.writethedocs.org/guide/" target="_blank" rel="noopener">Write the Docs <span class="ext-end">guide</span></a>, from the Write the Docs community: docs as code, and keeping documentation next to what it describes.</li><li><a class="ext" href="https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions" target="_blank" rel="noopener">Documenting architecture <span class="ext-end">decisions</span></a>, by Michael Nygard: the short decision record this standard uses.</li><li><a class="ext" href="https://keepachangelog.com/en/1.1.0/" target="_blank" rel="noopener">Keep a Changelog <span class="ext-end">1.1.0</span></a>: changelogs written for people, newest first.</li><li><a class="ext" href="https://sre.google/workbook/table-of-contents/" target="_blank" rel="noopener">Google SRE <span class="ext-end">workbook</span></a>, from Google: runbooks and on-call practice for services that must keep running.</li></ul>
       </div>
 
       <aside class="kc-next" aria-labelledby="kc-next-h">
@@ -151,7 +151,7 @@
         </ul>
       </aside>
 
-      <p class="kc-colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit. <a class="ext" href="https://github.com/neon1llc/neon1-corpus/blob/main/corpus/standards/documentation.md" target="_blank" rel="noopener">Source on GitHub</a>. </p>
+      <p class="kc-colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit. <a class="ext" href="https://github.com/neon1llc/neon1-corpus/blob/main/corpus/standards/documentation.md" target="_blank" rel="noopener">Source on <span class="ext-end">GitHub</span></a>. </p>
     </article>
     <nav class="kc-toc kc-toc-side" aria-label="On this page">
       <p class="kc-toc-title">On this page</p>
@@ -200,7 +200,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener">v0.56.1</a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener"><span class="ext-end">v0.57.0</span></a>
       </span>
     </div>
   </footer>

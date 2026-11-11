@@ -181,3 +181,14 @@ test("only templates, forms, and examples carry the fill-in permission", () => {
   assert.ok(read(f, "knowledge/guides/spot-phishing/index.html").includes("Please don&#x27;t republish the blank template as your own."))
   assert.ok(!read(f, "knowledge/guides/use-case-cloud/index.html").includes("republish the blank"))
 })
+
+// An outbound link's last word carries the arrow and never parts from it at a line break
+test("bindExtArrows keeps the arrow with the last word", async () => {
+  const { bindExtArrows } = await import("./knowledge-lib.mjs")
+  assert.equal(bindExtArrows('<a class="ext" href="x">WCAG 2.2</a>'), '<a class="ext" href="x">WCAG <span class="ext-end">2.2</span></a>')
+  assert.equal(bindExtArrows('<a class="ext" href="x">one</a>'), '<a class="ext" href="x"><span class="ext-end">one</span></a>')
+  assert.equal(bindExtArrows('<a class="ext" href="x"><code>a b</code></a>'), '<a class="ext" href="x"><span class="ext-end"><code>a b</code></span></a>')
+  const once = bindExtArrows('<a class="ext" href="x">a b</a>')
+  assert.equal(bindExtArrows(once), once)
+  assert.match(bindExtArrows('<a class="ext" href="x">github.com/neon1llc/neon1-corpus</a>'), /neon1llc\/neon1-co<span class="ext-end">rpus<\/span>/)
+})

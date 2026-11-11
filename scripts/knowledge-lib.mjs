@@ -100,6 +100,22 @@ export function classifyLinks(html) {
   })
 }
 
+// An outbound link's arrow is drawn after its last word, and that word and the arrow never part at a line
+// break: the last word goes in a nowrap span that carries the arrow (css/frame.css a.ext .ext-end). The rest
+// of a long link still wraps normally. Already-bound links are left as they are
+export function bindExtArrows(html) {
+  return html.replace(/(<a class="ext"[^>]*>)([\s\S]*?)(<\/a>)/g, (whole, open, inner, close) => {
+    if (inner.includes('class="ext-end"')) return whole
+    // The last run of text outside any tag, split at its last space; a link ending in markup binds whole
+    const m = /^([\s\S]*\s)?([^\s<>]+)$/.exec(inner)
+    if (!m) return `${open}<span class="ext-end">${inner}</span>${close}`
+    // A long last word (a pasted address, say) keeps only its last few letters with the arrow, so it can still wrap
+    const [lead, word] = [m[1] ?? "", m[2]]
+    if (word.length > 20 && !/&/.test(word.slice(-8))) return `${open}${lead}${word.slice(0, -4)}<span class="ext-end">${word.slice(-4)}</span>${close}`
+    return `${open}${lead}<span class="ext-end">${word}</span>${close}`
+  })
+}
+
 // A document's body as the web page shows it
 // Checkboxes in forms, templates, and examples are printed marks, not controls: the page saves nothing, so
 // they show their state without taking focus or clicks (AS-08). Fill in a downloaded or printed copy
@@ -108,7 +124,7 @@ export function staticChecks(html) {
 }
 
 export function pageBody(doc, corpus) {
-  return staticChecks(classifyLinks(relink(singleH1(doc.html, doc.title), doc, corpus)))
+  return bindExtArrows(staticChecks(classifyLinks(relink(singleH1(doc.html, doc.title), doc, corpus))))
 }
 
 // Counts and the PDF claim, read from the documents so no sentence can say more than the manifest does
