@@ -6,6 +6,7 @@ neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site
 
 - [Home page](https://neon1.tech/): services, process, client work, tools, and questions
 - [Knowledge center](https://neon1.tech/knowledge/): every public document below, most with a PDF to download
+- [Blog](https://neon1.tech/blog/): posts on local businesses' questions, the whats and whys of neon1, and lessons from its open repositories ([RSS](https://neon1.tech/blog/feed.xml))
 - Source for these documents: https://github.com/neon1llc/neon1-corpus (CC BY-ND 4.0)
 
 ## Company
@@ -128,3 +129,7 @@ neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site
 - [Privacy policy](https://neon1.tech/knowledge/policies/privacy/): What neon1.tech and the 1NEON portal collect, why, and what you can do about it.
 - [Security disclosure](https://neon1.tech/knowledge/policies/security/): How to report a security problem in neon1.tech, the 1NEON portal, or a neon1 repository, and what happens after you do.
 - [Terms of use](https://neon1.tech/knowledge/policies/terms/): The terms for using neon1.tech and the 1NEON portal.
+
+## Blog
+
+- [Tax preparers are financial institutions, as far as the FTC is concerned](https://neon1.tech/blog/tax-preparers-are-financial-institutions/): What the FTC Safeguards Rule asks of a small tax or accounting office, and what to get done before tax season. (2026-11-12)
