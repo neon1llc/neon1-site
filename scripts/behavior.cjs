@@ -196,7 +196,7 @@ check("browser", "home: one wheel gesture from the first screen settles on servi
 
 // ---- CP-16: prose lists neon1's repositories and the tools in two folds; every row says whether it is
 // public or private, public rows open GitHub in a new tab, and private rows link nowhere ----
-check("browser", "prose: four folds open with their arrows turned, public rows open GitHub in a new tab, teaching rows open the Knowledge Center, private rows link nowhere", async () => {
+check("browser", "prose: four folds open with their arrows turned, public rows (education ones included) open GitHub in a new tab, private rows link nowhere, any other row opens the Knowledge Center", async () => {
   const { page, context, errors } = await open();
   try {
     await page.locator("#work").scrollIntoViewIfNeeded();
