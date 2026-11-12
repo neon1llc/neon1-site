@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.60.0" />
+  <meta name="version" content="0.60.1" />
   <title>Security and data · neon1 knowledge center</title>
   <meta name="description" content="How neon1 handles your accounts, access, and information, and the baseline every project starts from." />
   <meta name="theme-color" content="#F2F4F2" />
@@ -90,7 +90,7 @@
           <div><dt>Type</dt><dd>Standard</dd></div>
           <div><dt>Edition</dt><dd>1.1</dd></div>
           <div><dt>Published</dt><dd>November 1, 2026</dd></div>
-          <div><dt>Updated</dt><dd>November 11, 2026</dd></div>
+          <div><dt>Updated</dt><dd>November 12, 2026</dd></div>
         </dl>
         <div class="kc-actions">
           <a class="btn btn-primary" href="/knowledge/standards/security-and-data/neon1-security-and-data.pdf" download><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Download PDF</a>
@@ -116,7 +116,7 @@
       <div class="kc-text">
 <p>Security work protects your actual task, your information, and your way back when something goes wrong. It starts with who owns what and who can get in, then adds controls to match the data and what's at stake. Installing a tool or running a scan doesn't make a system secure, so I never describe it that way.</p>
 <h2 id="frameworks-used-for-what-they-re-for">Frameworks, used for what they're for</h2>
-<table><thead><tr><th>Framework</th><th>What I use it for</th></tr></thead><tbody><tr><td><a class="ext" href="https://www.nist.gov/cyberframework" target="_blank" rel="noopener">NIST Cybersecurity Framework <span class="ext-end">2.0</span></a></td><td>Spotting missing responsibilities across Govern, Identify, Protect, Detect, Respond, and Recover</td></tr><tr><td><a class="ext" href="https://www.cisecurity.org/controls/implementation-groups/ig1" target="_blank" rel="noopener">CIS Controls, Implementation Group <span class="ext-end">1</span></a></td><td>A prioritized starting point for basic hygiene</td></tr><tr><td><a class="ext" href="https://owasp.org/www-project-application-security-verification-standard/" target="_blank" rel="noopener">OWASP Application Security Verification Standard <span class="ext-end">(ASVS)</span></a></td><td>Testable requirements for applications, cited by version and number</td></tr><tr><td><a class="ext" href="https://csrc.nist.gov/pubs/sp/800/218/final" target="_blank" rel="noopener">NIST Secure Software Development <span class="ext-end">Framework</span></a></td><td>How software gets built and released safely</td></tr></tbody></table>
+<table><thead><tr><th>Framework</th><th>What I use it for</th></tr></thead><tbody><tr><td><a class="ext" href="https://www.nist.gov/cyberframework" target="_blank" rel="noopener">NIST Cybersecurity Framework <span class="ext-end">2.0</span></a></td><td>Spotting missing responsibilities across Govern, Identify, Protect, Detect, Respond, and Recover</td></tr><tr><td><a class="ext" href="https://www.cisecurity.org/controls/implementation-groups/ig1" target="_blank" rel="noopener">CIS Controls, Implementation Group <span class="ext-end">1</span></a></td><td>A prioritized starting point for basic hygiene</td></tr><tr><td><a class="ext" href="https://asvs.owasp.org/" target="_blank" rel="noopener">OWASP Application Security Verification Standard <span class="ext-end">(ASVS)</span></a></td><td>Testable requirements for applications, cited by version and number</td></tr><tr><td><a class="ext" href="https://csrc.nist.gov/pubs/sp/800/218/final" target="_blank" rel="noopener">NIST Secure Software Development <span class="ext-end">Framework</span></a></td><td>How software gets built and released safely</td></tr></tbody></table>
 <p>Informed by a framework isn't the same as certified against it. I won't call work "NIST certified," "compliant," or "enterprise grade" because these sources shaped it.</p>
 <h2 id="know-the-data-first">Know the data first</h2>
 <p>Before connecting anything, we list the information involved, why it's needed, where it lives, who can see it, which vendors receive it, and when it should be deleted. We label it in plain words: public, internal, confidential, or restricted.</p>
@@ -140,7 +140,7 @@
 <h2 id="before-you-rely-on-it">Before you rely on it</h2>
 <p>Access is right, normal and failure paths behave as agreed, security findings are fixed or knowingly accepted, recovery is believable, recurring charges are understood, and you can run it. We write down who decided and on what evidence. If something important is unknown, we name it and either resolve it or limit the release.</p>
 <h2 id="sources">Sources</h2>
-<ul><li><a class="ext" href="https://www.nist.gov/cyberframework" target="_blank" rel="noopener">Cybersecurity Framework <span class="ext-end">2.0</span></a>, NIST: a shared outline of what security covers.</li><li><a class="ext" href="https://www.cisecurity.org/controls/implementation-groups/ig1" target="_blank" rel="noopener">CIS Controls, implementation group <span class="ext-end">1</span></a>, Center for Internet Security: the safeguards sized for small teams.</li><li><a class="ext" href="https://pages.nist.gov/800-63-4/sp800-63b.html" target="_blank" rel="noopener">Digital identity guidelines, SP <span class="ext-end">800-63B</span></a>, NIST: passwords, multi-factor sign-in, and recovery.</li><li><a class="ext" href="https://owasp.org/www-project-application-security-verification-standard/" target="_blank" rel="noopener">Application Security Verification <span class="ext-end">Standard</span></a>, OWASP: what to check in a web application.</li><li><a class="ext" href="https://csrc.nist.gov/pubs/sp/800/218/final" target="_blank" rel="noopener">Secure Software Development Framework, SP <span class="ext-end">800-218</span></a>, NIST: security practices across development.</li><li><a class="ext" href="https://owasp.org/www-community/Threat_Modeling" target="_blank" rel="noopener">Threat <span class="ext-end">modeling</span></a>, OWASP: asking what could go wrong before building.</li><li><a class="ext" href="https://www.nist.gov/privacy-framework" target="_blank" rel="noopener">Privacy <span class="ext-end">Framework</span></a>, NIST: treating personal data as a risk to people.</li></ul>
+<ul><li><a class="ext" href="https://www.nist.gov/cyberframework" target="_blank" rel="noopener">Cybersecurity Framework <span class="ext-end">2.0</span></a>, NIST: a shared outline of what security covers.</li><li><a class="ext" href="https://www.cisecurity.org/controls/implementation-groups/ig1" target="_blank" rel="noopener">CIS Controls, implementation group <span class="ext-end">1</span></a>, Center for Internet Security: the safeguards sized for small teams.</li><li><a class="ext" href="https://pages.nist.gov/800-63-4/sp800-63b.html" target="_blank" rel="noopener">Digital identity guidelines, SP <span class="ext-end">800-63B</span></a>, NIST: passwords, multi-factor sign-in, and recovery.</li><li><a class="ext" href="https://asvs.owasp.org/" target="_blank" rel="noopener">Application Security Verification <span class="ext-end">Standard</span></a>, OWASP: what to check in a web application.</li><li><a class="ext" href="https://csrc.nist.gov/pubs/sp/800/218/final" target="_blank" rel="noopener">Secure Software Development Framework, SP <span class="ext-end">800-218</span></a>, NIST: security practices across development.</li><li><a class="ext" href="https://community.owasp.org/Threat_Modeling" target="_blank" rel="noopener">Threat <span class="ext-end">modeling</span></a>, OWASP: asking what could go wrong before building.</li><li><a class="ext" href="https://www.nist.gov/privacy-framework" target="_blank" rel="noopener">Privacy <span class="ext-end">Framework</span></a>, NIST: treating personal data as a risk to people.</li></ul>
       </div>
 
       <aside class="kc-next" aria-labelledby="kc-next-h">
@@ -205,7 +205,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener"><span class="ext-end">v0.60.0</span></a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener"><span class="ext-end">v0.60.1</span></a>
       </span>
     </div>
   </footer>
