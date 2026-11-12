@@ -52,6 +52,8 @@ a.card { text-decoration: none; }
 /* Hero text fades up in turn */
 .reveal { opacity: 0; animation: rise .9s ease-out forwards; }
 .reveal.d1 { animation-delay: .5s; }
+.reveal.d2 { animation-delay: .8s; }
+.reveal.d3 { animation-delay: 1.1s; }
 @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
 .hero { position: relative; }
@@ -215,6 +217,19 @@ html.case-lock { overflow: hidden; }
 /* Views set their own spacing; the about story reads as one column */
 .story { display: block; max-width: 720px; }
 .story p { font-size: 18px; line-height: 1.65; margin: 0 0 18px; }
+
+/* Under the slogan: what neon1 does in plain words, and the free first call */
+.hero-pane .what { font: 500 clamp(15px, 1.9vw, 19px)/1.5 var(--sans); color: var(--text); margin: 14px auto 0; max-width: 30ch; }
+.hero-pane .hero-call { margin-top: 22px; justify-self: center; }
+
+/* About: the photo beside the story, above it on a phone; the client's words close the story */
+.about { display: grid; grid-template-columns: minmax(180px, 300px) minmax(0, 720px); gap: clamp(24px, 4vw, 48px); align-items: center; }
+.portrait { margin: 0; }
+.portrait img { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; border-radius: 12px; border: 1px solid var(--line); }
+.story .client-quote { margin: 8px 0 0; padding: 2px 0 2px 18px; border-left: 2px solid var(--brand); font: inherit; color: var(--text); }
+.story .client-quote p { font: italic 400 16px/1.6 var(--sans); margin: 0 0 8px; }
+.story .client-quote footer { all: unset; display: block; font: 400 14px/1.5 var(--sans); color: var(--muted); }
+@media (max-width: 760px) { .about { grid-template-columns: 1fr; } .portrait { max-width: 260px; } }
 /* "More" links: a line of its own under a section, in the site's usual bold link style (.ext) */
 .more { margin: 18px 0 0; }
 .row p b { color: var(--ink); font-weight: 600; }
