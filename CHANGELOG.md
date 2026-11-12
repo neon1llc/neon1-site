@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.62.1
+
+### Changed
+- The first blog post, from neon1-corpus v0.34.1, is rewritten in the blog's own voice: it opens with a short story, ties in this week's IRS IP PIN deadline, and links its facts inline. p.r.o.s.e lists neon1-corpus v0.34.1.
+
 ## v0.62.0
 
 ### Added
