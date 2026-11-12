@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.62.2
+
+### Changed
+- The first blog post tells its opening story directly (neon1-corpus v0.34.2). p.r.o.s.e lists neon1-corpus v0.34.2.
+
 ## v0.62.1
 
 ### Changed
