@@ -196,13 +196,13 @@ check("browser", "home: one wheel gesture from the first screen settles on servi
 
 // ---- CP-16: prose lists neon1's repositories and the tools in two folds; every row says whether it is
 // public or private, public rows open GitHub in a new tab, and private rows link nowhere ----
-check("browser", "prose: two folds open with their arrows turned, public rows open GitHub in a new tab, private rows link nowhere", async () => {
+check("browser", "prose: four folds open with their arrows turned, public rows open GitHub in a new tab, teaching rows open the Knowledge Center, private rows link nowhere", async () => {
   const { page, context, errors } = await open();
   try {
     await page.locator("#work").scrollIntoViewIfNeeded();
     const folds = page.locator("#work details.fold");
-    expect((await folds.count()) === 2, "there aren't two groups");
-    for (let i = 0; i < 2; i++) {
+    expect((await folds.count()) === 4, "there aren't four groups");
+    for (let i = 0; i < 4; i++) {
       await folds.nth(i).locator("summary").click();
       expect(await folds.nth(i).evaluate((d) => d.open && getComputedStyle(d.querySelector(".arr")).transform !== "none"), "a group did not open with its arrow turned");
     }
@@ -210,7 +210,8 @@ check("browser", "prose: two folds open with their arrows turned, public rows op
     expect(rows.length >= 8, "rows are missing", rows);
     for (const r of rows) {
       if (/^public/.test(r.state)) expect(r.links.length === 1 && /^https:\/\/github\.com\/neon1llc\//.test(r.links[0][0]) && r.links[0][1] === "_blank" && /noopener/.test(r.links[0][2]), "a public row doesn't open GitHub in a new tab", r);
-      else expect(/^private/.test(r.state) && !r.links.length, "a private row links somewhere", r);
+      else if (/^private/.test(r.state)) expect(!r.links.length, "a private row links somewhere", r);
+      else expect(r.links.length === 1 && new URL(r.links[0][0]).pathname.startsWith("/knowledge/") && !r.links[0][1], "a teaching row doesn't open the Knowledge Center in place", r);
     }
     expect(!errors.length, "page errors", errors);
   } finally { await context.close(); }
