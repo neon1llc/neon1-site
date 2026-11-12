@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## Unreleased
+
+### Fixed
+- After leaving the white rabbit's scene in DuckDuckGo on iPhone, the strip under the browser's bottom toolbar no longer keeps a light leftover of the scene: closing the scene asks the browser to repaint the whole window.
+
 ## v0.57.0
 
 ### Fixed
