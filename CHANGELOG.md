@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.57.1
+
+### Fixed
+- The phone menu's links sit centered between the logo row and the bottom of the screen. They sat a little low, because the first link has no tall letters and the last one has letters that drop below the line.
+
 ## v0.57.0
 
 ### Fixed
