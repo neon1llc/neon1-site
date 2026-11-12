@@ -80,9 +80,11 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 .n1-bar.light .menu-btn { color: var(--brand); background: #fff; border-color: rgba(3,87,4,.25); }
 @media (max-width: 1040px) { .links { display: none; } .menu-btn { display: inline-block; } }
 /* The overlay always scrolls below the bar and its close button. The list's auto margins center it when
- * it fits and let it start at the top when it doesn't, so no height breakpoint decides (1024x600, zoom) */
+ * it fits and let it start at the top when it doesn't, so no height breakpoint decides (1024x600, zoom).
+ * The top padding is set so the links read centered between the logo row and the screen's bottom edge:
+ * the first link is lowercase with no tall letters and the last has descenders, so equal boxes look low */
 .menu { position: fixed; inset: 0; z-index: 7; display: grid; overflow-y: auto; overscroll-behavior: contain;
-  padding: calc(80px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom)); background: rgba(13,2,8,.94); backdrop-filter: blur(6px); }
+  padding: calc(68px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom)); background: rgba(13,2,8,.94); backdrop-filter: blur(6px); }
 .menu[hidden] { display: none; }
 .menu ul { list-style: none; margin: auto; padding: 0; display: grid; gap: 18px; text-align: center; }
 /* Menu links in the logo's neon, glowing brighter under a finger or focus */
