@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## Unreleased
+
+### Fixed
+- On phones, scrolling down until "On this page" docks under the top bar and back up again quickly no longer leaves an empty gap above it that grew each time. A scroll back down while the bar is easing back now cancels the undock instead of docking a second time, and one spacer holds its place (Knowledge Center and blog).
+
 ## v0.62.0
 
 ### Added
