@@ -97,7 +97,7 @@ const page = (opts) => page_(frame, {
   current: "blog",
   generator: "scripts/blog.mjs from neon1-corpus. Edit the corpus, then run make blog",
   styles: ["/css/knowledge.css"],
-  scripts: ["/js/knowledge-toc.js"],
+  scripts: ["/js/knowledge-toc.js", "/js/blog-share.js"],
   head: feedLink,
 })
 
@@ -156,6 +156,36 @@ ${list}
   })
 }
 
+// Share: plain links to each service's own share page, so no outside script ever runs on neon1.tech (the CSP
+// allows none) and nothing tracks the reader. Copy link and the device's own share sheet are buttons that
+// js/blog-share.js reveals only where the browser supports them
+const SHARES = [
+  ["LinkedIn", (u) => `https://www.linkedin.com/sharing/share-offsite/?url=${u}`],
+  ["X", (u, t) => `https://x.com/intent/post?text=${t}&url=${u}`],
+  ["Facebook", (u) => `https://www.facebook.com/sharer/sharer.php?u=${u}`],
+  ["Bluesky", (u, t) => `https://bsky.app/intent/compose?text=${t}%20${u}`],
+  ["Threads", (u, t) => `https://www.threads.com/intent/post?text=${t}%20${u}`],
+  ["Reddit", (u, t) => `https://www.reddit.com/submit?url=${u}&title=${t}`],
+  ["WhatsApp", (u, t) => `https://wa.me/?text=${t}%20${u}`],
+]
+function shareOf(p) {
+  const url = `${SITE}${p.url}`
+  const [u, t] = [encodeURIComponent(url), encodeURIComponent(p.title)]
+  const mail = `mailto:?subject=${t}&body=${encodeURIComponent(`${p.summary}\n\n${url}`)}`
+  const links = SHARES.map(([name, href]) => `          <li><a href="${esc(href(u, t))}" target="_blank" rel="noopener">${name}</a></li>`)
+  return `
+      <aside class="kc-share" aria-labelledby="kc-share-h" data-url="${esc(url)}" data-title="${esc(p.title)}" data-text="${esc(p.summary)}">
+        <h2 id="kc-share-h">Share this post</h2>
+        <ul>
+          <li hidden><button type="button" class="kc-share-copy">Copy link</button></li>
+          <li hidden><button type="button" class="kc-share-native">Share&hellip;</button></li>
+${links.join("\n")}
+          <li><a href="${esc(mail)}">Email</a></li>
+        </ul>
+        <p class="kc-share-status" role="status"></p>
+      </aside>`
+}
+
 function postPage(p) {
   const body = bodyOf(p)
   // Read next: the post's related documents, then the two newest other posts not already listed
@@ -198,6 +228,7 @@ ${factsOf(p).map(([k, v]) => `          <div><dt>${esc(k)}</dt><dd>${esc(v)}</dd
       <div class="kc-text">
 ${body}
       </div>
+${shareOf(p)}
 ${next.length ? `
       <aside class="kc-next" aria-labelledby="kc-next-h">
         <h2 id="kc-next-h">Read next</h2>
