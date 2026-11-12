@@ -5,7 +5,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 ## Unreleased
 
 ### Added
-- p.r.o.s.e has a second half, "Purposeful, repeatable, open-source education", under the engineering one. Its guides fold holds Ready, Secure, Go and Home Is Where the Smart Is, a household tech handbook, and its training fold holds Phish Out of Water, a security awareness session kit, and SOC It 2 Me, SOC 2 readiness training. All four open on GitHub.
+- p.r.o.s.e has a second half, "Purposeful, repeatable, open-source education", under the engineering one. Its guides fold holds Ready, Secure, Go, Home Is Where the Smart Is, a household tech handbook, and You Have 20 Seconds To Comply, compliance guides by domain, and its training fold holds Phish Out of Water, a security awareness session kit, and SOC It 2 Me, SOC 2 readiness training. All five open on GitHub.
 
 ### Changed
 - Each p.r.o.s.e row's arrow sits at the row's end, so the whole row reads as the thing to tap. It still points left when closed and turns down when open.
