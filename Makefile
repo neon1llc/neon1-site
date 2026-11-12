@@ -30,7 +30,7 @@ GITLEAKS_IMAGE := ghcr.io/gitleaks/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79
 
 # Plain make shows the help
 .DEFAULT_GOAL := help
-.PHONY: help corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf check html js links logic frame frame-check release rollback manifest rehash models budget secrets behavior perf serve three icons deploy invalidate verify
+.PHONY: help corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf check html js links logic frame frame-check release rollback manifest rehash models budget secrets behavior perf serve three icons deploy invalidate verify indexnow
 
 
 ##@ Checks
@@ -167,6 +167,10 @@ deploy: ## Upload the site as one release, switch to it, and keep the last 10
 	@test -n "$(BUCKET)" || { echo "deploy: BUCKET is empty"; exit 1; }
 	@test -f "$(SITE_DIR)/index.html" || { echo "deploy: no $(SITE_DIR)/index.html, refusing to sync"; exit 1; }
 	python3 scripts/deploy.py deploy $(SITE_DIR) $(BUCKET) $(RELEASE_STORE)
+
+# After verify: pings IndexNow (Bing, and through it Copilot and ChatGPT search) with the pages that just changed
+indexnow: ## Tell IndexNow search engines which pages changed (DRY_RUN=1 to print only)
+	python3 scripts/indexnow.py $(SITE_DIR) $(if $(DRY_RUN),--dry-run)
 
 rollback: ## Switch back to the release before the live one (RELEASE=<id> for a specific one)
 	python3 scripts/deploy.py rollback $(BUCKET) $(RELEASE_STORE) $(RELEASE)

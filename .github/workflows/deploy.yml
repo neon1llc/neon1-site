@@ -109,6 +109,10 @@ jobs:
 
       - run: make verify
 
+      # Ask IndexNow engines to re-read the pages that changed; a refused ping doesn't fail the deploy
+      - run: make indexnow
+        continue-on-error: true
+
       # Every released version gets an annotated tag on the commit that shipped it, once it's live
       - name: Tag the release
         env:
