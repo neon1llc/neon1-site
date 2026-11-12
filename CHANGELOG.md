@@ -2,6 +2,17 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.59.0
+
+### Changed
+- On phones, the menu follows the page's theme: over the light part of the home page and on light pages such as the Knowledge Center, it opens on the light surface with dark green links instead of going dark. Over the rain, it stays dark.
+- The menu eases open (a fade, with the links lifting into place) and fades out when it closes. With reduced motion, it opens and closes at once.
+- Moving to the next section of the home page takes about twice the push: roughly 110px of finger travel on a phone (was 55), and about five wheel notches or a longer trackpad swipe on a computer (was three). The page gives a little more as you push, so you can feel it building.
+- p.r.o.s.e lists neon1-1NEON at v0.4.1 and neon1-aws-infrastructure at v0.4.1.
+
+### Fixed
+- After leaving the white rabbit's scene in DuckDuckGo on iPhone, the strip under the browser's bottom toolbar no longer keeps a light leftover of the scene: closing the scene asks the browser to repaint the whole window.
+
 ## v0.58.0
 
 ### Added
