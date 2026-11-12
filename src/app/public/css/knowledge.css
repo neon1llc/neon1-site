@@ -189,6 +189,17 @@ body.kc { background: var(--paper); }
 
 .kc-colophon { margin: 40px 0 0; font-size: 13px; color: var(--muted); }
 
+/* Share this post: plain links and two buttons, as small outlined chips that wrap on phones */
+.kc-share { margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--line); }
+.kc-share h2 { margin: 0 0 14px; font: 700 18px var(--sans); color: var(--brand); }
+.kc-share ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.kc-share li[hidden] { display: none; }
+.kc-share a, .kc-share button { display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; border: 1px solid var(--line);
+  border-radius: 999px; background: #fff; color: var(--ink); font: 600 14px var(--sans); text-decoration: none; cursor: pointer; }
+.kc-share a:hover, .kc-share button:hover { border-color: rgba(3, 87, 4, .45); color: var(--brand); }
+.kc-share a:focus-visible, .kc-share button:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.kc-share-status { min-height: 1.4em; margin: 10px 0 0; font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+
 @media (max-width: 600px) {
   .kc-band-inner { padding: 44px 16px 36px; }
   .kc-body, .kc-doc { padding-left: 16px; padding-right: 16px; }
@@ -206,7 +217,7 @@ body.kc { background: var(--paper); }
 }
 
 @media print {
-  .n1-bar, .menu, .kc-shelves, .kc-actions, .kc-next, .kc-toc, footer, .skip { display: none !important; }
+  .n1-bar, .menu, .kc-shelves, .kc-actions, .kc-next, .kc-share, .kc-toc, footer, .skip { display: none !important; }
   .kc main { padding-top: 0; }
   .kc-doc { max-width: none; padding: 0; }
 }
