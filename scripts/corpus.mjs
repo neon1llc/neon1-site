@@ -3,10 +3,11 @@
 // Usage: node scripts/corpus.mjs sync|check SITE_DIR CORPUS_EXPORT   (make corpus, and make corpus-check in make check)
 //
 // neon1-corpus holds the words, and this page shows them. CORPUS_EXPORT is a corpus bundle written by its
-// tools/export.mjs --target site, from the tag pinned in the Makefile (CORPUS_TAG). Each generated block sits
-// between <!-- corpus:NAME --> and <!-- /corpus:NAME --> and is committed, so deploys stay a plain copy of the
-// folder and nothing is fetched while someone reads the page. sync rewrites the blocks; check fails if a block
-// differs from what the pinned corpus gives, so a hand edit here, or a corpus change not yet pulled in, is caught.
+// tools/export.mjs --target site, from CORPUS_TAG (the newest corpus release unless the Makefile is told
+// otherwise). Each generated block sits between <!-- corpus:NAME --> and <!-- /corpus:NAME -->. The committed
+// copy is the last sync; every check and deploy runs make content first, so a release always carries the
+// blocks of the corpus it was built from, as static HTML: nothing is fetched while someone reads the page.
+// sync rewrites the blocks; check fails if a block differs from that corpus, so a hand edit here is caught.
 
 import { readFileSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
@@ -107,6 +108,6 @@ if (mode === "sync") {
   if (stale.length) writeFileSync(file, next)
   console.log(stale.length ? `corpus: rewrote ${stale.join(", ")} from ${manifest.digest.slice(0, 19)}` : "corpus: already matches")
 } else if (stale.length) {
-  console.error(`corpus: ${stale.join(", ")} in index.html differ from the pinned corpus. Edit neon1-corpus, then run make corpus`)
+  console.error(`corpus: ${stale.join(", ")} in index.html differ from the corpus. Edit neon1-corpus, then run make corpus`)
   process.exit(1)
 } else console.log(`corpus: case studies and questions match ${manifest.digest.slice(0, 19)}`)
