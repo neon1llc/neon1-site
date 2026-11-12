@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## Unreleased
+
+### Added
+- The p.r.o.s.e training fold lists There Are No Incidents, incident response training for small businesses with a runbook, playbooks, and tabletop exercises, open on GitHub.
+
 ## v0.60.1
 
 ### Fixed
