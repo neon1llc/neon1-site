@@ -2,11 +2,12 @@
 // scripts/knowledge.mjs - Writes the Knowledge Center (/knowledge/) from neon1-corpus, or checks it matches.
 // Usage: node scripts/knowledge.mjs sync|check SITE_DIR CORPUS_EXPORT [BLOG_EXPORT]   (make knowledge, and make knowledge-check)
 //
-// CORPUS_EXPORT is the corpus's knowledge bundle (tools/export.mjs --target knowledge) from the tag pinned in the
-// Makefile. Every document becomes /knowledge/<shelf>/<slug>/index.html, and the shelves and search live at
-// /knowledge/index.html. The pages are committed, like the case studies in index.html, so a deploy stays a copy
-// of the folder. The bar and footer come from index.html's frame blocks, so they match every other page. sync
-// rewrites the folder; check fails if anything differs, so a hand edit or an unpulled corpus change is caught.
+// CORPUS_EXPORT is the corpus's knowledge bundle (tools/export.mjs --target knowledge) from CORPUS_TAG, the newest
+// corpus release unless the Makefile is told otherwise. Every document becomes /knowledge/<shelf>/<slug>/index.html,
+// and the shelves and search live at /knowledge/index.html. The folder is built, never committed: make content
+// writes it before checks and deploys, so each release carries static pages from one corpus release, and
+// /knowledge/corpus.json names that release for the deploy job's watch. The bar and footer come from index.html's
+// frame blocks, so they match every other page. sync rewrites the folder; check fails if anything differs.
 // PDFs are not written here: scripts/knowledge-pdf.mjs prints them in the deploy job.
 
 import { readFileSync, writeFileSync, mkdirSync, rmSync, readdirSync, statSync, existsSync } from "node:fs"
@@ -299,6 +300,9 @@ const want = new Map([["knowledge/index.html", indexPage()]])
 for (const d of corpus.docs) want.set(`${d.url.slice(1)}index.html`, docPage(d))
 // The search index sits beside the shelves and is fetched only when someone searches
 want.set("knowledge/search-index.json", JSON.stringify(searchIndex(corpus)) + "\n")
+// Which corpus release these pages came from. The deploy workflow's watch reads it from the live site and
+// publishes when a newer release exists, so it must name the tag and the bundle's digest exactly
+want.set("knowledge/corpus.json", JSON.stringify({ tag: process.env.CORPUS_TAG || "local", digest: corpus.manifest.digest }) + "\n")
 // Diagrams the documents draw (neon1-corpus tools/diagrams.mjs), served beside them as image files
 const diagramsDir = join(exportDir, "diagrams")
 if (existsSync(diagramsDir)) for (const f of readdirSync(diagramsDir)) if (f.endsWith(".svg")) want.set(`knowledge/diagrams/${f}`, readFileSync(join(diagramsDir, f), "utf8"))
@@ -367,7 +371,7 @@ if (mode === "check") {
   if (sitemapNow !== sitemapWant) problems.push("differs sitemap.xml knowledge block")
   if (llmsNow !== llmsWant) problems.push("differs llms.txt")
   if (problems.length) {
-    console.error(problems.join("\n") + "\nknowledge: run make knowledge to rewrite the knowledge center from the pinned corpus")
+    console.error(problems.join("\n") + "\nknowledge: run make knowledge to rewrite the knowledge center from the corpus")
     process.exit(1)
   }
   console.log(`knowledge: ${want.size} pages match the corpus`)

@@ -15,10 +15,16 @@ PORT         ?= 8000
 BUDGET_KB    ?= 8192
 # The key value store whose "release" key names the live release folder (neon1-aws-infrastructure site/)
 RELEASE_STORE ?= neon1-site-release
-# neon1-corpus holds the case studies and questions. A tag pins it; CORPUS_DIR can point at a local checkout instead
-CORPUS_TAG   ?= v0.34.2
+# neon1-corpus holds the words: case studies, questions, the Knowledge Center, and the blog. Every build takes
+# its newest release (the highest vX.Y.Z tag), so a corpus release reaches the site without a site change.
+# CORPUS_TAG=vX.Y.Z pins one instead, and CORPUS_DIR can point at a local checkout
 CORPUS_REPO  ?= https://github.com/neon1llc/neon1-corpus
+ifeq ($(origin CORPUS_TAG),undefined)
+CORPUS_TAG   := $(shell git ls-remote --tags --refs --sort=-v:refname $(CORPUS_REPO) 'v*' 2>/dev/null | sed -n 's|.*refs/tags/\(v[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)$$|\1|p' | head -1)
+endif
 CORPUS_DIR   ?= .corpus/$(CORPUS_TAG)
+# The tag travels to the generators, which record it in /knowledge/corpus.json
+export CORPUS_TAG
 
 # The AWS CLI reads the region from the environment
 export AWS_REGION
@@ -30,12 +36,12 @@ GITLEAKS_IMAGE := ghcr.io/gitleaks/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79
 
 # Plain make shows the help
 .DEFAULT_GOAL := help
-.PHONY: help corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf blog blog-check blog-export check html js links logic frame frame-check release rollback manifest rehash models budget secrets behavior perf serve three icons deploy invalidate verify indexnow
+.PHONY: help content corpus-tag static corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf blog blog-check blog-export check html js links logic frame frame-check release rollback manifest rehash models budget secrets behavior perf serve three icons deploy invalidate verify indexnow
 
 
 ##@ Checks
 
-check: html js links logic frame-check corpus-check knowledge-check blog-check release manifest models budget secrets ## Run every static check
+check: html js links logic frame-check corpus-check knowledge-check blog-check static release manifest models budget secrets ## Run every static check
 
 # Every page served as HTML, so each check covers the tour as well as the home page
 PAGES := $(SITE_DIR)/index.html $(SITE_DIR)/tour.html
@@ -71,16 +77,24 @@ frame: ## Copy the shared bar and footer blocks from index.html into the other p
 frame-check: ## Fail if any page's bar or footer differs from index.html
 	@python3 scripts/frame.py check $(SITE_DIR)
 
-# The case studies and questions are written once, in neon1-corpus, and copied into index.html from the pinned tag
+# Everything the corpus writes into the site, in one step. The Knowledge Center and blog folders are built here,
+# never committed, so a fresh checkout runs this before make serve or make check
+content: corpus knowledge blog ## Write every corpus-made part of the site from the newest neon1-corpus release
+
+corpus-tag: ## Print the neon1-corpus tag this build reads
+	@echo $(CORPUS_TAG)
+
+# The case studies and questions are written once, in neon1-corpus, and copied into index.html from CORPUS_TAG
 corpus-export:
 	@command -v node >/dev/null 2>&1 || { echo "corpus: install Node.js"; exit 1; }
+	@test -n "$(CORPUS_TAG)" || { echo "corpus: couldn't find a neon1-corpus release; set CORPUS_TAG=vX.Y.Z"; exit 1; }
 	@test -d $(CORPUS_DIR)/tools || { git init -q $(CORPUS_DIR) && git -C $(CORPUS_DIR) fetch -q --depth 1 $(CORPUS_REPO) $(CORPUS_TAG) && git -C $(CORPUS_DIR) checkout -q FETCH_HEAD; }
 	@node $(CORPUS_DIR)/tools/export.mjs --target site --out "$(abspath .corpus/export)" >/dev/null
 
-corpus: corpus-export ## Rewrite the case studies and questions in index.html from the pinned neon1-corpus tag
+corpus: corpus-export ## Rewrite the case studies and questions in index.html from CORPUS_TAG
 	@node scripts/corpus.mjs sync $(SITE_DIR) .corpus/export/site
 
-corpus-check: corpus-export ## Fail if the case studies or questions differ from the pinned neon1-corpus tag
+corpus-check: corpus-export ## Fail if the case studies or questions differ from CORPUS_TAG
 	@node scripts/corpus.mjs check $(SITE_DIR) .corpus/export/site
 
 # The knowledge center: every corpus document the knowledge bundle holds, as a page under /knowledge/
@@ -88,10 +102,10 @@ knowledge-export: corpus-export
 	@node $(CORPUS_DIR)/tools/export.mjs --target knowledge --out "$(abspath .corpus/export)" >/dev/null
 
 # llms.txt, written whole by scripts/knowledge.mjs, lists the blog's posts too, so the knowledge targets read both bundles
-knowledge: knowledge-export blog-export ## Rewrite the knowledge center under /knowledge/ from the pinned neon1-corpus tag
+knowledge: knowledge-export blog-export ## Rewrite the knowledge center under /knowledge/ from CORPUS_TAG
 	@node scripts/knowledge.mjs sync $(SITE_DIR) .corpus/export/knowledge .corpus/export/blog
 
-knowledge-check: knowledge-export blog-export ## Fail if the knowledge center differs from the pinned neon1-corpus tag
+knowledge-check: knowledge-export blog-export ## Fail if the knowledge center differs from CORPUS_TAG
 	@node scripts/knowledge.mjs check $(SITE_DIR) .corpus/export/knowledge .corpus/export/blog
 
 # The blog: every post the blog bundle holds, as a page under /blog/, with an RSS feed. Links to other corpus
@@ -99,11 +113,16 @@ knowledge-check: knowledge-export blog-export ## Fail if the knowledge center di
 blog-export: corpus-export
 	@node $(CORPUS_DIR)/tools/export.mjs --target blog --out "$(abspath .corpus/export)" >/dev/null
 
-blog: blog-export knowledge-export ## Rewrite the blog under /blog/ from the pinned neon1-corpus tag
+blog: blog-export knowledge-export ## Rewrite the blog under /blog/ from CORPUS_TAG
 	@node scripts/blog.mjs sync $(SITE_DIR) .corpus/export/blog .corpus/export/knowledge
 
-blog-check: blog-export knowledge-export ## Fail if the blog differs from the pinned neon1-corpus tag
+blog-check: blog-export knowledge-export ## Fail if the blog differs from CORPUS_TAG
 	@node scripts/blog.mjs check $(SITE_DIR) .corpus/export/blog .corpus/export/knowledge
+
+# Corpus words reach readers only as HTML written here: no page script may read a corpus source, and every built
+# page must hold its own heading and text (scripts/static_check.py)
+static: ## Fail if a page script reads corpus sources, or a built page lacks its own text
+	@python3 scripts/static_check.py $(SITE_DIR)
 
 # Chromium through Playwright prints each document with knowledge/print.css. The deploy job runs it; PDFs aren't committed
 # Chromium draws the running footer in a frame that only sees installed fonts, so Figtree is installed for this user first
@@ -213,6 +232,16 @@ verify: ## Check that each live URL returns 200 and serves the local version
 		test -n "$$ok" || { echo "verify: $$url is not serving version $$version"; exit 1; }; \
 		echo "$$url serves version $$version"; \
 	done
+	@# The corpus release too, since a corpus publish leaves the site's version as it was
+	@want=$$(cat $(SITE_DIR)/knowledge/corpus.json 2>/dev/null); \
+	test -n "$$want" || { echo "verify: no knowledge/corpus.json; run make content"; exit 1; }; \
+	ok=; \
+	for try in 1 2 3 4 5 6; do \
+		live=$$(curl -fsS --max-time 15 "https://neon1.tech/knowledge/corpus.json") && test "$$live" = "$$want" && { ok=1; break; }; \
+		sleep 10; \
+	done; \
+	test -n "$$ok" || { echo "verify: neon1.tech isn't serving corpus $$want"; exit 1; }; \
+	echo "neon1.tech serves corpus $$want"
 
 
 ##@ Help
