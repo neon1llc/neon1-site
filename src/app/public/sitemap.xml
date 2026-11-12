@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- neon1.tech sitemap: the home page and the knowledge center (its block is written by scripts/knowledge.mjs) -->
+<!-- neon1.tech sitemap: the home page, the knowledge center, and the blog (their blocks are written by scripts/knowledge.mjs and scripts/blog.mjs) -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://neon1.tech/</loc></url>
   <!-- /1NEON/example is left out until it is pre-rendered with its own content; the canonical 1NEON help is /knowledge/faq/1neon-help/, listed below -->
@@ -91,4 +91,8 @@
   <url><loc>https://neon1.tech/knowledge/policies/security/</loc><lastmod>2026-11-11</lastmod></url>
   <url><loc>https://neon1.tech/knowledge/policies/terms/</loc><lastmod>2026-11-10</lastmod></url>
   <!-- /knowledge -->
+  <!-- blog -->
+  <url><loc>https://neon1.tech/blog/</loc><lastmod>2026-11-12</lastmod></url>
+  <url><loc>https://neon1.tech/blog/tax-preparers-are-financial-institutions/</loc><lastmod>2026-11-12</lastmod></url>
+  <!-- /blog -->
 </urlset>

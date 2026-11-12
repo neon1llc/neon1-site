@@ -16,7 +16,7 @@ BUDGET_KB    ?= 8192
 # The key value store whose "release" key names the live release folder (neon1-aws-infrastructure site/)
 RELEASE_STORE ?= neon1-site-release
 # neon1-corpus holds the case studies and questions. A tag pins it; CORPUS_DIR can point at a local checkout instead
-CORPUS_TAG   ?= v0.33.0
+CORPUS_TAG   ?= v0.34.0
 CORPUS_REPO  ?= https://github.com/neon1llc/neon1-corpus
 CORPUS_DIR   ?= .corpus/$(CORPUS_TAG)
 
@@ -30,21 +30,23 @@ GITLEAKS_IMAGE := ghcr.io/gitleaks/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79
 
 # Plain make shows the help
 .DEFAULT_GOAL := help
-.PHONY: help corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf check html js links logic frame frame-check release rollback manifest rehash models budget secrets behavior perf serve three icons deploy invalidate verify indexnow
+.PHONY: help corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf blog blog-check blog-export check html js links logic frame frame-check release rollback manifest rehash models budget secrets behavior perf serve three icons deploy invalidate verify indexnow
 
 
 ##@ Checks
 
-check: html js links logic frame-check corpus-check knowledge-check release manifest models budget secrets ## Run every static check
+check: html js links logic frame-check corpus-check knowledge-check blog-check release manifest models budget secrets ## Run every static check
 
 # Every page served as HTML, so each check covers the tour as well as the home page
 PAGES := $(SITE_DIR)/index.html $(SITE_DIR)/tour.html
 # The knowledge center's generated pages, checked like the others
 KNOWLEDGE_PAGES = $(shell find $(SITE_DIR)/knowledge -name index.html 2>/dev/null | sort)
+# The blog's generated pages, checked the same way
+BLOG_PAGES = $(shell find $(SITE_DIR)/blog -name index.html 2>/dev/null | sort)
 
 html: ## Validate every page against the HTML standard
 	@command -v npx >/dev/null 2>&1 || { echo "html: install Node.js to get npx"; exit 1; }
-	npx --yes $(HTML_VALIDATE) $(PAGES) $(KNOWLEDGE_PAGES)
+	npx --yes $(HTML_VALIDATE) $(PAGES) $(KNOWLEDGE_PAGES) $(BLOG_PAGES)
 
 js: ## Syntax-check the JavaScript files, vendored modules, shared modules, and inline scripts
 	@command -v node >/dev/null 2>&1 || { echo "js: install Node.js"; exit 1; }
@@ -52,7 +54,7 @@ js: ## Syntax-check the JavaScript files, vendored modules, shared modules, and 
 	@for f in $(PAGES); do python3 scripts/check_page.py scripts "$$f" || exit 1; done
 
 links: ## Check in-page anchors and root-relative asset paths
-	@for f in $(PAGES) $(KNOWLEDGE_PAGES); do python3 scripts/check_page.py links "$$f" || exit 1; done
+	@for f in $(PAGES) $(KNOWLEDGE_PAGES) $(BLOG_PAGES); do python3 scripts/check_page.py links "$$f" || exit 1; done
 
 # No browser: replays the white rabbit's lifetime faults against the real controller, then breaks a fixture
 # site one way at a time to prove the links check catches each break
@@ -85,11 +87,23 @@ corpus-check: corpus-export ## Fail if the case studies or questions differ from
 knowledge-export: corpus-export
 	@node $(CORPUS_DIR)/tools/export.mjs --target knowledge --out "$(abspath .corpus/export)" >/dev/null
 
-knowledge: knowledge-export ## Rewrite the knowledge center under /knowledge/ from the pinned neon1-corpus tag
-	@node scripts/knowledge.mjs sync $(SITE_DIR) .corpus/export/knowledge
+# llms.txt, written whole by scripts/knowledge.mjs, lists the blog's posts too, so the knowledge targets read both bundles
+knowledge: knowledge-export blog-export ## Rewrite the knowledge center under /knowledge/ from the pinned neon1-corpus tag
+	@node scripts/knowledge.mjs sync $(SITE_DIR) .corpus/export/knowledge .corpus/export/blog
 
-knowledge-check: knowledge-export ## Fail if the knowledge center differs from the pinned neon1-corpus tag
-	@node scripts/knowledge.mjs check $(SITE_DIR) .corpus/export/knowledge
+knowledge-check: knowledge-export blog-export ## Fail if the knowledge center differs from the pinned neon1-corpus tag
+	@node scripts/knowledge.mjs check $(SITE_DIR) .corpus/export/knowledge .corpus/export/blog
+
+# The blog: every post the blog bundle holds, as a page under /blog/, with an RSS feed. Links to other corpus
+# documents open their knowledge center pages, so it reads the knowledge bundle too
+blog-export: corpus-export
+	@node $(CORPUS_DIR)/tools/export.mjs --target blog --out "$(abspath .corpus/export)" >/dev/null
+
+blog: blog-export knowledge-export ## Rewrite the blog under /blog/ from the pinned neon1-corpus tag
+	@node scripts/blog.mjs sync $(SITE_DIR) .corpus/export/blog .corpus/export/knowledge
+
+blog-check: blog-export knowledge-export ## Fail if the blog differs from the pinned neon1-corpus tag
+	@node scripts/blog.mjs check $(SITE_DIR) .corpus/export/blog .corpus/export/knowledge
 
 # Chromium through Playwright prints each document with knowledge/print.css. The deploy job runs it; PDFs aren't committed
 # Chromium draws the running footer in a frame that only sees installed fonts, so Figtree is installed for this user first
