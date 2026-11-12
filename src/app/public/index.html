@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.64.0" />
+  <meta name="version" content="0.64.1" />
   <title>neon1 · cloud, AI, and IT consulting</title>
   <meta name="description" content="neon1 is a one-person technology practice: cloud and AI engineering, business automation, networks, and cameras." />
   <meta name="theme-color" content="#0D0208" />
@@ -32,6 +32,7 @@
           "@id": "https://neon1.tech/#organization",
           "name": "neon1",
           "legalName": "neon1 LLC",
+          "alternateName": ["neon1 LLC", "neon1.tech"],
           "url": "https://neon1.tech/",
           "logo": { "@type": "ImageObject", "@id": "https://neon1.tech/#logo", "url": "https://neon1.tech/media/neon1-logo-512.png", "width": 512, "height": 512 },
           "image": "https://neon1.tech/media/og-card-1.png",
@@ -46,7 +47,7 @@
           "@type": "WebSite",
           "@id": "https://neon1.tech/#website",
           "name": "neon1",
-          "alternateName": "neon1 LLC",
+          "alternateName": ["neon1 LLC", "neon1.tech"],
           "url": "https://neon1.tech/",
           "publisher": { "@id": "https://neon1.tech/#organization" }
         }
@@ -55,6 +56,8 @@
   </script>
   <!-- Square icons at stable URLs, drawn from the bar's mark by scripts/icons.cjs, so crawlers can fetch them -->
   <!-- Transparent, and green to match the browser: brand green when light, matrix green when dark -->
+  <!-- Search engines show one icon to everyone: the 192 px PNG, listed first, is matrix green on the dark ground -->
+  <link rel="icon" href="/favicon-192.png" type="image/png" sizes="192x192" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="any" />
   <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
   <link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48" />
@@ -252,7 +255,7 @@
         <div class="rows repos">
           <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-corpus" target="_blank" rel="noopener"><span class="ext-end">neon1-corpus</span></a></h3><p class="state">public · v0.34.2</p><p>neon1's public information, written once in Markdown and shared by the site, 1NEON, and Neo.</p></div>
           <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-aws-infrastructure" target="_blank" rel="noopener"><span class="ext-end">neon1-aws-infrastructure</span></a></h3><p class="state">public · v0.5.0</p><p>Terraform for neon1.tech on AWS.</p></div>
-          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener"><span class="ext-end">neon1-site</span></a></h3><p class="state">public · v0.64.0</p><p>The neon1.tech website, its Knowledge Center, and its blog.</p></div>
+          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener"><span class="ext-end">neon1-site</span></a></h3><p class="state">public · v0.64.1</p><p>The neon1.tech website, its Knowledge Center, and its blog.</p></div>
           <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-1NEON" target="_blank" rel="noopener"><span class="ext-end">neon1-1NEON</span></a></h3><p class="state">public · v0.4.1</p><p>1NEON, the client portal: Needs, Execute, Observe, Normalize.</p></div>
           <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-chat" target="_blank" rel="noopener"><span class="ext-end">neon1-chat</span></a></h3><p class="state">public · v0.1.0</p><p>Neo, the site's assistant, answering from neon1's public pages.</p></div>
         </div>
@@ -380,7 +383,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener"><span class="ext-end">v0.64.0</span></a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener"><span class="ext-end">v0.64.1</span></a>
       </span>
     </div>
   </footer>

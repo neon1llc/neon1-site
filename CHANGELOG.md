@@ -4,6 +4,12 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+## v0.64.1
+
+### Changed
+- The home page's structured data names neon1.tech and neon1 LLC as other names for neon1, so a search for "neon1" can match the business and the site to the home page.
+- Search results get their own icon: a 192px matrix green mark on the dark ground, listed first, since search engines show one icon to everyone and a light or dark theme can't switch it. Browser tabs still follow the light or dark setting.
+
 ## v0.64.0
 
 ### Added
