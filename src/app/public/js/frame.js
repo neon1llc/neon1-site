@@ -53,8 +53,14 @@
   const behind = () => document.querySelectorAll(".top, .awake, .rainctl, .n1chat-launch, .n1chat");
   // Closing by Escape, the button, or a click outside gives focus back to the button. Choosing a link
   // doesn't: the page focuses where the link went (js/views.js), or the browser follows it (AS-02)
+  // Opening and closing ease (css/frame.css); a close keeps the overlay up while it fades, then hides it
+  const still = matchMedia("(prefers-reduced-motion: reduce)");
+  let fading = 0;
   function setMenu(open, restore = true) {
-    menu.hidden = !open;
+    clearTimeout(fading);
+    menu.classList.toggle("closing", !open && !menu.hidden && !still.matches);
+    if (open || !menu.classList.contains("closing")) menu.hidden = !open;
+    else fading = setTimeout(() => { menu.hidden = true; menu.classList.remove("closing"); }, 220);
     behind().forEach((el) => (el.inert = open));
     menuBtn.setAttribute("aria-expanded", String(open));
     menuBtn.textContent = open ? "close" : "menu";
