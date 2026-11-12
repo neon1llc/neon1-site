@@ -56,6 +56,8 @@ export function page(frame, { title, description, path, main, kind, ld, current,
   <!-- What this page is, for search engines and AI answers: built from the same corpus fields the page shows -->
   <script type="application/ld+json">${jsonLd(ld)}</script>` : ""}${head}
   <!-- Transparent, and green to match the browser: brand green when light, matrix green when dark -->
+  <!-- Search engines show one icon to everyone: the 192 px PNG, listed first, is matrix green on the dark ground -->
+  <link rel="icon" href="/favicon-192.png" type="image/png" sizes="192x192" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="any" />
   <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
   <link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48" />

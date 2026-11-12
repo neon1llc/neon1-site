@@ -2,7 +2,7 @@
 // scripts/icons.cjs - Draws neon1's square brand icons from the mark in the bar: favicons, the touch icon, and the logo.
 // Usage: node scripts/icons.cjs [SITE_DIR]   (make icons; needs Playwright and its Chromium)
 //
-// Writes favicon.ico (16, 32, and 48 px), favicon-48.png, and apple-touch-icon.png (180 px) at the site root,
+// Writes favicon.ico (16, 32, and 48 px), favicon-48.png, favicon-192.png (for search results), and apple-touch-icon.png (180 px) at the site root,
 // where browsers and search crawlers look for them, and media/neon1-logo-512.png, the square logo the
 // structured data names. Media never changes in place (README, Deploy), so a redrawn logo needs a new
 // name here and in index.html; then run make rehash. Chromium's rasterizer can differ between versions,
@@ -59,7 +59,9 @@ function ico(pngs) {
   fs.writeFileSync(path.join(SITE, "favicon.ico"), ico([[16, small[16]], [32, small[32]], [48, small[48]]]));
   fs.writeFileSync(path.join(SITE, "favicon-48.png"), small[48]);
   fs.writeFileSync(path.join(SITE, "apple-touch-icon.png"), await draw(180, false));
+  // Search results show one icon to everyone, at a multiple of 48 px: matrix green on the dark ground
+  fs.writeFileSync(path.join(SITE, "favicon-192.png"), await draw(192, false));
   fs.writeFileSync(path.join(SITE, "media/neon1-logo-512.png"), await draw(512, false));
   await browser.close();
-  console.log("icons: favicon.ico, favicon-48.png, apple-touch-icon.png, media/neon1-logo-512.png");
+  console.log("icons: favicon.ico, favicon-48.png, favicon-192.png, apple-touch-icon.png, media/neon1-logo-512.png");
 })().catch((e) => { console.error(e); process.exit(1); });
