@@ -4,6 +4,11 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+## v0.64.2
+
+### Fixed
+- The Knowledge Center and blog menus now match the home page's word for word, on desktop and phones: "p.r.o.s.e" instead of "tools I'm building", and "1NEON client portal" in the phone menu. Their bar and menu links are read from the home page when the pages are built, so the two can't drift apart again.
+
 ## v0.64.1
 
 ### Changed
