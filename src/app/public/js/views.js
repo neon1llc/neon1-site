@@ -108,16 +108,16 @@
 
   // Gesture feel and easing curves
   const HEADER = 64;
-  const THRESHOLD = 55;    // touch: finger travel (px) needed to move to the next view (40 felt too easy to tip over)
+  const THRESHOLD = 110;   // touch: finger travel (px) needed to move to the next view (55 still tipped over too easily; Pradeep asked for double)
   // Wheel and trackpad: a mouse notch is about 100px and a trackpad flick sends hundreds, so 55px tipped
   // over on a single notch. The wheel needs more travel, each event counts for at most WHEEL_STEP, and a
-  // pull holds for WHEEL_HOLD ms between notches, so it takes about three deliberate notches or a real
-  // swipe, never one stray notch or a flick's tail
-  const WHEEL_THRESHOLD = 150;
+  // pull holds for WHEEL_HOLD ms between notches, so it takes about five deliberate notches or a long
+  // swipe, never a stray notch or a flick's tail (three notches still felt too easy on desktop)
+  const WHEEL_THRESHOLD = 250;
   const WHEEL_STEP = 50;
   const WHEEL_HOLD = 380;
   const GIVE = 0.7;        // how far the page moves per px of input while resisting
-  const MAX_GIVE = 40;     // the most the page gives before it settles
+  const MAX_GIVE = 60;     // the most the page gives before it settles (more travel to tip over, so a bit more give to feel it)
   const IDLE = 160;        // ms without input that ends a gesture
   const settleEase = [0.22, 1, 0.36, 1];
   const enterEase = [0.19, 1, 0.22, 1];
