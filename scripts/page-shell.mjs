@@ -171,10 +171,22 @@ ${links}
   }
 }
 
-// A document or post: breadcrumbs, title, summary, facts, optional actions, the text, then whatever follows it
-// (share links), Read next, and the colophon. crumbs is a list of [label, href]; the last may have no link.
+// The short version: the corpus's optional `short` sentences, already HTML, in a labeled box between the facts
+// and the text. It's part of the page, not a side note, so it's a section with its own heading (not an aside),
+// and it stays out of On this page, which lists the text's own sections
+export const shortBox = (items = []) => (items.length ? `
+        <section class="kc-short" aria-labelledby="kc-short-h">
+          <h2 id="kc-short-h">The short version</h2>
+          <ul>
+${items.map((h) => `            <li>${h}</li>`).join("\n")}
+          </ul>
+        </section>` : "")
+
+// A document or post: breadcrumbs, title, summary, facts, the short version, optional actions, the text, then
+// whatever follows it (share links), Read next, and the colophon. crumbs is a list of [label, href]; the last
+// may have no link. A fact is [label, text], or [label, html, true] when it carries a link.
 // next items are { url, kicker, title, cls }
-export function docMain({ crumbs: trail, flag = "", title, summary, facts, actions = "", sections, body, after = "", next = [], colophon }) {
+export function docMain({ crumbs: trail, flag = "", title, summary, facts, short = [], actions = "", sections, body, after = "", next = [], colophon }) {
   const t = toc(sections, body)
   const trailHtml = trail.map(([label, href]) => (href ? `<a href="${href}">${esc(label)}</a>` : `<span>${esc(label)}</span>`)).join('<span aria-hidden="true">/</span>')
   const nextHtml = next.map((n) => `          <li${n.cls ? ` class="${n.cls}"` : ""}><a href="${n.url}"><span class="kc-kicker">${esc(n.kicker)}</span><span class="kc-card-title">${esc(n.title)}</span></a></li>`)
@@ -185,8 +197,8 @@ export function docMain({ crumbs: trail, flag = "", title, summary, facts, actio
         ${flag}<h1>${esc(title)}</h1>
         <p class="kc-summary">${esc(summary)}</p>
         <dl class="kc-facts">
-${facts.map(([k, v]) => `          <div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("\n")}
-        </dl>${actions}${t.fold}
+${facts.map(([k, v, html]) => `          <div><dt>${esc(k)}</dt><dd>${html ? v : esc(v)}</dd></div>`).join("\n")}
+        </dl>${shortBox(short)}${actions}${t.fold}
       </header>
 
       <div class="kc-text">

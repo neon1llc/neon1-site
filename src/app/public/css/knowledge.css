@@ -90,6 +90,14 @@ body.kc { background: var(--paper); }
 .kc-facts div { display: flex; flex-direction: column; }
 .kc-facts dt { font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--mark); }
 .kc-facts dd { margin: 0; font-size: 14px; color: var(--ink); }
+/* The short version: a light panel with a thin green outline, like 1NEON's Next step, so "read this first" looks
+   the same on the site and in the portal. The label matches the facts' labels */
+.kc-short { margin: 0 0 20px; padding: 14px 18px 16px; border: 1px solid var(--brand); border-radius: 8px; background: #f7faf7; }
+.kc-short h2 { margin: 0 0 8px; font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--mark); }
+.kc-short ul { margin: 0; padding-left: 18px; font-size: 16px; line-height: 1.55; color: var(--ink); }
+.kc-short li + li { margin-top: 6px; }
+.kc-short a { color: var(--brand); }
+.kc-short h2::before { content: none; }
 .kc-actions { display: flex; flex-wrap: wrap; gap: 10px; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
 .kc-actions .btn { min-height: 44px; font: 600 14px var(--sans); text-decoration: none; }
 .kc-actions .btn-outline { background: #fff; color: var(--brand); border-color: rgba(3,87,4,.35); }
