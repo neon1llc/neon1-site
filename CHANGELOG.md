@@ -4,6 +4,15 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+## v0.65.1
+
+### Changed
+- About's second paragraph links to the mission and promise page, which puts the whole promise on one page.
+- The p.r.o.s.e rows show neon1-corpus v0.35.1.
+
+### Removed
+- Two stray screenshots at the root of the repository.
+
 ## v0.65.0
 
 ### Added
