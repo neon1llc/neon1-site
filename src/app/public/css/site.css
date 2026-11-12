@@ -252,6 +252,8 @@ a.row:hover .go, a.row:focus-visible .go { opacity: 1; transform: translate(2px,
 
 /* ---- White rabbit (js/white-rabbit.js): the page holds still once a rabbit is caught ---- */
 html.white-rabbit-lock { overscroll-behavior: none; touch-action: none; }
+/* A few frames after the scene closes, so the browser repaints the whole window (js/white-rabbit.js) */
+html.white-rabbit-repaint { background-color: var(--void); }
 body.white-rabbit-hover { cursor: pointer; }
 
 /* The layer over everything: the scene's canvas, or the card, and the closing line */
