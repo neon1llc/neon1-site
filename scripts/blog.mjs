@@ -11,7 +11,7 @@
 import { readFileSync } from "node:fs"
 import { join, posix } from "node:path"
 import { load, slugOf, singleH1, classifyLinks, bindExtArrows, staticChecks, esc, longDate, SITE, CORPUS_BLOB } from "./knowledge-lib.mjs"
-import { homeFrame, page as page_, ORG, WEBSITE, AUTHOR, LICENSE, OG_IMAGE, crumbs, band, card as cardOf, CORPUS_LINK, rights, dateFacts, docMain, sitemapWith, syncFolder } from "./page-shell.mjs"
+import { homeFrame, page as page_, ORG, WEBSITE, AUTHOR, LICENSE, OG_IMAGE, crumbs, band, card as cardOf, CORPUS_LINK, rights, dateFacts, docMain, shortBox, sitemapWith, syncFolder } from "./page-shell.mjs"
 
 
 const [mode, siteDir, blogExport, knowledgeExport] = process.argv.slice(2)
@@ -64,6 +64,17 @@ function relink(html, doc, { absolute = false } = {}) {
   })
 }
 const bodyOf = (p) => bindExtArrows(staticChecks(classifyLinks(relink(singleH1(p.html, p.title), p))))
+// The short version's sentences, linked the same way as the text
+const shortOf = (p) => (p.shortHtml ?? []).map((h) => bindExtArrows(classifyLinks(relink(h, p))))
+// The same sentences as plain text, for structured data (a jump to one of the post's own sections is left out)
+const plainText = (html) => html.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\s+/g, " ").trim()
+
+// Minutes to read the text, Sources left out, at 230 words a minute, never under one
+const WPM = 230
+const minutesOf = (p) => {
+  const words = p.sections.filter((s) => s.heading !== "Sources").map((s) => plainText(s.html)).join(" ").split(/\s+/).filter(Boolean).length
+  return Math.max(1, Math.round(words / WPM))
+}
 
 
 // ---- Structured data ----
@@ -79,6 +90,8 @@ const posting = (p) => ({
   datePublished: p.data.created,
   dateModified: p.data.updated,
   author: AUTHOR,
+  ...(p.shortHtml?.length ? { abstract: p.shortHtml.map((h) => plainText(h.replace(/\s*<a href="#[^"]*">[^<]*<\/a>\.?/g, ""))).join(" ") } : {}),
+  timeRequired: `PT${minutesOf(p)}M`,
 })
 
 
@@ -94,9 +107,12 @@ const page = (opts) => page_(frame, {
   head: feedLink,
 })
 
-// The facts under a post's title: when, what kind, and who it's for. Updated shows only once it has changed
+// The facts under a post's title: who wrote it, when, how long it takes, what kind, and who it's for. Updated
+// shows only once it has changed
 const factsOf = (p) => [
+  ["By", '<a href="/knowledge/company/about/">Pradeep Tathineni</a>', true],
   ...dateFacts(p.data.created, p.data.updated),
+  ["Read", `${minutesOf(p)} min`],
   ["Topic", TOPICS[p.data.topic]],
   p.data.audience ? ["For", p.data.audience] : null,
 ].filter(Boolean)
@@ -178,8 +194,8 @@ function postPage(p) {
   const next = [...related, ...more].map((d) => ({ url: d.url, kicker: kicker(d), title: d.title }))
   const main = docMain({
     crumbs: [["Blog", BLOG], [TOPICS[p.data.topic]]],
-    title: p.title, summary: p.summary, facts: factsOf(p), sections: p.sections, body, after: shareOf(p), next,
-    colophon: `By <a href="/knowledge/company/about/">Pradeep Tathineni</a>. ${rights(p.source)} <a href="${FEED}">Follow with RSS</a>.`,
+    title: p.title, summary: p.summary, facts: factsOf(p), short: shortOf(p), sections: p.sections, body, after: shareOf(p), next,
+    colophon: `${rights(p.source)} <a href="${FEED}">Follow with RSS</a>.`,
   })
   const ld = [
     {
@@ -210,8 +226,10 @@ const rfc822 = (iso) => {
   const d = new Date(`${iso}T12:00:00Z`)
   return `${DAYS[d.getUTCDay()]}, ${String(d.getUTCDate()).padStart(2, "0")} ${MON[d.getUTCMonth()]} ${d.getUTCFullYear()} 12:00:00 -0500`
 }
-// The whole post with absolute links, since a feed reader shows it away from neon1.tech
-const feedBody = (p) => classifyLinks(relink(singleH1(p.html, p.title), p, { absolute: true })).replace(/\]\]>/g, "]]&gt;")
+// The whole post with absolute links, since a feed reader shows it away from neon1.tech, led by its short
+// version. A link to the post's own section points at the post on neon1.tech
+const feedShort = (p) => shortBox((p.shortHtml ?? []).map((h) => classifyLinks(relink(h, p, { absolute: true })).replace(/href="#/g, `href="${SITE}${p.url}#`)))
+const feedBody = (p) => (feedShort(p) + classifyLinks(relink(singleH1(p.html, p.title), p, { absolute: true }))).replace(/\]\]>/g, "]]&gt;")
 function feed() {
   const latest = posts[0]?.data.created
   return `<?xml version="1.0" encoding="UTF-8"?>
