@@ -4,6 +4,11 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+## v0.66.1
+
+### Removed
+- The plain line and booking button under the slogan. The first screen stays the wordmark and slogan alone, a curiosity to explore; what neon1 does starts one screen down.
+
 ## v0.66.0
 
 ### Added
