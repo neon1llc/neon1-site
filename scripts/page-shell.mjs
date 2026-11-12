@@ -1,8 +1,10 @@
-// scripts/page-shell.mjs - The page every generated address shares (the Knowledge Center and the blog): head,
-// bar, menu, the page's own main, footer, and scripts. The bar and footer come from index.html's frame blocks,
-// so a generated page always matches the home page.
+// scripts/page-shell.mjs - Everything the generated pages (the Knowledge Center and the blog) share: the page itself
+// (head, bar, menu, footer, and scripts), the parts of a document page, structured data, and writing or checking a
+// generated folder. The bar, menu, and footer come from index.html, so a generated page always matches the home page.
 
-import { esc, SITE } from "./knowledge-lib.mjs"
+import { readFileSync, writeFileSync, mkdirSync, rmSync, readdirSync, statSync, existsSync } from "node:fs"
+import { join, dirname, relative } from "node:path"
+import { esc, longDate, SITE, CORPUS_BLOB } from "./knowledge-lib.mjs"
 
 
 // Everything a page needs from index.html: its release number, its frame blocks, and its bar and menu links.
@@ -52,17 +54,11 @@ export function page(frame, { title, description, path, main, kind, ld, current,
   <meta property="og:title" content="${esc(title)}" />
   <meta property="og:description" content="${esc(description)}" />
   <meta property="og:url" content="${url}" />
-  <meta property="og:image" content="${SITE}/media/og-card-1.png" />
+  <meta property="og:image" content="${OG_IMAGE}" />
   <meta name="twitter:card" content="summary_large_image" />${ld ? `
   <!-- What this page is, for search engines and AI answers: built from the same corpus fields the page shows -->
   <script type="application/ld+json">${jsonLd(ld)}</script>` : ""}${head}
-  <!-- Transparent, and green to match the browser: brand green when light, matrix green when dark -->
-  <!-- Search engines show one icon to everyone: the 192 px PNG, listed first, is matrix green on the dark ground -->
-  <link rel="icon" href="/favicon-192.png" type="image/png" sizes="192x192" />
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="any" />
-  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
-  <link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48" />
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  ${frame.block("icons")}
   <link rel="stylesheet" href="/shared/neon1.css" />
   <link rel="stylesheet" href="/css/frame.css" />
 ${styles.map((s) => `  <link rel="stylesheet" href="${s}" />`).join("\n")}
@@ -100,4 +96,165 @@ ${scripts.map((s) => `  <script type="module" src="${s}"></script>`).join("\n")}
 </body>
 </html>
 `
+}
+
+
+// ---- Structured data every generated page points at ----
+
+// The @id values name the organization, website, and author the home page describes, so every page joins one graph
+export const ORG = { "@id": `${SITE}/#organization` }
+export const WEBSITE = { "@id": `${SITE}/#website` }
+export const AUTHOR = { "@type": "Person", "@id": `${SITE}/#pradeep`, name: "Pradeep Tathineni", url: "https://www.linkedin.com/in/pradeep-tathineni/", worksFor: ORG }
+export const LICENSE = "https://creativecommons.org/licenses/by-nd/4.0/"
+export const OG_IMAGE = `${SITE}/media/og-card-1.png`
+// A breadcrumb trail from the home page down; the last step, the page itself, has no link
+export const crumbs = (items) => ({
+  "@type": "BreadcrumbList",
+  itemListElement: [["neon1", `${SITE}/`], ...items].map(([name, item], i) => ({ "@type": "ListItem", position: i + 1, name, ...(item ? { item } : {}) })),
+})
+
+
+// ---- Parts of a page ----
+
+// The band that opens an index page: a small eyebrow, the heading, a lead line, and anything after it (a search box)
+export const band = ({ id, eyebrow, title, lead, after = "" }) => `    <section class="kc-band" aria-labelledby="${id}">
+      <div class="kc-band-inner">
+        <p class="kc-eyebrow">${eyebrow}</p>
+        <h1 id="${id}">${title}</h1>
+        <p class="kc-lead">${lead}</p>${after}
+      </div>
+    </section>`
+
+// A card on an index: an optional kicker above the title, the summary, and optional tags under it
+export const card = ({ url, kicker = "", title, summary, tags = [] }) => `        <li class="kc-card">
+          <a href="${url}">${kicker ? `
+            <span class="kc-kicker">${kicker}</span>` : ""}
+            <span class="kc-card-title">${esc(title)}</span>
+            <span class="kc-card-summary">${esc(summary)}</span>${tags.length ? `
+            <span class="kc-tags">${tags.map((t) => `<span>${esc(t)}</span>`).join("")}</span>` : ""}
+          </a>
+        </li>`
+
+// When a document or post appeared, and when it last changed. Updated shows only once it differs
+export const dateFacts = (created, updated) => [
+  created ? ["Published", longDate(created)] : null,
+  !created || created !== updated ? ["Updated", longDate(updated)] : null,
+].filter(Boolean)
+
+// The line every corpus page's colophon shares: the corpus repository, linked
+export const CORPUS_LINK = '<a class="ext" href="https://github.com/neon1llc/neon1-corpus" target="_blank" rel="noopener"><span class="ext-end">neon1-corpus</span></a>'
+// The rights line under a document or post, with a link to its source
+export const rights = (source) => `© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit. <a class="ext" href="${esc(CORPUS_BLOB + source)}" target="_blank" rel="noopener">Source on <span class="ext-end">GitHub</span></a>.`
+
+// On this page: a document's sections, for documents with three or more. Wide screens keep it beside the text;
+// narrower ones fold it into the header. Both are plain links, so it works without JavaScript. Only sections
+// whose heading made it into the page count: a "## " line inside a code sample is not a section
+export function toc(sections, body) {
+  const heads = sections.filter((x) => x.heading && x.key && body.includes(`id="${x.key}"`))
+  if (heads.length < 3) return { side: "", fold: "" }
+  const links = heads.map((x) => `            <li><a href="#${esc(x.key)}">${esc(x.heading)}</a></li>`).join("\n")
+  return {
+    side: `
+    <nav class="kc-toc kc-toc-side" aria-label="On this page">
+      <p class="kc-toc-title">On this page</p>
+      <ol>
+${links}
+      </ol>
+    </nav>`,
+    fold: `
+        <details class="kc-toc kc-toc-fold">
+          <summary>On this page <span>${heads.length} sections</span></summary>
+          <ol>
+${links}
+          </ol>
+        </details>`,
+  }
+}
+
+// A document or post: breadcrumbs, title, summary, facts, optional actions, the text, then whatever follows it
+// (share links), Read next, and the colophon. crumbs is a list of [label, href]; the last may have no link.
+// next items are { url, kicker, title, cls }
+export function docMain({ crumbs: trail, flag = "", title, summary, facts, actions = "", sections, body, after = "", next = [], colophon }) {
+  const t = toc(sections, body)
+  const trailHtml = trail.map(([label, href]) => (href ? `<a href="${href}">${esc(label)}</a>` : `<span>${esc(label)}</span>`)).join('<span aria-hidden="true">/</span>')
+  const nextHtml = next.map((n) => `          <li${n.cls ? ` class="${n.cls}"` : ""}><a href="${n.url}"><span class="kc-kicker">${esc(n.kicker)}</span><span class="kc-card-title">${esc(n.title)}</span></a></li>`)
+  return `    <div class="kc-doc-wrap${t.side ? " has-toc" : ""}">
+    <article class="kc-doc">
+      <header class="kc-doc-head">
+        <nav class="kc-crumbs" aria-label="Breadcrumb">${trailHtml}</nav>
+        ${flag}<h1>${esc(title)}</h1>
+        <p class="kc-summary">${esc(summary)}</p>
+        <dl class="kc-facts">
+${facts.map(([k, v]) => `          <div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("\n")}
+        </dl>${actions}${t.fold}
+      </header>
+
+      <div class="kc-text">
+${body}
+      </div>
+${after}${nextHtml.length ? `
+      <aside class="kc-next" aria-labelledby="kc-next-h">
+        <h2 id="kc-next-h">Read next</h2>
+        <ul>
+${nextHtml.join("\n")}
+        </ul>
+      </aside>` : ""}
+
+      <p class="kc-colophon">${colophon}</p>
+    </article>${t.side}
+    </div>`
+}
+
+
+// ---- Writing or checking a generated folder ----
+
+// The sitemap block between <!-- name --> markers, one line per [address, lastmod]
+export function sitemapWith(sitemap, name, entries) {
+  if (!sitemap.includes(`<!-- ${name} -->`)) throw new Error(`sitemap.xml has no <!-- ${name} --> block`)
+  const urls = entries.map(([loc, mod]) => `  <url><loc>${loc}</loc>${mod ? `<lastmod>${mod}</lastmod>` : ""}</url>`)
+  return sitemap.replace(new RegExp(`  <!-- ${name} -->[\\s\\S]*?<!-- /${name} -->`), `  <!-- ${name} -->\n${urls.join("\n")}\n  <!-- /${name} -->`)
+}
+
+const walk = (dir) => (existsSync(dir) ? readdirSync(dir).flatMap((f) => (statSync(join(dir, f)).isDirectory() ? walk(join(dir, f)) : [join(dir, f)])) : [])
+
+// Sync writes every wanted file under siteDir/folder, removes files nobody wants and folders left empty, and
+// rewrites each extra file (sitemap.xml, llms.txt) when it changed. Check changes nothing and fails on any
+// difference. Files skip names left alone (PDFs, which the deploy job prints). Every page stays light: the
+// text of one document plus the shared frame; limit(path) can give a file its own cap
+export function syncFolder({ name, mode, siteDir, folder, want, extras = [], skip = () => false, limit = () => 120 * 1024, hint }) {
+  for (const [path, text] of want) if (Buffer.byteLength(text) > limit(path)) {
+    console.error(`${name}: ${path} is ${Math.round(Buffer.byteLength(text) / 1024)} KB, over its limit`)
+    process.exit(1)
+  }
+  const root = join(siteDir, folder)
+  const have = walk(root).map((f) => relative(siteDir, f)).filter((f) => !skip(f))
+  if (mode === "check") {
+    const problems = []
+    for (const [path, text] of want) {
+      const file = join(siteDir, path)
+      if (!existsSync(file)) problems.push(`missing ${path}`)
+      else if (readFileSync(file, "utf8") !== text) problems.push(`differs ${path}`)
+    }
+    for (const path of have) if (!want.has(path)) problems.push(`not from the corpus ${path}`)
+    for (const x of extras) if (x.now !== x.want) problems.push(`differs ${x.label}`)
+    if (problems.length) {
+      console.error(problems.join("\n") + `\n${name}: ${hint}`)
+      process.exit(1)
+    }
+    console.log(`${name}: ${want.size} files match the corpus`)
+    return
+  }
+  for (const path of have) if (!want.has(path)) rmSync(join(siteDir, path))
+  for (const [path, text] of want) {
+    const file = join(siteDir, path)
+    mkdirSync(dirname(file), { recursive: true })
+    if (!existsSync(file) || readFileSync(file, "utf8") !== text) writeFileSync(file, text)
+  }
+  for (const x of extras) if (x.now !== x.want) writeFileSync(x.file, x.want)
+  const prune = (dir) => {
+    for (const f of readdirSync(dir)) if (statSync(join(dir, f)).isDirectory()) prune(join(dir, f))
+    if (dir !== root && !readdirSync(dir).length) rmSync(dir, { recursive: true })
+  }
+  prune(root)
+  console.log(`${name}: wrote ${want.size} files`)
 }

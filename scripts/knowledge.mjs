@@ -10,10 +10,10 @@
 // frame blocks, so they match every other page. sync rewrites the folder; check fails if anything differs.
 // PDFs are not written here: scripts/knowledge-pdf.mjs prints them in the deploy job.
 
-import { readFileSync, writeFileSync, mkdirSync, rmSync, readdirSync, statSync, existsSync } from "node:fs"
-import { join, dirname, relative } from "node:path"
-import { load, pageBody, catalogFacts, fillNote, TASK_PATHS, searchIndex, esc, longDate, TYPE_LABELS, SITE, BASE } from "./knowledge-lib.mjs"
-import { homeFrame, page as page_ } from "./page-shell.mjs"
+import { readFileSync, readdirSync, existsSync } from "node:fs"
+import { join } from "node:path"
+import { load, pageBody, catalogFacts, fillNote, TASK_PATHS, searchIndex, esc, longDate, TYPE_LABELS, SITE, BASE, slugOf } from "./knowledge-lib.mjs"
+import { homeFrame, page as page_, ORG, WEBSITE, AUTHOR, LICENSE, OG_IMAGE, crumbs, band, card as cardOf, CORPUS_LINK, rights, dateFacts, docMain, sitemapWith, syncFolder } from "./page-shell.mjs"
 
 
 // BLOG_EXPORT, the corpus's blog bundle, adds the blog's posts to llms.txt, which this script writes whole
@@ -32,16 +32,7 @@ const ICON_VIEW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v
 const ICON_PDF = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>'
 
 
-// Structured data. The @id values point at the organization and website the home page describes, so every
-// page joins one graph. "<" is escaped so no text can close the script element early
-const ORG = { "@id": `${SITE}/#organization` }
-const WEBSITE = { "@id": `${SITE}/#website` }
-const AUTHOR = { "@type": "Person", "@id": `${SITE}/#pradeep`, name: "Pradeep Tathineni", url: "https://www.linkedin.com/in/pradeep-tathineni/", worksFor: ORG }
-const LICENSE = "https://creativecommons.org/licenses/by-nd/4.0/"
-const crumbs = (items) => ({
-  "@type": "BreadcrumbList",
-  itemListElement: items.map(([name, item], i) => ({ "@type": "ListItem", position: i + 1, name, ...(item ? { item } : {}) })),
-})
+// Structured data (ORG, WEBSITE, AUTHOR, and crumbs) comes from page-shell.mjs, shared with the blog
 // Plain text from a section's HTML, for answers in FAQ data
 const plain = (html) => html.replace(/<[^>]+>/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\s+/g, " ").trim()
 
@@ -58,16 +49,7 @@ const page = (opts) => page_(frame, {
 
 // A document as a small card: title, summary, and whether it has a PDF. The shelf heading already
 // names the kind, so the card doesn't repeat it. Search reads search-index.json, not the cards
-function card(d) {
-  const tags = d.pdf ? ["PDF"] : []
-  return `        <li class="kc-card">
-          <a href="${d.url}">
-            <span class="kc-card-title">${esc(d.title)}</span>
-            <span class="kc-card-summary">${esc(d.summary)}</span>
-            ${tags.length ? `<span class="kc-tags">${tags.map((t) => `<span>${esc(t)}</span>`).join("")}</span>` : ""}
-          </a>
-        </li>`
-}
+const card = (d) => cardOf({ url: d.url, title: d.title, summary: d.summary, tags: d.pdf ? ["PDF"] : [] })
 
 
 // The four task paths come from knowledge-lib.mjs. The build fails if a chosen document disappears, so a path never points at nothing
@@ -135,18 +117,12 @@ ${g.shelves.map(shelfSection).join("\n\n")}
     .map((g) => `        <li class="kc-nav-group"><span>${esc(g.label)}</span></li>
 ${g.shelves.map((s) => `        <li><a href="#${s.key}">${esc(s.label)} <span>${s.docs.length}</span></a></li>`).join("\n")}`)
     .join("\n")
-  const main = `    <section class="kc-band" aria-labelledby="kc-title">
-      <div class="kc-band-inner">
-        <p class="kc-eyebrow">neon1 · knowledge center</p>
-        <h1 id="kc-title">Everything neon1</h1>
-        <p class="kc-lead">Guides, templates, forms, and filled-out examples, plus how I work, services, and policies. ${facts.summary}.</p>
+  const main = `${band({ id: "kc-title", eyebrow: "neon1 · knowledge center", title: "Everything neon1", lead: `Guides, templates, forms, and filled-out examples, plus how I work, services, and policies. ${facts.summary}.`, after: `
         <form class="kc-search" role="search" action="${BASE}" method="get" hidden>
           <label for="kc-q">Search the knowledge center</label>
           <input id="kc-q" name="q" type="search" placeholder="Try &quot;backup&quot;, &quot;passkey&quot;, or &quot;privacy&quot;" autocomplete="off" />
           <p class="kc-results" id="kc-results" role="status" aria-live="polite" aria-atomic="true"></p>
-        </form>
-      </div>
-    </section>
+        </form>` })}
 
     <section class="kc-found" id="kc-found" aria-label="Search results" hidden>
       <ol class="kc-hits" id="kc-found-list"></ol>
@@ -176,7 +152,7 @@ ${nav}
     <div class="kc-body">
 ${groups}
 
-    <p class="kc-colophon">These documents come from <a class="ext" href="https://github.com/neon1llc/neon1-corpus" target="_blank" rel="noopener"><span class="ext-end">neon1-corpus</span></a> and are shared under CC BY-ND 4.0. Templates and examples are illustrations, not legal advice.</p>
+    <p class="kc-colophon">These documents come from ${CORPUS_LINK} and are shared under CC BY-ND 4.0. Templates and examples are illustrations, not legal advice.</p>
     </div>
     </div>`
   return page({
@@ -187,7 +163,7 @@ ${groups}
     kind: "index",
     ld: [
       { "@type": "CollectionPage", "@id": `${SITE}${BASE}#page`, url: `${SITE}${BASE}`, name: "neon1 knowledge center", inLanguage: "en-US", isPartOf: WEBSITE, publisher: ORG, about: ORG },
-      crumbs([["neon1", `${SITE}/`], ["Knowledge center"]]),
+      crumbs([["Knowledge center"]]),
     ],
   })
 }
@@ -199,9 +175,7 @@ function docPage(d) {
   const facts = [
     ["Type", TYPE_LABELS[d.type] ?? d.type],
     d.data.edition ? ["Edition", d.data.edition] : null,
-    // Published is when the content first appeared; Updated shows only once it has changed since
-    d.data.created ? ["Published", longDate(d.data.created)] : null,
-    !d.data.created || d.data.created !== d.data.updated ? ["Updated", longDate(d.data.updated)] : null,
+    ...dateFacts(d.data.created, d.data.updated),
     d.data.reviewed ? ["Facts checked", longDate(d.data.reviewed)] : null,
     d.data.audience ? ["For", d.data.audience] : null,
   ].filter(Boolean)
@@ -212,63 +186,23 @@ function docPage(d) {
   const related = (d.data.related ?? []).map((id) => corpus.byId.get(id)).filter((r) => r && !pairs.some(([, p]) => p.id === r.id))
 
   const next = [
-    ...pairs.map(([label, p]) => `          <li class="kc-pair"><a href="${p.url}"><span class="kc-kicker">${label}</span><span class="kc-card-title">${esc(p.title)}</span></a></li>`),
-    ...related.map((r) => `          <li><a href="${r.url}"><span class="kc-kicker">${esc(corpus.manifest.shelves[r.section].label)}</span><span class="kc-card-title">${esc(r.title)}</span></a></li>`),
+    ...pairs.map(([label, p]) => ({ cls: "kc-pair", url: p.url, kicker: label, title: p.title })),
+    ...related.map((r) => ({ url: r.url, kicker: corpus.manifest.shelves[r.section].label, title: r.title })),
   ]
-
   const body = pageBody(d, corpus)
-  // On this page: the document's sections, for documents with three or more. Wide screens keep it beside the text;
-  // narrower ones fold it under the actions. Both are plain links, so it works without JavaScript
-  // Only sections whose heading made it into the page: a "## " line inside a code sample is not a section
-  const heads = d.sections.filter((x) => x.heading && x.key && body.includes(`id="${x.key}"`))
-  const tocLinks = heads.map((x) => `            <li><a href="#${esc(x.key)}">${esc(x.heading)}</a></li>`).join("\n")
-  const toc = heads.length >= 3 ? {
-    side: `
-    <nav class="kc-toc kc-toc-side" aria-label="On this page">
-      <p class="kc-toc-title">On this page</p>
-      <ol>
-${tocLinks}
-      </ol>
-    </nav>`,
-    fold: `
-        <details class="kc-toc kc-toc-fold">
-          <summary>On this page <span>${heads.length} sections</span></summary>
-          <ol>
-${tocLinks}
-          </ol>
-        </details>`,
-  } : { side: "", fold: "" }
-  const fictional = d.data.fictional ? '<p class="kc-flag">Fictional example</p>' : ""
-
-  const main = `    <div class="kc-doc-wrap${toc.side ? " has-toc" : ""}">
-    <article class="kc-doc">
-      <header class="kc-doc-head">
-        <nav class="kc-crumbs" aria-label="Breadcrumb"><a href="${BASE}">Knowledge center</a><span aria-hidden="true">/</span><a href="${BASE}#${d.section}">${esc(shelf.label)}</a></nav>
-        ${fictional}<h1>${esc(d.title)}</h1>
-        <p class="kc-summary">${esc(d.summary)}</p>
-        <dl class="kc-facts">
-${facts.map(([k, v]) => `          <div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("\n")}
-        </dl>
-        <div class="kc-actions">
-          ${d.pdf ? `<a class="btn btn-primary" href="${d.pdf}" download>${ICON_PDF}Download PDF</a>
+  // The actions row also draws the line under the header, so it stays even when a document has no PDF
+  const actions = `
+        <div class="kc-actions">${d.pdf ? `
+          <a class="btn btn-primary" href="${d.pdf}" download>${ICON_PDF}Download PDF</a>
           <a class="btn btn-outline" href="${d.pdf}" target="_blank" rel="noopener">${ICON_VIEW}Preview PDF<span class="kc-sr"> (opens in a new tab)</span></a>` : ""}
-        </div>${toc.fold}
-      </header>
-
-      <div class="kc-text">
-${body}
-      </div>
-${next.length ? `
-      <aside class="kc-next" aria-labelledby="kc-next-h">
-        <h2 id="kc-next-h">Read next</h2>
-        <ul>
-${next.join("\n")}
-        </ul>
-      </aside>` : ""}
-
-      <p class="kc-colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit. <a class="ext" href="${esc(`https://github.com/neon1llc/neon1-corpus/blob/main/${d.source}`)}" target="_blank" rel="noopener">Source on <span class="ext-end">GitHub</span></a>. ${d.type === "template" || d.type === "example" ? "Templates and examples are illustrations, not legal advice. " : ""}${esc(fillNote(d))}</p>
-    </article>${toc.side}
-    </div>`
+        </div>`
+  const note = d.type === "template" || d.type === "example" ? "Templates and examples are illustrations, not legal advice. " : ""
+  const main = docMain({
+    crumbs: [["Knowledge center", BASE], [shelf.label, `${BASE}#${d.section}`]],
+    flag: d.data.fictional ? '<p class="kc-flag">Fictional example</p>' : "",
+    title: d.title, summary: d.summary, facts, actions, sections: d.sections, body, next,
+    colophon: `${rights(d.source)} ${note}${esc(fillNote(d))}`,
+  })
   // An article for every document; a questions page also lists each question with its answer
   const url = SITE + d.url
   const article = {
@@ -285,7 +219,7 @@ ${next.join("\n")}
     publisher: ORG,
     isPartOf: WEBSITE,
     license: LICENSE,
-    image: `${SITE}/media/og-card-1.png`,
+    image: OG_IMAGE,
     ...(d.data.audience ? { audience: { "@type": "Audience", audienceType: d.data.audience } } : {}),
   }
   if (d.type === "faq") article.mainEntity = d.sections.filter((x) => x.heading?.endsWith("?") && x.html)
@@ -311,10 +245,7 @@ if (existsSync(diagramsDir)) for (const f of readdirSync(diagramsDir)) if (f.end
 const sitemapFile = join(siteDir, "sitemap.xml")
 const sitemapNow = readFileSync(sitemapFile, "utf8")
 const lastmod = corpus.docs.map((d) => d.data.updated).sort().at(-1)
-const urls = [`  <url><loc>${SITE}${BASE}</loc><lastmod>${lastmod}</lastmod></url>`,
-  ...corpus.docs.map((d) => `  <url><loc>${SITE}${d.url}</loc><lastmod>${d.data.updated}</lastmod></url>`)]
-const sitemapWant = sitemapNow.replace(/  <!-- knowledge -->[\s\S]*?<!-- \/knowledge -->/, `  <!-- knowledge -->\n${urls.join("\n")}\n  <!-- /knowledge -->`)
-if (!sitemapNow.includes("<!-- knowledge -->")) throw new Error("sitemap.xml has no <!-- knowledge --> block")
+const sitemapWant = sitemapWith(sitemapNow, "knowledge", [[`${SITE}${BASE}`, lastmod], ...corpus.docs.map((d) => [`${SITE}${d.url}`, d.data.updated])])
 
 // llms.txt (llmstxt.org): a plain map of the site for AI assistants and answer engines, written from the same
 // corpus so it never drifts from the pages. Each shelf lists its documents with their one-line summaries
@@ -333,7 +264,7 @@ const blogPosts = blogDir
     .sort((a, b) => b.data.created.localeCompare(a.data.created))
   : []
 const llmsBlog = blogPosts.length
-  ? `\n## Blog\n\n${blogPosts.map((d) => `- [${d.title}](${SITE}/blog/${d.id.replace(/^blog-/, "")}/): ${d.summary} (${d.data.created})`).join("\n")}\n`
+  ? `\n## Blog\n\n${blogPosts.map((d) => `- [${d.title}](${SITE}/blog/${slugOf(d.id, "blog")}/): ${d.summary} (${d.data.created})`).join("\n")}\n`
   : ""
 const llmsWant = `# neon1
 
@@ -346,49 +277,16 @@ neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site
 ${blogPosts.length ? `- [Blog](${SITE}/blog/): posts on local businesses' questions, the whats and whys of neon1, and lessons from its open repositories ([RSS](${SITE}/blog/feed.xml))\n` : ""}- Source for these documents: https://github.com/neon1llc/neon1-corpus (CC BY-ND 4.0)
 ${llmsShelves}${llmsBlog}`
 
-// What the folder holds now, PDFs left out since the deploy job writes those
-const walk = (dir) => (existsSync(dir) ? readdirSync(dir).flatMap((f) => (statSync(join(dir, f)).isDirectory() ? walk(join(dir, f)) : [join(dir, f)])) : [])
-const have = walk(join(siteDir, "knowledge")).map((f) => relative(siteDir, f)).filter((f) => !f.endsWith(".pdf"))
-
-// Each page stays light: the text of one document plus the shared frame
-// The search index is the one file that holds every document's text, so it has its own cap. CloudFront
-// compresses it to about a third on the wire, and it's fetched once, on the first search
-const PAGE_MAX = 120 * 1024
-const INDEX_MAX = 384 * 1024
-for (const [path, html] of want) if (Buffer.byteLength(html) > (path.endsWith(".json") ? INDEX_MAX : PAGE_MAX)) {
-  console.error(`knowledge: ${path} is ${Math.round(Buffer.byteLength(html) / 1024)} KB, over its limit`)
-  process.exit(1)
-}
-
-if (mode === "check") {
-  const problems = []
-  for (const [path, html] of want) {
-    const file = join(siteDir, path)
-    if (!existsSync(file)) problems.push(`missing ${path}`)
-    else if (readFileSync(file, "utf8") !== html) problems.push(`differs ${path}`)
-  }
-  for (const path of have) if (!want.has(path)) problems.push(`not from the corpus ${path}`)
-  if (sitemapNow !== sitemapWant) problems.push("differs sitemap.xml knowledge block")
-  if (llmsNow !== llmsWant) problems.push("differs llms.txt")
-  if (problems.length) {
-    console.error(problems.join("\n") + "\nknowledge: run make knowledge to rewrite the knowledge center from the corpus")
-    process.exit(1)
-  }
-  console.log(`knowledge: ${want.size} pages match the corpus`)
-} else {
-  for (const path of have) if (!want.has(path)) rmSync(join(siteDir, path))
-  for (const [path, html] of want) {
-    const file = join(siteDir, path)
-    mkdirSync(dirname(file), { recursive: true })
-    if (!existsSync(file) || readFileSync(file, "utf8") !== html) writeFileSync(file, html)
-  }
-  if (sitemapNow !== sitemapWant) writeFileSync(sitemapFile, sitemapWant)
-  if (llmsNow !== llmsWant) writeFileSync(llmsFile, llmsWant)
-  // Folders left empty by a removed document go too
-  const prune = (dir) => {
-    for (const f of readdirSync(dir)) if (statSync(join(dir, f)).isDirectory()) prune(join(dir, f))
-    if (dir !== join(siteDir, "knowledge") && !readdirSync(dir).length) rmSync(dir, { recursive: true })
-  }
-  prune(join(siteDir, "knowledge"))
-  console.log(`knowledge: wrote ${want.size} pages`)
-}
+// Write or check the folder, PDFs left alone since the deploy job writes those. The search index is the one file
+// that holds every document's text, so it has its own cap. CloudFront compresses it to about a third on the
+// wire, and it's fetched once, on the first search
+syncFolder({
+  name: "knowledge", mode, siteDir, folder: "knowledge", want,
+  extras: [
+    { file: sitemapFile, now: sitemapNow, want: sitemapWant, label: "sitemap.xml knowledge block" },
+    { file: llmsFile, now: llmsNow, want: llmsWant, label: "llms.txt" },
+  ],
+  skip: (f) => f.endsWith(".pdf"),
+  limit: (path) => (path.endsWith(".json") ? 384 : 120) * 1024,
+  hint: "run make knowledge to rewrite the knowledge center from the corpus",
+})
