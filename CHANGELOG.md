@@ -2,6 +2,16 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## Unreleased
+
+### Added
+- Every Knowledge Center page describes itself to search engines and AI assistants with structured data: an article (or, for question pages, each question and its answer) with its author, published and updated dates, edition, and license, plus its breadcrumb. The index is a collection page. All of it joins the organization the home page already describes.
+- /llms.txt: a plain map of the site for AI assistants, listing every Knowledge Center document with its summary, written from neon1-corpus with the pages.
+- IndexNow: after each verified deploy, the home page and the pages that changed are sent to Bing and the other IndexNow engines (make indexnow), so they're re-read within hours. Bing's index also feeds Copilot and ChatGPT search.
+
+### Changed
+- robots.txt names the search engines, AI search assistants, and AI training crawlers, each with the same rules as everyone else, so the choice to welcome them is on record.
+
 ## v0.60.0
 
 ### Added

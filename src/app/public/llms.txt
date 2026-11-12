@@ -1,0 +1,129 @@
+# neon1
+
+> neon1 is a one-person technology practice: cloud and AI engineering, business automation, networks, and cameras.
+
+neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site within about 30 miles of Queens, NY, or over a secure temporary connection. Contact: hello@neon1.tech, +1 424-326-3661, or the form at https://neon1.tech/#contact.
+
+- [Home page](https://neon1.tech/): services, process, client work, tools, and questions
+- [Knowledge center](https://neon1.tech/knowledge/): every public document below, most with a PDF to download
+- Source for these documents: https://github.com/neon1llc/neon1-corpus (CC BY-ND 4.0)
+
+## Company
+
+- [About neon1](https://neon1.tech/knowledge/company/about/): A one-person technology practice in New York that leaves people better off with their tech than they were before.
+- [How neon1 is built](https://neon1.tech/knowledge/company/architecture/): Diagrams of the website, the 1NEON portal, Neo, and how a change reaches them.
+- [Capability statement](https://neon1.tech/knowledge/company/capabilities/): neon1 on one page for a buyer, partner, or procurement office: what it does, how it differs, work it has delivered, and the company's details.
+- [Charter](https://neon1.tech/knowledge/company/charter/): What neon1 is for, who it serves first, the values it works by, and what it leaves to others.
+- [Contact](https://neon1.tech/knowledge/company/contact/): How to reach neon1, when, and what the first call covers.
+- [Glossary](https://neon1.tech/knowledge/company/glossary/): The names and technical terms used across neon1's documents, each in a sentence or two.
+- [How neon1.tech works](https://neon1.tech/knowledge/company/how-it-works/): A plain walk through every part of neon1.tech: the page and its sections, the rain, the white rabbit, the Knowledge Center, the contact form, Neo, the 1NEON portal and its demo, sample, and guided walkthroughs, and how a change goes live.
+- [Mission and promise](https://neon1.tech/knowledge/company/mission/): Why neon1 exists, what it does, and the five things every client can count on, on one page.
+- [The names](https://neon1.tech/knowledge/company/names/): Where neon1, its slogan and its products get their names.
+- [How a project runs](https://neon1.tech/knowledge/company/process/): Listen, propose, decide, build and hand over.
+- [State registration](https://neon1.tech/knowledge/company/registration/): neon1 LLC's public record with the New York Department of State: its ID, status, filings, registered agent, and assumed name, and how to check the live record yourself.
+- [Where I learn from](https://neon1.tech/knowledge/company/sources/): The standards bodies, government guides, and practitioners whose published work shapes how neon1 works, grouped by topic, with what each one is for.
+
+## Services
+
+- [Services](https://neon1.tech/knowledge/services/services/): Four kinds of help, from automating a small business to SOC 2 readiness.
+
+## How I work
+
+- [Writing](https://neon1.tech/knowledge/standards/writing/): How everything neon1 writes is written, from policies and proposals to READMEs, commit messages, code comments, and interface text.
+- [Development](https://neon1.tech/knowledge/standards/development/): The main development standard for neon1: the principles in priority order, what each word means, how work moves from idea to release, and where the detailed rules live.
+- [Operating principles](https://neon1.tech/knowledge/standards/operating-principles/): The habits behind every neon1 engagement, and what each one means in practice.
+- [Discovery and delivery](https://neon1.tech/knowledge/standards/discovery-and-delivery/): How a neon1 project moves from your problem to a result you can run, step by step.
+- [Version control](https://neon1.tech/knowledge/standards/version-control/): How neon1 uses git: branch names, commit messages, merges, protected branches, and the history rules, and which safeguards production and client data require.
+- [Versioning and releases](https://neon1.tech/knowledge/standards/versioning/): How neon1 numbers releases of code (vX.Y.Z) and editions of documents (X.Y), when each number goes up, and how tags, changelogs, and package files stay in agreement.
+- [Code style](https://neon1.tech/knowledge/standards/code-style/): How neon1 code reads: names, comments, file headers, formatting, and layout, in every language and configuration format.
+- [Testing and review](https://neon1.tech/knowledge/standards/testing-and-review/): What neon1 tests, how changes are checked and reviewed before they ship, and what done means.
+- [Documentation](https://neon1.tech/knowledge/standards/documentation/): The documents every neon1 project keeps and how they stay true, and how the documents in this Knowledge Center are built, dated, shared, and credited.
+- [Security and data](https://neon1.tech/knowledge/standards/security-and-data/): How neon1 handles your accounts, access, and information, and the baseline every project starts from.
+- [Design and accessibility](https://neon1.tech/knowledge/standards/design-and-accessibility/): How neon1 designs interfaces and documents for any device and for people using assistive technology.
+- [Technology decisions](https://neon1.tech/knowledge/standards/technology-decisions/): How neon1 chooses tools and architecture, counts the full cost, and checks licenses.
+- [Reliability and recovery](https://neon1.tech/knowledge/standards/reliability-and-recovery/): How neon1 sets service targets, plans for failure, and tests that backups restore.
+- [AI quality and oversight](https://neon1.tech/knowledge/standards/ai-quality/): When neon1 uses AI, how it's tested before anyone relies on it, and where a person stays in charge.
+- [Measurement](https://neon1.tech/knowledge/standards/measurement/): How neon1 defines success with you, measures it, and reports what the numbers can and can't show.
+- [Customers](https://neon1.tech/knowledge/standards/customers/): Who neon1 works with, how the work differs from households to enterprises, and when it declines work.
+- [Partners](https://neon1.tech/knowledge/standards/partners/): How neon1 works with other firms, vendors, and referrals, and how responsibilities and fees are disclosed.
+- [Outreach and claims](https://neon1.tech/knowledge/standards/outreach/): How neon1 finds clients and talks about its work, and the sales tactics it doesn't use.
+
+## Guides
+
+- [Backups you can trust](https://neon1.tech/knowledge/guides/backups-you-can-trust/): How a small office or household checks that its backups would restore what it needs.
+- [Before you buy a new tool](https://neon1.tech/knowledge/guides/before-you-buy/): Ten questions to ask before adding software to your business, so it fits, lasts, and lets you leave.
+- [Do you need a business associate agreement?](https://neon1.tech/knowledge/guides/do-you-need-a-baa/): A plain guide for health practices on when a vendor needs a BAA, and what to check before signing one.
+- [Getting ready for a first call](https://neon1.tech/knowledge/guides/first-call/): What to bring to a free 15-minute call with neon1.
+- [A password manager for your family](https://neon1.tech/knowledge/guides/password-manager-for-family/): How to move a household onto a password manager, step by step, without locking anyone out.
+- [Use case: a cloud account you can trust](https://neon1.tech/knowledge/guides/use-case-cloud/): How a typical cloud engineering engagement goes for a small technical team: inventory, infrastructure as code, deploys, and tested recovery.
+- [Use case: security awareness for a team or family](https://neon1.tech/knowledge/guides/use-case-security-awareness/): How a typical plain-language security session goes, and what people leave able to do.
+- [Use case: one workflow, no more retyping](https://neon1.tech/knowledge/guides/use-case-workflows/): How a typical business workflow engagement goes, from the first call to a handover the staff can run.
+
+## Questions
+
+- [1NEON help](https://neon1.tech/knowledge/faq/1neon-help/): Short answers about using the 1NEON client portal.
+- [Working with neon1](https://neon1.tech/knowledge/faq/working-with-neon1/): Short answers on where, when, how long, how much, and how data is handled.
+
+## Case studies
+
+- [Answers in seconds, with sources](https://neon1.tech/knowledge/case-studies/answers-in-seconds/): Staff spent minutes hunting through Microsoft 365, or interrupted a senior colleague.
+- [Intake, out of the shared inbox](https://neon1.tech/knowledge/case-studies/intake-out-of-the-inbox/): Intake ran through one inbox, with staff chasing documents and retyping them.
+- [Two offices off local servers](https://neon1.tech/knowledge/case-studies/two-offices-off-local-servers/): The app, database, and files lived on two local servers both offices relied on.
+- [Security for non-security people](https://neon1.tech/knowledge/case-studies/security-for-non-security-people/): People knew they were exposed online, but not where to start.
+- [From cameras to Grandma's email](https://neon1.tech/knowledge/case-studies/cameras-to-grandmas-email/): A house with no cameras, and passwords reused everywhere.
+- [Where neon1 started](https://neon1.tech/knowledge/case-studies/where-neon1-started/): A grade school wanted real STEM tools on a small budget.
+
+## Products
+
+- [1NEON](https://neon1.tech/knowledge/products/1neon/): The neon1 client portal that comes with a client engagement, where each project runs from the first call to handover.
+- [AWS CLIP](https://neon1.tech/knowledge/products/aws-clip/): AWS CLI Plus: account guards and approval checks around the AWS CLI, for people who juggle several AWS profiles.
+- [DeployOps](https://neon1.tech/knowledge/products/deploy-ops/): Cloud automation, bundled: pipelines for infrastructure and applications on any major cloud.
+- [Home Is Where the Smart Is](https://neon1.tech/knowledge/products/home-is-where-the-smart-is/): A household tech handbook for the person who looks after a family's devices and accounts.
+- [Phish Out of Water](https://neon1.tech/knowledge/products/phish-out-of-water/): A security awareness session kit: slides, hands-on exercises, and a one-page takeaway.
+- [Ready, Secure, Go](https://neon1.tech/knowledge/products/ready-secure-go/): Security readiness for every space, in plain language.
+- [SOC It 2 Me](https://neon1.tech/knowledge/products/soc-it-2-me/): Hands-on SOC 2 readiness training for small and growing companies.
+- [You Have 20 Seconds To Comply](https://neon1.tech/knowledge/products/you-have-20-seconds-to-comply/): Plain-language compliance guides and training for small businesses, from HIPAA and GxP to PCI DSS, privacy, and accessibility.
+
+## Alternatives
+
+- [Open-source tools on my shortlist](https://neon1.tech/knowledge/landscape/open-source-shortlist/): The open-source projects I'd look at first for common small-business needs, what each is for, and what to check before relying on one.
+- [Where else to get help](https://neon1.tech/knowledge/landscape/where-else-to-get-help/): The other places a small business or household can get technology help, who each one suits, and when they'd serve you better than neon1.
+
+## Templates
+
+- [Business associate agreement request](https://neon1.tech/knowledge/templates/baa-request/): The short questionnaire that tells us whether a project involves health information, and if so, what the business associate agreement needs to cover.
+- [Business associate agreement](https://neon1.tech/knowledge/templates/business-associate-agreement/): An example HIPAA business associate agreement with neon1 LLC as the business associate, modeled on the HHS sample provisions.
+- [Care plan](https://neon1.tech/knowledge/templates/care-plan/): The monthly agreement for ongoing care after a project: what's looked after, what's included each month, how fast I respond, what it costs, and how it ends.
+- [Decision review](https://neon1.tech/knowledge/templates/decision-review/): A two-page written review of one technology decision: the situation, the options with their costs, a recommendation, and the next step.
+- [Partner responsibilities](https://neon1.tech/knowledge/templates/partner-responsibilities/): Who does what when neon1 works alongside another firm: selling, building, support, billing, data, insurance, and exit.
+- [Proposal](https://neon1.tech/knowledge/templates/proposal/): The proposal neon1 sends after discovery: your problem, the result, the options with what's in and out and honest hours, what each of us will do, price, and acceptance.
+- [Services agreement](https://neon1.tech/knowledge/templates/services-agreement/): The short agreement a client and neon1 sign once, before any paid work: how proposals become agreed work, payment, changes, ownership, confidentiality, limits, and ending.
+
+## Forms
+
+- [Change request](https://neon1.tech/knowledge/forms/change-request/): How a change to agreed scope is written down, priced, and approved before any work happens.
+- [Discovery and outcome record](https://neon1.tech/knowledge/forms/discovery/): What's learned about one real task before a solution is proposed: steps, baseline, desired result, and options.
+- [Incident and restore record](https://neon1.tech/knowledge/forms/incident-and-restore/): A timestamped record of an interruption or restore test, what was affected, what was done, and what changes next.
+- [Intake](https://neon1.tech/knowledge/forms/intake/): The first record of a possible project: the problem, who's involved, and whether it's a fit.
+- [Metric record](https://neon1.tech/knowledge/forms/metric-record/): The exact definition of one measure: what counts, the formula, the source, the baseline, and the target.
+- [Publication permission record](https://neon1.tech/knowledge/forms/publication-permission/): Your specific permission before anything about your project is published.
+- [Release and handover record](https://neon1.tech/knowledge/forms/release-and-handover/): The checklist that closes a project: acceptance, ownership, recovery, training, access removal, and follow-up.
+- [Service and recovery profile](https://neon1.tech/knowledge/forms/service-and-recovery-profile/): What a running service must do, how it's measured, who supports it, and how it comes back after a failure.
+- [Tool and architecture decision](https://neon1.tech/knowledge/forms/tool-decision/): A short record of a technology choice: the problem, the options, the evidence, the cost, and the way out.
+
+## Filled-out examples
+
+- [Business associate agreement request, filled in](https://neon1.tech/knowledge/examples/baa-request/): The BAA questionnaire completed for a fictional physical therapy practice, showing how the decision gets made. (fictional example)
+- [Intake, filled in](https://neon1.tech/knowledge/examples/intake/): The intake form completed for a fictional physical therapy practice after a first call. (fictional example)
+- [Proposal with options, filled in](https://neon1.tech/knowledge/examples/proposal-options/): A complete neon1 proposal with three options for a fictional bakery's order list: discovery, goals, what's in and out, honest hours, what each side will do, and the agreement. (fictional example)
+- [Proposal, filled in](https://neon1.tech/knowledge/examples/proposal/): A complete neon1 proposal for a fictional physical therapy practice's intake project. (fictional example)
+- [Release and handover record, filled in](https://neon1.tech/knowledge/examples/release-and-handover/): The handover record that closed a fictional physical therapy practice's intake project. (fictional example)
+
+## Policies
+
+- [Accessibility statement](https://neon1.tech/knowledge/policies/accessibility/): neon1.tech aims for WCAG 2.2 AA. What's in place, what isn't yet, and how to report a barrier.
+- [How I use AI](https://neon1.tech/knowledge/policies/ai-use/): Where neon1 uses AI tools in its own work, where a person stays responsible, and how your information is kept out of them.
+- [Cookie and browser storage notice](https://neon1.tech/knowledge/policies/cookies/): The only cookies and browser storage neon1.tech and 1NEON use, and why.
+- [Privacy policy](https://neon1.tech/knowledge/policies/privacy/): What neon1.tech and the 1NEON portal collect, why, and what you can do about it.
+- [Security disclosure](https://neon1.tech/knowledge/policies/security/): How to report a security problem in neon1.tech, the 1NEON portal, or a neon1 repository, and what happens after you do.
+- [Terms of use](https://neon1.tech/knowledge/policies/terms/): The terms for using neon1.tech and the 1NEON portal.

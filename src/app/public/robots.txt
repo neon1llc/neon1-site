@@ -1,4 +1,33 @@
-# neon1.tech crawler rules: everything public may be crawled; the portal's API is not content
+# neon1.tech crawler rules: everything public may be crawled; the portal's API is not content.
+# Search engines and AI assistants are both welcome to read and cite the site. Each named bot below gets the
+# same rules as everyone else; they are listed so the choice is on record, and a bot with its own group reads
+# only that group, so each repeats the API rule.
+
+# Search engines
+User-agent: Googlebot
+User-agent: Bingbot
+User-agent: DuckDuckBot
+User-agent: Applebot
+Disallow: /1NEON/api/
+
+# AI search and assistants that fetch pages to answer and cite
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+Disallow: /1NEON/api/
+
+# AI model training (Google-Extended and Applebot-Extended are opt-out tokens, not separate crawlers)
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: CCBot
+Disallow: /1NEON/api/
+
+# Everyone else
 User-agent: *
 Disallow: /1NEON/api/
 
