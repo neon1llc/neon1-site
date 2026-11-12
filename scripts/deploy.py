@@ -21,7 +21,7 @@ import sys
 # Shared at the bucket's top rather than per release
 SHARED = ("fonts/", "media/", ".well-known/")
 # Releases kept for rollback; older folders are deleted after a switch
-KEEP = 10
+KEEP = 5
 LONG_CACHE = "public, max-age=31536000, immutable"
 SHORT_CACHE = "no-cache"
 # The sync skips dotfiles everywhere except the top-level .well-known folder

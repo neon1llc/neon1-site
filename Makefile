@@ -163,7 +163,7 @@ icons: ## Redraw the square brand icons from the mark (needs Playwright), then r
 # Each release goes up whole under releases/<id>/, then one write to the release store switches every
 # visitor to it (scripts/deploy.py). Fonts and media are shared and never deleted, so a page left
 # open from an older release can still load them. New folders mean new cache keys: no invalidation
-deploy: ## Upload the site as one release, switch to it, and keep the last 10
+deploy: ## Upload the site as one release, switch to it, and keep the last 5
 	@test -n "$(BUCKET)" || { echo "deploy: BUCKET is empty"; exit 1; }
 	@test -f "$(SITE_DIR)/index.html" || { echo "deploy: no $(SITE_DIR)/index.html, refusing to sync"; exit 1; }
 	python3 scripts/deploy.py deploy $(SITE_DIR) $(BUCKET) $(RELEASE_STORE)
