@@ -26,6 +26,8 @@ The asset check follows each page into its stylesheets and scripts, so a missing
 
 The case studies and the questions are written in [neon1-corpus](https://github.com/neon1llc/neon1-corpus), the one place neon1's public words live, and copied into `index.html` between `<!-- corpus:NAME -->` comments. Edit them there, not here. To bring a corpus change in, tag a corpus release, set `CORPUS_TAG` in the `Makefile`, and run `make corpus`. `make check` fails if the blocks differ from the pinned tag. To try unreleased corpus edits, run `make corpus CORPUS_DIR=../neon1-corpus`.
 
+The Knowledge Center (`/knowledge/`, `make knowledge`) and the blog (`/blog/`, `make blog`, with an RSS feed at `/blog/feed.xml`) are generated from the same pinned tag, one folder of `index.html` pages per document or post, sharing the page shell in `scripts/page-shell.mjs`. A blog post is a `post` document in the corpus's `blog/` folder: write it there, release the corpus, bump `CORPUS_TAG`, and run `make blog knowledge` (the second rewrites `/llms.txt`, which lists the posts).
+
 The generated blocks are committed, so the deploy stays a plain copy of `src/app/public/` and nothing is fetched while someone reads the page. Checks need network access once, to fetch the tag into `.corpus/`.
 
 ## Content Security Policy
