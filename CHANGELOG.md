@@ -4,6 +4,11 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+## v0.66.2
+
+### Fixed
+- Scrolling back up a Knowledge Center page, the On this page bar rejoins the page the moment it reaches its place, then shrinks there, so no gap shows above it.
+
 ## v0.66.1
 
 ### Removed
