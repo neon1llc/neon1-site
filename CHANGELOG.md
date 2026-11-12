@@ -2,6 +2,15 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.60.0
+
+### Added
+- The p.r.o.s.e guides fold lists You Have 20 Seconds To Comply, compliance guides by domain from HIPAA and GxP to PCI DSS, privacy, and accessibility, open on GitHub.
+- Knowledge Center: a page for You Have 20 Seconds To Comply (neon1-corpus v0.32.0).
+
+### Changed
+- p.r.o.s.e lists neon1-corpus at v0.32.0.
+
 ## v0.59.0
 
 ### Changed
