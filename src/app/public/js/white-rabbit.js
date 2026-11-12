@@ -90,10 +90,10 @@ export function whiteRabbit({ rain, root }) {
 
   // Leaving the cover: some phone browsers (DuckDuckGo on iPhone) keep the scene's last frame in the
   // strip under their floating toolbar, outside the page's own viewport, until something repaints the
-  // whole window. Changing the root's background for two frames (same color) asks for that repaint
+  // whole window. Giving the root its own background for a few frames (the page's color, css/site.css) asks for that repaint
   function repaintEdges() {
-    html.style.backgroundColor = getComputedStyle(body).backgroundColor;
-    requestAnimationFrame(() => requestAnimationFrame(() => { html.style.backgroundColor = ""; }));
+    html.classList.add("white-rabbit-repaint");
+    setTimeout(() => html.classList.remove("white-rabbit-repaint"), 80);
   }
 
   // The card's carved sign, painted once by the same module the room uses
