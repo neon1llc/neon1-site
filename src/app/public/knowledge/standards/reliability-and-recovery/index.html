@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.57.1" />
+  <meta name="version" content="0.58.0" />
   <title>Reliability and recovery · neon1 knowledge center</title>
   <meta name="description" content="How neon1 sets service targets, plans for failure, and tests that backups restore." />
   <meta name="theme-color" content="#F2F4F2" />
@@ -120,7 +120,7 @@
 <p>Dependencies such as sign-in, email delivery, payments, and your own internet connection are listed, with which failures the design survives.</p>
 <h2 id="the-vocabulary">The vocabulary</h2>
 <table><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td><strong>SLI</strong> (service level indicator)</td><td>What we observe, such as the share of valid requests stored and acknowledged within a set time</td></tr><tr><td><strong>SLO</strong> (service level objective)</td><td>The target value for that indicator over a stated window</td></tr><tr><td><strong>SLA</strong> (service level agreement)</td><td>A contractual promise with consequences. An internal target isn't automatically one</td></tr><tr><td><strong>Response time</strong></td><td>Time to a real person's first useful reply, separate from time to fix</td></tr><tr><td><strong>RTO</strong> (recovery time objective)</td><td>The intended longest time to restore the service after a defined disruption</td></tr><tr><td><strong>RPO</strong> (recovery point objective)</td><td>How much recent data you can afford to lose, measured in time</td></tr></tbody></table>
-<p>Definitions follow <a class="ext" href="https://sre.google/sre-book/service-level-objectives/" target="_blank" rel="noopener">Google's SRE <span class="ext-end">guidance</span></a> and <a class="ext" href="https://csrc.nist.gov/pubs/sp/800/34/r1/upd1/final" target="_blank" rel="noopener">NIST SP <span class="ext-end">800-34</span></a>.</p>
+<p>Definitions follow <a class="ext" href="https://sre.google/sre-book/service-level-objectives/" target="_blank" rel="noopener">Google's site reliability guidance on service level <span class="ext-end">objectives</span></a> and NIST's contingency planning guide, <a class="ext" href="https://csrc.nist.gov/pubs/sp/800/34/r1/upd1/final" target="_blank" rel="noopener">SP <span class="ext-end">800-34</span></a>.</p>
 <h2 id="what-a-percentage-costs">What a percentage costs</h2>
 <table><thead><tr><th>Availability target</th><th>Allowed downtime in 30 days</th></tr></thead><tbody><tr><td>99%</td><td>7 hours 12 minutes</td></tr><tr><td>99.5%</td><td>3 hours 36 minutes</td></tr><tr><td>99.9%</td><td>43 minutes</td></tr><tr><td>99.99%</td><td>4 minutes</td></tr></tbody></table>
 <p>Each extra nine needs faster detection, faster response, and usually more money. A person who's unavailable until the weekend can't meet 99.9% for anything that needs a human to fix it. So I don't sell targets that the coverage can't back up.</p>
@@ -205,7 +205,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener"><span class="ext-end">v0.57.1</span></a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener"><span class="ext-end">v0.58.0</span></a>
       </span>
     </div>
   </footer>

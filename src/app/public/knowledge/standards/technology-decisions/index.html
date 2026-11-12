@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.57.1" />
+  <meta name="version" content="0.58.0" />
   <title>Technology decisions · neon1 knowledge center</title>
   <meta name="description" content="How neon1 chooses tools and architecture, counts the full cost, and checks licenses." />
   <meta name="theme-color" content="#F2F4F2" />
@@ -122,7 +122,7 @@
 <h2 id="count-the-whole-cost">Count the whole cost</h2>
 <p>First-year cost includes setup, subscriptions, computing, storage, data transfer, backups, monitoring, AI usage, payment fees, migration, training, upkeep, and the cost of leaving later.</p>
 <aside class="callout example"><p class="callout-title">Why the license price isn't the price</p><p>A free tool on a $12 a month server that needs an hour of someone's time each month, valued here at $75, costs at least $1,044 a year before setup, backups, or incidents. A $25 a month managed service costs $300 a year in fees before its own admin time and limits. Neither is automatically better, and the license price is only part of the cost.</p></aside>
-<p>I follow the <a class="ext" href="https://www.finops.org/framework/" target="_blank" rel="noopener"><span class="ext-end">FinOps</span></a> idea at a small scale: a budget, an owner, a regular look at the bill, and a cost per useful result.</p>
+<p>I follow the <a class="ext" href="https://www.finops.org/framework/" target="_blank" rel="noopener">FinOps <span class="ext-end">Framework</span></a>, the practice of managing cloud costs, at a small scale: a budget, an owner, a regular look at the bill, and a cost per useful result.</p>
 <h2 id="architecture-that-fits-a-small-business">Architecture that fits a small business</h2>
 <ul><li>A brochure website is usually a static site on managed hosting with versioned source and a documented redeploy.</li><li>Client workflows use a few clearly owned parts and supported integrations. A modular app or a managed workflow usually beats microservices or Kubernetes at this size.</li><li>Infrastructure as code is worth it when repeatability and recovery justify the setup.</li><li>The <a class="ext" href="https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html" target="_blank" rel="noopener">AWS <span class="ext-end">Well-Architected</span></a> pillars (operations, security, reliability, performance, cost, sustainability) are a useful lens even when nothing runs on AWS.</li></ul>
 <h2 id="integrations-that-don-t-break-quietly">Integrations that don't break quietly</h2>
@@ -198,7 +198,7 @@
         <a href="/1NEON/cookies">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/1NEON/terms">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener"><span class="ext-end">v0.57.1</span></a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener"><span class="ext-end">v0.58.0</span></a>
       </span>
     </div>
   </footer>
