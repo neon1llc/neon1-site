@@ -4,6 +4,15 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+## v0.65.0
+
+### Added
+- The short version: posts and Knowledge Center documents that have one (neon1-corpus v0.35.0, `short`) show it in a box between their facts and their text, with the same outline as 1NEON's Next step. It's a section with its own heading, left out of On this page, and it also leads each RSS item, sits under the facts in the PDF, and becomes the page's `abstract` in its structured data.
+- Blog posts list their author and minutes to read in the facts row, and their structured data gives the reading time (`timeRequired`). The author moved up from the line at the bottom.
+
+### Changed
+- The p.r.o.s.e row for neon1-corpus shows v0.35.0.
+
 ## v0.64.3
 
 ### Changed

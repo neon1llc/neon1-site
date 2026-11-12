@@ -12,7 +12,7 @@
 
 import { readFileSync, readdirSync, existsSync } from "node:fs"
 import { join } from "node:path"
-import { load, pageBody, catalogFacts, fillNote, TASK_PATHS, searchIndex, esc, longDate, TYPE_LABELS, SITE, BASE, slugOf } from "./knowledge-lib.mjs"
+import { load, pageBody, relink, classifyLinks, bindExtArrows, catalogFacts, fillNote, TASK_PATHS, searchIndex, esc, longDate, TYPE_LABELS, SITE, BASE, slugOf } from "./knowledge-lib.mjs"
 import { homeFrame, page as page_, ORG, WEBSITE, AUTHOR, LICENSE, OG_IMAGE, crumbs, band, card as cardOf, CORPUS_LINK, rights, dateFacts, docMain, sitemapWith, syncFolder } from "./page-shell.mjs"
 
 
@@ -190,6 +190,8 @@ function docPage(d) {
     ...related.map((r) => ({ url: r.url, kicker: corpus.manifest.shelves[r.section].label, title: r.title })),
   ]
   const body = pageBody(d, corpus)
+  // The short version, linked the same way as the text
+  const short = (d.shortHtml ?? []).map((h) => bindExtArrows(classifyLinks(relink(h, d, corpus))))
   // The actions row also draws the line under the header, so it stays even when a document has no PDF
   const actions = `
         <div class="kc-actions">${d.pdf ? `
@@ -200,7 +202,7 @@ function docPage(d) {
   const main = docMain({
     crumbs: [["Knowledge center", BASE], [shelf.label, `${BASE}#${d.section}`]],
     flag: d.data.fictional ? '<p class="kc-flag">Fictional example</p>' : "",
-    title: d.title, summary: d.summary, facts, actions, sections: d.sections, body, next,
+    title: d.title, summary: d.summary, facts, short, actions, sections: d.sections, body, next,
     colophon: `${rights(d.source)} ${note}${esc(fillNote(d))}`,
   })
   // An article for every document; a questions page also lists each question with its answer
@@ -211,6 +213,7 @@ function docPage(d) {
     url,
     [d.type === "faq" ? "name" : "headline"]: d.title,
     description: d.summary,
+    ...(d.shortHtml?.length ? { abstract: d.shortHtml.map((h) => plain(h.replace(/\s*<a href="#[^"]*">[^<]*<\/a>\.?/g, ""))).join(" ") } : {}),
     inLanguage: "en-US",
     ...(d.data.created ? { datePublished: d.data.created } : {}),
     dateModified: d.data.updated,

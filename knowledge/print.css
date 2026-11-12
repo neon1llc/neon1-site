@@ -131,6 +131,24 @@ h1 {
 }
 
 
+/* ---- The short version: a thin green box under the facts, its label in the facts' small capitals ---- */
+.short {
+  margin: 0 0 16pt;
+  padding: 8pt 12pt 9pt;
+  border: 0.75pt solid var(--brand);
+  border-radius: 4pt;
+  break-inside: avoid;
+}
+.short-label {
+  margin: 0 0 4pt;
+  font: 700 7.5pt var(--body);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+.short ul { margin: 0; padding-left: 14pt; font-size: 10pt; line-height: 1.45; }
+.short li + li { margin-top: 3pt; }
+
 /* ---- Document facts: a small bordered table under a green bar, like a proposal's "Design for" block ---- */
 .facts {
   width: 100%;

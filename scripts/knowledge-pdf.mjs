@@ -58,6 +58,9 @@ function facts(d) {
   return `<table class="facts"><caption>About this document</caption><tbody>${rows.join("")}</tbody></table>`
 }
 
+// The short version under the facts, when the document has one, with links that work from paper too
+const shortOf = (d) => (d.shortHtml?.length ? `<section class="short"><p class="short-label">The short version</p><ul>${d.shortHtml.map((h) => `<li>${relink(h, d, corpus, { absolute: true }).replace(/href="#/g, `href="${SITE}${d.url}#`)}</li>`).join("")}</ul></section>` : "")
+
 // The full page Chromium prints. Fonts and styles resolve from knowledge/
 function pageHtml(d) {
   const shelf = corpus.manifest.shelves[d.section].label
@@ -85,6 +88,7 @@ function pageHtml(d) {
   </header>
   <p class="summary">${esc(d.summary)}</p>
   ${facts(d)}
+  ${shortOf(d)}
   <main>${keepFields(relink(singleH1(d.html, d.title), d, corpus, { absolute: true }))}</main>
   <p class="colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit.${note}${fillNote(d) ? ` ${esc(fillNote(d))}` : ""} The latest version is at <a href="${SITE}${d.url}">${esc(`neon1.tech${d.url}`)}</a>.</p>
 </body>
