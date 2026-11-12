@@ -2,6 +2,15 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## Unreleased
+
+### Changed
+- Corpus releases publish on their own. Every build reads the newest neon1-corpus release instead of a tag pinned in the Makefile, and the deploy workflow checks every 15 minutes whether neon1.tech shows that release; when it doesn't, it runs the usual checks, browser tests, PDF printing, and release switch from main. Site versions and tags only move for site changes. /knowledge/corpus.json names the corpus release that's live, and make verify confirms it.
+- The Knowledge Center and blog folders are built by make content and no longer committed, so the repository can't fall behind what's live.
+
+### Added
+- make static (part of make check) fails if a page script reads a corpus source, or if a built Knowledge Center or blog page lacks its own heading and text, so corpus words always reach readers as static HTML.
+
 ## v0.62.2
 
 ### Changed

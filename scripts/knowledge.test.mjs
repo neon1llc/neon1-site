@@ -108,7 +108,7 @@ test("task paths link existing documents, and the build fails when one disappear
   assert.match(r.stderr, new RegExp(TASK_PATHS[0].ids[0]))
 })
 
-// What each query must surface, as document ids. The fixture and the pinned corpus both have to satisfy these
+// What each query must surface, as document ids. The fixture and the release-built corpus both have to satisfy these
 const QUERIES = {
   passkey: ["faq-1neon-help"],
   authenticator: ["faq-1neon-help"],
@@ -142,9 +142,9 @@ test("the listed queries return relevant documents from the built index", () => 
   assert.equal(search(prepare(JSON.parse(read(f, "knowledge/search-index.json"))), "zzqx").results.length, 0)
 })
 
-// The same queries against the real pinned export, when a checkout has built one (make knowledge-export)
+// The same queries against the real export of CORPUS_TAG, when a checkout has built one (make knowledge-export)
 const realExport = join(here, "..", ".corpus", "export", "knowledge")
-test("the listed queries return documents from the pinned corpus", { skip: !existsSync(join(realExport, "manifest.json")) }, () => {
+test("the listed queries return documents from the built corpus", { skip: !existsSync(join(realExport, "manifest.json")) }, () => {
   const site = mkdtempSync(join(tmpdir(), "kc-real-"))
   mkdirSync(join(site, "knowledge"), { recursive: true })
   const src = join(here, "..", "src", "app", "public")

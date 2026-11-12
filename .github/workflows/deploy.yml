@@ -1,13 +1,18 @@
 # .github/workflows/deploy.yml - Check the site, then deploy main to S3 and CloudFront.
+# Every build takes the newest neon1-corpus release, and a watch publishes each new corpus release on its own,
+# so corpus words go live without a site change (README, Publishing a corpus release).
 
 name: deploy
 
-# Pull requests run the checks; pushes to main and manual runs also deploy
+# Pull requests run the checks; pushes to main and manual runs also deploy. The schedule is the corpus watch:
+# it deploys main only when the newest corpus release isn't the one live, and otherwise stops after one request
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+  schedule:
+    - cron: "*/15 * * * *"
   workflow_dispatch:
     inputs:
       force_invalidation:
@@ -20,8 +25,35 @@ permissions:
   contents: read
 
 jobs:
-  check:
+  # Which corpus release this run builds, decided once so the checks and the deploy use the same one. The
+  # watch goes ahead only when the live site names another release in /knowledge/corpus.json
+  plan:
     runs-on: ubuntu-latest
+    outputs:
+      corpus_tag: ${{ steps.pick.outputs.corpus_tag }}
+      go: ${{ steps.pick.outputs.go }}
+    steps:
+      - id: pick
+        env:
+          EVENT: ${{ github.event_name }}
+        run: |
+          tag=$(git ls-remote --tags --refs --sort=-v:refname https://github.com/neon1llc/neon1-corpus 'v*' \
+            | sed -n 's|.*refs/tags/\(v[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)$|\1|p' | head -1)
+          test -n "$tag" || { echo "::error::no neon1-corpus release found"; exit 1; }
+          go=true
+          if [ "$EVENT" = "schedule" ]; then
+            live=$(curl -fsS --max-time 15 https://neon1.tech/knowledge/corpus.json | sed -n 's/.*"tag":"\([^"]*\)".*/\1/p' || true)
+            if [ "$live" = "$tag" ]; then go=false; echo "neon1.tech already shows neon1-corpus $tag"; else echo "neon1.tech shows ${live:-no corpus release}; publishing $tag"; fi
+          fi
+          echo "corpus_tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "go=$go" >> "$GITHUB_OUTPUT"
+
+  check:
+    needs: plan
+    if: needs.plan.outputs.go == 'true'
+    runs-on: ubuntu-latest
+    env:
+      CORPUS_TAG: ${{ needs.plan.outputs.corpus_tag }}
     steps:
       # Full history so gitleaks scans every commit
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -35,6 +67,9 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: knowledge/package-lock.json
+
+      # The corpus-made pages aren't committed, so they're written first, from the planned corpus release
+      - run: make content
 
       # A push compares fonts and media with the commit before it; a pull request, with origin/main
       - run: make check
@@ -64,9 +99,11 @@ jobs:
   # Deploys only from main, after the static checks and the browser contracts in check pass; nothing
   # touches S3 or CloudFront before then
   deploy:
-    needs: check
+    needs: [plan, check]
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
+    env:
+      CORPUS_TAG: ${{ needs.plan.outputs.corpus_tag }}
     permissions:
       contents: write
       id-token: write
@@ -88,15 +125,17 @@ jobs:
           role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
           aws-region: us-east-1
 
-      # The knowledge center's PDFs are printed here, from the pinned corpus, so they're never committed
+      # The knowledge center's pages and PDFs are written here, from the planned corpus release, never committed
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: knowledge/package-lock.json
 
-      - name: make knowledge-pdf
+      # The same corpus release the checks passed, written again here, then printed
+      - name: make content and knowledge-pdf
         run: |
+          make content
           npm ci --prefix knowledge
           npx --prefix knowledge playwright install --with-deps chromium
           make knowledge-pdf

@@ -2,11 +2,11 @@
 // scripts/blog.mjs - Writes the blog (/blog/) from neon1-corpus, or checks it matches.
 // Usage: node scripts/blog.mjs sync|check SITE_DIR BLOG_EXPORT KNOWLEDGE_EXPORT   (make blog, and make blog-check)
 //
-// BLOG_EXPORT is the corpus's blog bundle (tools/export.mjs --target blog) from the tag pinned in the Makefile;
-// KNOWLEDGE_EXPORT is its knowledge bundle, so a post's links to other corpus documents open their Knowledge
-// Center pages. Every post becomes /blog/<slug>/index.html, newest first on /blog/index.html, with an RSS feed at
-// /blog/feed.xml. Like the Knowledge Center, the pages are committed and generated: sync rewrites the folder and
-// the sitemap's blog block; check fails if anything differs, so a hand edit or an unpulled corpus change is caught.
+// BLOG_EXPORT is the corpus's blog bundle (tools/export.mjs --target blog) from CORPUS_TAG, the newest corpus
+// release unless the Makefile is told otherwise; KNOWLEDGE_EXPORT is its knowledge bundle, so a post's links to
+// other corpus documents open their Knowledge Center pages. Every post becomes /blog/<slug>/index.html, newest
+// first on /blog/index.html, with an RSS feed at /blog/feed.xml. Like the Knowledge Center, the folder is built by
+// make content and never committed: sync rewrites it and the sitemap's blog block; check fails if anything differs.
 
 import { readFileSync, writeFileSync, mkdirSync, rmSync, readdirSync, statSync, existsSync } from "node:fs"
 import { join, dirname, relative, posix } from "node:path"
@@ -302,7 +302,7 @@ if (mode === "check") {
   for (const path of have) if (!want.has(path)) problems.push(`not from the corpus ${path}`)
   if (sitemapNow !== sitemapWant) problems.push("differs sitemap.xml blog block")
   if (problems.length) {
-    console.error(problems.join("\n") + "\nblog: run make blog to rewrite the blog from the pinned corpus")
+    console.error(problems.join("\n") + "\nblog: run make blog to rewrite the blog from the corpus")
     process.exit(1)
   }
   console.log(`blog: ${want.size} files match the corpus`)
