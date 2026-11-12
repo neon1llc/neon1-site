@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## Unreleased
+
+### Added
+- The p.r.o.s.e guides fold lists You Have 20 Seconds To Comply, compliance guides by domain from HIPAA and GxP to PCI DSS, privacy, and accessibility, open on GitHub.
+
 ## v0.59.0
 
 ### Changed
