@@ -85,6 +85,15 @@ export function whiteRabbit({ rain, root }) {
     body.classList.toggle("white-rabbit-cover", on);
     page().forEach((el) => (el.inert = on));
     if (on && how === "card") paintSign();
+    if (!on) repaintEdges();
+  }
+
+  // Leaving the cover: some phone browsers (DuckDuckGo on iPhone) keep the scene's last frame in the
+  // strip under their floating toolbar, outside the page's own viewport, until something repaints the
+  // whole window. Changing the root's background for two frames (same color) asks for that repaint
+  function repaintEdges() {
+    html.style.backgroundColor = getComputedStyle(body).backgroundColor;
+    requestAnimationFrame(() => requestAnimationFrame(() => { html.style.backgroundColor = ""; }));
   }
 
   // The card's carved sign, painted once by the same module the room uses
