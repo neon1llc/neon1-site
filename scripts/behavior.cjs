@@ -189,7 +189,7 @@ check("browser", "home: one wheel gesture from the first screen settles on servi
   try {
     await page.waitForLoadState("load");
     await page.mouse.move(640, 450);
-    for (let i = 0; i < 6; i++) { await page.mouse.wheel(0, 30); await page.waitForTimeout(20); }
+    for (let i = 0; i < 10; i++) { await page.mouse.wheel(0, 30); await page.waitForTimeout(20); }
     await page.waitForFunction(() => Math.abs(document.getElementById("services").getBoundingClientRect().top - 64) < 3, null, { timeout: 5000 });
   } finally { await context.close(); }
 });

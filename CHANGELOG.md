@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## Unreleased
+
+### Changed
+- Moving to the next section of the home page takes about twice the push: roughly 110px of finger travel on a phone (was 55), and about five wheel notches or a longer trackpad swipe on a computer (was three). The page gives a little more as you push, so you can feel it building.
+
 ## v0.57.0
 
 ### Fixed
