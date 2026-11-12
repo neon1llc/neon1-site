@@ -2,7 +2,7 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
-## Unreleased
+## v0.61.0
 
 ### Added
 - The p.r.o.s.e training fold lists There Are No Incidents, incident response training for small businesses with a runbook, playbooks, and tabletop exercises, open on GitHub.
@@ -13,6 +13,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 ### Changed
 - robots.txt names the search engines, AI search assistants, and AI training crawlers, each with the same rules as everyone else, so the choice to welcome them is on record.
 - Deploys keep the last 5 releases for rollback instead of 10, so older release folders are removed sooner.
+- Knowledge Center from neon1-corpus v0.33.0, with a page for There Are No Incidents; p.r.o.s.e lists neon1-corpus v0.33.0.
 
 ## v0.60.1
 

@@ -16,7 +16,7 @@ BUDGET_KB    ?= 8192
 # The key value store whose "release" key names the live release folder (neon1-aws-infrastructure site/)
 RELEASE_STORE ?= neon1-site-release
 # neon1-corpus holds the case studies and questions. A tag pins it; CORPUS_DIR can point at a local checkout instead
-CORPUS_TAG   ?= v0.32.1
+CORPUS_TAG   ?= v0.33.0
 CORPUS_REPO  ?= https://github.com/neon1llc/neon1-corpus
 CORPUS_DIR   ?= .corpus/$(CORPUS_TAG)
 
