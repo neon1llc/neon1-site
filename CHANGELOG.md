@@ -2,6 +2,14 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.60.1
+
+### Fixed
+- Knowledge Center from neon1-corpus v0.32.1: dead, moved, and retired source links now point to their current pages, and the measurement standard names DORA's five metrics.
+
+### Changed
+- p.r.o.s.e lists neon1-corpus v0.32.1, Ready, Secure, Go v0.1.1, You Have 20 Seconds To Comply v0.1.1, and SOC It 2 Me, Phish Out of Water, and Home Is Where the Smart Is v0.1.2, each with current source links.
+
 ## v0.60.0
 
 ### Added
