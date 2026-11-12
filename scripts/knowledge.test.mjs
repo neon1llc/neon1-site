@@ -44,7 +44,10 @@ function fixture({ dropId = null, noPdf = [] } = {}) {
   for (const d of list) writeFileSync(join(exp, `${d.id}.json`), JSON.stringify(d))
   writeFileSync(join(exp, "manifest.json"), JSON.stringify({ target: "knowledge", groups: { resources: { label: "For you", description: "Docs." } }, shelves: SHELVES, files: list.map((d) => ({ id: d.id, json: `${d.id}.json` })) }))
   const frame = (n) => `<!-- frame:${n} -->x<!-- /frame:${n} -->`
-  writeFileSync(join(site, "index.html"), `<meta name="version" content="v0">${["logo", "actions", "menu-button", "footer"].map(frame).join("")}`)
+  // The bar and phone menu links come from the home page, so the fixture home page carries a few
+  const bar = `<ul class="links">\n        <li><a href="#work">p.r.o.s.e</a></li>\n        <li><a href="/knowledge/">knowledge</a></li>\n        ${frame("actions")}</ul>`
+  const menu = `<div class="menu" id="menu" hidden>\n    <ul>\n      <li><a href="#work">p.r.o.s.e</a></li>\n      <li><a href="/1NEON/" data-handoff>1NEON client portal</a></li>\n    </ul>\n  </div>`
+  writeFileSync(join(site, "index.html"), `<meta name="version" content="v0">${["logo", "menu-button", "footer"].map(frame).join("")}${bar}${menu}`)
   writeFileSync(join(site, "sitemap.xml"), "<urlset>\n  <!-- knowledge -->\n  <!-- /knowledge -->\n</urlset>")
   return { exp, site, list }
 }
@@ -192,4 +195,14 @@ test("bindExtArrows keeps the arrow with the last word", async () => {
   const once = bindExtArrows('<a class="ext" href="x">a b</a>')
   assert.equal(bindExtArrows(once), once)
   assert.match(bindExtArrows('<a class="ext" href="x">github.com/neon1llc/neon1-corpus</a>'), /neon1llc\/neon1-co<span class="ext-end">rpus<\/span>/)
+})
+
+test("the bar and phone menu use the home page's links and words, pointed back at the home page", () => {
+  const f = fixture()
+  assert.equal(build(f).status, 0)
+  const html = read(f, "knowledge/index.html")
+  assert.match(html, /<li><a href="\/#work">p\.r\.o\.s\.e<\/a><\/li>/)
+  assert.match(html, /<a href="\/knowledge\/" aria-current="page">knowledge<\/a>/)
+  assert.match(html, /<a href="\/1NEON\/" data-handoff>1NEON client portal<\/a>/)
+  assert.doesNotMatch(html, /tools I'm building|href="#work"/)
 })
