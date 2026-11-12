@@ -2,6 +2,19 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.61.0
+
+### Added
+- The p.r.o.s.e training fold lists There Are No Incidents, incident response training for small businesses with a runbook, playbooks, and tabletop exercises, open on GitHub.
+- Every Knowledge Center page describes itself to search engines and AI assistants with structured data: an article (or, for question pages, each question and its answer) with its author, published and updated dates, edition, and license, plus its breadcrumb. The index is a collection page. All of it joins the organization the home page already describes.
+- /llms.txt: a plain map of the site for AI assistants, listing every Knowledge Center document with its summary, written from neon1-corpus with the pages.
+- IndexNow: after each verified deploy, the home page and the pages that changed are sent to Bing and the other IndexNow engines (make indexnow), so they're re-read within hours. Bing's index also feeds Copilot and ChatGPT search.
+
+### Changed
+- robots.txt names the search engines, AI search assistants, and AI training crawlers, each with the same rules as everyone else, so the choice to welcome them is on record.
+- Deploys keep the last 5 releases for rollback instead of 10, so older release folders are removed sooner.
+- Knowledge Center from neon1-corpus v0.33.0, with a page for There Are No Incidents; p.r.o.s.e lists neon1-corpus v0.33.0.
+
 ## v0.60.1
 
 ### Fixed

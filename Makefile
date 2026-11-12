@@ -16,7 +16,7 @@ BUDGET_KB    ?= 8192
 # The key value store whose "release" key names the live release folder (neon1-aws-infrastructure site/)
 RELEASE_STORE ?= neon1-site-release
 # neon1-corpus holds the case studies and questions. A tag pins it; CORPUS_DIR can point at a local checkout instead
-CORPUS_TAG   ?= v0.32.1
+CORPUS_TAG   ?= v0.33.0
 CORPUS_REPO  ?= https://github.com/neon1llc/neon1-corpus
 CORPUS_DIR   ?= .corpus/$(CORPUS_TAG)
 
@@ -30,7 +30,7 @@ GITLEAKS_IMAGE := ghcr.io/gitleaks/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79
 
 # Plain make shows the help
 .DEFAULT_GOAL := help
-.PHONY: help corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf check html js links logic frame frame-check release rollback manifest rehash models budget secrets behavior perf serve three icons deploy invalidate verify
+.PHONY: help corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf check html js links logic frame frame-check release rollback manifest rehash models budget secrets behavior perf serve three icons deploy invalidate verify indexnow
 
 
 ##@ Checks
@@ -163,10 +163,14 @@ icons: ## Redraw the square brand icons from the mark (needs Playwright), then r
 # Each release goes up whole under releases/<id>/, then one write to the release store switches every
 # visitor to it (scripts/deploy.py). Fonts and media are shared and never deleted, so a page left
 # open from an older release can still load them. New folders mean new cache keys: no invalidation
-deploy: ## Upload the site as one release, switch to it, and keep the last 10
+deploy: ## Upload the site as one release, switch to it, and keep the last 5
 	@test -n "$(BUCKET)" || { echo "deploy: BUCKET is empty"; exit 1; }
 	@test -f "$(SITE_DIR)/index.html" || { echo "deploy: no $(SITE_DIR)/index.html, refusing to sync"; exit 1; }
 	python3 scripts/deploy.py deploy $(SITE_DIR) $(BUCKET) $(RELEASE_STORE)
+
+# After verify: pings IndexNow (Bing, and through it Copilot and ChatGPT search) with the pages that just changed
+indexnow: ## Tell IndexNow search engines which pages changed (DRY_RUN=1 to print only)
+	python3 scripts/indexnow.py $(SITE_DIR) $(if $(DRY_RUN),--dry-run)
 
 rollback: ## Switch back to the release before the live one (RELEASE=<id> for a specific one)
 	python3 scripts/deploy.py rollback $(BUCKET) $(RELEASE_STORE) $(RELEASE)
