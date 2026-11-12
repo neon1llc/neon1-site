@@ -6,7 +6,8 @@
 # The home page (index.html) is the one source. Each block it marks with
 # <!-- frame:NAME --> ... <!-- /frame:NAME --> is copied, as is, into every other page that
 # loads /css/frame.css. sync writes the copies; check fails if any page has drifted or lacks
-# a block, so an edit made on another page is caught instead of silently overwritten.
+# a block, so an edit made on another page is caught instead of silently overwritten. Both also
+# check that the home page's phone menu holds every bar link with the same words.
 
 import pathlib
 import re
@@ -24,6 +25,22 @@ def blocks(text):
     return {m.group(1): m.group(2) for m in BLOCK.finditer(text)}
 
 
+# The bar's links before its shared actions, and the phone menu's links, as (href, words) pairs
+LINK = re.compile(r'<a [^>]*?href="([^"]+)"[^>]*>([^<]+)</a>')
+BAR = re.compile(r'<ul class="links">(.*?)<!-- frame:actions -->', re.S)
+MENU = re.compile(r'<div class="menu" id="menu" hidden>\s*<ul>(.*?)</ul>', re.S)
+
+
+def menu_problems(home):
+    """The phone menu is the bar for small screens, so it must hold every bar link with the same words."""
+    bar, menu = BAR.search(home), MENU.search(home)
+    if not bar or not menu:
+        return [f"{SOURCE}: bar links or phone menu not found"]
+    have = set(LINK.findall(menu.group(1)))
+    return [f"{SOURCE}: the phone menu lacks the bar's link {words!r} ({href})"
+            for href, words in LINK.findall(bar.group(1)) if (href, words) not in have]
+
+
 def main():
     if len(sys.argv) != 3 or sys.argv[1] not in ("sync", "check"):
         sys.exit("usage: frame.py sync|check SITE_DIR")
@@ -33,7 +50,7 @@ def main():
         sys.exit(f"frame: {SOURCE} marks no blocks")
 
     # Every other page on the shared frame gets every block
-    problems = []
+    problems = menu_problems((root / SOURCE).read_text())
     for page in sorted(root.glob("*.html")):
         if page.name == SOURCE or USES_FRAME not in (text := page.read_text()):
             continue
