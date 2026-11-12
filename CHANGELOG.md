@@ -2,6 +2,17 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.62.0
+
+### Added
+- The blog at neon1.tech/blog/: posts written in neon1-corpus, like the Knowledge Center, each on its own page with its published date, topic, and who it's for, plus an RSS feed at /blog/feed.xml (make blog, checked by make blog-check). Each post describes itself to search engines as a BlogPosting with its author and dates, and the index as a Blog. Posts are listed in the sitemap and in /llms.txt.
+- First post: "Tax preparers are financial institutions, as far as the FTC is concerned," on what the FTC Safeguards Rule asks of a small tax or accounting office before tax season.
+- The bar, the menu, and the footer link to the blog, and every page advertises the feed.
+
+### Changed
+- The Knowledge Center and the blog share one page shell (scripts/page-shell.mjs), so their bars and menus stay the same.
+- Knowledge Center and blog from neon1-corpus v0.34.0; p.r.o.s.e lists neon1-corpus v0.34.0 and neon1-aws-infrastructure v0.5.0.
+
 ## v0.61.0
 
 ### Added
