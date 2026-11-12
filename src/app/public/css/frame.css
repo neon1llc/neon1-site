@@ -80,10 +80,10 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 .menu-btn { margin-left: auto; display: none; border-radius: var(--glass-r); }
 .n1-bar.light .menu-btn { color: var(--brand); background: #fff; border-color: rgba(3,87,4,.25); }
 @media (max-width: 1040px) { .links { display: none; } .menu-btn { display: inline-block; } }
-/* The overlay always scrolls below the bar and its close button. The list's auto margins center it when
+/* The overlay always scrolls below the bar and its close button, with the same 24px under the bar as above the screen's bottom, so the list sits centered between them. The list's auto margins center it when
  * it fits and let it start at the top when it doesn't, so no height breakpoint decides (1024x600, zoom) */
 .menu { position: fixed; inset: 0; z-index: 7; display: grid; overflow-y: auto; overscroll-behavior: contain;
-  padding: calc(80px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom)); background: rgba(13,2,8,.94); backdrop-filter: blur(6px); }
+  padding: calc(64px + 24px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom)); background: rgba(13,2,8,.94); backdrop-filter: blur(6px); }
 .menu[hidden] { display: none; }
 /* Opening fades the overlay in and lifts the links a little; closing fades it out (js/frame.js waits) */
 .menu:not([hidden]) { animation: menu-in .28s cubic-bezier(.28,.11,.32,1) both; }
