@@ -4,6 +4,14 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+## v0.64.3
+
+### Changed
+- The Knowledge Center and blog now build their pages from one set of shared parts instead of two near copies: the page header band, cards, breadcrumbs, the facts list (Published and Updated), "On this page", Read next, the rights line, structured data, and the step that writes or checks each folder and its sitemap block. Their pages read the same as before.
+- The browser icons in each page's head come from the home page, like the bar and footer.
+- Knowledge Center documents' breadcrumbs for search engines start at neon1, like the blog's.
+- make frame-check fails if the home page's phone menu lacks any link from its bar, or words it differently.
+
 ## v0.64.2
 
 ### Fixed
