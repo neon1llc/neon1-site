@@ -4,6 +4,16 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+## v0.66.0
+
+### Added
+- The first screen says what neon1 does in one plain line under the slogan, "Cloud, AI, and IT help for small businesses, offices, and homes," with a button to book the free 15-minute call.
+- About shows Pradeep's photo beside the story, and closes with a client's words: Boris M. of Boris M Tax on the knowledge base project, linked to its case study.
+
+### Changed
+- The page description, link preview, and structured data call neon1 a technology practice, without "one-person".
+- The p.r.o.s.e rows show neon1-corpus v0.36.0, which adds the short versions of the Terms and Security policy, typical first projects on Services, and the client's words in the accounting case study.
+
 ## v0.65.1
 
 ### Changed
