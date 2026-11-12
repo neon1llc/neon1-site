@@ -2,6 +2,14 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## Unreleased
+
+### Added
+- p.r.o.s.e has a second half, "Purposeful, repeatable, open-source education", under the engineering one. Its guides fold holds Ready, Secure, Go and the Knowledge Center's guides, and its training fold holds security awareness sessions and SOC 2 readiness.
+
+### Changed
+- Each p.r.o.s.e row's arrow sits at the row's end, so the whole row reads as the thing to tap. It still points left when closed and turns down when open.
+
 ## v0.57.0
 
 ### Fixed
