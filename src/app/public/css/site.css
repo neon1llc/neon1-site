@@ -338,7 +338,12 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 /* The prose groups: one line above and below each label, like the fit list's rows */
 .fold.group { border-top: 1px solid rgba(18,36,26,.12); }
 .fold.group:last-of-type { border-bottom: 1px solid rgba(18,36,26,.12); }
-.fold.group > summary { padding: 14px 0; }
+/* The education half of p.r.o.s.e starts a second list: room above, and the last fold before it closes its line */
+.lead.intro.second { margin-top: 36px; }
+.fold.group:has(+ .lead.intro.second) { border-bottom: 1px solid rgba(18,36,26,.12); }
+/* A group's label spans the row and its arrow sits at the row's end, so the whole row reads as the
+   control; the arrow still points left when closed and turns down when open, like every fold */
+.fold.group > summary { padding: 14px 0; width: auto; justify-content: space-between; }
 .fold.group > .rows { border-top: 0; margin-bottom: 8px; }
 .repos .row { padding: 12px 0; }
 .repos .row h3 { font-size: 16px; }
