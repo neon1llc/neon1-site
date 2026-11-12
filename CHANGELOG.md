@@ -2,6 +2,12 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## Unreleased
+
+### Changed
+- On phones, the menu follows the page's theme: over the light part of the home page and on light pages such as the Knowledge Center, it opens on the light surface with dark green links instead of going dark. Over the rain, it stays dark.
+- The menu eases open (a fade, with the links lifting into place) and fades out when it closes. With reduced motion, it opens and closes at once.
+
 ## v0.57.0
 
 ### Fixed
