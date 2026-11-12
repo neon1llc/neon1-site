@@ -48,26 +48,22 @@ function mark() {
 
 // ---- Docking the folded index (narrow screens, where it's shown) ----
 // One spacer holds the fold's place while it's docked, so the text doesn't jump when it leaves the flow. Docking
-// starts the bar at the fold's own size and position, then eases it out to the full width; undocking eases it back
-// before it rejoins. A scroll back down while it's still easing back cancels the undock rather than docking twice,
-// so a quick down-up-down never leaves a stray spacer behind (each one used to add a gap above the bar).
+// starts the bar at the fold's own size and position, then eases it out to the full width. Undocking puts it back
+// in the page the moment its place comes back under the top bar, still full width, and eases it to its resting
+// size there, so scrolling on up never shows a gap where the bar was. A scroll back down mid-ease docks it again.
 const spacer = document.createElement("div");
 spacer.className = "kc-toc-spacer";
 let docked = false;
-let leaving = null; // the pending end of an undock: { finish, timer }
+let settling = 0; // the timer that ends an undock's easing back
+
+function stopSettling() {
+  clearTimeout(settling);
+  settling = 0;
+  fold.classList.remove("settling", "bleed");
+}
 
 function dock() {
-  if (leaving) {
-    // Still easing back: stay docked and ease out again, with the same spacer
-    fold.removeEventListener("transitionend", leaving.finish);
-    clearTimeout(leaving.timer);
-    leaving = null;
-    fold.classList.remove("leaving");
-    current = "";
-    if (reduce.matches) return fold.classList.add("wide");
-    requestAnimationFrame(() => fold.classList.add("wide"));
-    return;
-  }
+  stopSettling();
   const r = fold.getBoundingClientRect();
   spacer.style.height = `${fold.offsetHeight}px`;
   fold.before(spacer);
@@ -82,36 +78,28 @@ function dock() {
 }
 
 function undock() {
-  const done = () => {
-    if (!leaving || leaving.finish !== finish) return;
-    fold.removeEventListener("transitionend", finish);
-    clearTimeout(leaving.timer);
-    leaving = null;
-    fold.classList.remove("docked", "wide", "leaving");
-    spacer.remove();
-    current = "";
-    mark();
-  };
-  // Only the fold's own easing ends the undock, not a transition inside it
-  const finish = (e) => { if (!e || e.target === fold) done(); };
   fold.open = false;
-  leaving = { finish, timer: 0 };
-  if (reduce.matches) return done();
-  // Ease back to the resting size over the spot it came from, then rejoin the page
+  // Rejoin the page at once, in the spacer's place
   const r = spacer.getBoundingClientRect();
-  fold.style.setProperty("--from-left", `${r.left}px`);
-  fold.style.setProperty("--from-right", `${innerWidth - r.right}px`);
-  fold.classList.add("leaving");
-  fold.classList.remove("wide");
-  fold.addEventListener("transitionend", finish);
-  leaving.timer = setTimeout(done, 400);
+  fold.classList.remove("docked", "wide");
+  spacer.remove();
+  current = "";
+  mark();
+  if (reduce.matches) return;
+  // Then ease from the bar's full width to the resting size, in place: negative margins reach the screen's edges
+  fold.style.setProperty("--bleed-l", `${-r.left}px`);
+  fold.style.setProperty("--bleed-r", `${r.right - document.documentElement.clientWidth}px`);
+  fold.classList.add("settling", "bleed");
+  fold.getBoundingClientRect(); // start from full width before easing back
+  requestAnimationFrame(() => fold.classList.remove("bleed"));
+  settling = setTimeout(stopSettling, 400);
 }
 
 function place() {
   if (!fold) return;
   const shown = getComputedStyle(fold).display !== "none";
   const edge = bar?.getBoundingClientRect().bottom ?? 0;
-  // While the fold is docked or easing back, its place in the page is the spacer's
+  // While the fold is docked, its place in the page is the spacer's
   const top = (spacer.isConnected ? spacer : fold).getBoundingClientRect().top;
   if (!docked) {
     if (shown && top <= edge) { docked = true; dock(); }
