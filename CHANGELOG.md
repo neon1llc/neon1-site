@@ -4,6 +4,11 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+## v0.64.0
+
+### Added
+- Every blog post ends with "Share this post": Copy link, the device's own share sheet where the browser has one, and links to share on LinkedIn, X, Facebook, Bluesky, Threads, Reddit, WhatsApp, or by email. They're plain links to each service's share page, so no outside script runs on neon1.tech and nothing tracks readers. The links work without JavaScript; js/blog-share.js only reveals the two buttons where the browser supports them.
+
 ## v0.63.0
 
 ### Changed
