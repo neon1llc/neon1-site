@@ -4,6 +4,7 @@
 # Usage: python3 scripts/deploy.py id SITE_DIR
 #        python3 scripts/deploy.py deploy SITE_DIR BUCKET STORE
 #        python3 scripts/deploy.py rollback BUCKET STORE [RELEASE]
+#        python3 scripts/deploy.py dev SITE_DIR BUCKET STORE KEY      (dev.neon1.tech; KEY is "release" or "branch:<name>")
 #
 # Pages, scripts, and styles are uploaded whole to releases/<id>/, where <id> is a hash of their
 # content, and only then does the store's "release" key name that folder. neon1.tech's router
@@ -15,6 +16,7 @@
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 
@@ -22,6 +24,8 @@ import sys
 SHARED = ("fonts/", "media/", ".well-known/")
 # Releases kept for rollback; older folders are deleted after a switch
 KEEP = 5
+# dev.neon1.tech keeps fewer: its own last 3, plus one folder per branch preview
+DEV_KEEP = 3
 LONG_CACHE = "public, max-age=31536000, immutable"
 SHORT_CACHE = "no-cache"
 # The sync skips dotfiles everywhere except the top-level .well-known folder
@@ -122,6 +126,58 @@ def deploy(root, bucket, store):
             aws("s3", "rm", f"s3://{bucket}/releases/{old}/", "--recursive", "--only-show-errors", capture=False)
 
 
+def dev(root, bucket, store, key):
+    """dev.neon1.tech: the same upload, then one key switches. "release" is the dev branch (with a short
+    history for make dev-rollback); "branch:<name>" is a branch preview. No tags, no IndexNow, no verify
+    against neon1.tech: dev releases are never releases of the site."""
+    if key != "release" and not re.fullmatch(r"branch:[a-z0-9][a-z0-9-]{0,39}", key):
+        sys.exit(f"dev: bad key {key!r}")
+    rid = release_id(root)
+    arn = aws("cloudfront", "describe-key-value-store", "--name", store, "--output", "json")["KeyValueStore"]["ARN"]
+    etag = aws("cloudfront-keyvaluestore", "describe-key-value-store", "--kvs-arn", arn, "--output", "json")["ETag"]
+    items = aws("cloudfront-keyvaluestore", "list-keys", "--kvs-arn", arn, "--output", "json").get("Items", [])
+    keys = {i["Key"]: i["Value"] for i in items}
+    if len(keys.get("gate", "")) < 32:
+        print("dev: no gate key yet, so dev.neon1.tech stays closed to everyone (make dev-gate sets one)")
+    print(f"{key} -> release {rid} (was {keys.get(key) or 'none'})")
+
+    # Shared files, then the release folder, exactly as the live deploy does them
+    aws("s3", "sync", root, f"s3://{bucket}", "--no-progress", "--exclude", "*", "--include", "fonts/*",
+        "--include", "media/*", *DOTFILES, "--cache-control", LONG_CACHE, capture=False)
+    aws("s3", "sync", root, f"s3://{bucket}", "--no-progress", "--exclude", "*", "--include", ".well-known/*",
+        "--cache-control", SHORT_CACHE, capture=False)
+    if keys.get(key) != rid:
+        aws("s3", "sync", root, f"s3://{bucket}/releases/{rid}", "--delete", "--no-progress",
+            "--exclude", "fonts/*", "--exclude", "media/*", *DOTFILES, "--cache-control", SHORT_CACHE, capture=False)
+        puts = [{"Key": key, "Value": rid}]
+        if key == "release":
+            history = [rid] + [h for h in keys.get("history", "").split(",") if h and h != rid]
+            keys["history"] = ",".join(history[:DEV_KEEP])
+            puts.append({"Key": "history", "Value": keys["history"]})
+        keys[key] = rid
+        aws("cloudfront-keyvaluestore", "update-keys", "--kvs-arn", arn, "--if-match", etag,
+            "--puts", json.dumps(puts), "--output", "json")
+    print(f"{key} is release {rid}")
+
+    # Keep every folder a key or the history still names; drop the rest
+    wanted = {v for k, v in keys.items() if k == "release" or k.startswith("branch:")}
+    wanted |= {h for h in keys.get("history", "").split(",") if h}
+    for old in folders(bucket):
+        if old not in wanted:
+            print(f"removing release {old}")
+            aws("s3", "rm", f"s3://{bucket}/releases/{old}/", "--recursive", "--only-show-errors", capture=False)
+
+
+def dev_drop(bucket, store, key):
+    """Forget a branch preview (its folder goes on the next dev deploy)."""
+    if not key.startswith("branch:"):
+        sys.exit("dev-drop: only branch previews can be dropped")
+    arn = aws("cloudfront", "describe-key-value-store", "--name", store, "--output", "json")["KeyValueStore"]["ARN"]
+    etag = aws("cloudfront-keyvaluestore", "describe-key-value-store", "--kvs-arn", arn, "--output", "json")["ETag"]
+    aws("cloudfront-keyvaluestore", "delete-key", "--kvs-arn", arn, "--if-match", etag, "--key", key, "--output", "json")
+    print(f"dropped {key}")
+
+
 def rollback(bucket, store, target=None):
     arn, etag, live, history = store_state(store)
     if target is None:
@@ -144,8 +200,13 @@ def main():
         deploy(*args[1:])
     elif args[:1] == ["rollback"] and len(args) in (3, 4):
         rollback(*args[1:])
+    elif args[:1] == ["dev"] and len(args) == 5:
+        dev(*args[1:])
+    elif args[:1] == ["dev-drop"] and len(args) == 4:
+        dev_drop(*args[1:])
     else:
-        sys.exit("usage: deploy.py id SITE_DIR | deploy SITE_DIR BUCKET STORE | rollback BUCKET STORE [RELEASE]")
+        sys.exit("usage: deploy.py id SITE_DIR | deploy SITE_DIR BUCKET STORE | rollback BUCKET STORE [RELEASE]"
+                 " | dev SITE_DIR BUCKET STORE KEY | dev-drop BUCKET STORE KEY")
 
 
 if __name__ == "__main__":
