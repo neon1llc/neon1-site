@@ -43,6 +43,9 @@ def main():
         problems.append("no Knowledge Center or blog pages; run make content first")
     for page in pages:
         html = page.read_text()
+        # A retired page's small "moved" stub (scripts/knowledge.mjs RETIRED) only forwards, so it carries no text
+        if 'http-equiv="refresh"' in html and "<title>Moved · neon1</title>" in html:
+            continue
         main_ = MAIN.search(html)
         text = re.sub(r"\s+", " ", TAGS.sub(" ", main_.group(0))).strip() if main_ else ""
         if not H1.search(html):

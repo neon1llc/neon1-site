@@ -41,7 +41,15 @@ const forPage = (html) =>
     .replace(/<(h[1-6]) id="[^"]*">/g, "<$1>"))
 
 const ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>'
-const STAGES = ["needs", "execute", "observe", "normalize"]
+// A case study's four sections, by their keys in the corpus, with the front-matter summary each one shortens to
+// and the word the card's glance shows beside it
+const STAGES = [
+  { key: "the-problem", short: "short_needs", word: "problem" },
+  { key: "the-work", short: "short_execute", word: "work" },
+  { key: "the-results", short: "short_observe", word: "results" },
+  { key: "after-handover", short: "short_normalize", word: "after" },
+]
+const STAGE_KEYS = STAGES.map((s) => s.key)
 
 
 
@@ -51,10 +59,10 @@ const withoutQuotes = (html) => html.replace(/(<p>[^<]*client's words:<\/p>)?<bl
 // One case study card. The full story waits in a template until js/cases.js opens it
 function caseCard(c) {
   const d = c.data
-  const glance = STAGES.map((s) => `<dt>${s[0].toUpperCase()}</dt><dd>${esc(d["short_" + s])}</dd>`).join("")
+  const glance = STAGES.map((s) => `<dt>${s.word}</dt><dd>${esc(d[s.short])}</dd>`).join("")
   const deep = c.sections
-    .filter((s) => STAGES.includes(s.key))
-    .map((s) => `<h4><span>${s.headingHtml[0]}</span>${s.headingHtml.slice(1)}</h4>${withoutQuotes(forPage(s.html).replace(/\n/g, ""))}`)
+    .filter((s) => STAGE_KEYS.includes(s.key))
+    .map((s) => `<h4>${s.headingHtml}</h4>${withoutQuotes(forPage(s.html).replace(/\n/g, ""))}`)
     .join("")
   return [
     `        <article class="case reveal-on" id="case-${d.key}">`,
