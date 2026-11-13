@@ -182,8 +182,8 @@ export const TASK_PATHS = [
     ids: ["guides-backups-you-can-trust", "guides-use-case-workflows"] },
   { key: "using", title: "Using 1NEON", blurb: "Answers for the client portal, and what it is.",
     ids: ["faq-1neon-help", "product-1neon"] },
-  { key: "diligence", title: "Technical due diligence", blurb: "How I handle security, data, and recovery, in writing.",
-    ids: ["standards-security-and-data", "standards-reliability-and-recovery", "policy-security"] },
+  { key: "diligence", title: "Technical due diligence", blurb: "How the systems are built, how data is handled, and how security problems are reported.",
+    ids: ["company-architecture", "policy-privacy", "policy-security"] },
 ]
 
 

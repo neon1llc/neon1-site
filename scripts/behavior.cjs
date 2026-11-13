@@ -194,15 +194,15 @@ check("browser", "home: one wheel gesture from the first screen settles on servi
   } finally { await context.close(); }
 });
 
-// ---- CP-16: prose lists neon1's repositories and the tools in two folds; every row says whether it is
+// ---- CP-16: open source lists neon1's repositories and the tools in two folds; every row says whether it is
 // public or private, public rows open GitHub in a new tab, and private rows link nowhere ----
-check("browser", "prose: four folds open with their arrows turned, public rows (education ones included) open GitHub in a new tab, private rows link nowhere, any other row opens the Knowledge Center", async () => {
+check("browser", "open source: three folds open with their arrows turned, public rows (education ones included) open GitHub in a new tab, private rows link nowhere, any other row opens the Knowledge Center", async () => {
   const { page, context, errors } = await open();
   try {
     await page.locator("#work").scrollIntoViewIfNeeded();
     const folds = page.locator("#work details.fold");
-    expect((await folds.count()) === 4, "there aren't four groups");
-    for (let i = 0; i < 4; i++) {
+    expect((await folds.count()) === 3, "there aren't three groups");
+    for (let i = 0; i < 3; i++) {
       await folds.nth(i).locator("summary").click();
       expect(await folds.nth(i).evaluate((d) => d.open && getComputedStyle(d.querySelector(".arr")).transform !== "none"), "a group did not open with its arrow turned");
     }
@@ -261,7 +261,7 @@ check("browser", "case: Shift+Tab from the panel, full Tab cycle, Escape, and fo
 check("browser", "case: on a phone, the menu can't open over an open case study", async () => {
   const { page, context } = await open({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
   try {
-    await page.locator("[data-case=home]").click();
+    await page.locator("[data-case=migration]").click();
     const box = await page.locator("#menuBtn").boundingBox();
     await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
     const menuHidden = await page.locator("#menu").evaluate((m) => m.hidden);
@@ -315,7 +315,7 @@ const landed = (page, id) => page.waitForFunction((id) => {
 }, id, { timeout: 5000 }).then(() => true, () => false);
 
 // The cards a link is tried on, and a link to one placed in the contact view
-const CARDS = ["dermatology", "accounting", "home", "security"];
+const CARDS = ["dermatology", "accounting", "migration", "security"];
 const caseLink = (page, id) => page.evaluate((id) => {
   const a = Object.assign(document.createElement("a"), { href: "#case-" + id, textContent: "case " + id, className: "test-case-link" });
   // In the middle of the view, clear of the fixed bar, so clicking it needs no scroll
@@ -341,10 +341,10 @@ for (const [label, options] of [
 }
 
 for (const motion of ["reduce", "no-preference"]) {
-  check("browser", `case links: opening /#case-home, then Back and Forward (${motion === "reduce" ? "reduced motion" : "motion"})`, async () => {
-    const { page, context, errors } = await open({ reducedMotion: motion }, "/#case-home");
+  check("browser", `case links: opening /#case-migration, then Back and Forward (${motion === "reduce" ? "reduced motion" : "motion"})`, async () => {
+    const { page, context, errors } = await open({ reducedMotion: motion }, "/#case-migration");
     try {
-      expect(await landed(page, "home"), "opening /#case-home did not land on the card");
+      expect(await landed(page, "migration"), "opening /#case-migration did not land on the card");
       await page.goto(origin + "/#contact", { waitUntil: "domcontentloaded" });
       await page.waitForTimeout(400);
       // The visitor goes to contact from the bar, so the page rests at the top of that view
@@ -609,10 +609,10 @@ check("browser", "AS-02: widening past the menu's breakpoint leaves focus on som
   } finally { await context.close(); }
 });
 
-check("browser", "RC-C1: the community case's contact link closes the case and lands on contact", async () => {
+check("browser", "RC-C1: the security case's contact link closes the case and lands on contact", async () => {
   const { page, context } = await open();
   try {
-    await page.locator('#case-community [data-case]').click();
+    await page.locator('#case-security [data-case]').click();
     await page.waitForSelector("#caseLayer:not([hidden])");
     const link = page.locator('.case-panel a[href="#contact"]');
     expect(await link.count(), "the case has no in-page contact link");
