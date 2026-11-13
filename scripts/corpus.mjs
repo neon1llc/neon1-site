@@ -45,13 +45,16 @@ const STAGES = ["needs", "execute", "observe", "normalize"]
 
 
 
+// Client quotes stay in the Knowledge Center case study; the home page panel leaves them out (Pradeep, 2026-11-13)
+const withoutQuotes = (html) => html.replace(/(<p>[^<]*client's words:<\/p>)?<blockquote>[\s\S]*?<\/blockquote>/g, "")
+
 // One case study card. The full story waits in a template until js/cases.js opens it
 function caseCard(c) {
   const d = c.data
   const glance = STAGES.map((s) => `<dt>${s[0].toUpperCase()}</dt><dd>${esc(d["short_" + s])}</dd>`).join("")
   const deep = c.sections
     .filter((s) => STAGES.includes(s.key))
-    .map((s) => `<h4><span>${s.headingHtml[0]}</span>${s.headingHtml.slice(1)}</h4>${forPage(s.html).replace(/\n/g, "")}`)
+    .map((s) => `<h4><span>${s.headingHtml[0]}</span>${s.headingHtml.slice(1)}</h4>${withoutQuotes(forPage(s.html).replace(/\n/g, ""))}`)
     .join("")
   return [
     `        <article class="case reveal-on" id="case-${d.key}">`,

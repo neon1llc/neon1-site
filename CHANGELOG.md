@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.67.1
+
+### Fixed
+- The client quote is gone from the home page's case study panel too. It stays on the case study's Knowledge Center page.
+
 ## v0.67.0
 
 ### Changed
