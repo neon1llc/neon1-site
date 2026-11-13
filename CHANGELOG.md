@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## Unreleased
+
+- dev.neon1.tech sign-in now takes two things: the secret link only starts a sign-in, and a passkey or email code for an account in the dev-access group finishes it. `make dev-gate` makes a new link without signing devices out, `make dev-signout` signs every device out, and `make dev-allow` / `make dev-deny EMAIL=...` decide who may sign in.
+
 ## v0.68.0
 
 - dev.neon1.tech, a private preview of the site: `make dev-push` (or any push to a branch other than main) builds the site in a few seconds and puts it there. The `dev` branch is the dev release; other branches are previews at `dev.neon1.tech/__preview?b=<branch>`. A manual run of the dev workflow can show a neon1-corpus branch, drafts included. Knowledge Center PDFs on dev are copied from neon1.tech rather than printed. Dev deploys are never tagged or announced.

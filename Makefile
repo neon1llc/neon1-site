@@ -36,7 +36,7 @@ GITLEAKS_IMAGE := ghcr.io/gitleaks/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79
 
 # Plain make shows the help
 .DEFAULT_GOAL := help
-.PHONY: help content corpus-tag static corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf blog blog-check blog-export check html js links logic frame frame-check release rollback manifest rehash models budget secrets behavior perf serve three icons deploy invalidate verify indexnow dev-build dev-check dev-push dev-drop dev-rollback dev-gate
+.PHONY: help content corpus-tag static corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf blog blog-check blog-export check html js links logic frame frame-check release rollback manifest rehash models budget secrets behavior perf serve three icons deploy invalidate verify indexnow dev-build dev-check dev-push dev-drop dev-rollback dev-gate dev-signout dev-allow dev-deny
 
 
 ##@ Checks
@@ -276,9 +276,22 @@ dev-drop: ## Forget this branch's preview on dev.neon1.tech (BRANCH=<name> for a
 dev-rollback: ## Switch dev.neon1.tech back to its previous dev release
 	python3 scripts/deploy.py rollback $(DEV_BUCKET) $(DEV_STORE) $(RELEASE)
 
-# A new random key signs every device out; the sign-in link is printed once, here, and kept nowhere else
-dev-gate: ## Set a new dev.neon1.tech sign-in key and print the sign-in link (signs every device out)
-	@python3 scripts/dev_build.py gate $(DEV_STORE)
+# Sign-in is the secret link plus a dev-access account (passkey or email code). The link is printed
+# once, here, and kept nowhere else
+dev-gate: ## Make a new dev.neon1.tech sign-in link and print it (signed-in devices stay in)
+	@python3 scripts/dev_build.py gate
+
+dev-signout: ## Sign every device out of dev.neon1.tech (new cookie key)
+	@python3 scripts/dev_build.py signout $(DEV_STORE)
+
+dev-allow: ## Let EMAIL sign in to dev.neon1.tech (adds them to dev-access, creating a dev account if needed)
+	@test -n "$(EMAIL)" || { echo "usage: make dev-allow EMAIL=someone@example.com"; exit 1; }
+	@python3 scripts/dev_build.py allow '$(EMAIL)'
+
+dev-deny: ## Stop EMAIL signing in to dev.neon1.tech (their devices stay in until make dev-signout)
+	@test -n "$(EMAIL)" || { echo "usage: make dev-deny EMAIL=someone@example.com"; exit 1; }
+	@python3 scripts/dev_build.py deny '$(EMAIL)'
+
 
 
 ##@ Help
