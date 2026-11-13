@@ -2,10 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
-## Unreleased
+## v0.68.0
 
 - dev.neon1.tech, a private preview of the site: `make dev-push` (or any push to a branch other than main) builds the site in a few seconds and puts it there. The `dev` branch is the dev release; other branches are previews at `dev.neon1.tech/__preview?b=<branch>`. A manual run of the dev workflow can show a neon1-corpus branch, drafts included. Knowledge Center PDFs on dev are copied from neon1.tech rather than printed. Dev deploys are never tagged or announced.
 - `dev-sync` merges main into `dev` after every push to main and rebuilds dev.neon1.tech.
+- The open source list names neon1-aws-infrastructure v0.7.0 and neon1-1NEON v0.8.0, their current releases.
 
 ## v0.67.1
 
