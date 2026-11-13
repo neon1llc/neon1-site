@@ -3,7 +3,10 @@
 # scripts/dev_build.py - Helpers for the dev.neon1.tech targets in the Makefile.
 # Usage: python3 scripts/dev_build.py name BRANCH                       (a branch's preview name)
 #        python3 scripts/dev_build.py prepare SITE_DIR DEV_DIR CORPUS_TAG (fresh copy to build into)
-#        python3 scripts/dev_build.py gate STORE                        (new sign-in key and link)
+#        python3 scripts/dev_build.py gate                              (new sign-in link)
+#        python3 scripts/dev_build.py signout STORE                     (sign every device out)
+#        python3 scripts/dev_build.py allow EMAIL                       (let someone sign in)
+#        python3 scripts/dev_build.py deny EMAIL                        (stop someone signing in)
 
 import json
 import os
@@ -16,6 +19,14 @@ import sys
 # Every dev build lives under here; prepare refuses to clear anything else
 DEV_ROOT = ".dev-build"
 CORPUS_REPO = "https://github.com/neon1llc/neon1-corpus"
+# The two sign-in keys (neon1-aws-infrastructure site-dev/sign-in.tf reads them at the edge)
+LINK_PARAM = "/neon1-site/dev/link_key"
+SESSION_PARAM = "/neon1-site/dev/session_key"
+# The 1NEON dev pool, its dev-access group, and the gate's own client there
+DEV_POOL = "1neon-dev"
+DEV_GROUP = "dev-access"
+DEV_CLIENT = "neon1-dev-gate"
+AUTH_HOST = "https://auth-dev.neon1.tech"
 
 
 def name(branch):
@@ -64,15 +75,79 @@ def aws(*args):
     return json.loads(out.stdout) if out.stdout.strip() else None
 
 
-def gate(store):
-    """Put a new random key in the dev store's "gate" and print the sign-in link once."""
+def put_secret(name, value):
+    """Overwrite one SecureString; the value goes in through a temp file, never the command line."""
+    import tempfile
+    with tempfile.NamedTemporaryFile("w", delete=True) as f:
+        os.chmod(f.name, 0o600)
+        f.write(value)
+        f.flush()
+        aws("ssm", "put-parameter", "--name", name, "--type", "SecureString", "--overwrite",
+            "--value", f"file://{f.name}")
+
+
+def gate():
+    """A new secret link. The old one stops working within a minute; signed-in devices stay in."""
     key = secrets.token_urlsafe(32)
+    put_secret(LINK_PARAM, key)
+    print("Sign-in link. Save it in your password manager; it only starts a sign-in, and a")
+    print("passkey or email code for a dev-access account finishes it. The old link no longer works.")
+    print(f"https://dev.neon1.tech/__signin?k={key}")
+
+
+def signout(store):
+    """A new cookie key, in SSM for the sign-in function and in the store for the gate: every device
+    is signed out at once (the store within seconds, the sign-in function within a minute)."""
+    key = secrets.token_hex(32)
+    put_secret(SESSION_PARAM, key)
     arn = aws("cloudfront", "describe-key-value-store", "--name", store)["KeyValueStore"]["ARN"]
     etag = aws("cloudfront-keyvaluestore", "describe-key-value-store", "--kvs-arn", arn)["ETag"]
-    aws("cloudfront-keyvaluestore", "put-key", "--kvs-arn", arn, "--if-match", etag, "--key", "gate", "--value", key)
-    print("Sign-in link. Save it in your password manager and open it once on each device;")
-    print("every device signed in before now is signed out.")
-    print(f"https://dev.neon1.tech/__signin?k={key}")
+    aws("cloudfront-keyvaluestore", "put-key", "--kvs-arn", arn, "--if-match", etag, "--key", "session", "--value", key)
+    print("Every device is signed out of dev.neon1.tech; sign in again with the link.")
+
+
+def pool():
+    """The dev pool's id and the gate client's id."""
+    pools = aws("cognito-idp", "list-user-pools", "--max-results", "60")["UserPools"]
+    pid = next(p["Id"] for p in pools if p["Name"] == DEV_POOL)
+    clients = aws("cognito-idp", "list-user-pool-clients", "--user-pool-id", pid, "--max-results", "60")["UserPoolClients"]
+    return pid, next(c["ClientId"] for c in clients if c["ClientName"] == DEV_CLIENT)
+
+
+def check_email(email):
+    """A plain address only: it goes into a Cognito filter expression."""
+    if not re.fullmatch(r"[^@\s\"'\\]+@[^@\s\"'\\]+\.[^@\s\"'\\]+", email):
+        sys.exit(f"dev: {email!r} is not an email address")
+
+
+def allow(email):
+    """Let someone sign in to dev: a dev account if they have none (no invite email), then the group."""
+    check_email(email)
+    pid, client = pool()
+    found = aws("cognito-idp", "list-users", "--user-pool-id", pid, "--filter", f'email = "{email}"')["Users"]
+    if found:
+        user = found[0]["Username"]
+    else:
+        user = aws("cognito-idp", "admin-create-user", "--user-pool-id", pid, "--username", email,
+                   "--message-action", "SUPPRESS", "--user-attributes", f"Name=email,Value={email}",
+                   "Name=email_verified,Value=true")["User"]["Username"]
+        print(f"created a dev account for {email}")
+    aws("cognito-idp", "admin-add-user-to-group", "--user-pool-id", pid, "--username", user, "--group-name", DEV_GROUP)
+    print(f"{email} may sign in to dev.neon1.tech (an email code works; a passkey is quicker).")
+    print("After signing in once with the link, add a passkey here:")
+    print(f"{AUTH_HOST}/passkeys/add?client_id={client}&redirect_uri=https://dev.neon1.tech/__auth")
+
+
+def deny(email):
+    """Take someone out of dev-access; their account stays, and make dev-signout ends live sessions."""
+    check_email(email)
+    pid, _ = pool()
+    found = aws("cognito-idp", "list-users", "--user-pool-id", pid, "--filter", f'email = "{email}"')["Users"]
+    if not found:
+        sys.exit(f"dev-deny: no dev account for {email}")
+    aws("cognito-idp", "admin-remove-user-from-group", "--user-pool-id", pid, "--username", found[0]["Username"],
+        "--group-name", DEV_GROUP)
+    print(f"{email} can no longer sign in to dev.neon1.tech; run make dev-signout to end their sessions now.")
 
 
 def main():
@@ -81,10 +156,16 @@ def main():
         print(name(a[1]))
     elif a[:1] == ["prepare"] and len(a) in (3, 4):
         prepare(a[1], a[2], a[3] if len(a) == 4 else "")
-    elif a[:1] == ["gate"] and len(a) == 2:
-        gate(a[1])
+    elif a == ["gate"]:
+        gate()
+    elif a[:1] == ["signout"] and len(a) == 2:
+        signout(a[1])
+    elif a[:1] == ["allow"] and len(a) == 2:
+        allow(a[1])
+    elif a[:1] == ["deny"] and len(a) == 2:
+        deny(a[1])
     else:
-        sys.exit("usage: dev_build.py name BRANCH | prepare SITE_DIR DEV_DIR [CORPUS_TAG] | gate STORE")
+        sys.exit("usage: dev_build.py name BRANCH | prepare SITE_DIR DEV_DIR [CORPUS_TAG] | gate | signout STORE | allow EMAIL | deny EMAIL")
 
 
 if __name__ == "__main__":

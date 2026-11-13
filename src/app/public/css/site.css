@@ -216,11 +216,13 @@ html.case-lock { overflow: hidden; }
 .story { display: block; max-width: 720px; }
 .story p { font-size: 18px; line-height: 1.65; margin: 0 0 18px; }
 
-/* About: the photo beside the story, above it on a phone */
-.about { display: grid; grid-template-columns: minmax(90px, 150px) minmax(0, 720px); gap: clamp(24px, 4vw, 48px); align-items: center; }
+/* About: the photo beside the story, above it on a phone. The photo is one fixed size everywhere: 137px, the
+   height of the two paragraphs beside it on a desktop, so it matches them there and doesn't grow on a phone */
+.about { display: grid; grid-template-columns: 137px minmax(0, 720px); gap: clamp(24px, 4vw, 48px); align-items: center; }
 .portrait { margin: 0; }
-.portrait img { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; border-radius: 12px; border: 1px solid var(--line); }
-@media (max-width: 760px) { .about { grid-template-columns: 1fr; } .portrait { max-width: 130px; } }
+.portrait img { display: block; width: 137px; height: 137px; aspect-ratio: 1; object-fit: cover; border-radius: 12px; border: 1px solid var(--line); }
+.about .story p:last-child { margin-bottom: 0; }
+@media (max-width: 760px) { .about { grid-template-columns: 1fr; } }
 /* "More" links: a line of its own under a section, in the site's usual bold link style (.ext) */
 .more { margin: 18px 0 0; }
 .row p b { color: var(--ink); font-weight: 600; }
