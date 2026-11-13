@@ -4,6 +4,10 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+### Changed
+- Pradeep's photo on the home page is half its old size, and the client quote moved off the home page (it stays in the case study).
+- Tighter wording across the home page: services, process, client work, p.r.o.s.e, about, questions, and contact say the same in about a fifth fewer words. The case studies and questions come trimmed from neon1-corpus.
+
 ## v0.66.2
 
 ### Fixed
