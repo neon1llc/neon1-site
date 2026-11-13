@@ -12,7 +12,7 @@ neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site
 ## Company
 
 - [About neon1](https://neon1.tech/knowledge/company/about/): Who does the work, what has been shipped, and how the practice is set up.
-- [How neon1 is built](https://neon1.tech/knowledge/company/architecture/): Diagrams of the website, the 1NEON portal, Neo, and how a change reaches them.
+- [How neon1 is built](https://neon1.tech/knowledge/company/architecture/): Diagrams of the website, the 1NEON portal, Neo, the private dev copy, and how a change reaches them.
 - [Capability statement](https://neon1.tech/knowledge/company/capabilities/): neon1 on one page for a buyer, partner, or procurement office: what it does, how it differs, work it has delivered, and the company's details.
 - [Contact](https://neon1.tech/knowledge/company/contact/): How to reach neon1, when, and what the first call covers.
 - [Glossary](https://neon1.tech/knowledge/company/glossary/): The names and technical terms used across neon1's documents, each in a sentence or two.
