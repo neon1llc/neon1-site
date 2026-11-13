@@ -4,7 +4,7 @@
 // A caught rabbit stops the rain. Scrolling down then scrubs the scene in
 // white-rabbit-scene.js, imported only after a catch: the landing turns out to be
 // the picture on an old TV, and the camera pulls back into a light room and up to
-// a window, ending on "go touch grass". Scrolling up plays it back into the screen
+// a window, ending on "Thanks for following the rabbit.". Scrolling up plays it back into the screen
 // and the rain picks up again. Reduced motion, no WebGL, or a failed import get a
 // still card instead. Sound, synthesized in white-rabbit-sound.js, is readied by the
 // catch and heard once the scroll out of the TV begins, quietly, and it stops when the
@@ -110,7 +110,7 @@ export function whiteRabbit({ rain, root }) {
 
   // Shown once, so the status line announces the end a single time
   function announce(on) {
-    if (on && !announced) { announced = true; grass.textContent = "go touch grass"; }
+    if (on && !announced) { announced = true; grass.textContent = "Thanks for following the rabbit."; }
     if (!on) { announced = false; grass.textContent = ""; }
   }
 
@@ -427,7 +427,7 @@ export function whiteRabbit({ rain, root }) {
 
   // ---- The card (reduced motion and fallbacks) ----
   // Scroll-linked and reversible, with nothing moving on its own: the page goes dark, the window and
-  // its view come up out of the dark, then "go touch grass" rises from behind the trees. Scrolling
+  // its view come up out of the dark, then "Thanks for following the rabbit." rises from behind the trees. Scrolling
   // back reverses it, and back at the start the egg is disarmed
   let cardP = 0;
   function card(d) {

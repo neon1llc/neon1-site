@@ -45,8 +45,8 @@ function fixture({ dropId = null, noPdf = [] } = {}) {
   writeFileSync(join(exp, "manifest.json"), JSON.stringify({ target: "knowledge", groups: { resources: { label: "For you", description: "Docs." } }, shelves: SHELVES, files: list.map((d) => ({ id: d.id, json: `${d.id}.json` })) }))
   const frame = (n) => `<!-- frame:${n} -->x<!-- /frame:${n} -->`
   // The bar and phone menu links come from the home page, so the fixture home page carries a few
-  const bar = `<ul class="links">\n        <li><a href="#work">p.r.o.s.e</a></li>\n        <li><a href="/knowledge/">knowledge</a></li>\n        ${frame("actions")}</ul>`
-  const menu = `<div class="menu" id="menu" hidden>\n    <ul>\n      <li><a href="#work">p.r.o.s.e</a></li>\n      <li><a href="/1NEON/" data-handoff>1NEON client portal</a></li>\n    </ul>\n  </div>`
+  const bar = `<ul class="links">\n        <li><a href="#work">open source</a></li>\n        <li><a href="/knowledge/">knowledge</a></li>\n        ${frame("actions")}</ul>`
+  const menu = `<div class="menu" id="menu" hidden>\n    <ul>\n      <li><a href="#work">open source</a></li>\n      <li><a href="/1NEON/" data-handoff>1NEON client portal</a></li>\n    </ul>\n  </div>`
   writeFileSync(join(site, "index.html"), `<meta name="version" content="v0">${["icons", "logo", "menu-button", "footer"].map(frame).join("")}${bar}${menu}`)
   writeFileSync(join(site, "sitemap.xml"), "<urlset>\n  <!-- knowledge -->\n  <!-- /knowledge -->\n</urlset>")
   return { exp, site, list }
@@ -201,7 +201,7 @@ test("the bar and phone menu use the home page's links and words, pointed back a
   const f = fixture()
   assert.equal(build(f).status, 0)
   const html = read(f, "knowledge/index.html")
-  assert.match(html, /<li><a href="\/#work">p\.r\.o\.s\.e<\/a><\/li>/)
+  assert.match(html, /<li><a href="\/#work">open source<\/a><\/li>/)
   assert.match(html, /<a href="\/knowledge\/" aria-current="page">knowledge<\/a>/)
   assert.match(html, /<a href="\/1NEON\/" data-handoff>1NEON client portal<\/a>/)
   assert.doesNotMatch(html, /tools I'm building|href="#work"/)

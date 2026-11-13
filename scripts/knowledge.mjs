@@ -240,6 +240,39 @@ want.set("knowledge/search-index.json", JSON.stringify(searchIndex(corpus)) + "\
 // Which corpus release these pages came from. The deploy workflow's watch reads it from the live site and
 // publishes when a newer release exists, so it must name the tag and the bundle's digest exactly
 want.set("knowledge/corpus.json", JSON.stringify({ tag: process.env.CORPUS_TAG || "local", digest: corpus.manifest.digest }) + "\n")
+// Pages that left the Knowledge Center but still live in the corpus on GitHub (corpus v0.40: the standards, the
+// charter, How neon1.tech works, and five education products). Each old address keeps a small page that sends a
+// reader, or a saved link, to the document on GitHub, so nothing someone bookmarked turns into a 404
+const RETIRED = {
+  "company/charter": "company/charter.md",
+  "company/how-it-works": "company/how-it-works.md",
+  "neo/motifs": null,
+  ...Object.fromEntries(["ai-quality", "code-style", "customers", "design-and-accessibility", "development",
+    "discovery-and-delivery", "documentation", "measurement", "operating-principles", "outreach", "partners",
+    "reliability-and-recovery", "security-and-data", "technology-decisions", "testing-and-review", "version-control",
+    "versioning", "writing"].map((n) => [`standards/${n}`, `standards/${n}.md`])),
+  ...Object.fromEntries(["soc-it-2-me", "there-are-no-incidents", "you-have-20-seconds-to-comply", "phish-out-of-water",
+    "home-is-where-the-smart-is"].map((n) => [`products/${n}`, `products/${n}.md`])),
+}
+const moved = (to) => `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta http-equiv="refresh" content="0; url=${to}">
+<link rel="canonical" href="${to}">
+<title>Moved · neon1</title>
+</head>
+<body><p>This page moved to <a href="${to}">${to}</a>.</p></body>
+</html>
+`
+for (const [path, source] of Object.entries(RETIRED)) {
+  const key = `knowledge/${path}/index.html`
+  if (want.has(key)) continue
+  want.set(key, moved(source ? `https://github.com/neon1llc/neon1-corpus/blob/main/corpus/${source}` : "/knowledge/"))
+}
+
 // Diagrams the documents draw (neon1-corpus tools/diagrams.mjs), served beside them as image files
 const diagramsDir = join(exportDir, "diagrams")
 if (existsSync(diagramsDir)) for (const f of readdirSync(diagramsDir)) if (f.endsWith(".svg")) want.set(`knowledge/diagrams/${f}`, readFileSync(join(diagramsDir, f), "utf8"))

@@ -11,43 +11,21 @@ neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site
 
 ## Company
 
-- [About neon1](https://neon1.tech/knowledge/company/about/): A technology practice that leaves people better off with their tech than they were before.
+- [About neon1](https://neon1.tech/knowledge/company/about/): Who does the work, what has been shipped, and how the practice is set up.
 - [How neon1 is built](https://neon1.tech/knowledge/company/architecture/): Diagrams of the website, the 1NEON portal, Neo, and how a change reaches them.
 - [Capability statement](https://neon1.tech/knowledge/company/capabilities/): neon1 on one page for a buyer, partner, or procurement office: what it does, how it differs, work it has delivered, and the company's details.
-- [Charter](https://neon1.tech/knowledge/company/charter/): What neon1 is for, who it serves first, the values it works by, and what it leaves to others.
 - [Contact](https://neon1.tech/knowledge/company/contact/): How to reach neon1, when, and what the first call covers.
 - [Glossary](https://neon1.tech/knowledge/company/glossary/): The names and technical terms used across neon1's documents, each in a sentence or two.
-- [How neon1.tech works](https://neon1.tech/knowledge/company/how-it-works/): A plain walk through every part of neon1.tech: the page and its sections, the rain, the white rabbit, the Knowledge Center, the blog, the contact form, Neo, the 1NEON portal and its demo, sample, and guided walkthroughs, and how a change goes live.
-- [Mission and promise](https://neon1.tech/knowledge/company/mission/): Why neon1 exists, what it does, and the five things every client can count on, on one page.
+- [Mission and promise](https://neon1.tech/knowledge/company/mission/): Why neon1 exists and the five things every client can count on.
 - [The names](https://neon1.tech/knowledge/company/names/): Where neon1, its slogan and its products get their names.
+- [How I price my work](https://neon1.tech/knowledge/company/pricing/): How a neon1 project is priced: a fixed price or a capped estimate, what most projects cost, what the price includes, when it can change, how paying works, and why the website shows ranges while each proposal shows the hours.
 - [How a project runs](https://neon1.tech/knowledge/company/process/): Listen, propose, decide, build and hand over.
 - [State registration](https://neon1.tech/knowledge/company/registration/): neon1 LLC's public record with the New York Department of State: its ID, status, filings, registered agent, and assumed name, and how to check the live record yourself.
 - [Where I learn from](https://neon1.tech/knowledge/company/sources/): The standards bodies, government guides, and practitioners whose published work shapes how neon1 works, grouped by topic, with what each one is for.
 
 ## Services
 
-- [Services](https://neon1.tech/knowledge/services/services/): Four kinds of help, from automating a small business to SOC 2 readiness.
-
-## How I work
-
-- [Writing](https://neon1.tech/knowledge/standards/writing/): How everything neon1 writes is written, from policies and proposals to READMEs, commit messages, code comments, and interface text.
-- [Development](https://neon1.tech/knowledge/standards/development/): The main development standard for neon1: the principles in priority order, what each word means, how work moves from idea to release, and where the detailed rules live.
-- [Operating principles](https://neon1.tech/knowledge/standards/operating-principles/): The habits behind every neon1 engagement, and what each one means in practice.
-- [Discovery and delivery](https://neon1.tech/knowledge/standards/discovery-and-delivery/): How a neon1 project moves from your problem to a result you can run, step by step.
-- [Version control](https://neon1.tech/knowledge/standards/version-control/): How neon1 uses git: branch names, commit messages, merges, protected branches, and the history rules, and which safeguards production and client data require.
-- [Versioning and releases](https://neon1.tech/knowledge/standards/versioning/): How neon1 numbers releases of code (vX.Y.Z) and editions of documents (X.Y), when each number goes up, and how tags, changelogs, and package files stay in agreement.
-- [Code style](https://neon1.tech/knowledge/standards/code-style/): How neon1 code reads: names, comments, file headers, formatting, and layout, in every language and configuration format.
-- [Testing and review](https://neon1.tech/knowledge/standards/testing-and-review/): What neon1 tests, how changes are checked and reviewed before they ship, and what done means.
-- [Documentation](https://neon1.tech/knowledge/standards/documentation/): The documents every neon1 project keeps and how they stay true, and how the documents in this Knowledge Center are built, dated, shared, and credited.
-- [Security and data](https://neon1.tech/knowledge/standards/security-and-data/): How neon1 handles your accounts, access, and information, and the baseline every project starts from.
-- [Design and accessibility](https://neon1.tech/knowledge/standards/design-and-accessibility/): How neon1 designs interfaces and documents for any device and for people using assistive technology.
-- [Technology decisions](https://neon1.tech/knowledge/standards/technology-decisions/): How neon1 chooses tools and architecture, counts the full cost, and checks licenses.
-- [Reliability and recovery](https://neon1.tech/knowledge/standards/reliability-and-recovery/): How neon1 sets service targets, plans for failure, and tests that backups restore.
-- [AI quality and oversight](https://neon1.tech/knowledge/standards/ai-quality/): When neon1 uses AI, how it's tested before anyone relies on it, and where a person stays in charge.
-- [Measurement](https://neon1.tech/knowledge/standards/measurement/): How neon1 defines success with you, measures it, and reports what the numbers can and can't show.
-- [Customers](https://neon1.tech/knowledge/standards/customers/): Who neon1 works with, how the work differs from households to enterprises, and when it declines work.
-- [Partners](https://neon1.tech/knowledge/standards/partners/): How neon1 works with other firms, vendors, and referrals, and how responsibilities and fees are disclosed.
-- [Outreach and claims](https://neon1.tech/knowledge/standards/outreach/): How neon1 finds clients and talks about its work, and the sales tactics it doesn't use.
+- [Services](https://neon1.tech/knowledge/services/services/): Mostly workflow projects for owner-run businesses, plus cloud engineering, office networks, and security training.
 
 ## Guides
 
@@ -79,12 +57,7 @@ neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site
 - [1NEON](https://neon1.tech/knowledge/products/1neon/): The neon1 client portal that comes with a client engagement, where each project runs from the first call to handover.
 - [AWS CLIP](https://neon1.tech/knowledge/products/aws-clip/): AWS CLI Plus: account guards and approval checks around the AWS CLI, for people who juggle several AWS profiles.
 - [DeployOps](https://neon1.tech/knowledge/products/deploy-ops/): Cloud automation, bundled: pipelines for infrastructure and applications on any major cloud.
-- [Home Is Where the Smart Is](https://neon1.tech/knowledge/products/home-is-where-the-smart-is/): A household tech handbook for the person who looks after a family's devices and accounts.
-- [Phish Out of Water](https://neon1.tech/knowledge/products/phish-out-of-water/): A security awareness session kit: slides, hands-on exercises, and a one-page takeaway.
 - [Ready, Secure, Go](https://neon1.tech/knowledge/products/ready-secure-go/): Security readiness for every space, in plain language.
-- [SOC It 2 Me](https://neon1.tech/knowledge/products/soc-it-2-me/): Hands-on SOC 2 readiness training for small and growing companies.
-- [There Are No Incidents](https://neon1.tech/knowledge/products/there-are-no-incidents/): Incident response training for small businesses: a runbook, playbooks, tabletop exercises, and templates.
-- [You Have 20 Seconds To Comply](https://neon1.tech/knowledge/products/you-have-20-seconds-to-comply/): Plain-language compliance guides and training for small businesses, from HIPAA and GxP to PCI DSS, privacy, and accessibility.
 
 ## Alternatives
 

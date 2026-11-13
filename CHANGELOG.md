@@ -2,6 +2,15 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## Unreleased
+
+- The white rabbit's last line is "Thanks for following the rabbit." in place of "go touch grass".
+- Services lead with owner-run businesses, where most of the work is; cloud, networks, and security training follow as shorter "also" lines, and the section links the published typical costs.
+- Client work: case studies read as the problem, the work, the results, and after handover, without the NEON letters, and the family and school cases stay in the Knowledge Center only.
+- p.r.o.s.e. is now "open source": the tools first, then Ready, Secure, Go with its five companion guides under plain titles, then the code behind this site.
+- About says who does the work, what's been shipped, and how the practice is set up.
+- Knowledge Center: the standards, the charter, How neon1.tech works, and five education product pages left it (neon1-corpus, Unreleased); each old address forwards to the document on GitHub. Technical due diligence points at the architecture, privacy, and security pages.
+
 ## v0.68.0
 
 - dev.neon1.tech, a private preview of the site: `make dev-push` (or any push to a branch other than main) builds the site in a few seconds and puts it there. The `dev` branch is the dev release; other branches are previews at `dev.neon1.tech/__preview?b=<branch>`. A manual run of the dev workflow can show a neon1-corpus branch, drafts included. Knowledge Center PDFs on dev are copied from neon1.tech rather than printed. Dev deploys are never tagged or announced.
