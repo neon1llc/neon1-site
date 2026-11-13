@@ -137,8 +137,8 @@ def dev(root, bucket, store, key):
     etag = aws("cloudfront-keyvaluestore", "describe-key-value-store", "--kvs-arn", arn, "--output", "json")["ETag"]
     items = aws("cloudfront-keyvaluestore", "list-keys", "--kvs-arn", arn, "--output", "json").get("Items", [])
     keys = {i["Key"]: i["Value"] for i in items}
-    if len(keys.get("gate", "")) < 32:
-        print("dev: no gate key yet, so dev.neon1.tech stays closed to everyone (make dev-gate sets one)")
+    if len(keys.get("session", "")) < 32:
+        print("dev: no session key yet, so dev.neon1.tech stays closed to everyone (make dev-signout sets one)")
     print(f"{key} -> release {rid} (was {keys.get(key) or 'none'})")
 
     # Shared files, then the release folder, exactly as the live deploy does them

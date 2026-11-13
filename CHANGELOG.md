@@ -2,14 +2,16 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
-## Unreleased
+## v0.69.0
 
 - The white rabbit's last line is "Thanks for following the rabbit." in place of "go touch grass".
 - Services lead with owner-run businesses, where most of the work is; cloud, networks, and security training follow as shorter "also" lines, and the section links the published typical costs.
 - Client work: case studies read as the problem, the work, the results, and after handover, without the NEON letters, and the family and school cases stay in the Knowledge Center only.
 - p.r.o.s.e. is now "open source": the tools first, then Ready, Secure, Go with its five companion guides under plain titles, then the code behind this site.
-- About says who does the work, what's been shipped, and how the practice is set up.
-- Knowledge Center: the standards, the charter, How neon1.tech works, and five education product pages left it (neon1-corpus, Unreleased); each old address forwards to the document on GitHub. Technical due diligence points at the architecture, privacy, and security pages.
+- About says who does the work (about 10 years of building and running systems), what's been shipped, and how the practice is set up. The photo is a fixed 137px square, the height of the text beside it on a desktop, and the same size on a phone.
+- The open source list names neon1-site v0.69.0, neon1-corpus v0.40.0, neon1-aws-infrastructure v0.8.0, neon1-1NEON v0.10.0, and neon1-chat v0.1.2.
+- Knowledge Center: the standards, the charter, How neon1.tech works, and five education product pages left it (neon1-corpus v0.40.0); each old address forwards to the document on GitHub. Technical due diligence points at the architecture, privacy, and security pages.
+- dev.neon1.tech sign-in now takes two things: the secret link only starts a sign-in, and a passkey or email code for an account in the dev-access group finishes it. `make dev-gate` makes a new link without signing devices out, `make dev-signout` signs every device out, and `make dev-allow` / `make dev-deny EMAIL=...` decide who may sign in.
 
 ## v0.68.0
 
