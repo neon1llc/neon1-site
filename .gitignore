@@ -15,3 +15,6 @@ node_modules/
 # printed in the deploy job by make knowledge-pdf). Never committed, so the repository can't drift from a release
 src/app/public/knowledge/
 src/app/public/blog/
+
+# dev.neon1.tech builds, from make dev-build
+.dev-build/

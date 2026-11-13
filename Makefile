@@ -36,7 +36,7 @@ GITLEAKS_IMAGE := ghcr.io/gitleaks/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79
 
 # Plain make shows the help
 .DEFAULT_GOAL := help
-.PHONY: help content corpus-tag static corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf blog blog-check blog-export check html js links logic frame frame-check release rollback manifest rehash models budget secrets behavior perf serve three icons deploy invalidate verify indexnow
+.PHONY: help content corpus-tag static corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf blog blog-check blog-export check html js links logic frame frame-check release rollback manifest rehash models budget secrets behavior perf serve three icons deploy invalidate verify indexnow dev-build dev-check dev-push dev-drop dev-rollback dev-gate
 
 
 ##@ Checks
@@ -242,6 +242,43 @@ verify: ## Check that each live URL returns 200 and serves the local version
 	done; \
 	test -n "$$ok" || { echo "verify: neon1.tech isn't serving corpus $$want"; exit 1; }; \
 	echo "neon1.tech serves corpus $$want"
+
+
+##@ Dev (dev.neon1.tech)
+
+# A private copy of the site for looking at changes before they ship (neon1-aws-infrastructure site-dev/).
+# The dev branch is "release" in the dev store; any other branch is a preview at dev.neon1.tech/__preview?b=<name>.
+# Builds go to .dev-build/, so the working tree stays as it was. Dev deploys are never tagged or announced
+DEV_BUCKET ?= neon1-site-dev
+DEV_STORE  ?= neon1-site-dev
+DEV_DIR    := .dev-build/site
+# The branch being shown (default: the checked-out one) and its preview name: lowercase, digits, and dashes
+BRANCH     ?= $(shell git rev-parse --abbrev-ref HEAD 2>/dev/null)
+DEV_NAME    = $(shell python3 scripts/dev_build.py name '$(BRANCH)')
+DEV_KEY     = $(if $(filter dev,$(BRANCH)),release,branch:$(DEV_NAME))
+
+dev-build: ## Build the site into .dev-build/ (CORPUS_TAG may name a corpus branch, e.g. draft/my-post)
+	@python3 scripts/dev_build.py prepare $(SITE_DIR) $(DEV_DIR) $(CORPUS_TAG)
+	@$(MAKE) --no-print-directory content SITE_DIR=$(DEV_DIR)
+	@if [ -n "$(PDF)" ]; then $(MAKE) --no-print-directory knowledge-pdf SITE_DIR=$(DEV_DIR); else python3 scripts/dev_pdfs.py $(DEV_DIR); fi
+
+# The checks that take seconds; the browser contracts and PDF printing stay on the way to main
+dev-check: ## Quick checks on the dev build: scripts, links, bar and footer, built text
+	@$(MAKE) --no-print-directory js links frame-check static SITE_DIR=$(DEV_DIR)
+
+dev-push: dev-build ## Build and put this branch on dev.neon1.tech (dev: the dev release; others: a preview)
+	python3 scripts/deploy.py dev $(DEV_DIR) $(DEV_BUCKET) $(DEV_STORE) $(DEV_KEY)
+	@if [ "$(DEV_KEY)" = "release" ]; then echo "open https://dev.neon1.tech/"; else echo "open https://dev.neon1.tech/__preview?b=$(DEV_NAME)"; fi
+
+dev-drop: ## Forget this branch's preview on dev.neon1.tech (BRANCH=<name> for another)
+	python3 scripts/deploy.py dev-drop $(DEV_BUCKET) $(DEV_STORE) branch:$(DEV_NAME)
+
+dev-rollback: ## Switch dev.neon1.tech back to its previous dev release
+	python3 scripts/deploy.py rollback $(DEV_BUCKET) $(DEV_STORE) $(RELEASE)
+
+# A new random key signs every device out; the sign-in link is printed once, here, and kept nowhere else
+dev-gate: ## Set a new dev.neon1.tech sign-in key and print the sign-in link (signs every device out)
+	@python3 scripts/dev_build.py gate $(DEV_STORE)
 
 
 ##@ Help
