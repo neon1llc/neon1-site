@@ -17,7 +17,7 @@ neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site
 - [Charter](https://neon1.tech/knowledge/company/charter/): What neon1 is for, who it serves first, the values it works by, and what it leaves to others.
 - [Contact](https://neon1.tech/knowledge/company/contact/): How to reach neon1, when, and what the first call covers.
 - [Glossary](https://neon1.tech/knowledge/company/glossary/): The names and technical terms used across neon1's documents, each in a sentence or two.
-- [How neon1.tech works](https://neon1.tech/knowledge/company/how-it-works/): A plain walk through every part of neon1.tech: the page and its sections, the rain, the white rabbit, the Knowledge Center, the contact form, Neo, the 1NEON portal and its demo, sample, and guided walkthroughs, and how a change goes live.
+- [How neon1.tech works](https://neon1.tech/knowledge/company/how-it-works/): A plain walk through every part of neon1.tech: the page and its sections, the rain, the white rabbit, the Knowledge Center, the blog, the contact form, Neo, the 1NEON portal and its demo, sample, and guided walkthroughs, and how a change goes live.
 - [Mission and promise](https://neon1.tech/knowledge/company/mission/): Why neon1 exists, what it does, and the five things every client can count on, on one page.
 - [The names](https://neon1.tech/knowledge/company/names/): Where neon1, its slogan and its products get their names.
 - [How a project runs](https://neon1.tech/knowledge/company/process/): Listen, propose, decide, build and hand over.
@@ -67,9 +67,9 @@ neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site
 
 ## Case studies
 
-- [Answers in seconds, with sources](https://neon1.tech/knowledge/case-studies/answers-in-seconds/): Staff spent minutes hunting through Microsoft 365, or interrupted a senior colleague.
-- [Intake, out of the shared inbox](https://neon1.tech/knowledge/case-studies/intake-out-of-the-inbox/): Intake ran through one inbox, with staff chasing documents and retyping them.
-- [Two offices off local servers](https://neon1.tech/knowledge/case-studies/two-offices-off-local-servers/): The app, database, and files lived on two local servers both offices relied on.
+- [Answers in seconds, with sources](https://neon1.tech/knowledge/case-studies/answers-in-seconds/): Staff spent minutes searching Microsoft 365, or asked a senior colleague.
+- [Intake, out of the shared inbox](https://neon1.tech/knowledge/case-studies/intake-out-of-the-inbox/): Intake ran through one inbox, with staff chasing and retyping documents.
+- [Two offices off local servers](https://neon1.tech/knowledge/case-studies/two-offices-off-local-servers/): The app, database, and files lived on two local servers both offices used.
 - [Security for non-security people](https://neon1.tech/knowledge/case-studies/security-for-non-security-people/): People knew they were exposed online, but not where to start.
 - [From cameras to Grandma's email](https://neon1.tech/knowledge/case-studies/cameras-to-grandmas-email/): A house with no cameras, and passwords reused everywhere.
 - [Where neon1 started](https://neon1.tech/knowledge/case-studies/where-neon1-started/): A grade school wanted real STEM tools on a small budget.
@@ -117,7 +117,7 @@ neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site
 
 - [Business associate agreement request, filled in](https://neon1.tech/knowledge/examples/baa-request/): The BAA questionnaire completed for a fictional physical therapy practice, showing how the decision gets made. (fictional example)
 - [Intake, filled in](https://neon1.tech/knowledge/examples/intake/): The intake form completed for a fictional physical therapy practice after a first call. (fictional example)
-- [Proposal with options, filled in](https://neon1.tech/knowledge/examples/proposal-options/): A complete neon1 proposal with three options for a fictional bakery's order list: discovery, goals, what's in and out, honest hours, what each side will do, and the agreement. (fictional example)
+- [Proposal with options, filled in](https://neon1.tech/knowledge/examples/proposal-options/): A complete neon1 proposal with three options for a fictional bakery's order list: discovery, goals, what's in and out, the hours behind each price, when the client pays, what each side will do, and the agreement. (fictional example)
 - [Proposal, filled in](https://neon1.tech/knowledge/examples/proposal/): A complete neon1 proposal for a fictional physical therapy practice's intake project. (fictional example)
 - [Release and handover record, filled in](https://neon1.tech/knowledge/examples/release-and-handover/): The handover record that closed a fictional physical therapy practice's intake project. (fictional example)
 
@@ -128,6 +128,7 @@ neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site
 - [Cookie and browser storage notice](https://neon1.tech/knowledge/policies/cookies/): The only cookies and browser storage neon1.tech and 1NEON use, and why.
 - [Privacy policy](https://neon1.tech/knowledge/policies/privacy/): What neon1.tech and the 1NEON portal collect, why, and what you can do about it.
 - [Security disclosure](https://neon1.tech/knowledge/policies/security/): How to report a security problem in neon1.tech, the 1NEON portal, or a neon1 repository, and what happens after you do.
+- [Service agreement](https://neon1.tech/knowledge/policies/service-agreement/): neon1's service agreement, as a client organization signs it once in 1NEON: how work is agreed, purchases, paying, ownership, confidentiality, records, quality, limits, and ending.
 - [Terms of use](https://neon1.tech/knowledge/policies/terms/): The terms for using neon1.tech and the 1NEON portal.
 
 ## Blog
