@@ -1,0 +1,82 @@
+# .github/workflows/dev.yml - Put a branch on dev.neon1.tech, the private preview, in about a minute.
+# The dev branch is the dev release at dev.neon1.tech/; any other branch (main aside) is a preview that
+# dev.neon1.tech/__preview?b=<name> switches to. A manual run can show a neon1-corpus branch instead of
+# the newest corpus release (corpus_ref: draft/<post>), drafts included, as its own preview. Only the
+# quick checks run here; the browser contracts and PDF printing run on the way to main (deploy.yml).
+# Dev deploys are never tagged, announced, or verified against neon1.tech.
+
+name: dev
+
+on:
+  push:
+    branches-ignore: [main]
+  workflow_dispatch:
+    inputs:
+      corpus_ref:
+        description: A neon1-corpus branch to show (e.g. draft/my-post); empty takes the newest release
+        type: string
+        default: ""
+
+# Read-only by default; the job adds an OIDC token for the dev deploy role
+permissions:
+  contents: read
+
+# One run per branch (or corpus branch); a newer push replaces a queued or running one
+concurrency:
+  group: dev-${{ github.ref_name }}-${{ inputs.corpus_ref }}
+  cancel-in-progress: true
+
+jobs:
+  dev:
+    runs-on: ubuntu-latest
+    # Quiet until the dev deploy role exists (neon1-aws-infrastructure github/dev.tf)
+    if: vars.AWS_DEV_DEPLOY_ROLE_ARN != ''
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+
+      # The preview this run writes: the dev release, a branch, or a corpus branch
+      - name: Pick the dev key
+        id: key
+        env:
+          BRANCH: ${{ github.ref_name }}
+          CORPUS_REF: ${{ inputs.corpus_ref }}
+        run: |
+          if [ -n "$CORPUS_REF" ]; then name=$(python3 scripts/dev_build.py name "corpus-$CORPUS_REF"); key="branch:$name"
+          elif [ "$BRANCH" = dev ]; then name=dev; key=release
+          else name=$(python3 scripts/dev_build.py name "$BRANCH"); key="branch:$name"; fi
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "key=$key" >> "$GITHUB_OUTPUT"
+
+      # Same build as make dev-build: a copy of the site, the corpus words, and the live site's PDFs
+      - name: make dev-build
+        env:
+          CORPUS_REF: ${{ inputs.corpus_ref }}
+        run: |
+          if [ -n "$CORPUS_REF" ]; then make dev-build CORPUS_TAG="$CORPUS_REF"; else make dev-build; fi
+
+      - run: make dev-check
+
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ vars.AWS_DEV_DEPLOY_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Upload and switch
+        run: python3 scripts/deploy.py dev .dev-build/site neon1-site-dev neon1-site-dev "${{ steps.key.outputs.key }}"
+
+      - name: Where to look
+        env:
+          NAME: ${{ steps.key.outputs.name }}
+        run: |
+          if [ "$NAME" = dev ]; then url=https://dev.neon1.tech/; else url="https://dev.neon1.tech/__preview?b=$NAME"; fi
+          echo "### On dev: $url" >> "$GITHUB_STEP_SUMMARY"
+          echo "$url"
