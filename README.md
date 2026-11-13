@@ -57,6 +57,26 @@ Two query flags help with testing, and in production they only add rabbits:
 
 The scene's models and images are in `media/white-rabbit/`, with their credits in `media/white-rabbit/CREDITS.txt`. `src/app/asset-manifest.json` records every shipped third-party or baked asset, fonts and vendored bundles included: its sha256, its source and license, how it was made, and which files load it. Where only a creator's profile or a library's home page is known, it says so, and its `unresolved` list tracks each piece of provenance still owed (the far trees' origin, the font releases, exact model pages), which `make manifest` keeps from going untracked. The Blender files, recipes, and photos behind the scene stay in the owner's private planning folder. `make models` builds the room in Node and fails if `room.glb`, its baked maps in `lm/`, or the car's material names no longer match the code, so a geometry change that would misplace the baked light fails loudly. The car model is based on "2019 Chevrolet Camaro" by IsaacOldton (CC BY 4.0), modified: unbranded, recolored, and optimized. The trees and photographed textures come from Poly Haven (CC0).
 
+## Dev: dev.neon1.tech
+
+dev.neon1.tech is a private copy of the site for looking at changes before they ship. Its hosting is `site-dev/` in neon1-aws-infrastructure, which also explains how its sign-in works.
+
+- **Any branch but main** deploys there on push, in about 30 seconds, as a preview at `dev.neon1.tech/__preview?b=<branch>`. `/__preview` alone goes back to the dev release.
+- **The `dev` branch** is the dev release. `dev-sync` merges main into it after every push to main and rebuilds it. Work branches can be merged into `dev` to be seen together, but each one goes to main on its own.
+- **Corpus drafts:** run the dev workflow by hand with `corpus_ref` set to a neon1-corpus branch, and that branch's documents, drafts included, are built into dev.
+- **Never a release.** Dev runs only the quick checks (`make dev-check`), is never tagged, and changelog entries wait under `## Unreleased` until the batch goes to main.
+
+```bash
+make dev-push                 # build this branch and put it on dev (dev: the dev release; others: a preview)
+make dev-drop BRANCH=<name>   # forget a preview
+make dev-rollback             # previous dev release
+make dev-gate                 # new sign-in link (printed once; signed-in devices stay in)
+make dev-signout              # sign every device out
+make dev-allow EMAIL=<who>    # let a neon1 person sign in (dev-deny removes them)
+```
+
+Releasing is unchanged: merge the finished branches to main, with the version set, and the deploy below tags it.
+
 ## Deploy
 
 Pushing to `main` runs the checks and then deploys from GitHub Actions. The `check` job runs `make check`, then `make behavior` and `scripts/chat_check.cjs` in headless Chromium with every API stubbed, and the deploy job starts only after all three pass. The workflow assumes an AWS role through OIDC, so the repo holds no AWS keys. The role ARN is the repository variable `AWS_DEPLOY_ROLE_ARN`.
