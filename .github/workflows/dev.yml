@@ -43,14 +43,27 @@ jobs:
         with:
           node-version: 22
 
+      # On the dev branch, a .dev-corpus-ref file (dev only, never on main) names a neon1-corpus branch for the
+      # dev release itself, so a site change and the corpus change it needs can be seen together at dev.neon1.tech/
+      - name: Pick the corpus
+        id: corpus
+        env:
+          BRANCH: ${{ github.ref_name }}
+          CORPUS_REF: ${{ inputs.corpus_ref }}
+        run: |
+          ref="$CORPUS_REF"
+          if [ -z "$ref" ] && [ "$BRANCH" = dev ] && [ -s .dev-corpus-ref ]; then ref=$(tr -d '[:space:]' < .dev-corpus-ref); fi
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+
       # The preview this run writes: the dev release, a branch, or a corpus branch
       - name: Pick the dev key
         id: key
         env:
           BRANCH: ${{ github.ref_name }}
-          CORPUS_REF: ${{ inputs.corpus_ref }}
+          CORPUS_REF: ${{ steps.corpus.outputs.ref }}
+          ASKED: ${{ inputs.corpus_ref }}
         run: |
-          if [ -n "$CORPUS_REF" ]; then name=$(python3 scripts/dev_build.py name "corpus-$CORPUS_REF"); key="branch:$name"
+          if [ -n "$CORPUS_REF" ] && [ "$BRANCH" != dev -o -n "$ASKED" ]; then name=$(python3 scripts/dev_build.py name "corpus-$CORPUS_REF"); key="branch:$name"
           elif [ "$BRANCH" = dev ]; then name=dev; key=release
           else name=$(python3 scripts/dev_build.py name "$BRANCH"); key="branch:$name"; fi
           echo "name=$name" >> "$GITHUB_OUTPUT"
@@ -59,7 +72,7 @@ jobs:
       # Same build as make dev-build: a copy of the site, the corpus words, and the live site's PDFs
       - name: make dev-build
         env:
-          CORPUS_REF: ${{ inputs.corpus_ref }}
+          CORPUS_REF: ${{ steps.corpus.outputs.ref }}
         run: |
           if [ -n "$CORPUS_REF" ]; then make dev-build CORPUS_TAG="$CORPUS_REF"; else make dev-build; fi
 
