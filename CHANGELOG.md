@@ -2,11 +2,12 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
-## Unreleased
+## v0.67.0
 
 ### Changed
 - Pradeep's photo on the home page is half its old size, and the client quote moved off the home page (it stays in the case study).
 - Tighter wording across the home page: services, process, client work, p.r.o.s.e, about, questions, and contact say the same in about a fifth fewer words. The case studies and questions come trimmed from neon1-corpus.
+- The p.r.o.s.e rows show neon1-corpus v0.38.1 (tighter wording, and Ready, Secure, Go, AWS CLIP, and DeployOps at their real versions) and this site at v0.67.0.
 
 ## v0.66.2
 
