@@ -156,8 +156,8 @@ h2 .pr { display: inline-block; width: .7ex; height: 1ex; margin-right: .3em; ve
 .faq details[open] summary::after { transform: rotate(45deg); }
 .faq details p { margin: -4px 0 22px; max-width: 720px; color: var(--muted); }
 
-.neon { display: grid; grid-template-columns: 1.1em 1fr; gap: 6px 10px; margin: 0 0 14px; font-size: 14px; line-height: 1.4; }
-.neon dt { font: 700 14px/1.45 var(--mono); color: var(--brand); }
+.neon { display: grid; grid-template-columns: max-content 1fr; gap: 6px 10px; margin: 0 0 14px; font-size: 14px; line-height: 1.4; }
+.neon dt { font: 700 13px/1.5 var(--mono); color: var(--brand); }
 .neon dd { margin: 0; color: var(--muted); }
 
 /* Read-more link on each card */
@@ -291,7 +291,7 @@ body.white-rabbit-scene > :not(.white-rabbit) { visibility: hidden; }
 /* The near row reuses the far trees, larger and darker, so the fallback ships no extra image */
 .white-rabbit-near { background-image: url("/media/white-rabbit/trees-far.webp"); background-size: 300% auto; background-position: 52% 100%; top: 58%; filter: brightness(.72) saturate(1.1); }
 
-/* "go touch grass" rises from behind the treetops into the sky of the upper sash, a small move, mostly a fade */
+/* The closing line rises from behind the treetops into the sky of the upper sash, a small move, mostly a fade */
 .white-rabbit-window > .white-rabbit-rise { inset: auto 0 69% 0; text-align: center; font: 500 clamp(18px, 3.2vw, 26px)/1.3 var(--mono);
   color: var(--brand); text-shadow: 0 0 12px rgba(255, 255, 255, .7); opacity: var(--card-rise, 0);
   transform: translateY(calc((1 - var(--card-rise, 0)) * 36px)); }
@@ -346,9 +346,6 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 /* The prose groups: one line above and below each label, like the fit list's rows */
 .fold.group { border-top: 1px solid rgba(18,36,26,.12); }
 .fold.group:last-of-type { border-bottom: 1px solid rgba(18,36,26,.12); }
-/* The education half of p.r.o.s.e starts a second list: room above, and the last fold before it closes its line */
-.lead.intro.second { margin-top: 36px; }
-.fold.group:has(+ .lead.intro.second) { border-bottom: 1px solid rgba(18,36,26,.12); }
 /* A group's label spans the row and its arrow sits at the row's end, so the whole row reads as the
    control; the arrow still points left when closed and turns down when open, like every fold */
 .fold.group > summary { padding: 14px 0; width: auto; justify-content: space-between; }
