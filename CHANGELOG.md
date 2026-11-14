@@ -5,6 +5,13 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 ## Unreleased
 
 - Links to the five companion guides use their new GitHub names (soc-2-readiness, incident-response-for-small-teams, compliance-basics, phishing-awareness-kit, household-tech-handbook); the old addresses still redirect.
+- The home page's title, description, link previews (Open Graph and Twitter), and structured data describe the small-business workflow work first, then cloud and AI, networks, and security training. The landing screen is unchanged.
+- One path from interest to a start: services, then client work, then a line to book a free 15-minute call or write in. Process, about, public code, and questions follow, and the bar and menu list them in that order.
+- The home page links to one example project in 1NEON, from the process section. The demo link and the 1NEON walkthrough links in the questions are gone from the home page; they stay on 1NEON's own pages.
+- Process: Build says each change is checked against the agreed measures.
+- "Open source" becomes "Public code and resources" in the section heading and "public code" in the bar and menu. Every row shows its license next to its version (MIT, Apache-2.0, CC BY-SA 4.0 with MIT, or FSL-1.1 with CC BY-ND 4.0), under a line on what each license allows. The behavior check fails if a row names no license or a TBD one.
+- Case study cards and Knowledge Center case pages show my role and the years once the corpus confirms them (`role` and `when`); until then the card shows no line and the build lists the cases still waiting. The card's at-a-glance list reads the corpus's renamed fields, and still reads the old ones from earlier corpus releases.
+- The blog and llms.txt say lessons come from neon1's public repositories, not open ones.
 
 ## v0.69.0
 

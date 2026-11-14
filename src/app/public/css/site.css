@@ -25,6 +25,8 @@ h2::before { content: "> "; color: var(--mid); }
 .row h3 { margin: 0; font-size: 17px; }
 .row .price, .row .state { margin: 0; font: 500 14px var(--mono); color: var(--glow); }
 .row .state.dim { color: var(--muted); }
+/* A public code row's license, quieter than its visibility and version */
+.row .state .lic { color: var(--muted); }
 .row p:last-child { margin: 0; color: var(--muted); font-size: 15px; }
 a.row:hover h3 { color: var(--glow); }
 @media (max-width: 700px) { .row { grid-template-columns: 1fr auto; gap: 6px 16px; } .row p:last-child { grid-column: 1 / -1; } }
@@ -156,9 +158,9 @@ h2 .pr { display: inline-block; width: .7ex; height: 1ex; margin-right: .3em; ve
 .faq details[open] summary::after { transform: rotate(45deg); }
 .faq details p { margin: -4px 0 22px; max-width: 720px; color: var(--muted); }
 
-.neon { display: grid; grid-template-columns: max-content 1fr; gap: 6px 10px; margin: 0 0 14px; font-size: 14px; line-height: 1.4; }
-.neon dt { font: 700 13px/1.5 var(--mono); color: var(--brand); }
-.neon dd { margin: 0; color: var(--muted); }
+.glance { display: grid; grid-template-columns: max-content 1fr; gap: 6px 10px; margin: 0 0 14px; font-size: 14px; line-height: 1.4; }
+.glance dt { font: 700 13px/1.5 var(--mono); color: var(--brand); }
+.glance dd { margin: 0; color: var(--muted); }
 
 /* Read-more link on each card */
 /* Whole card opens its case study; the corner arrow opens it, the panel arrow closes it */
@@ -398,4 +400,8 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 
 /* The link from the process steps to the sample tour */
 .tour-link { margin: 22px 0 0; color: var(--muted); }
+/* Under the case studies: the next step after the proof */
+.start-line { margin: clamp(14px, 2.5vh, 24px) 0 0; }
+/* A case card's role and years, above its glance */
+.case .role { margin: -4px 0 10px; font: 500 13px/1.4 var(--mono); color: var(--muted); }
 
