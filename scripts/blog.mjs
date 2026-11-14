@@ -129,7 +129,7 @@ function indexPage() {
 ${posts.map(card).join("\n")}
       </ul>`
     : "      <p>The first post is on its way.</p>"
-  const main = `${band({ id: "blog-title", eyebrow: "neon1 · blog", title: "Blog", lead: "Questions from local businesses answered in plain words, the whats and whys of how neon1 works, and lessons from building its open repositories. A new post about once a week." })}
+  const main = `${band({ id: "blog-title", eyebrow: "neon1 · blog", title: "Blog", lead: "Questions from local businesses answered in plain words, the whats and whys of how neon1 works, and lessons from building its public repositories. A new post about once a week." })}
 
     <div class="kc-body">
       <section class="kc-shelf" aria-labelledby="blog-posts-h">
@@ -144,7 +144,7 @@ ${list}
     </div>`
   return page({
     title: "Blog · neon1",
-    description: "Posts from neon1: questions from local businesses answered in plain words, the whats and whys of neon1, and lessons from its open repositories.",
+    description: "Posts from neon1: questions from local businesses answered in plain words, the whats and whys of neon1, and lessons from its public repositories.",
     path: BLOG,
     main,
     kind: "index",
@@ -239,7 +239,7 @@ function feed() {
     <title>neon1 blog</title>
     <link>${SITE}${BLOG}</link>
     <atom:link href="${SITE}${FEED}" rel="self" type="application/rss+xml" />
-    <description>Questions from local businesses answered in plain words, the whats and whys of neon1, and lessons from its open repositories.</description>
+    <description>Questions from local businesses answered in plain words, the whats and whys of neon1, and lessons from its public repositories.</description>
     <language>en-us</language>
     <copyright>© neon1 LLC. CC BY-ND 4.0.</copyright>${latest ? `
     <lastBuildDate>${rfc822(latest)}</lastBuildDate>` : ""}

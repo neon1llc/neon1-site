@@ -1,12 +1,12 @@
 # neon1
 
-> neon1 is a technology practice: cloud and AI engineering, business automation, networks, and cameras.
+> I connect the orders, intake, and invoices an owner-run business types in more than once, in two to four weeks. Also cloud and AI engineering, office networks, and security training. Queens, NY, and remote.
 
 neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site within about 30 miles of Queens, NY, or over a secure temporary connection. Contact: hello@neon1.tech, +1 424-326-3661, or the form at https://neon1.tech/#contact.
 
-- [Home page](https://neon1.tech/): services, process, client work, tools, and questions
+- [Home page](https://neon1.tech/): services, client work, process, public code and resources, and questions
 - [Knowledge center](https://neon1.tech/knowledge/): every public document below, most with a PDF to download
-- [Blog](https://neon1.tech/blog/): posts on local businesses' questions, the whats and whys of neon1, and lessons from its open repositories ([RSS](https://neon1.tech/blog/feed.xml))
+- [Blog](https://neon1.tech/blog/): posts on local businesses' questions, the whats and whys of neon1, and lessons from its public repositories ([RSS](https://neon1.tech/blog/feed.xml))
 - Source for these documents: https://github.com/neon1llc/neon1-corpus (CC BY-ND 4.0)
 
 ## Company
