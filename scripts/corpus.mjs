@@ -42,12 +42,13 @@ const forPage = (html) =>
 
 const ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>'
 // A case study's four sections, by their keys in the corpus, with the front-matter summary each one shortens to
-// and the word the card's glance shows beside it
+// and the word the card's glance shows beside it. old names the field before neon1-corpus renamed it, so a build
+// from an older corpus release still fills the card
 const STAGES = [
-  { key: "the-problem", short: "short_needs", word: "problem" },
-  { key: "the-work", short: "short_execute", word: "work" },
-  { key: "the-results", short: "short_observe", word: "results" },
-  { key: "after-handover", short: "short_normalize", word: "after" },
+  { key: "the-problem", short: "short_problem", old: "short_needs", word: "problem" },
+  { key: "the-work", short: "short_work", old: "short_execute", word: "work" },
+  { key: "the-results", short: "short_results", old: "short_observe", word: "results" },
+  { key: "after-handover", short: "short_after", old: "short_normalize", word: "after" },
 ]
 const STAGE_KEYS = STAGES.map((s) => s.key)
 
@@ -56,10 +57,17 @@ const STAGE_KEYS = STAGES.map((s) => s.key)
 // Client quotes stay in the Knowledge Center case study; the home page panel leaves them out (Pradeep, 2026-11-13)
 const withoutQuotes = (html) => html.replace(/(<p>[^<]*client's words:<\/p>)?<blockquote>[\s\S]*?<\/blockquote>/g, "")
 
+// In what capacity and when the work was done, such as "Through partner Xenoss, 2025". The corpus export drops
+// TBD placeholders, so a case without a confirmed role shows no line, and the build says which ones wait
+const confirmed = (v) => typeof v === "string" && v.trim() !== "" && v.trim() !== "TBD"
+const roleLine = (d) => (confirmed(d.role) ? [d.role, confirmed(d.when) ? d.when : null].filter(Boolean).join(", ") : "")
+
 // One case study card. The full story waits in a template until js/cases.js opens it
 function caseCard(c) {
   const d = c.data
-  const glance = STAGES.map((s) => `<dt>${s.word}</dt><dd>${esc(d[s.short])}</dd>`).join("")
+  if (!confirmed(d.role)) console.warn(`corpus: case ${d.key} has no confirmed role yet, so its card shows none`)
+  const role = roleLine(d)
+  const glance = STAGES.map((s) => `<dt>${s.word}</dt><dd>${esc(d[s.short] ?? d[s.old])}</dd>`).join("")
   const deep = c.sections
     .filter((s) => STAGE_KEYS.includes(s.key))
     .map((s) => `<h4>${s.headingHtml}</h4>${withoutQuotes(forPage(s.html).replace(/\n/g, ""))}`)
@@ -68,7 +76,8 @@ function caseCard(c) {
     `        <article class="case reveal-on" id="case-${d.key}">`,
     `          <p class="idx">${esc(`${d.client} · ${d.area}`)}</p>`,
     `          <h3>${esc(c.title)}</h3>`,
-    `          <dl class="neon">${glance}</dl>`,
+    ...(role ? [`          <p class="role">${esc(role)}</p>`] : []),
+    `          <dl class="glance">${glance}</dl>`,
     `          <p class="stat"><b>${esc(d.stat_key)}</b> ${esc(d.stat)}</p>`,
     `          <button class="open" type="button" data-case="${d.key}" aria-haspopup="dialog" aria-label="Open case study: ${esc(c.title)}">${ARROW}</button>`,
     `          <template class="deep">${deep}</template>`,

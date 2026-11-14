@@ -306,7 +306,7 @@
   }
 
   // ---- Folds: eased open and close, and the view makes room ----
-  // A fold (the open source groups, the questions, the contact form) opens with its height eased from the
+  // A fold (the public code groups, the questions, the contact form) opens with its height eased from the
   // label to the full content, and closes the same way back. On the first fold opened in a view, the
   // view glides from centered to its top, so its heading sits just under the bar with the usual spacing
   // and the opened content runs down from there. A view taller than the screen then scrolls inside
