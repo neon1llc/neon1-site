@@ -56,7 +56,7 @@ neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site
 
 - [1NEON](https://neon1.tech/knowledge/products/1neon/): The neon1 client portal that comes with a client engagement, where each project runs from the first call to handover.
 - [AWS CLIP](https://neon1.tech/knowledge/products/aws-clip/): AWS CLI Plus: account guards and approval checks around the AWS CLI, for people who juggle several AWS profiles.
-- [DeployOps](https://neon1.tech/knowledge/products/deploy-ops/): Cloud automation, bundled: pipelines for infrastructure and applications on any major cloud.
+- [DeployOps](https://neon1.tech/knowledge/products/deploy-ops/): Deploy pipelines with checks, approvals, and rollback: a local developer preview, not production-supported.
 - [Ready, Secure, Go](https://neon1.tech/knowledge/products/ready-secure-go/): Security readiness for every space, in plain language.
 
 ## Alternatives
