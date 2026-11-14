@@ -2,7 +2,7 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
-## Unreleased
+## v0.70.0
 
 - Links to the five companion guides use their new GitHub names (soc-2-readiness, incident-response-for-small-teams, compliance-basics, phishing-awareness-kit, household-tech-handbook); the old addresses still redirect.
 - The home page's title, description, link previews (Open Graph and Twitter), and structured data describe the small-business workflow work first, then cloud and AI, networks, and security training. The landing screen is unchanged.
