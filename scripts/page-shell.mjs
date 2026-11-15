@@ -116,16 +116,18 @@ export const crumbs = (items) => ({
 
 // ---- Parts of a page ----
 
-// The eyebrow's capital letters would turn "neon1" into "NEON1", so its wordmark stays lowercase. In this mono face the
-// digit stands taller than the lowercase letters, so "neon" is drawn larger to match the 1 and lighter to match its stroke
-// (see .kc-eyebrow .wm in knowledge.css)
-const wordmark = (text) => text.replace(/^neon1/, '<span class="wm"><span class="wm-neon">neon</span>1</span>')
+// The standard neon1 wordmark, the one the top-left logo uses (see ".ne" and ".one" in shared/neon1.css): "neon" is drawn
+// larger so its letters match the height of the digit, and lighter so its strokes match the digit's. "face" picks the
+// font's proportions: "mono" (the logo's face, the default) or "sans" (headings). Size, color, and glow are set by the
+// surrounding element. The wrapper turns off the eyebrow's capitals, so "neon1" never becomes "NEON1".
+export const wordmark = (text, face = "mono") =>
+  text.replace(/neon1/g, `<span class="wm wm-${face}"><span class="ne">neon</span><span class="one">1</span></span>`)
 
 // The band that opens an index page: a small eyebrow, the heading, a lead line, and anything after it (a search box)
 export const band = ({ id, eyebrow, title, lead = "", after = "" }) => `    <section class="kc-band" aria-labelledby="${id}">
       <div class="kc-band-inner">
         <p class="kc-eyebrow">${wordmark(eyebrow)}</p>
-        <h1 id="${id}">${title}</h1>
+        <h1 id="${id}">${wordmark(title, "sans")}</h1>
         ${lead ? `<p class="kc-lead">${lead}</p>` : ""}${after}
       </div>
     </section>`
