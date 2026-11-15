@@ -4,7 +4,8 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
-- The contact view's free-account invitation links the Knowledge Center's "Free 1NEON accounts" guide. Release with the corpus release that adds the guide, when 1NEON's sign-up opens.
+- The contact view's free-account invitation links the Knowledge Center's "Free 1NEON accounts" guide.
+- Cut wording that repeats a table, list, or linked page.
 
 ## v0.72.1
 
