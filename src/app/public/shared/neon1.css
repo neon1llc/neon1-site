@@ -27,7 +27,7 @@
 /* Motion: one curve, three lengths, and a longer open/close for folds (--t-open with --ease-open) for every state change on neon1.tech and 1NEON (shared/motion.js holds the same
    numbers). Reduced motion, or html[data-motion="off"] (1NEON's own switch), sets the lengths to nothing, so every
    transition and animation that uses them becomes a plain change. A browser without the features simply changes at once. */
-:root { --ease: cubic-bezier(.28, .11, .32, 1); --t-fast: .16s; --t-base: .3s; --t-slow: .45s; --t-open: .6s; --ease-open: cubic-bezier(.25, .8, .25, 1); }
+:root { --ease: cubic-bezier(.28, .11, .32, 1); --t-fast: .16s; --t-base: .3s; --t-slow: .45s; --t-open: .6s; --transit: #3a4a40; --ease-open: cubic-bezier(.25, .8, .25, 1); }
 @media (prefers-reduced-motion: reduce) { :root { --t-fast: 0s; --t-base: 0s; --t-slow: 0s; --t-open: 0s; } }
 :root[data-motion="off"] { --t-fast: 0s; --t-base: 0s; --t-slow: 0s; --t-open: 0s; }
 /* Something that appears (an error, a result, a panel) eases in from just above its place */
@@ -36,8 +36,16 @@
 /* Going from one page to the next fades between them, where the browser supports it; never with reduced motion */
 @media (prefers-reduced-motion: no-preference) {
   @view-transition { navigation: auto; }
-  ::view-transition-group(root) { animation-duration: var(--t-slow); animation-timing-function: var(--ease); }
+  /* Fade through, not cross: the old page fades out into a middle tone, then the new page fades in out of it. Dark to
+     light (the Knowledge Center to an awake section) never snaps from black to white, and two similar pages (the blog to the
+     Knowledge Center) still show a clear change. The tone sits between the void and the paper. */
+  ::view-transition { background: var(--transit); }
+  ::view-transition-group(root) { animation-duration: calc(var(--t-fast) + var(--t-slow)); animation-timing-function: var(--ease); }
+  ::view-transition-old(root) { animation: n1-page-out var(--t-fast) var(--ease) both; mix-blend-mode: normal; }
+  ::view-transition-new(root) { animation: n1-page-in var(--t-slow) var(--ease) var(--t-fast) both; mix-blend-mode: normal; }
 }
+@keyframes n1-page-out { to { opacity: 0; } }
+@keyframes n1-page-in { from { opacity: 0; } }
 :root[data-motion="off"]::view-transition-group(*), :root[data-motion="off"]::view-transition-old(*), :root[data-motion="off"]::view-transition-new(*) { animation-duration: 0s; }
 
 /* Rain: the canvas behind everything, and the lens layer that magnifies it behind glass; both
