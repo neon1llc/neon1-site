@@ -7,6 +7,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - Home page closing lines: "Something similar going on?" under client work and "See how it works" under process each sit closer to what is above them and stay on one line on a wide screen. Before, they wrapped at 620 pixels (client work) or at the width of the heading column (process), with a large gap above. Phones keep their two-line wrap.
 - The rain is dulled so it feels calmer: the canvas is about 30% fainter (opacity .6 to .42), trails fade a little sooner, and the green glyphs are a step deeper. The bright head glyphs, the gold words, and the neon1 words keep their colors. 1NEON's sign-in uses the same shared rain, so it is dulled too.
 - The black band at the top of the Knowledge Center and the blog reads "neon1" in lowercase, not "NEON1". In that typeface the 1 stands taller than lowercase letters, so "neon" is drawn 1.33 times larger to match the 1, at a lighter weight so its strokes are as thick as the 1's.
+- Every production deploy, including a corpus release picked up on its own, also rebuilds dev.neon1.tech from the new main in the same run, and a dev build pinned to an older corpus branch takes the newest corpus release in first.
 
 ## v0.73.1
 

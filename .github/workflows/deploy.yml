@@ -1,6 +1,8 @@
 # .github/workflows/deploy.yml - Check the site, then deploy main to S3 and CloudFront.
 # Every build takes the newest neon1-corpus release, and a watch publishes each new corpus release on its own,
 # so corpus words go live without a site change (README, Publishing a corpus release).
+# Every run that deploys also rebuilds dev.neon1.tech from the new main in the dev job, beside the deploy job,
+# so dev never falls behind production and a dev failure shows red on this run.
 
 name: deploy
 
@@ -21,7 +23,7 @@ on:
         type: boolean
         default: false
 
-# Read-only by default; the deploy job adds an OIDC token for AWS
+# Read-only by default; the deploy and dev jobs add what they need
 permissions:
   contents: read
 
@@ -110,6 +112,19 @@ jobs:
         env:
           NODE_PATH: ${{ github.workspace }}/knowledge/node_modules
         run: node scripts/chat_check.cjs
+
+  # Merges main into dev and rebuilds dev.neon1.tech, in parallel with the deploy job and on the same checks. A
+  # schedule run that found a new corpus release comes here too, since dev must show the release production does.
+  # The called workflows need contents to push dev and an OIDC token for the dev deploy role
+  dev:
+    needs: [plan, check]
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.plan.outputs.go == 'true'
+    uses: ./.github/workflows/dev-sync.yml
+    with:
+      corpus_tag: ${{ needs.plan.outputs.corpus_tag }}
+    permissions:
+      contents: write
+      id-token: write
 
   # Deploys only from main, after the static checks and the browser contracts in check pass; nothing
   # touches S3 or CloudFront before then
