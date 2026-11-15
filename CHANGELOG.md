@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## Unreleased
+
+- Footer: "state registration" loses its right arrow. Links within neon1 carry no arrow; only links that leave neon1 carry the northeast one.
+
 ## v0.71.1
 
 - Public code shows neon1-corpus v0.42.1.
