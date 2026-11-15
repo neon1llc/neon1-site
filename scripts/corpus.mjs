@@ -57,15 +57,22 @@ const STAGE_KEYS = STAGES.map((s) => s.key)
 // Client quotes stay in the Knowledge Center case study; the home page panel leaves them out (Pradeep, 2026-11-13)
 const withoutQuotes = (html) => html.replace(/(<p>[^<]*client's words:<\/p>)?<blockquote>[\s\S]*?<\/blockquote>/g, "")
 
-// In what capacity and when the work was done, such as "Through partner Xenoss, 2025". The corpus export drops
-// TBD placeholders, so a case without a confirmed role shows no line, and the build says which ones wait
+// The kind of work, then in what capacity and when, such as "Partner engagement: As neon1, 2026". The corpus
+// export (from v0.42) writes the kind's label and says "not yet confirmed" for a missing role or year, so every
+// card carries its context; an older export without them shows whatever it has
 const confirmed = (v) => typeof v === "string" && v.trim() !== "" && v.trim() !== "TBD"
-const roleLine = (d) => (confirmed(d.role) ? [d.role, confirmed(d.when) ? d.when : null].filter(Boolean).join(", ") : "")
+const roleLine = (d) => {
+  // "neon1 engagement: As neon1" says the same thing twice, so a neon1 engagement's plain role is left to the label
+  const role = d.kind === "neon1" && d.role === "As neon1" ? null : d.role
+  const facts = [role, d.when].filter(confirmed).join(", ")
+  if (!d.kind_label) return facts
+  return confirmed(role) ? `${d.kind_label}: ${facts}` : [d.kind_label, facts].filter(Boolean).join(", ")
+}
 
 // One case study card. The full story waits in a template until js/cases.js opens it
 function caseCard(c) {
   const d = c.data
-  if (!confirmed(d.role)) console.warn(`corpus: case ${d.key} has no confirmed role yet, so its card shows none`)
+  if (!d.kind_label) console.warn(`corpus: case ${d.key} has no kind yet; its card shows only its role and years`)
   const role = roleLine(d)
   const glance = STAGES.map((s) => `<dt>${s.word}</dt><dd>${esc(d[s.short] ?? d[s.old])}</dd>`).join("")
   const deep = c.sections

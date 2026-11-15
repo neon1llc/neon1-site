@@ -48,8 +48,16 @@ const page = (opts) => page_(frame, {
 
 
 // A document as a small card: title, summary, and whether it has a PDF. The shelf heading already
-// names the kind, so the card doesn't repeat it. Search reads search-index.json, not the cards
-const card = (d) => cardOf({ url: d.url, title: d.title, summary: d.summary, tags: d.pdf ? ["PDF"] : [] })
+// names the type, so the card doesn't repeat it; a case study (or an example shown beside them) leads with its
+// kind, such as "Partner engagement", so one kind of work is never mistaken for another. Search reads
+// search-index.json, not the cards
+const card = (d) => cardOf({ url: d.url, kicker: d.data.kind_label ? esc(d.data.kind_label) : "", title: d.title, summary: d.summary, tags: d.pdf ? ["PDF"] : [] })
+
+// Case studies by kind: neon1's own engagements first, then partner work, founder experience, and last the
+// independent demonstrations, which live on other shelves (such as the fictional bakery proposal) and are
+// listed here too so all four kinds sit side by side
+const KIND_ORDER = ["neon1", "partner", "founder", "demonstration"]
+const byKind = (a, b) => KIND_ORDER.indexOf(a.data.kind) - KIND_ORDER.indexOf(b.data.kind) || (a.data.order ?? 0) - (b.data.order ?? 0)
 
 
 // The four task paths come from knowledge-lib.mjs. The build fails if a chosen document disappears, so a path never points at nothing
@@ -84,7 +92,8 @@ ${docs.map(card).join("\n")}
         </ul>`
 function shelfSection(s) {
   const lead = s.docs.filter((d) => d.data.featured)
-  const rest = s.docs.filter((d) => !d.data.featured && d.data.audience !== DEVELOPERS)
+  let rest = s.docs.filter((d) => !d.data.featured && d.data.audience !== DEVELOPERS)
+  if (s.key === "case-studies") rest = [...rest, ...corpus.docs.filter((d) => d.section !== s.key && d.data.kind === "demonstration")].sort(byKind)
   const dev = s.docs.filter((d) => !d.data.featured && d.data.audience === DEVELOPERS)
   const fold = dev.length
     ? `
@@ -169,6 +178,9 @@ ${groups}
 }
 
 
+// A fact on its own line starts with a capital, as "year not yet confirmed" does mid-sentence elsewhere
+const capital = (t) => t.charAt(0).toUpperCase() + t.slice(1)
+
 // One document: where it sits, its title and facts, the PDF, the text, and where to go next
 function docPage(d) {
   const shelf = corpus.manifest.shelves[d.section]
@@ -178,9 +190,11 @@ function docPage(d) {
     ...dateFacts(d.data.created, d.data.updated),
     d.data.reviewed ? ["Facts checked", longDate(d.data.reviewed)] : null,
     d.data.audience ? ["For", d.data.audience] : null,
-    // A case study's role and years; the corpus export already leaves out TBD placeholders
-    d.data.role && d.data.role !== "TBD" ? ["Role", d.data.role] : null,
-    d.data.when && d.data.when !== "TBD" ? ["When", d.data.when] : null,
+    // A case study's kind, role, and years. The corpus export says "not yet confirmed" for a missing role or
+    // year, and an older export without a kind leaves that line out
+    d.data.kind_label ? ["Kind", d.data.kind_label] : null,
+    d.data.role && d.data.role !== "TBD" ? ["Role", capital(d.data.role)] : null,
+    d.data.when && d.data.when !== "TBD" ? ["When", capital(d.data.when)] : null,
   ].filter(Boolean)
 
   const pairs = []
