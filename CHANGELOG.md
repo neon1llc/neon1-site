@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## Unreleased
+
+- Knowledge Center search: a search made only of common words, like "how" or "what is", now finds documents instead of nothing, with titles that begin with the word first ("How a project runs", "How I price my work"). Common words are still ignored next to other words, so "how backups" searches for backups. Titles already counted for the most; they just never got the chance when every word was dropped.
+
 ## v0.71.1
 
 - Public code shows neon1-corpus v0.42.1.

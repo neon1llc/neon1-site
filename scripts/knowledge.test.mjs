@@ -35,6 +35,7 @@ function fixture({ dropId = null, noPdf = [] } = {}) {
     sections: [sec("lead", "", "<p>Short answers.</p>"), sec("sign-in", "Signing in", "<p>1NEON supports passkeys (WebAuthn) and an authenticator app (TOTP) for two-factor sign-in.</p>")],
   })
   add("guides-password-manager-for-family", "Password manager for a family", "<p>Turn on MFA and 2FA everywhere. Check the Wi-Fi router too, and your home WiFi password.</p>")
+  add("guides-how-it-goes", "How a first call goes", "<p>Fifteen minutes, free, and plain.</p>")
   add("guides-spot-phishing", "Spotting phishing", "<p>Phishing messages and ransomware demands are the two things I see most.</p>")
   add("guides-backups-you-can-trust", "Backups you can trust", "<h2 id=\"ransom\">Ransomware</h2><p>A backup you cannot restore is not a backup. Backups matter against ransomware.</p>", {
     sections: [sec("lead", "", "<p>Start here.</p>"), sec("ransom", "Ransomware", "<p>Ransomware locks your files, so a backup you cannot restore is not a backup.</p>")],
@@ -141,6 +142,10 @@ test("the listed queries return relevant documents from the built index", () => 
   const res = search(prepare(JSON.parse(read(f, "knowledge/search-index.json"))), "ransomware").results
   assert.equal(res[0].url, "/knowledge/guides/backups-you-can-trust/#ransom")
   assert.ok(res[0].snippet.some((p) => p.hit))
+  // A query of only common words ("how") still searches, so titles that begin with it come up first
+  const how = search(prepare(JSON.parse(read(f, "knowledge/search-index.json"))), "how").results
+  assert.ok(how.length > 0, "how finds nothing")
+  assert.ok(/^how\b/i.test(how[0].title), `the best match for "how" should be a title that starts with it, got ${how[0]?.title}`)
   // Nonsense finds nothing, so the empty state shows
   assert.equal(search(prepare(JSON.parse(read(f, "knowledge/search-index.json"))), "zzqx").results.length, 0)
 })
