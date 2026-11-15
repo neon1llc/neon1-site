@@ -21,13 +21,22 @@ if (fold && form) {
   // Opening the fold puts the cursor in the first field it asks for
   fold.addEventListener("toggle", () => { if (fold.open && !form.hidden) form.elements.today.focus({ preventScroll: true }); });
 
-  // Plain checks before sending; the first field that needs attention gets focus. What it's about is optional
+  // Plain checks before sending, the same minimums the API holds (1NEON's forms.ts): a message of a
+  // sentence or so, names of at least 2 characters, other answers of at least 3. The first field that needs attention gets
+  // focus. What it's about is optional
   function problems() {
     const f = form.elements, out = [];
-    if (!f.today.value.trim()) out.push(["today", "Say what's going on."]);
-    if (!f.name.value.trim()) out.push(["name", "Add your name."]);
+    const clean = (el) => el.value.trim().replace(/\s+/g, " ");
+    const today = clean(f.today), name = clean(f.name), org = clean(f.company), other = clean(f.other), where = clean(f.foundOther);
+    if (!today) out.push(["today", "Say what's going on."]);
+    else if (today.length < 10) out.push(["today", "Tell me a little more, at least 10 characters."]);
+    if (!name) out.push(["name", "Add your name."]);
+    else if ((name.match(/\p{L}/gu) || []).length < 2) out.push(["name", "Enter at least 2 letters of your name."]);
     if (!/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(f.email.value.trim())) out.push(["email", "Enter a full email address, like you@company.com."]);
-    if (f.found.value === "other" && !f.foundOther.value.trim()) out.push(["foundOther", "Say where you found neon1."]);
+    if (org.length === 1) out.push(["company", "Enter at least 2 characters for the organization's name."]);
+    if (other && other.length < 3) out.push(["other", "Enter at least 3 characters for the topic."]);
+    if (f.found.value === "other" && !where) out.push(["foundOther", "Say where you found neon1."]);
+    else if (f.found.value === "other" && where.length < 3) out.push(["foundOther", "Enter at least 3 characters for where you found neon1."]);
     return out;
   }
 
