@@ -4,6 +4,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## v0.72.0
 
+- Public code shows neon1-corpus v0.43.0 and neon1-1NEON v0.12.0.
 - Case cards: a neon1 or subcontracted engagement shows just its label and year, such as "neon1 subcontracted engagement, 2026", with no role text and no partner name. The intro line over the cards says "each labeled by kind". The new label wording comes with the next corpus release.
 - Knowledge Center shelf bar: the group titles ("For you", "About neon1") are centered vertically with the shelf buttons and the arrow boxes; they sat a few pixels high.
 - Menu: "Book a call" is the same weight as the other menu items; it had come out lighter.
