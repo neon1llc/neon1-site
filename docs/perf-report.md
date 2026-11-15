@@ -4,11 +4,11 @@ Measured by `make perf` (scripts/perf.cjs) on site v0.32.0, in headless Chromium
 
 ## How it is measured
 
-The script serves the site on loopback, enters the scene the way a visitor does (`?rabbit=now`, then a click or tap on the rabbit), and scrolls to six fixed checkpoints. At each one it waits for the scroll to settle and records 12 frames of three.js's `renderer.info`: draw calls and triangles for the scene itself (the RenderPass, including any shadow map update) and for the whole frame (every postprocessing pass), and the live geometries, textures, and shader programs. Counts are the median frame; geometries, textures, and programs are the most seen.
+The script serves the site on loopback, enters the scene the way a visitor does (`?rabbit=now`, then a click or tap on the rabbit), and scrolls to six fixed checkpoints. At each one it records 12 frames of three.js's `renderer.info`: draw calls and triangles for the scene and for the whole frame (every postprocessing pass), plus live geometries, textures, and shader programs. Counts are the median frame. Geometries, textures, and programs are the most seen.
 
-Those counts depend on the scene, not the machine, so they are what the budget holds. Headless Chromium draws WebGL in software (SwiftShader), so **frame times and the time to the first frame are software-rendered**: useful only for comparing runs on the same machine, never as a phone's or a desktop's real speed. The scene's adaptive step sees those slow frames too and lowers its pixel ratio and drops bloom, so each row notes the pixel ratio and the number of postprocessing passes it ran at; a real desktop GPU keeps bloom, which adds about a dozen full-screen draws to the frame from the window on (the scene's own counts do not change).
+The budget holds these counts because they depend on the scene, not the machine. Headless Chromium draws WebGL in software (SwiftShader), so **frame times and the time to the first frame are software-rendered**. Compare them only between runs on the same machine. The scene's adaptive step sees those slow frames too, lowers its pixel ratio, and drops bloom, so each row notes the pixel ratio and postprocessing passes it ran at. A real desktop GPU keeps bloom, which adds about a dozen full-screen draws from the window on.
 
-Scene ready is the time from the catch to the first composed frame: the rain's stop, the scene's modules, the models and maps, and building the room and the yard.
+Scene ready is the time from the catch to the first composed frame.
 
 ## Desktop, 1440x900 at 1x
 
@@ -42,7 +42,7 @@ Hidden tab: audio running before, suspended while hidden, running after.
 
 ## Budget
 
-`scripts/perf-budget.json` holds the most each profile may reach at any checkpoint. It was set from v0.31.0's counts with about 10% headroom, rounded up (the desktop's frame calls, textures, and programs also leave room for bloom, which a real GPU keeps on), so a new feature in the room or the yard that adds draw calls, triangles, textures, or programs past that shows up as a failed `make perf` and gets a deliberate budget change instead of a silent one. Frame times are not budgeted, since this runner can't measure them.
+`scripts/perf-budget.json` holds the most each profile may reach at any checkpoint. It was set from v0.31.0's counts with about 10% headroom, rounded up. The desktop's frame calls, textures, and programs also leave room for bloom. A feature that goes past the budget fails `make perf` and needs a deliberate budget change. Frame times are not budgeted, since this runner can't measure them.
 
 | Profile | Scene calls | Scene triangles | Frame calls | Geometries | Textures | Programs |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -53,7 +53,7 @@ Every profile is within its budget.
 
 ## Hidden tabs
 
-The scene draws only from `requestAnimationFrame`, which browsers stop for hidden tabs, and the controller suspends the audio device on `visibilitychange` and resumes it on return (the rows above show it). Headless pages are always visible, so the script reports the page as hidden through `visibilityState` and the event, as a browser would. The scene's adaptive quality step ignores a frame gap longer than a second, so coming back to the tab doesn't count the time away as one slow frame and lower the quality for the rest of the visit.
+The scene draws only from `requestAnimationFrame`, which browsers stop for hidden tabs. The controller suspends the audio device on `visibilitychange` and resumes it on return. Headless pages are always visible, so the script reports the page as hidden through `visibilityState` and the event. The adaptive quality step ignores a frame gap over a second, so returning to the tab doesn't lower quality.
 
 ## Running it
 
@@ -62,4 +62,4 @@ make perf                                   # measure and check the budget
 PERF_REPORT=docs/perf-report.md make perf   # also rewrite this report
 ```
 
-It needs Node's `playwright` package and its Chromium, like `make behavior`, so it stays out of `make check`. A desktop and a phone run take a few minutes in software rendering. Run it before adding to the room or the yard, and raise a budget only on purpose, in the same change as what needs it.
+It needs Node's `playwright` package and its Chromium, like `make behavior`, so it stays out of `make check`. A desktop and a phone run take a few minutes. Run it before adding to the room or the yard, and raise a budget only on purpose, in the same change.
