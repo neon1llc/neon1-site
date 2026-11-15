@@ -22,7 +22,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
-- Knowledge Center: the shelf bar under the title has a left and a right button at its ends for a mouse or trackpad, so no one needs to know that Shift and the wheel scroll it sideways. Each shows only on a side that has more to scroll to. One click moves the bar by nearly a full view and keeps the last two shelf buttons in view so the reader keeps their place, and the buttons beneath fade out. Reduced motion jumps instead of gliding. A touch screen swipes as before and gets no buttons, and a keyboard uses the shelf links themselves, which scroll into view when focused.
+- Knowledge Center: the shelf bar under the title has a left and a right button at its ends, so no one needs to know that Shift and the wheel scroll it sideways, or that a label cut off at a phone's edge means there is more. Each shows only on a side that has more to scroll to. One click or tap moves the bar by nearly a full view and keeps the last two shelf buttons in view so the reader keeps their place, and the buttons beneath fade out. The buttons are smaller on a touch screen, where the bar still swipes. Reduced motion jumps instead of gliding. A keyboard uses the shelf links themselves, which scroll into view when focused.
 
 ## v0.71.1
 
