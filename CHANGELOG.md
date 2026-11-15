@@ -4,6 +4,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+- The white rabbit's "go back" plays the walk back 25% faster: 6.9 seconds in place of 8.6.
 - Services on the home page: each service name stands on its own line, in bold, with its description below it in regular weight, a step smaller, still gray, and its link a step heavier. Before, the bold name ran into the description on one line. Rows are a little tighter so the four still fit about one screen.
 - About, on the home page: it names no client project now ("moved offices off closet servers, built assistants that answer from a company's own documents, shown parents and executives how to lock down their accounts"), says "established July 2025 in New York", and "neon1" in the second paragraph links to the About page in the Knowledge Center. Page titles with neon1 in them, such as "About neon1", use the standard wordmark in the heading. Running text keeps plain "neon1", since the larger-\"neon\" wordmark in a sentence reads as a typo.
 - The contact form refuses answers too short to mean anything, in the browser and in 1NEON's API: a message under 10 characters, a name under 2 letters, an organization under 2 characters, and the topic or "Where?" under 3. Each says so under its field.
