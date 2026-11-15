@@ -405,7 +405,8 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 @supports (appearance: base-select) {
   .cform select, .cform select::picker(select) { appearance: base-select; }
   .cform select { background-image: none; padding-right: 14px; display: inline-flex; align-items: center; gap: 12px; }
-  .cform select::picker-icon { content: ""; width: .95em; height: .75em; font: 15px var(--sans); background: var(--brand); clip-path: polygon(0 50%, 31% 12%, 40% 20%, 24% 43%, 100% 43%, 100% 57%, 24% 57%, 40% 80%, 31% 88%); align-self: center; margin-left: auto; margin-right: 2px; transition: rotate var(--t-base) var(--ease); }
+  .cform select { --arr-t: .09em; } /* the select's text is regular weight, so its arrow's stroke is too */
+  .cform select::picker-icon { content: ""; width: .95em; height: .75em; font: 15px var(--sans); background: var(--brand); clip-path: var(--arr-shape); align-self: center; margin-left: auto; margin-right: 2px; transition: rotate var(--t-base) var(--ease); }
   .cform select:open::picker-icon { rotate: -90deg; }
   /* The list opens above when there isn't room below (js/motion.js sets data-dir), and the arrow turns clockwise to point up */
   .cform select[data-dir="up"]::picker(select) { position-area: block-start span-inline-end; margin: 0 0 4px; }
