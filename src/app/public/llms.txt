@@ -11,7 +11,7 @@ neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site
 
 ## Company
 
-- [About neon1](https://neon1.tech/knowledge/company/about/): Who does the work, what has been shipped, and how the practice is set up.
+- [About neon1](https://neon1.tech/knowledge/company/about/): Who does the work, a few case studies, and how the practice is set up.
 - [How neon1 is built](https://neon1.tech/knowledge/company/architecture/): Diagrams of the website, the Knowledge Center, the 1NEON portal, Neo, and the infrastructure: how each runs in production and on the private dev copy, what data each keeps and why, and how a change reaches them.
 - [Capability statement](https://neon1.tech/knowledge/company/capabilities/): neon1 on one page for a buyer, partner, or procurement office: what it does, how it differs, work it has delivered, and the company's details.
 - [Contact](https://neon1.tech/knowledge/company/contact/): How to reach neon1, when, and what the first call covers.
@@ -20,6 +20,7 @@ neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site
 - [The names](https://neon1.tech/knowledge/company/names/): Where neon1, its slogan and its products get their names.
 - [How I price my work](https://neon1.tech/knowledge/company/pricing/): How a neon1 project is priced: a fixed price or a capped estimate, what most projects cost, what the price includes, when it can change, how paying works, and why the website shows ranges while each proposal shows the hours.
 - [How a project runs](https://neon1.tech/knowledge/company/process/): Listen, propose, decide, build and hand over.
+- [Publishing client work](https://neon1.tech/knowledge/company/publishing-client-work/): When and how a client's work appears as a case study: permission, anonymity, quotes, and figures.
 - [State registration](https://neon1.tech/knowledge/company/registration/): neon1 LLC's public record with the New York Department of State: its ID, status, filings, registered agent, and assumed name, and how to check the live record yourself.
 - [Where I learn from](https://neon1.tech/knowledge/company/sources/): The standards bodies, government guides, and practitioners whose published work shapes how neon1 works, grouped by topic, with what each one is for.
 
@@ -33,7 +34,7 @@ neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site
 - [Before you buy a new tool](https://neon1.tech/knowledge/guides/before-you-buy/): Ten questions to ask before adding software to your business, so it fits, lasts, and lets you leave.
 - [Do you need a business associate agreement?](https://neon1.tech/knowledge/guides/do-you-need-a-baa/): A plain guide for health practices on when a vendor needs a BAA, and what to check before signing one.
 - [Getting ready for a first call](https://neon1.tech/knowledge/guides/first-call/): What to bring to a free 15-minute call with neon1.
-- [Free 1NEON accounts](https://neon1.tech/knowledge/guides/free-accounts/): Start without a call: make a free 1NEON account, write down what your project needs, and I'll reply with what I'd do.
+- [Free 1NEON accounts](https://neon1.tech/knowledge/guides/free-accounts/): Start without a call: make a free 1NEON account, write down what your project needs, then ask for an assessment or a call from your account.
 - [A password manager for your family](https://neon1.tech/knowledge/guides/password-manager-for-family/): How to move a household onto a password manager, step by step, without locking anyone out.
 - [Use case: a cloud account you can trust](https://neon1.tech/knowledge/guides/use-case-cloud/): How a typical cloud engineering engagement goes for a small technical team: inventory, infrastructure as code, deploys, and tested recovery.
 - [Use case: security awareness for a team or family](https://neon1.tech/knowledge/guides/use-case-security-awareness/): How a typical plain-language security session goes, and what people leave able to do.

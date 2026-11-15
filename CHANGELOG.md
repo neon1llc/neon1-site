@@ -6,7 +6,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## v0.74.0
 
-- Dark theme: the home page below the landing, the Knowledge Center, and the blog come in light or dark. A sun and moon switch in the bar picks one and remembers it; until then the device's setting decides. Contrast meets WCAG AA, there is no white flash on load, and it eases with a fade (instant with reduced motion). The landing is unchanged.
+- Dark theme: the home page below the landing, the Knowledge Center, and the blog come in light or dark. A sun and moon switch picks one and remembers it: on desktop it sits in the page margin right of the bar, which keeps its layout, and on phones beside the menu button; until then the device's setting decides. Contrast meets WCAG AA, there is no white flash on load, and it eases with a fade (instant with reduced motion). The landing is unchanged.
 - Page changes fade through a middle tone instead of cross-fading, so dark pages (Knowledge Center, blog) no longer snap to white. Arriving at a home section no longer flashes the black hero.
 - One arrow everywhere, with the longer arms of the client-work card: folds, dropdowns, outbound links, and the previous and next buttons. Its stroke matches the text beside it, and it turns on its own center.
 - Motion: one curve and three lengths for every state change, shared with 1NEON. Folds open in 0.6 s with the arrow finishing its turn as the fold finishes. The contact form's fields, errors, "Where?" box, and sent note ease in and out.
