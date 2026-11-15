@@ -21,6 +21,7 @@ import { whiteRabbit } from "/js/white-rabbit.js";
     // Fully scrolled into the light page, the rain is invisible, so it stops drawing
     idle: () => document.body.classList.contains("woke"),
     rabbit: {
+      every: 7000, // a rabbit every 7 seconds (Pradeep, 2026-11-15)
       ok: () => !!egg && egg.ready(),
       avoid: () => document.querySelectorAll(".hero-pane, header a, header button, .rainctl"),
     },
