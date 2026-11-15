@@ -8,6 +8,8 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - Blog: the share block is one short row under a small "Share" label, in place of ten pill buttons under a heading. It holds Share (the phone's own share sheet) or, where there is none, Copy link, which reads "Copied" for a moment; then LinkedIn and Email. A reader who arrived from X, Facebook, Bluesky, Threads, or Reddit also sees that network's link. Share rows get about 2 clicks in 1,000 views (GOV.UK, Moovweb), more than three buttons lowered use in Big Medium's tests, and readers coming from a network are the ones likeliest to share back to it. The buttons are drawn like the Knowledge Center's actions, with line icons and the outbound arrow, and every link is still a plain link with no outside script.
 - Public code: "GitHub" in the line under the heading links to neon1's GitHub page, with the outbound arrow, as "Source on GitHub" does at the foot of each post and Knowledge Center page.
 - Footer: "state registration" loses its right arrow. Links within neon1 carry no arrow; only links that leave neon1 carry the northeast one.
+- Links follow one rule everywhere: a link within neon1 has no arrow, and a link that leaves neon1 has the northeast arrow that nudges out on hover. The footer's "state registration" loses its right arrow, and "book a call", "linkedin", "github", and "pradeep on linkedin" in the footer, plus "book a call" in the phone menu, gain the outbound arrow while keeping those places' own colors. Links in running text already followed the rule, and a long Sources list keeps its arrows, since each one says where it goes.
+- Knowledge Center: the line under the title no longer states how many documents there are or how many have a PDF.
 
 ## v0.71.1
 
