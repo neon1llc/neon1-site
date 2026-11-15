@@ -22,7 +22,8 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
-- Knowledge Center: the shelf bar under the title has a left and a right button at its ends, so no one needs to know that Shift and the wheel scroll it sideways, or that a label cut off at a phone's edge means there is more. Each shows only on a side that has more to scroll to. One click or tap moves the bar by nearly a full view and keeps the last two shelf buttons in view so the reader keeps their place, and the buttons beneath fade out. The buttons are smaller on a touch screen, where the bar still swipes. Reduced motion jumps instead of gliding. A keyboard uses the shelf links themselves, which scroll into view when focused.
+- Knowledge Center: the shelf bar under the title has a box at each end, as tall as the bar, with the site's own chevron and the same thin line the bar draws between its groups. Shelf buttons passing under a box end at its line. Each box shows only on a side that has more to scroll to, so no one needs to know that Shift and the wheel scroll the bar sideways, or that a label cut off at a phone's edge means there is more. One click or tap moves the bar by nearly a full view and keeps the last two shelf buttons in view so the reader keeps their place. The boxes are a little narrower on a touch screen, where the bar still swipes. Reduced motion jumps instead of gliding. A keyboard uses the shelf links themselves, which scroll into view when focused.
+- Dev: two runs that finish together, like a push to dev and its branch preview, no longer make one fail after uploading. Each retries its one key write against the store's fresh state, and a run that cleans up old releases keeps any folder changed in the last 15 minutes. Dev's fonts and media revalidate every time, as its pages do.
 
 ## v0.71.1
 

@@ -1,7 +1,7 @@
 // src/app/public/js/knowledge-shelves.js - Left and right buttons for the Knowledge Center's shelf bar. The bar
 // scrolls sideways, and a reader may not know it does: a mouse user may not know Shift plus the wheel moves it, and
 // on a phone the only sign is a label cut off at the edge. So a button sits at each end, shown only on the side that
-// has more to scroll to, with the shelf buttons fading out beneath it. One tap or click moves the bar by nearly a
+// has more to scroll to, and shelf buttons passing under one are covered at its edge. One tap or click moves the bar by nearly a
 // full view, keeping the last two shelf buttons in view so the reader never loses their place. On a touch screen
 // the buttons are smaller and the bar still swipes. Keyboard users have the links themselves: focusing one scrolls
 // it into view, so the buttons are left out of the Tab order and the reading order.
@@ -17,8 +17,8 @@ if (track) {
     b.tabIndex = -1;
     b.setAttribute("aria-hidden", "true");
     b.hidden = true;
-    // A chevron drawn like the site's other line icons
-    b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${side === "prev" ? "m15 5-7 7 7 7" : "m9 5 7 7-7 7"}"/></svg>`;
+    // The chevron that marks each heading on the site (index.html .pr); the CSS turns it around for the left button
+    b.innerHTML = `<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>`;
     return b;
   };
   const prev = arrow("prev"), next = arrow("next");
