@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## Unreleased
+
+- Shorter, plainer wording in the README, docs, and home page.
+
 ## v0.71.1
 
 - Public code shows neon1-corpus v0.42.1.
