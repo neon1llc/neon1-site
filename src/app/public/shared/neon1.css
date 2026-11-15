@@ -122,3 +122,8 @@
 /* Sentence case or mixed case (a capital to line up with, such as a dropdown's "Choose one"): add .arr-mixed and the arrow
    centers on half the cap height (Figtree: 0.70em / 2) instead, which is the ordinary middle of the line */
 .arr-mixed { --arr-xc: .35em; }
+
+/* A required field's asterisk, after its label: one definition for the contact form and 1NEON's forms. It is set in the
+   sans face at the label's size so its position is the same whatever the label's font (a mono asterisk sits mid-letter,
+   a sans one sits at the top), which reads as a superscript, and it takes its color from --req-color. */
+.req { margin-left: 3px; font: 700 1em/0 var(--sans); vertical-align: baseline; color: var(--req-color, currentColor); }

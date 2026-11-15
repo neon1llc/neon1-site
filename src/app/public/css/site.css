@@ -385,7 +385,7 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 .cerr { display: block; margin-top: 4px; font-size: 13px; color: #B45309; animation: n1-appear var(--t-base) var(--ease) both; }
 .cform [aria-invalid="true"] { border-color: #B45309; }
 /* A required field's asterisk, after its label, in the brand green */
-.cform .req { margin-left: 3px; color: var(--brand); font-weight: 700; }
+.cform { --req-color: var(--brand); } /* the asterisk's shape is shared (.req in shared/neon1.css) */
 .cform .cfound-other[hidden] { display: none; }
 .cform[hidden], .cdone[hidden] { display: none; }
 .cform label { display: grid; gap: 6px; font: 500 14px var(--sans); color: var(--ink); }
