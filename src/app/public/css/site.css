@@ -416,3 +416,6 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 /* A case card's role and years, above its glance */
 .case .role { margin: -4px 0 10px; font: 500 13px/1.4 var(--mono); color: var(--muted); }
 
+
+/* Invitations to start a free 1NEON account stay hidden until js/signup.js hears sign-up is open */
+[data-signup][hidden] { display: none !important; }
