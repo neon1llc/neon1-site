@@ -16,6 +16,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - Home page: About names no client project and says "established July 2025 in New York". Each service name sits on its own line, with its description below. Shorter free-account copy and closing lines.
 - Section links such as Contact keep their place in the address, so a view can be shared.
 - Every production deploy also rebuilds dev.neon1.tech from the new main.
+- Public code shows neon1-corpus v0.46.0 and neon1-1NEON v0.15.0.
 
 ## v0.73.1
 
