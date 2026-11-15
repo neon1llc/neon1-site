@@ -68,6 +68,8 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 /* Over the rain: clear glass, so the rain's lens shows through every item in the bar */
 .n1-bar:not(.light) .n1-logo, .n1-bar:not(.light) .links a, .n1-bar:not(.light) .menu-btn { border-radius: var(--glass-r); background: transparent; box-shadow: none; }
 .n1-bar:not(.light) .links .portal:hover { background: rgba(0,230,118,.08); }
+/* The bar itself is the glass pane (js/page.js), so its lower edge gets the same thin line the light bar has, and a light dark tint keeps the links readable over the magnified rain */
+.n1-bar:not(.light) { box-shadow: 0 1px 0 rgba(108,255,168,.14); background: rgba(13,2,8,.4); }
 /* Over the light page: grey links that turn brand green, and brand-green buttons */
 .n1-bar.light .n1-logo { color: var(--brand); text-shadow: none; }
 .n1-bar.light .links a:not(.btn), .n1-bar.light .links .note { color: #56665c; }

@@ -4,6 +4,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+- The home page's top bar is one glass pane across its full width, in place of a separate pane behind each item. The rain behind it is magnified as through glass, with a faint tint to keep the links readable and a thin green line along its lower edge. Item layout is unchanged; the bar still turns light and opaque over the light sections.
 - Section links keep their place in the address: the top bar's Contact link, and "tell me what's going on" under client work, leave #contact in the URL like the other section links, so a view can be shared. Before, they reset it to the home address, which was meant only for the logo. A behavior check covers both.
 - Home page closing lines: "Something similar going on?" under client work and "See how it works" under process each sit closer to what is above them and stay on one line on a wide screen. Before, they wrapped at 620 pixels (client work) or at the width of the heading column (process), with a large gap above. Phones keep their two-line wrap.
 - The rain is calmer: the canvas is about 40% fainter than before (opacity .6 to .35), the steps are a fifth slower (82 ms in place of 66), and the green glyphs are a step deeper. Trails keep their original length. The bright head glyphs, the gold words, and the neon1 words keep their colors. 1NEON's sign-in uses the same shared rain, so it is calmer too.

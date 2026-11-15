@@ -260,11 +260,11 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
   }
 
   // Draws the rain behind rect r, inset by `inset` px, scaled by `zoom` around its center
-  function lensRect(r, inset, zoom) {
+  function lensRect(r, inset, zoom, radius = 8) {
     const x = r.left + inset, y = r.top + inset, w = r.width - inset * 2, h = r.height - inset * 2;
     const sw = w / zoom, sh = h / zoom, sx = x + (w - sw) / 2, sy = y + (h - sh) / 2;
     lctx.save();
-    lctx.beginPath(); lctx.roundRect(x, y, w, h, Math.max(2, 8 - inset)); lctx.clip();
+    lctx.beginPath(); lctx.roundRect(x, y, w, h, radius && Math.max(2, radius - inset)); lctx.clip();
     lctx.fillRect(x, y, w, h);
     lctx.drawImage(canvas, sx * dpr, sy * dpr, sw * dpr, sh * dpr, x, y, w, h);
     lctx.restore();
@@ -281,8 +281,10 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
       lctx.save();
       lctx.fillStyle = VOID;
       lctx.filter = "blur(0.6px)";
-      lensRect(r, 0, 0.9);
-      lensRect(r, RIM, ZOOM);
+      // A pane's corner radius, 8 px unless its element says otherwise with data-lens-radius (0 for a bar edge to edge)
+      const radius = el.dataset.lensRadius === undefined ? 8 : +el.dataset.lensRadius;
+      lensRect(r, 0, 0.9, radius);
+      lensRect(r, RIM, ZOOM, radius);
       lctx.restore();
     }
   }

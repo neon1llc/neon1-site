@@ -9,11 +9,13 @@ import { whiteRabbit } from "/js/white-rabbit.js";
   let egg = null;
   const canvas = document.getElementById("rain"), lens = document.getElementById("lens");
   const header = document.querySelector("header");
+  header.dataset.lensRadius = "0";
   const reduce = matchMedia("(prefers-reduced-motion: reduce)");
   const r = rain({
     canvas,
     lens,
-    panes: () => document.querySelectorAll(".hero-pane, header .logo, header .links a, #menuBtn, .rainctl button"),
+    // The top bar is one pane edge to edge, the size of the light bar it becomes, rather than a pane per item
+    panes: () => document.querySelectorAll(".hero-pane, header.n1-bar, .rainctl button"),
     // The lens rests once the header turns light
     lensOff: () => header.classList.contains("light"),
     // Fully scrolled into the light page, the rain is invisible, so it stops drawing
