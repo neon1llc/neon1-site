@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // scripts/knowledge.mjs - Writes the Knowledge Center (/knowledge/) from neon1-corpus, or checks it matches.
-// Usage: node scripts/knowledge.mjs sync|check SITE_DIR CORPUS_EXPORT [BLOG_EXPORT]   (make knowledge, and make knowledge-check)
+// Usage: node scripts/knowledge.mjs sync|check SITE_DIR CORPUS_EXPORT [BLOG_EXPORT] [RELEASES_DIR]   (make knowledge, and make knowledge-check)
 //
 // CORPUS_EXPORT is the corpus's knowledge bundle (tools/export.mjs --target knowledge) from CORPUS_TAG, the newest
 // corpus release unless the Makefile is told otherwise. Every document becomes /knowledge/<shelf>/<slug>/index.html,
@@ -8,18 +8,20 @@
 // writes it before checks and deploys, so each release carries static pages from one corpus release, and
 // /knowledge/corpus.json names that release for the deploy job's watch. The bar and footer come from index.html's
 // frame blocks, so they match every other page. sync rewrites the folder; check fails if anything differs.
-// PDFs are not written here: scripts/knowledge-pdf.mjs prints them in the deploy job.
+// PDFs are not written here: scripts/knowledge-pdf.mjs prints them in the deploy job. RELEASES_DIR, from
+// scripts/releases.sh, adds /knowledge/releases/: every product's releases from its changelog (scripts/releases-lib.mjs).
 
 import { readFileSync, readdirSync, existsSync } from "node:fs"
 import { join } from "node:path"
 import { load, pageBody, relink, classifyLinks, bindExtArrows, catalogFacts, fillNote, TASK_PATHS, searchIndex, esc, longDate, TYPE_LABELS, SITE, BASE, slugOf } from "./knowledge-lib.mjs"
+import { gather, releasesBody, releasesSections, releasesLd, pinOf, RELEASES_URL } from "./releases-lib.mjs"
 import { homeFrame, page as page_, ORG, WEBSITE, AUTHOR, LICENSE, OG_IMAGE, crumbs, band, card as cardOf, CORPUS_LINK, rights, dateFacts, docMain, sitemapWith, syncFolder } from "./page-shell.mjs"
 
 
 // BLOG_EXPORT, the corpus's blog bundle, adds the blog's posts to llms.txt, which this script writes whole
-const [mode, siteDir, exportDir, blogDir] = process.argv.slice(2)
+const [mode, siteDir, exportDir, blogDir, releasesDir] = process.argv.slice(2)
 if (!["sync", "check"].includes(mode) || !siteDir || !exportDir) {
-  console.error("usage: node scripts/knowledge.mjs sync|check SITE_DIR CORPUS_EXPORT [BLOG_EXPORT]")
+  console.error("usage: node scripts/knowledge.mjs sync|check SITE_DIR CORPUS_EXPORT [BLOG_EXPORT] [RELEASES_DIR]")
   process.exit(2)
 }
 
@@ -79,7 +81,7 @@ ${p.ids.map((id) => `            <li><a href="${corpus.byId.get(id).url}">${esc(
           </ul>
         </li>`).join("\n")}
       </ul>
-      <p class="kc-paths-more">Not sure where you fit? <a href="/#services">See what I offer</a> or <a href="/#contact">get in touch</a>.</p>
+      <p class="kc-paths-more">Not sure where you fit? <a href="/#services">See what I offer</a> or <a href="/#contact">get in touch</a>.${releasesDir ? ` <a href="${RELEASES_URL}">Releases</a> lists what changed in each product.` : ""}</p>
     </section>`
 }
 
@@ -254,6 +256,28 @@ const want = new Map([["knowledge/index.html", indexPage()]])
 for (const d of corpus.docs) want.set(`${d.url.slice(1)}index.html`, docPage(d))
 // The search index sits beside the shelves and is fetched only when someone searches
 want.set("knowledge/search-index.json", JSON.stringify(searchIndex(corpus)) + "\n")
+// The releases page: current versions, then the newest releases across every product, from each repository's
+// changelog. releases.json names the tags it read, so the deploy watch republishes when any product releases
+const releases = releasesDir ? gather(releasesDir) : null
+if (releases) {
+  const updated = releases.all[0]?.date
+  const main = docMain({
+    crumbs: [["Knowledge center", BASE], ["Releases"]],
+    title: "Releases",
+    summary: "What changed in each neon1 product, newest first.",
+    facts: [updated ? ["Updated", longDate(updated)] : null, ["Products", String(releases.current.length)]].filter(Boolean),
+    sections: releasesSections,
+    body: releasesBody(releases),
+    colophon: "Written from each repository's CHANGELOG.md at its newest release. Every release is also on its repository's GitHub Releases page.",
+  })
+  want.set(`${RELEASES_URL.slice(1)}index.html`, page({
+    title: "Releases · neon1 knowledge center",
+    description: "What changed in neon1.tech, 1NEON, Neo, the Knowledge Center documents, and neon1's public tools, newest first.",
+    path: RELEASES_URL, main, kind: "doc",
+    ld: [releasesLd(updated), crumbs([["Knowledge center", `${SITE}${BASE}`], ["Releases"]])],
+  }))
+  want.set("knowledge/releases.json", JSON.stringify({ pin: pinOf(releasesDir) }) + "\n")
+}
 // Which corpus release these pages came from. The deploy workflow's watch reads it from the live site and
 // publishes when a newer release exists, so it must name the tag and the bundle's digest exactly
 want.set("knowledge/corpus.json", JSON.stringify({ tag: process.env.CORPUS_TAG || "local", digest: corpus.manifest.digest }) + "\n")
@@ -298,7 +322,7 @@ if (existsSync(diagramsDir)) for (const f of readdirSync(diagramsDir)) if (f.end
 const sitemapFile = join(siteDir, "sitemap.xml")
 const sitemapNow = readFileSync(sitemapFile, "utf8")
 const lastmod = corpus.docs.map((d) => d.data.updated).sort().at(-1)
-const sitemapWant = sitemapWith(sitemapNow, "knowledge", [[`${SITE}${BASE}`, lastmod], ...corpus.docs.map((d) => [`${SITE}${d.url}`, d.data.updated])])
+const sitemapWant = sitemapWith(sitemapNow, "knowledge", [[`${SITE}${BASE}`, lastmod], ...(releases ? [[`${SITE}${RELEASES_URL}`, releases.all[0]?.date]] : []), ...corpus.docs.map((d) => [`${SITE}${d.url}`, d.data.updated])])
 
 // llms.txt (llmstxt.org): a plain map of the site for AI assistants and answer engines, written from the same
 // corpus so it never drifts from the pages. Each shelf lists its documents with their one-line summaries

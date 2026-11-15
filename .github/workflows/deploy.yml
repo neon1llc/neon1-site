@@ -4,8 +4,9 @@
 
 name: deploy
 
-# Pull requests run the checks; pushes to main and manual runs also deploy. The schedule is the corpus watch:
-# it deploys main only when the newest corpus release isn't the one live, and otherwise stops after one request
+# Pull requests run the checks; pushes to main and manual runs also deploy. The schedule is the corpus and
+# releases watch: it deploys main only when the newest corpus release, or any public repository's newest release
+# (the Knowledge Center's releases page), isn't the one live, and otherwise stops after two requests
 on:
   push:
     branches: [main]
@@ -31,6 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       corpus_tag: ${{ steps.pick.outputs.corpus_tag }}
+      releases_pin: ${{ steps.pick.outputs.releases_pin }}
       go: ${{ steps.pick.outputs.go }}
     steps:
       - id: pick
@@ -40,12 +42,24 @@ jobs:
           tag=$(git ls-remote --tags --refs --sort=-v:refname https://github.com/neon1llc/neon1-corpus 'v*' \
             | sed -n 's|.*refs/tags/\(v[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)$|\1|p' | head -1)
           test -n "$tag" || { echo "::error::no neon1-corpus release found"; exit 1; }
+          # Each public repository's newest release, in scripts/releases.sh's order and form, for the releases page
+          pin=()
+          for repo in neon1-1NEON neon1-chat neon1-corpus neon1-aws-infrastructure refmark deploy-ops aws-clip ready-secure-go soc-2-readiness compliance-basics incident-response-for-small-teams phishing-awareness-kit household-tech-handbook; do
+            t=$(git ls-remote --tags --refs --sort=-v:refname "https://github.com/neon1llc/$repo" 'v*' \
+              | sed -n 's|.*refs/tags/\(v[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)$|\1|p' | head -1)
+            test -n "$t" || { echo "::error::no $repo release found"; exit 1; }
+            pin+=("$repo@$t")
+          done
+          releases=$(IFS=,; echo "${pin[*]}")
           go=true
           if [ "$EVENT" = "schedule" ]; then
             live=$(curl -fsS --max-time 15 https://neon1.tech/knowledge/corpus.json | sed -n 's/.*"tag":"\([^"]*\)".*/\1/p' || true)
-            if [ "$live" = "$tag" ]; then go=false; echo "neon1.tech already shows neon1-corpus $tag"; else echo "neon1.tech shows ${live:-no corpus release}; publishing $tag"; fi
+            live_pin=$(curl -fsS --max-time 15 https://neon1.tech/knowledge/releases.json | sed -n 's/.*"pin":"\([^"]*\)".*/\1/p' || true)
+            if [ "$live" = "$tag" ] && [ "$live_pin" = "$releases" ]; then go=false; echo "neon1.tech already shows neon1-corpus $tag and every newest release"
+            else echo "neon1.tech shows ${live:-no corpus release} and ${live_pin:-no releases}; publishing $tag and $releases"; fi
           fi
           echo "corpus_tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "releases_pin=$releases" >> "$GITHUB_OUTPUT"
           echo "go=$go" >> "$GITHUB_OUTPUT"
 
   check:
@@ -54,6 +68,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CORPUS_TAG: ${{ needs.plan.outputs.corpus_tag }}
+      RELEASES_PIN: ${{ needs.plan.outputs.releases_pin }}
     steps:
       # Full history so gitleaks scans every commit
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -104,6 +119,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CORPUS_TAG: ${{ needs.plan.outputs.corpus_tag }}
+      RELEASES_PIN: ${{ needs.plan.outputs.releases_pin }}
     permissions:
       contents: write
       id-token: write
@@ -166,3 +182,15 @@ jobs:
             git tag -a "v$version" -m "v$version" "$GITHUB_SHA"
             git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "v$version"
           fi
+
+      # The release's notes on GitHub are its changelog entry, so the Releases page reads newest first.
+      # A failure here only warns: the release is already live and tagged
+      - name: Publish the release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(sed -n 's/.*<meta name="version" content="\([^"]*\)".*/\1/p' src/app/public/index.html)
+          if gh release view "v$version" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1; then echo "v$version already has release notes"; exit 0; fi
+          awk -v v="v$version" '$0 ~ "^## "v"( |$)" {f=1; if ($4) print "Released "$4"."; next} /^## / {f=0} f' CHANGELOG.md > "$RUNNER_TEMP/notes.md"
+          gh release create "v$version" -R "$GITHUB_REPOSITORY" --verify-tag --title "v$version" --notes-file "$RUNNER_TEMP/notes.md" \
+            || echo "::warning::v$version has no release notes yet"
