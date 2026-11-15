@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## Unreleased
+
+- Blog: the share block is one short row under a small "Share" label, in place of ten pill buttons under a heading. It holds Share (the phone's own share sheet) or, where there is none, Copy link, which reads "Copied" for a moment; then LinkedIn and Email. A reader who arrived from X, Facebook, Bluesky, Threads, or Reddit also sees that network's link. Share rows get about 2 clicks in 1,000 views (GOV.UK, Moovweb), more than three buttons lowered use in Big Medium's tests, and readers coming from a network are the ones likeliest to share back to it. The buttons are drawn like the Knowledge Center's actions, with line icons and the outbound arrow, and every link is still a plain link with no outside script.
+
 ## v0.71.1
 
 - Public code shows neon1-corpus v0.42.1.
