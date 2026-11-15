@@ -13,12 +13,15 @@
 # needs invalidating. Fonts and media never change at a path (make manifest) and .well-known is
 # read by mail servers and scanners, so those stay shared at the bucket's top.
 
+import datetime
 import hashlib
 import json
 import os
+import random
 import re
 import subprocess
 import sys
+import time
 
 # Shared at the bucket's top rather than per release
 SHARED = ("fonts/", "media/", ".well-known/")
@@ -91,6 +94,17 @@ def folders(bucket):
     return [p[len("releases/"):-1] for p in out]
 
 
+def fresh(bucket, rid, minutes=15):
+    """True when a release folder changed in the last few minutes. Dev runs can overlap, so one run's folder
+    may be uploaded but not yet switched to (and so not named by any key) while another run cleans up."""
+    last = aws("s3api", "list-objects-v2", "--bucket", bucket, "--prefix", f"releases/{rid}/",
+               "--query", "max_by(Contents, &LastModified).LastModified", "--output", "json")
+    if not last:
+        return False
+    when = datetime.datetime.fromisoformat(last.replace("Z", "+00:00"))
+    return datetime.datetime.now(datetime.timezone.utc) - when < datetime.timedelta(minutes=minutes)
+
+
 # --- Commands ---
 
 
@@ -126,6 +140,34 @@ def deploy(root, bucket, store):
             aws("s3", "rm", f"s3://{bucket}/releases/{old}/", "--recursive", "--only-show-errors", capture=False)
 
 
+def dev_switch(arn, key, rid, tries=8):
+    """Point one dev key at a release. Several runs can finish together (a push to dev and its branch preview
+    start at the same moment), and each key value store write must name the store's current ETag, so a run
+    that lost the race would fail after uploading everything. Each try reads the ETag and the keys fresh, writes
+    only this key (and the history, for the dev release), and tries again from fresh state if another run wrote
+    in between. Returns the keys as written."""
+    for attempt in range(1, tries + 1):
+        etag = aws("cloudfront-keyvaluestore", "describe-key-value-store", "--kvs-arn", arn, "--output", "json")["ETag"]
+        items = aws("cloudfront-keyvaluestore", "list-keys", "--kvs-arn", arn, "--output", "json").get("Items", [])
+        keys = {i["Key"]: i["Value"] for i in items}
+        puts = [{"Key": key, "Value": rid}]
+        if key == "release":
+            history = [rid] + [h for h in keys.get("history", "").split(",") if h and h != rid]
+            keys["history"] = ",".join(history[:DEV_KEEP])
+            puts.append({"Key": "history", "Value": keys["history"]})
+        keys[key] = rid
+        try:
+            aws("cloudfront-keyvaluestore", "update-keys", "--kvs-arn", arn, "--if-match", etag,
+                "--puts", json.dumps(puts), "--output", "json")
+            return keys
+        except subprocess.CalledProcessError:
+            if attempt == tries:
+                raise
+            # Another run wrote first: wait a moment, different for each run, then read the store again
+            print(f"another run changed the store; trying again ({attempt}/{tries - 1})")
+            time.sleep(1 + random.random() * 3)
+
+
 def dev(root, bucket, store, key):
     """dev.neon1.tech: the same upload, then one key switches. "release" is the dev branch (with a short
     history for make dev-rollback); "branch:<name>" is a branch preview. No tags, no IndexNow, no verify
@@ -134,29 +176,22 @@ def dev(root, bucket, store, key):
         sys.exit(f"dev: bad key {key!r}")
     rid = release_id(root)
     arn = aws("cloudfront", "describe-key-value-store", "--name", store, "--output", "json")["KeyValueStore"]["ARN"]
-    etag = aws("cloudfront-keyvaluestore", "describe-key-value-store", "--kvs-arn", arn, "--output", "json")["ETag"]
     items = aws("cloudfront-keyvaluestore", "list-keys", "--kvs-arn", arn, "--output", "json").get("Items", [])
     keys = {i["Key"]: i["Value"] for i in items}
     if len(keys.get("session", "")) < 32:
         print("dev: no session key yet, so dev.neon1.tech stays closed to everyone (make dev-signout sets one)")
     print(f"{key} -> release {rid} (was {keys.get(key) or 'none'})")
 
-    # Shared files, then the release folder, exactly as the live deploy does them
+    # Shared files, then the release folder, exactly as the live deploy does them, except that dev's fonts and
+    # media also revalidate every time (production keeps them immutable), so a changed one shows at once
     aws("s3", "sync", root, f"s3://{bucket}", "--no-progress", "--exclude", "*", "--include", "fonts/*",
-        "--include", "media/*", *DOTFILES, "--cache-control", LONG_CACHE, capture=False)
+        "--include", "media/*", *DOTFILES, "--cache-control", SHORT_CACHE, capture=False)
     aws("s3", "sync", root, f"s3://{bucket}", "--no-progress", "--exclude", "*", "--include", ".well-known/*",
         "--cache-control", SHORT_CACHE, capture=False)
     if keys.get(key) != rid:
         aws("s3", "sync", root, f"s3://{bucket}/releases/{rid}", "--delete", "--no-progress",
             "--exclude", "fonts/*", "--exclude", "media/*", *DOTFILES, "--cache-control", SHORT_CACHE, capture=False)
-        puts = [{"Key": key, "Value": rid}]
-        if key == "release":
-            history = [rid] + [h for h in keys.get("history", "").split(",") if h and h != rid]
-            keys["history"] = ",".join(history[:DEV_KEEP])
-            puts.append({"Key": "history", "Value": keys["history"]})
-        keys[key] = rid
-        aws("cloudfront-keyvaluestore", "update-keys", "--kvs-arn", arn, "--if-match", etag,
-            "--puts", json.dumps(puts), "--output", "json")
+        keys = dev_switch(arn, key, rid)
     print(f"{key} is release {rid}")
 
     # Keep every folder a key or the history still names; drop the rest
@@ -164,6 +199,9 @@ def dev(root, bucket, store, key):
     wanted |= {h for h in keys.get("history", "").split(",") if h}
     for old in folders(bucket):
         if old not in wanted:
+            if fresh(bucket, old):
+                print(f"keeping release {old}: another run may be about to switch to it")
+                continue
             print(f"removing release {old}")
             aws("s3", "rm", f"s3://{bucket}/releases/{old}/", "--recursive", "--only-show-errors", capture=False)
 

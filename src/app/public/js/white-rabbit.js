@@ -5,7 +5,8 @@
 // white-rabbit-scene.js, imported only after a catch: the landing turns out to be
 // the picture on an old TV, and the camera pulls back into a light room and up to
 // a window, ending on "Thanks for following the rabbit.". Scrolling up plays it back into the screen
-// and the rain picks up again. Reduced motion, no WebGL, or a failed import get a
+// and the rain picks up again. At the end a "go back" button plays the whole walk back on its own, slowly
+// enough to watch the room go by, unless a scroll takes over. Reduced motion, no WebGL, or a failed import get a
 // still card instead. Sound, synthesized in white-rabbit-sound.js, is readied by the
 // catch and heard once the scroll out of the TV begins, quietly, and it stops when the
 // scroll returns to the landing. The card is always silent.
@@ -17,7 +18,8 @@
 // Keyboard: "follow the white rabbit" (#whiteRabbitIn, hidden until focused, like the skip link)
 // catches one and focuses a line, read only by screen readers, that says how to move and leave; nothing on
 // screen explains the scene, Tab stays on that line while the page is covered, Esc always leaves, and focus
-// returns where it was when the entry ends. The car on the sill starts when clicked, inside the scene itself.
+// returns where it was when the entry ends. At the end, Tab moves between that line and "go back"; Enter or
+// Space on it plays back. The car on the sill starts when clicked, inside the scene itself.
 // Testing: ?rabbit=now keeps a rabbit on the landing and notes its cell center on root
 // as data-spot; ?rabbit=p0.5 catches one and jumps to that progress. Both only add
 // rabbits, so they are harmless in production.
@@ -36,6 +38,9 @@ const STIFF = 90;          // spring stiffness, per second squared
 const DAMP = 2 * Math.sqrt(STIFF);
 const BAND = 0.02;         // the most input can pull past the end
 const IDLE = 160;          // ms without input that ends a gesture
+const REWIND = 8600;       // ms for "go back" to play the whole walk back (15 s / 1.75): calm enough to take in each turn
+const SETTLE = 400;        // ms after "go back" during which leftover scroll momentum can't take over
+const FADE = 500;          // ms the card fades out for "go back" (reduced motion: a fade, no movement)
 const DOWN = ["ArrowDown", "PageDown", "End"], UP = ["ArrowUp", "PageUp", "Home"];
 const SCENE = "/js/white-rabbit-scene.js", SOUND = "/js/white-rabbit-sound.js";
 
@@ -58,6 +63,8 @@ export function whiteRabbit({ rain, root }) {
   const inBtn = document.getElementById("whiteRabbitIn");
   const how = root.querySelector(".white-rabbit-how");
   if (inBtn) inBtn.hidden = false;
+  // "go back", shown only at the end of the walk (CSS hides it in every other state)
+  const backBtn = root.querySelector(".white-rabbit-back");
 
   // Progress: wanted and rendered, with the spring's velocity
   let state = "idle", mode = "scene", target = 0, p = 0, v = 0;
@@ -66,10 +73,21 @@ export function whiteRabbit({ rain, root }) {
   let audio = null, sound = null;
   // The current entry's generation, and where focus was when it began
   let gen = 0, before = null;
+  // "go back" under way: in the scene, where it started and when; in the card, the fade's timer
+  let rewind = null, fadeTimer = 0;
 
   // ---- State and page ----
   // The state shows on root, so CSS and tests can follow it
-  function set(s) { state = s; root.dataset.state = s; }
+  function set(s) {
+    state = s; root.dataset.state = s;
+    // "go back" can be pressed only at the end; leaving the end with focus on it hands focus to the line
+    // that says how to move, so a keyboard never ends up on nothing
+    if (backBtn) {
+      const end = s === "done";
+      if (!end && document.activeElement === backBtn && how) how.focus({ preventScroll: true });
+      backBtn.disabled = !end;
+    }
+  }
 
   // Locks the page while caught: views.js stands down and touch can't scroll or bounce
   function lock(on) {
@@ -85,7 +103,7 @@ export function whiteRabbit({ rain, root }) {
     body.classList.toggle("white-rabbit-cover", on);
     page().forEach((el) => (el.inert = on));
     if (on && how === "card") paintSign();
-    if (!on) repaintEdges();
+    if (!on) { root.classList.remove("white-rabbit-fading"); clearTimeout(fadeTimer); repaintEdges(); }
   }
 
   // Leaving the cover: some phone browsers (DuckDuckGo on iPhone) keep the scene's last frame in the
@@ -187,7 +205,7 @@ export function whiteRabbit({ rain, root }) {
     before = document.activeElement;
     set("caught"); lock(true);
     body.classList.remove("white-rabbit-hover");
-    target = p = v = 0; halted = prepared = handed = false; escape = null; cardP = 0;
+    target = p = v = 0; halted = prepared = handed = false; escape = rewind = null; cardP = 0;
     mode = reduce.matches ? "card" : "scene";
     root.dataset.mode = mode;
     openAudio();
@@ -237,8 +255,8 @@ export function whiteRabbit({ rain, root }) {
     stop(); closeAudio(); drop();
     root.dataset.mode = mode;
     if (state === "caught") return;
-    const leaving = !!escape;
-    handed = false; escape = null;
+    const leaving = !!(escape || rewind);
+    handed = false; escape = rewind = null;
     cover(true, "card"); card(Math.max(0.001, p) - cardP);
     if (leaving) card(-cardP);
   }
@@ -261,7 +279,7 @@ export function whiteRabbit({ rain, root }) {
   function exit() {
     gen++;
     if (handed && scene) scene.render(0, { still: true });
-    handed = false; escape = null;
+    handed = false; escape = rewind = null;
     cover(false); announce(false);
     set("exiting");
     rain.resume(); closeAudio();
@@ -293,7 +311,9 @@ export function whiteRabbit({ rain, root }) {
   // One step of input in progress units, positive is down
   function step(d) {
     lastInput = performance.now();
-    if (state === "exiting" || !d || escape) return;
+    if (state === "exiting" || !d || escape || fadeTimer) return;
+    // A scroll during "go back" takes over from where the view is, after a moment for leftover momentum
+    if (rewind) { if (lastInput - rewind.t0 < SETTLE) return; rewind = null; }
     if (state === "caught") {
       if (d < 0) return;
       set("playing");
@@ -363,9 +383,13 @@ export function whiteRabbit({ rain, root }) {
     if (!active() || e.altKey || e.ctrlKey || e.metaKey) return;
     const k = e.key, space = k === " ";
     if (k === "Escape") { e.preventDefault(); e.stopPropagation(); bail(); return; }
+    // Enter and Space on "go back" press it, like any button
+    if (backBtn && e.target === backBtn && (space || k === "Enter")) return;
     if (k === "Tab" && state !== "caught") {
       e.preventDefault();
-      if (how) how.focus();
+      // At the end there are two stops, the line and "go back"; otherwise only the line
+      const next = state === "done" && backBtn && document.activeElement !== backBtn ? backBtn : how;
+      if (next) next.focus();
       return;
     }
     if (!space && !DOWN.includes(k) && !UP.includes(k)) return;
@@ -382,15 +406,34 @@ export function whiteRabbit({ rain, root }) {
     if (state === "idle") return;
     if (state === "caught") { leave(); return; }
     if (state === "exiting") return;
-    if (mode === "card") { card(-cardP); return; }
+    if (mode === "card") { clearTimeout(fadeTimer); fadeTimer = 0; card(-cardP); return; }
     set("reversing");
+    rewind = null;
     escape = { from: Math.min(target, 1), t0: performance.now() };
+  }
+
+  // "go back": the scene plays the walk back to the TV over REWIND ms, easing out of the window and into
+  // the screen, while the frame loop keeps following it; the card (reduced motion) fades out instead.
+  // Either way it ends like scrolling back up: the landing returns and the rain picks up
+  function goBack() {
+    if (state !== "done" || escape || rewind || fadeTimer) return;
+    if (mode === "card") {
+      root.classList.add("white-rabbit-fading");
+      const g = gen;
+      fadeTimer = setTimeout(() => { fadeTimer = 0; if (g === gen && state !== "idle") card(-cardP); }, FADE);
+      return;
+    }
+    const from = Math.min(Math.max(target, p), 1);
+    target = from;
+    set("reversing");
+    rewind = { from, t0: performance.now(), ms: REWIND * from };
   }
 
   // Clicks: on the rabbit (or the keyboard way in), a catch; on the car in the scene, its engine;
   // while caught, the pause button leaves and other controls leave and carry on
   addEventListener("click", (e) => {
     if (inBtn && inBtn.contains(e.target)) { e.preventDefault(); e.stopPropagation(); enter(); return; }
+    if (backBtn && backBtn.contains(e.target)) { e.preventDefault(); e.stopPropagation(); goBack(); return; }
     if (state === "idle") {
       if (!ready() || !rain.rabbitAt(e.clientX, e.clientY)) return;
       e.preventDefault(); e.stopPropagation();
@@ -457,6 +500,11 @@ export function whiteRabbit({ rain, root }) {
     if (escape) {
       const t = clamp((now - escape.t0) / 1200, 0, 1);
       target = escape.from * (1 - smooth(0, 1, t));
+    } else if (rewind) {
+      // Progress already spends the walk evenly on how much the view changes, so an even pace here
+      // means an even pace on screen; smoothstep only eases the first and last moments
+      const t = clamp((now - rewind.t0) / Math.max(1, rewind.ms), 0, 1);
+      target = rewind.from * (1 - smooth(0, 1, t));
     }
     // Hold at the landing until the scene is ready; going back up before then just leaves
     if (!prepared || !scene) { if ((state === "reversing" || escape) && target <= 0) exit(); return; }
@@ -473,8 +521,8 @@ export function whiteRabbit({ rain, root }) {
     root.dataset.progress = q.toFixed(3);
     grass.parentElement.style.opacity = smooth(0.993, 1, q).toFixed(3);
     if (q > 0.995) announce(true);
-    if (state !== "done" && target >= 1 && p > 0.999 && Math.abs(v) < 0.01) set("done");
-    if ((state === "reversing" || escape) && target <= 0 && p < 0.002 && Math.abs(v) < 0.02) { p = v = 0; exit(); }
+    if (state !== "done" && !rewind && target >= 1 && p > 0.999 && Math.abs(v) < 0.01) set("done");
+    if ((state === "reversing" || escape || rewind) && target <= 0 && p < 0.002 && Math.abs(v) < 0.02) { p = v = 0; exit(); }
   }
 
   // ---- Testing: ?rabbit=now keeps a rabbit on the landing, or ?rabbit=p0.5 catches one and jumps ahead ----

@@ -8,7 +8,7 @@ import { tmpdir } from "node:os"
 import { spawnSync } from "node:child_process"
 import { fileURLToPath } from "node:url"
 import { TASK_PATHS, singleH1, classifyLinks, catalogFacts, keepFields, fillNote, FILL_NOTE, load } from "./knowledge-lib.mjs"
-import { prepare, search } from "../src/app/public/js/knowledge-search-core.js"
+import { prepare, search, stem, SYNONYMS, normalize } from "../src/app/public/js/knowledge-search-core.js"
 
 const here = dirname(fileURLToPath(import.meta.url))
 const SHELVES = { guides: { label: "Guides", description: "How-tos.", group: "resources" }, faq: { label: "Questions", description: "Answers.", group: "resources" } }
@@ -35,6 +35,7 @@ function fixture({ dropId = null, noPdf = [] } = {}) {
     sections: [sec("lead", "", "<p>Short answers.</p>"), sec("sign-in", "Signing in", "<p>1NEON supports passkeys (WebAuthn) and an authenticator app (TOTP) for two-factor sign-in.</p>")],
   })
   add("guides-password-manager-for-family", "Password manager for a family", "<p>Turn on MFA and 2FA everywhere. Check the Wi-Fi router too, and your home WiFi password.</p>")
+  add("guides-how-it-goes", "How a first call goes", "<p>Fifteen minutes, free, and plain.</p>")
   add("guides-spot-phishing", "Spotting phishing", "<p>Phishing messages and ransomware demands are the two things I see most.</p>")
   add("guides-backups-you-can-trust", "Backups you can trust", "<h2 id=\"ransom\">Ransomware</h2><p>A backup you cannot restore is not a backup. Backups matter against ransomware.</p>", {
     sections: [sec("lead", "", "<p>Start here.</p>"), sec("ransom", "Ransomware", "<p>Ransomware locks your files, so a backup you cannot restore is not a backup.</p>")],
@@ -78,7 +79,7 @@ test("same-origin absolute links are internal; other origins open in a new tab",
   for (const tag of html.match(/<a [^>]*>/g)) assert.ok(!(tag.includes("neon1.tech") && tag.includes("_blank")), tag)
 })
 
-test("counts and the PDF claim come from the manifest, in the text and the head", () => {
+test("counts and the PDF claim come from the manifest, in the head only", () => {
   const f = fixture({ noPdf: ["guides-spot-phishing", "faq-1neon-help"] })
   build(f)
   const total = f.list.length
@@ -88,7 +89,8 @@ test("counts and the PDF claim come from the manifest, in the text and the head"
   assert.equal(facts.pdfs, pdfs)
   const html = read(f, "knowledge/index.html")
   const claim = `${total} documents, ${pdfs} with a PDF to download`
-  assert.ok(html.includes(`${claim}.</p>`), "visible lead")
+  // The count line is gone from the title's lead (2026-11-15) but stays in the description meta, so a search snippet can show it
+  assert.ok(!html.includes(`${claim}.</p>`), "no count line under the title")
   assert.ok(html.includes(`content="neon1&#x27;s public documents`) && html.match(/name="description" content="[^"]*"/)[0].includes(claim), "description meta")
   assert.doesNotMatch(html, /each with a PDF/)
   // Every document with a PDF says so, and a document without one does not
@@ -141,8 +143,50 @@ test("the listed queries return relevant documents from the built index", () => 
   const res = search(prepare(JSON.parse(read(f, "knowledge/search-index.json"))), "ransomware").results
   assert.equal(res[0].url, "/knowledge/guides/backups-you-can-trust/#ransom")
   assert.ok(res[0].snippet.some((p) => p.hit))
+  // A query of only common words ("how") still searches, so titles that begin with it come up first
+  const how = search(prepare(JSON.parse(read(f, "knowledge/search-index.json"))), "how").results
+  assert.ok(how.length > 0, "how finds nothing")
+  assert.ok(/^how\b/i.test(how[0].title), `the best match for "how" should be a title that starts with it, got ${how[0]?.title}`)
   // Nonsense finds nothing, so the empty state shows
   assert.equal(search(prepare(JSON.parse(read(f, "knowledge/search-index.json"))), "zzqx").results.length, 0)
+})
+
+test("ranking is BM25: deterministic, a 0 to 1 similarity, titles over repeats, roots over endings", () => {
+  const f = fixture()
+  build(f)
+  const prepared = prepare(JSON.parse(read(f, "knowledge/search-index.json")))
+  // The same query over the same documents gives the same numbers, every time
+  assert.deepEqual(search(prepared, "backup").results.map((r) => [r.url, r.similarity]), search(prepared, "backup").results.map((r) => [r.url, r.similarity]))
+  const r = search(prepared, "backup").results
+  for (const x of r) assert.ok(x.similarity > 0 && x.similarity <= 1, `similarity out of range: ${x.similarity}`)
+  // Sorted best first, and a title match is the strongest sign
+  assert.ok(r.every((x, i) => !i || r[i - 1].similarity >= x.similarity), "results are not best first")
+  assert.equal(r[0].title, "Backups you can trust")
+  // A word found only in a body scores lower than in a title, and repeating it can't make up the difference
+  const body = search(prepared, "restore").results.find((x) => x.title !== "Backups you can trust")
+  assert.ok(!body || body.similarity < r[0].similarity, "a body mention outranked a title")
+  // "backups" and "pricing"-style endings reduce to a root that also finds the shorter form
+  assert.equal(stem("pricing"), "pric"); assert.equal(stem("business"), "business"); assert.equal(stem("backups"), "backup"); assert.equal(stem("use"), "use")
+  assert.deepEqual(search(prepared, "backups").results.map((x) => x.url), r.map((x) => x.url))
+})
+
+test("synonym groups are normalized, and no word sits in two groups", () => {
+  const seen = new Map()
+  for (const [g, group] of SYNONYMS.entries()) {
+    for (const v of group) {
+      assert.equal(v, normalize(v), `"${v}" is not written the way normalize() leaves it`)
+      assert.ok(!seen.has(v) || seen.get(v) === g, `"${v}" is in two groups`)
+      seen.set(v, g)
+    }
+  }
+})
+
+test("a reader's plain words find the documents that use the formal ones", () => {
+  const f = fixture()
+  build(f)
+  const prepared = prepare(JSON.parse(read(f, "knowledge/search-index.json")))
+  // "restore" and "recovery" are backup words now: both find the backups guide
+  for (const q of ["restore", "recovery"]) assert.ok(search(prepared, q).results.some((r) => r.title === "Backups you can trust"), `${q} should find the backups guide`)
 })
 
 // The same queries against the real export of CORPUS_TAG, when a checkout has built one (make knowledge-export)

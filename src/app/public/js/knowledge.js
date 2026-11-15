@@ -38,7 +38,9 @@ if (box && input && status && found && list && none && browse) {
     const link = make("a");
     link.href = r.url;
     link.append(make("span", "kc-card-title", r.title));
-    link.append(make("span", "kc-hit-where", r.section ? `${r.shelf} · ${r.section}` : `${r.shelf} · ${r.type}`));
+    // The match, 0 to 100, is search-core's similarity: how much of the query the document holds, weighted by where and how rare
+    const where = r.section ? `${r.shelf} · ${r.section}` : `${r.shelf} · ${r.type}`;
+    link.append(make("span", "kc-hit-where", `${where} · ${Math.round(r.similarity * 100)}% match`));
     const p = make("span", "kc-card-summary");
     for (const part of r.snippet) {
       if (part.hit) p.append(make("mark", "", part.text));
