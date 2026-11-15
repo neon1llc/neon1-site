@@ -137,7 +137,9 @@ export function gather(dir) {
 
 // ---- The page ----
 
-export const RELEASES_URL = `${BASE}releases/`
+// Under the company shelf: neon1.tech sends a one-level folder such as /knowledge/releases/ to that shelf on the
+// front page (neon1-aws-infrastructure site-router.js), so a page of its own needs two levels
+export const RELEASES_URL = `${BASE}company/releases/`
 
 // The body docMain wraps: the current versions, then the newest releases across every product
 // The page links to GitHub dozens of times, so only links inside the release notes and each product's name

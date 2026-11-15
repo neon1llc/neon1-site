@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.73.1
+
+- The releases page moves to /knowledge/company/releases/. At /knowledge/releases/, neon1.tech sent readers to the Knowledge Center's front page, as it does for every one-level folder.
+
 ## v0.73.0
 
 - Public code shows neon1-corpus v0.45.1, neon1-aws-infrastructure v0.10.0, neon1-1NEON v0.14.0, neon1-chat v0.2.3, deploy-ops v0.14.3, aws-clip v0.1.4, refmark v0.1.5, and ready-secure-go v0.1.4.
