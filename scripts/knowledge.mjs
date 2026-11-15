@@ -13,7 +13,7 @@
 
 import { readFileSync, readdirSync, existsSync } from "node:fs"
 import { join } from "node:path"
-import { load, pageBody, relink, classifyLinks, bindExtArrows, catalogFacts, fillNote, TASK_PATHS, searchIndex, esc, longDate, TYPE_LABELS, SITE, BASE, slugOf } from "./knowledge-lib.mjs"
+import { load, pageBody, relink, classifyLinks, bindExtArrows, fillNote, TASK_PATHS, searchIndex, esc, longDate, TYPE_LABELS, SITE, BASE, slugOf } from "./knowledge-lib.mjs"
 import { gather, releasesBody, releasesSections, releasesLd, pinOf, RELEASES_URL } from "./releases-lib.mjs"
 import { homeFrame, page as page_, ORG, WEBSITE, AUTHOR, LICENSE, OG_IMAGE, crumbs, band, card as cardOf, CORPUS_LINK, rights, dateFacts, docMain, sitemapWith, syncFolder } from "./page-shell.mjs"
 
@@ -100,7 +100,7 @@ function shelfSection(s) {
   const fold = dev.length
     ? `
         <details class="kc-fold">
-          <summary>For developers <span>${dev.length}</span></summary>
+          <summary>For developers</summary>
           ${cardList(dev)}
         </details>`
     : ""
@@ -114,7 +114,6 @@ function shelfSection(s) {
 }
 
 function indexPage() {
-  const facts = catalogFacts(corpus.docs)
   const groups = corpus.groups
     .map((g) => `    <section class="kc-group" id="${g.key}" aria-labelledby="${g.key}-h">
       <div class="kc-group-head">
@@ -126,9 +125,9 @@ ${g.shelves.map(shelfSection).join("\n\n")}
     .join("\n\n")
   const nav = corpus.groups
     .map((g) => `        <li class="kc-nav-group"><span>${esc(g.label)}</span></li>
-${g.shelves.map((s) => `        <li><a href="#${s.key}">${esc(s.label)} <span>${s.docs.length}</span></a></li>`).join("\n")}`)
+${g.shelves.map((s) => `        <li><a href="#${s.key}">${esc(s.label)}</a></li>`).join("\n")}`)
     .join("\n")
-  const main = `${band({ id: "kc-title", eyebrow: "neon1 · knowledge center", title: "Everything neon1", lead: `Guides, templates, forms, and filled-out examples, plus how I work, services, and policies.`, after: `
+  const main = `${band({ id: "kc-title", eyebrow: "neon1 · knowledge center", title: "Everything neon1", after: `
         <form class="kc-search" role="search" action="${BASE}" method="get" hidden>
           <label for="kc-q">Search the knowledge center</label>
           <input id="kc-q" name="q" type="search" placeholder="Try &quot;backup&quot;, &quot;passkey&quot;, or &quot;privacy&quot;" autocomplete="off" />
@@ -168,7 +167,7 @@ ${groups}
     </div>`
   return page({
     title: "Knowledge center · neon1",
-    description: `neon1's public documents in one place: guides, templates, forms, filled-out examples, and alternatives, plus standards, services, and policies. ${facts.summary}.`,
+    description: `neon1's public documents in one place: guides, templates, forms, filled-out examples, and alternatives, plus standards, services, and policies.`,
     path: BASE,
     main,
     kind: "index",
@@ -264,15 +263,15 @@ if (releases) {
   const main = docMain({
     crumbs: [["Knowledge center", BASE], ["Releases"]],
     title: "Releases",
-    summary: "What changed in each neon1 product, newest first.",
-    facts: [updated ? ["Updated", longDate(updated)] : null, ["Products", String(releases.current.length)]].filter(Boolean),
+    summary: "What changed in each neon1 product.",
+    facts: [updated ? ["Updated", longDate(updated)] : null].filter(Boolean),
     sections: releasesSections,
     body: releasesBody(releases),
-    colophon: "Written from each repository's CHANGELOG.md at its newest release. Every release is also on its repository's GitHub Releases page.",
+    colophon: "Every release is also on its repository's GitHub Releases page.",
   })
   want.set(`${RELEASES_URL.slice(1)}index.html`, page({
     title: "Releases · neon1 knowledge center",
-    description: "What changed in neon1.tech, 1NEON, Neo, the Knowledge Center documents, and neon1's public tools, newest first.",
+    description: "What changed in neon1.tech, 1NEON, Neo, the Knowledge Center documents, and neon1's public tools.",
     path: RELEASES_URL, main, kind: "doc",
     ld: [releasesLd(updated), crumbs([["Knowledge center", `${SITE}${BASE}`], ["Releases"]])],
   }))

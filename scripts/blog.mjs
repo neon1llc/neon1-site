@@ -129,7 +129,7 @@ function indexPage() {
 ${posts.map(card).join("\n")}
       </ul>`
     : "      <p>The first post is on its way.</p>"
-  const main = `${band({ id: "blog-title", eyebrow: "neon1 · blog", title: "Blog", lead: "Questions from local businesses answered in plain words, the whats and whys of how neon1 works, and lessons from building its public repositories. A new post about once a week." })}
+  const main = `${band({ id: "blog-title", eyebrow: "neon1 · blog", title: "Blog", lead: "Questions from local businesses answered in plain words, the whats and whys of how neon1 works, and lessons from building its public repositories." })}
 
     <div class="kc-body">
       <section class="kc-shelf" aria-labelledby="blog-posts-h">
