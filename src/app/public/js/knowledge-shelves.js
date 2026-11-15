@@ -17,8 +17,8 @@ if (track) {
     b.tabIndex = -1;
     b.setAttribute("aria-hidden", "true");
     b.hidden = true;
-    // The chevron that marks each heading on the site (index.html .pr); the CSS turns it around for the left button
-    b.innerHTML = `<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>`;
+    // The site's one arrow (shared/neon1.css .arr), turned around for the right button
+    b.innerHTML = `<span class="arr${side === "next" ? " arr-next" : ""}" aria-hidden="true"></span>`;
     return b;
   };
   const prev = arrow("prev"), next = arrow("next");

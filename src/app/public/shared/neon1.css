@@ -119,13 +119,13 @@
    of the turn the center of the arrow. --arr-xc is half the text's x-height (Figtree: 0.515em / 2); the arrow sits on
    the text's baseline and is moved down so its center lands on that line, where the middle of the lowercase letters is.
    Where the arrow turns, it turns on that center line, in place. */
-.arr { --arr-xc: .2575em; width: .95em; height: .75em; background: currentColor; flex: none; clip-path: var(--arr-shape); }
+.arr { --arr-xc: .2575em; width: .95em; height: .8em; background: currentColor; flex: none; clip-path: var(--arr-shape); }
 /* The arrow's stroke is the stem width of the text beside it, so it never looks thinner than its label: --arr-t, in em, is
    that stem (Figtree: .156em at weight 700, about .109em at 500, .086em at 400; set it where the text weight differs). The
    head's arms are 45 degrees, and each is the same thickness as the shaft. */
-:root { --arr-t: .156em; --arr-shape: polygon(0 50%, .285em calc(50% - .285em), calc(.285em + .7071 * var(--arr-t)) calc(50% - .285em + .7071 * var(--arr-t)),
+:root { --arr-t: .156em; --arr-shape: polygon(0 50%, .37em calc(50% - .37em), calc(.37em + .7071 * var(--arr-t)) calc(50% - .37em + .7071 * var(--arr-t)),
   calc(1.914 * var(--arr-t)) calc(50% - .5 * var(--arr-t)), 100% calc(50% - .5 * var(--arr-t)), 100% calc(50% + .5 * var(--arr-t)),
-  calc(1.914 * var(--arr-t)) calc(50% + .5 * var(--arr-t)), calc(.285em + .7071 * var(--arr-t)) calc(50% + .285em - .7071 * var(--arr-t)), .285em calc(50% + .285em)); }
+  calc(1.914 * var(--arr-t)) calc(50% + .5 * var(--arr-t)), calc(.37em + .7071 * var(--arr-t)) calc(50% + .37em - .7071 * var(--arr-t)), .37em calc(50% + .37em)); }
 .arr { display: inline-block; position: relative; top: calc(.375em - var(--arr-xc)); }
 /* Sentence case or mixed case (a capital to line up with, such as a dropdown's "Choose one"): add .arr-mixed and the arrow
    centers on half the cap height (Figtree: 0.70em / 2) instead, which is the ordinary middle of the line */
@@ -135,3 +135,5 @@
    sans face at the label's size so its position is the same whatever the label's font (a mono asterisk sits mid-letter,
    a sans one sits at the top), which reads as a superscript, and it takes its color from --req-color. */
 .req { margin-left: 3px; font: 700 1em/0 var(--sans); vertical-align: baseline; color: var(--req-color, currentColor); }
+/* The right-hand button of a pair (next): the same arrow, turned around by the independent rotate property so a hover nudge can still use transform */
+.arr-next { rotate: 180deg; }

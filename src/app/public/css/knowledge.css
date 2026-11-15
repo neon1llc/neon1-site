@@ -49,12 +49,12 @@ body.kc { background: var(--paper); }
 .kc-shelves-prev { left: max(0px, calc((100% - 1040px) / 2)); border-right: 1px solid var(--line); }
 .kc-shelves-next { right: max(0px, calc((100% - 1040px) / 2)); border-left: 1px solid var(--line); }
 .kc-shelves-btn:hover { background: #fff; }
-.kc-shelves-btn svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: transform .15s; }
-.kc-shelves-prev svg { transform: scaleX(-1); }
-.kc-shelves-next:hover svg { transform: translateX(2px); }
+.kc-shelves-btn .arr { top: 0; width: 1em; height: .8em; font-size: 15px; --arr-t: .12em; transition: transform .15s; }
+.kc-shelves-prev:hover .arr { transform: translateX(-2px); }
+.kc-shelves-next:hover .arr { transform: translateX(2px); }
 .kc-shelves-prev:hover svg { transform: scaleX(-1) translateX(2px); }
 @media (pointer: coarse) { .kc-shelves-btn { width: 40px; } }
-@media (prefers-reduced-motion: reduce) { .kc-shelves-btn, .kc-shelves-btn svg { transition: none; } .kc-shelves-next:hover svg { transform: none; } .kc-shelves-prev:hover svg { transform: scaleX(-1); } }
+@media (prefers-reduced-motion: reduce) { .kc-shelves-btn, .kc-shelves-btn .arr { transition: none; } .kc-shelves-btn:hover .arr { transform: none; } }
 
 /* ---- Featured row and the two groups ---- */
 .kc-group { padding-top: 56px; scroll-margin-top: 120px; }

@@ -154,10 +154,11 @@ a.ext { color: var(--brand); font-weight: 600; text-decoration: none; }
 /* The arrow belongs to the link's last word (scripts/knowledge-lib.mjs bindExtArrows): that word and the arrow
    never part at a line break, while the rest of a long link wraps as text does */
 a.ext .ext-end { white-space: nowrap; }
-a.ext .ext-end::after, a.ext:not(:has(.ext-end))::after { content: ""; display: inline-block; width: .62em; height: .62em; margin-left: .18em; vertical-align: .02em; background: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12 12 4M6 4h6v6'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12 12 4M6 4h6v6'/%3E%3C/svg%3E") center / contain no-repeat; transition: transform .15s ease; }
+a.ext .ext-end::after, a.ext:not(:has(.ext-end))::after { content: ""; display: inline-block; width: .7em; height: .7em; margin-left: .18em; vertical-align: .02em; background: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.8 12.2 12 4M5.2 4H12v6.8'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.8 12.2 12 4M5.2 4H12v6.8'/%3E%3C/svg%3E") center / contain no-repeat; transition: transform .15s ease; }
 a.ext:hover .ext-end::after, a.ext:focus-visible .ext-end::after, a.ext:hover::after, a.ext:focus-visible::after { transform: translate(1px, -1px); }
 a.ext:hover { color: var(--brand); }
 @media (prefers-reduced-motion: reduce) { a.ext::after, a.ext .ext-end::after { transition: none; } }
 /* Outbound links in the footer and phone menu keep those places' own colours and weight; only the arrow is added */
 .foot a.ext { color: var(--muted); font-weight: inherit; } .foot a.ext:hover { color: var(--glow); }
 .menu a.ext { color: var(--neon); font-weight: 500; } .menu a.ext:hover, .menu a.ext:focus-visible { color: #e9ffee; }
+.chip.arrow .arr { top: 0; --arr-t: .12em; }
