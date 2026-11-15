@@ -43,7 +43,7 @@ const page = (opts) => page_(frame, {
   current: "knowledge",
   generator: "scripts/knowledge.mjs from neon1-corpus. Edit the corpus, then run make knowledge",
   styles: ["/css/knowledge.css"],
-  scripts: ["/js/knowledge.js", "/js/knowledge-toc.js"],
+  scripts: ["/js/knowledge.js", "/js/knowledge-toc.js", "/js/knowledge-shelves.js"],
 })
 
 
