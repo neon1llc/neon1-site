@@ -396,6 +396,25 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 /* Fields, picks, and the send button ease between their states, and a status line eases in */
 .cform textarea, .cform input, .cform select, .ctopic .pick { transition: border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease), background-color var(--t-fast) var(--ease), opacity var(--t-fast) var(--ease); }
 .cstatus:not(:empty) { animation: n1-appear var(--t-base) var(--ease) both; }
+/* The "How did you find neon1?" dropdown stays a native select (keyboard and screen readers unchanged), as in 1NEON.
+   Safari and Firefox: a plain chevron in the brand green with room for it, and the browser's own list. Chrome and
+   Edge (base-select): a left arrow that turns down as the list unrolls, both over --t-base so they finish together */
+.cform select { appearance: none; padding-right: 44px;
+  background-image: linear-gradient(45deg, transparent 50%, var(--brand) 50%), linear-gradient(135deg, var(--brand) 50%, transparent 50%);
+  background-position: calc(100% - 23px) 50%, calc(100% - 18px) 50%; background-size: 5px 5px, 5px 5px; background-repeat: no-repeat; }
+@supports (appearance: base-select) {
+  .cform select, .cform select::picker(select) { appearance: base-select; }
+  .cform select { background-image: none; padding-right: 14px; display: inline-flex; align-items: center; gap: 12px; }
+  .cform select::picker-icon { content: "\2190"; font: 700 15px/1 var(--sans); color: var(--brand); margin-left: auto; margin-right: 2px; transition: rotate var(--t-base) var(--ease); }
+  .cform select:open::picker-icon { rotate: -90deg; }
+  .cform select::picker(select) { border: 1px solid rgba(18,36,26,.2); border-radius: var(--glass-r); background: #fff; box-shadow: 0 12px 32px rgba(0,0,0,.16); padding: 4px; margin-top: 4px; }
+  .cform select:open::picker(select) { animation: n1-unroll var(--t-base) var(--ease); }
+  .cform select option { padding: 8px 12px; border-radius: 6px; }
+  .cform select option::checkmark { display: none; }
+  .cform select option:checked { color: var(--brand); font-weight: 600; }
+  .cform select option:is(:hover, :focus-visible) { background: rgba(3,87,4,.08); outline: none; }
+}
+@keyframes n1-unroll { from { opacity: 0; clip-path: inset(0 0 100% 0 round 8px); } to { opacity: 1; clip-path: inset(0 0 0 0 round 8px); } }
 .crow { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 @media (max-width: 520px) { .crow { grid-template-columns: 1fr; } }
 .ctopic { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
