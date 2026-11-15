@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+
+## Unreleased
+
+- Cut text that describes the site or its documents instead of helping the reader: post cadence, document and PDF counts, and notes on how a page is kept.
+
 ## v0.73.1
 
 - The releases page moves to /knowledge/company/releases/. At /knowledge/releases/, neon1.tech sent readers to the Knowledge Center's front page, as it does for every one-level folder.

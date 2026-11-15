@@ -117,11 +117,11 @@ export const crumbs = (items) => ({
 // ---- Parts of a page ----
 
 // The band that opens an index page: a small eyebrow, the heading, a lead line, and anything after it (a search box)
-export const band = ({ id, eyebrow, title, lead, after = "" }) => `    <section class="kc-band" aria-labelledby="${id}">
+export const band = ({ id, eyebrow, title, lead = "", after = "" }) => `    <section class="kc-band" aria-labelledby="${id}">
       <div class="kc-band-inner">
         <p class="kc-eyebrow">${eyebrow}</p>
         <h1 id="${id}">${title}</h1>
-        <p class="kc-lead">${lead}</p>${after}
+        ${lead ? `<p class="kc-lead">${lead}</p>` : ""}${after}
       </div>
     </section>`
 

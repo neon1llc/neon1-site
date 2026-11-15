@@ -89,9 +89,9 @@ test("counts and the PDF claim come from the manifest, in the head only", () => 
   assert.equal(facts.pdfs, pdfs)
   const html = read(f, "knowledge/index.html")
   const claim = `${total} documents, ${pdfs} with a PDF to download`
-  // The count line is gone from the title's lead (2026-11-15) but stays in the description meta, so a search snippet can show it
-  assert.ok(!html.includes(`${claim}.</p>`), "no count line under the title")
-  assert.ok(html.includes(`content="neon1&#x27;s public documents`) && html.match(/name="description" content="[^"]*"/)[0].includes(claim), "description meta")
+  // No document or PDF count anywhere on the page, the description meta included (2026-11-15)
+  assert.ok(!html.includes(claim), "no count line")
+  assert.ok(html.includes(`content="neon1&#x27;s public documents`), "description meta")
   assert.doesNotMatch(html, /each with a PDF/)
   // Every document with a PDF says so, and a document without one does not
   assert.equal(catalogFacts([{ pdf: null }]).pdfClaim, "")
