@@ -19,14 +19,14 @@
    The rain, the hero, and the white rabbit keep their own colors in both themes. */
 :root {
   --page: var(--paper); --page-rgb: 242 244 242; --ink-rgb: 18 36 26; --brand-rgb: 3 87 4;
-  --surface: #fff; --surface-rgb: 255 255 255; --surface-2: #e8ece8; --ink-soft: #3b4a40; --muted-ink: #56665c; --err: #a12b1f; --warn: #B45309;
+  --ctl-line: rgb(var(--brand-rgb) / .3); --surface: #fff; --surface-rgb: 255 255 255; --surface-2: #e8ece8; --ink-soft: #3b4a40; --muted-ink: #56665c; --err: #a12b1f; --warn: #B45309;
 }
 /* Matrix: 1NEON's dark palette (its ground and panels, the rain's pale green text, the logo's neon for the brand) */
 :root[data-site-theme="matrix"] { --page: #0F0A0D; --page-rgb: 15 10 13; color-scheme: dark; }
 :root[data-site-theme="matrix"] :is(.awake, .n1-bar, .menu, .case-layer) {
   --paper: #0F0A0D; --ink: #D6F5DC; --brand: #6CFFA8; --mark: #00B84F; --deep: #E9FFEE;
   --page-rgb: 15 10 13; --ink-rgb: 214 245 220; --brand-rgb: 108 255 168;
-  --surface: #17110F; --surface-rgb: 23 17 15; --surface-2: #0A0608; --ink-soft: #BCD6C2; --muted-ink: #8DB096; --err: #FF8A80; --warn: #FFB547;
+  --ctl-line: rgb(var(--brand-rgb) / .3); --surface: #17110F; --surface-rgb: 23 17 15; --surface-2: #0A0608; --ink-soft: #BCD6C2; --muted-ink: #8DB096; --err: #FF8A80; --warn: #FFB547;
 }
 /* Switching eases every color at once, for one slow beat (js/theme.js sets the class for just that long); with
    reduced motion the length is nothing, so it is a plain change */
@@ -105,37 +105,39 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 .n1-bar.light .links a:not(.btn), .n1-bar.light .links .note { color: var(--muted-ink); }
 .n1-bar.light .links a:not(.btn):hover { color: var(--brand); }
 .n1-bar.light .btn-ghost { color: var(--brand); border-color: var(--brand); }
-.n1-bar.light .links .portal { color: var(--brand); border-color: rgb(var(--brand-rgb) / .25); }
+.n1-bar.light .links .portal { color: var(--brand); border-color: var(--ctl-line); }
 .n1-bar.light .links .portal:hover { border-color: var(--brand); }
 
 /* ---- Theme switch: the last thing in the bar, sun on the left (awake) and moon on the right (matrix) ----
-   A 52 by 28 track holds both pictures; the knob slides over to the chosen side and the picture under it lights up,
-   so the switch shows what is on. It belongs to the light bar only: over the landing's rain it fades out and leaves
-   the tab order but keeps its place, so the links never jump as the bar turns light. Without JavaScript it is hidden,
-   since it could do nothing. */
+   A quiet peer of the menu button and 1NEON: the same surface and the same thin theme-green border (--ctl-line), no
+   fill or glow, so the logo stays the brightest thing in the bar. A softly tinted knob slides to the chosen side, and
+   the picture under it takes the brand green while the other stays dim, so the switch still shows what is on. It
+   belongs to the light bar only: over the landing's rain it fades out and leaves the tab order but keeps its place,
+   so the links never jump as the bar turns light. Without JavaScript it is hidden, since it could do nothing. */
 .theme-sw { position: relative; flex: none; width: 52px; height: 28px; margin-left: 12px; padding: 0; border-radius: 99px; cursor: pointer;
-  background: rgb(var(--brand-rgb) / .08); border: 1px solid rgb(var(--brand-rgb) / .28); color: var(--muted-ink);
-  transition: opacity var(--t-base) var(--ease), visibility var(--t-base), background-color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease); }
+  background: var(--surface); border: 1px solid var(--ctl-line); color: var(--muted-ink);
+  transition: opacity var(--t-base) var(--ease), visibility var(--t-base), border-color var(--t-fast) var(--ease); }
 .theme-sw:hover { border-color: var(--brand); }
-/* Both pictures sit on the track, centered in each half; the knob's side shows its picture in the knob's ink */
-.theme-sw svg { position: absolute; top: 50%; width: 15px; height: 15px; margin-top: -7.5px; z-index: 1; fill: none; stroke: currentColor;
-  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: color var(--t-base) var(--ease), opacity var(--t-base) var(--ease); }
+/* Both pictures sit on the track, centered in each half */
+.theme-sw svg { position: absolute; top: 50%; width: 14px; height: 14px; margin-top: -7px; z-index: 1; fill: none; stroke: currentColor;
+  stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: color var(--t-base) var(--ease), opacity var(--t-base) var(--ease); }
 .theme-sun { left: 6px; } .theme-moon { right: 6px; }
 .theme-moon path { fill: currentColor; stroke: none; }
-.theme-knob { position: absolute; top: 2px; left: 2px; width: 22px; height: 22px; border-radius: 50%; background: var(--brand);
-  box-shadow: 0 1px 3px rgb(var(--ink-rgb) / .25); transition: transform var(--t-base) var(--ease-open); }
-.theme-sw[aria-checked="false"] .theme-sun, .theme-sw[aria-checked="true"] .theme-moon { color: var(--paper); }
-.theme-sw[aria-checked="true"] .theme-knob { transform: translateX(24px); box-shadow: 0 0 10px rgb(var(--brand-rgb) / .55); }
-.theme-sw[aria-checked="false"] .theme-moon, .theme-sw[aria-checked="true"] .theme-sun { opacity: .75; }
+.theme-knob { position: absolute; top: 2px; left: 2px; width: 22px; height: 22px; border-radius: 50%; background: rgb(var(--brand-rgb) / .12);
+  transition: transform var(--t-base) var(--ease-open); }
+.theme-sw[aria-checked="true"] .theme-knob { transform: translateX(24px); }
+.theme-sw[aria-checked="false"] .theme-sun, .theme-sw[aria-checked="true"] .theme-moon { color: var(--brand); }
+.theme-sw[aria-checked="false"] .theme-moon, .theme-sw[aria-checked="true"] .theme-sun { opacity: .6; }
 .n1-bar.light .theme-sw:focus-visible { outline-color: var(--brand); }
 .n1-bar:not(.light) .theme-sw { opacity: 0; visibility: hidden; pointer-events: none; }
 :root:not([data-site-theme]) .theme-sw { display: none; }
 :root:not([data-site-theme]) .menu-btn { margin-left: auto; }
-@media (forced-colors: active) { .theme-knob { background: ButtonText; } .theme-sw svg { color: ButtonText; } }
+@media (forced-colors: active) { .theme-knob { border: 1px solid ButtonText; } .theme-sw svg { color: ButtonText; opacity: 1; } }
 
 /* ---- Phone menu: below the width the links need, they fold into a full-screen menu ---- */
 .menu-btn { margin-left: auto; display: none; border-radius: var(--glass-r); }
-.n1-bar.light .menu-btn { color: var(--brand); background: var(--surface); border-color: rgb(var(--brand-rgb) / .25); }
+/* On the light bar the menu button, the theme switch, and 1NEON share one surface and one thin theme-green border */
+.n1-bar.light .menu-btn { color: var(--brand); background: var(--surface); border-color: var(--ctl-line); }
 @media (max-width: 1040px) { .links { display: none; } .menu-btn { display: inline-block; margin-left: 10px; } .theme-sw { margin-left: auto; } }
 /* The overlay always scrolls below the bar and its close button. The list's auto margins center it when
  * it fits and let it start at the top when it doesn't, so no height breakpoint decides (1024x600, zoom).
