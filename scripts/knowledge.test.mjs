@@ -8,7 +8,7 @@ import { tmpdir } from "node:os"
 import { spawnSync } from "node:child_process"
 import { fileURLToPath } from "node:url"
 import { TASK_PATHS, singleH1, classifyLinks, catalogFacts, keepFields, fillNote, FILL_NOTE, load } from "./knowledge-lib.mjs"
-import { prepare, search } from "../src/app/public/js/knowledge-search-core.js"
+import { prepare, search, stem } from "../src/app/public/js/knowledge-search-core.js"
 
 const here = dirname(fileURLToPath(import.meta.url))
 const SHELVES = { guides: { label: "Guides", description: "How-tos.", group: "resources" }, faq: { label: "Questions", description: "Answers.", group: "resources" } }
@@ -149,6 +149,25 @@ test("the listed queries return relevant documents from the built index", () => 
   assert.ok(/^how\b/i.test(how[0].title), `the best match for "how" should be a title that starts with it, got ${how[0]?.title}`)
   // Nonsense finds nothing, so the empty state shows
   assert.equal(search(prepare(JSON.parse(read(f, "knowledge/search-index.json"))), "zzqx").results.length, 0)
+})
+
+test("ranking is BM25: deterministic, a 0 to 1 similarity, titles over repeats, roots over endings", () => {
+  const f = fixture()
+  build(f)
+  const prepared = prepare(JSON.parse(read(f, "knowledge/search-index.json")))
+  // The same query over the same documents gives the same numbers, every time
+  assert.deepEqual(search(prepared, "backup").results.map((r) => [r.url, r.similarity]), search(prepared, "backup").results.map((r) => [r.url, r.similarity]))
+  const r = search(prepared, "backup").results
+  for (const x of r) assert.ok(x.similarity > 0 && x.similarity <= 1, `similarity out of range: ${x.similarity}`)
+  // Sorted best first, and a title match is the strongest sign
+  assert.ok(r.every((x, i) => !i || r[i - 1].similarity >= x.similarity), "results are not best first")
+  assert.equal(r[0].title, "Backups you can trust")
+  // A word found only in a body scores lower than in a title, and repeating it can't make up the difference
+  const body = search(prepared, "restore").results.find((x) => x.title !== "Backups you can trust")
+  assert.ok(!body || body.similarity < r[0].similarity, "a body mention outranked a title")
+  // "backups" and "pricing"-style endings reduce to a root that also finds the shorter form
+  assert.equal(stem("pricing"), "pric"); assert.equal(stem("business"), "business"); assert.equal(stem("backups"), "backup"); assert.equal(stem("use"), "use")
+  assert.deepEqual(search(prepared, "backups").results.map((x) => x.url), r.map((x) => x.url))
 })
 
 // The same queries against the real export of CORPUS_TAG, when a checkout has built one (make knowledge-export)

@@ -17,14 +17,32 @@ export const SYNONYMS = [
 // Words too common to narrow anything, unless the query holds nothing else (see parseQuery)
 const STOP = new Set(["a", "an", "the", "and", "or", "of", "to", "for", "in", "on", "is", "it", "my", "i", "do", "how", "what", "with"])
 
-// Where a match counts most: the title, then a heading, then the summary, then the body
-export const WEIGHTS = { title: 10, heading: 6, summary: 4, body: 1 }
+// Where a match counts most: the title, then a heading, then the summary, then the body. These are the BM25F
+// field weights: a word in the title is worth as much as twenty in the body, before rarity and length are counted
+export const WEIGHTS = { title: 20, heading: 6, summary: 4, body: 1 }
+// BM25's two knobs: k1 says how fast repeats stop adding (a word 3 times is not 3 times as relevant), and b how
+// much a long field is discounted against the average (a short title should not lose to a long page)
+export const K1 = 1.2
+export const LENGTH_B = { title: 0.3, heading: 0.3, summary: 0.5, body: 0.75 }
 // Above the catalog's size, so every document a search counts is also listed (AS-10)
+// The most repeats of a word one field can earn credit for, so a long page repeating a word doesn't outrank a
+// title that says it once
+export const TF_CAP = { title: 3, heading: 2, summary: 2, body: 5 }
 export const MAX_RESULTS = 200
 
 // Lowercase, drop apostrophes, and turn every other run of punctuation into one space
 export function normalize(text) {
   return String(text ?? "").toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/['’]/g, "").replace(/[^a-z0-9]+/g, " ").trim()
+}
+
+// A query word cut back to its root, so "pricing" finds "price" and "prices" (matching starts at a word start, so
+// the root also finds longer forms). Only a plain ending of -ing, -ed, -es, or -s comes off, and never down to
+// fewer than three letters or off a double s ("business", "access")
+export function stem(word) {
+  for (const end of ["ing", "ed", "es", "s"]) {
+    if (word.endsWith(end) && word.length - end.length >= 3 && !(end === "s" && word.endsWith("ss"))) return word.slice(0, -end.length)
+  }
+  return word
 }
 
 // The query as clauses. Each clause is the set of normalized phrases that satisfy it: a synonym group, or one word
@@ -40,10 +58,10 @@ export function parseQuery(query) {
     }
   }
   const words = rest.split(" ").filter(Boolean)
-  for (const w of words.filter((w) => !STOP.has(w))) clauses.push({ phrases: [w], label: w })
+  for (const w of words.filter((w) => !STOP.has(w))) clauses.push({ phrases: [stem(w)], label: w })
   // A query made only of common words ("how", "what is") would otherwise match nothing, though titles such as
   // "How neon1 works" start with exactly those. Then the common words are the query
-  if (!clauses.length) for (const w of words) clauses.push({ phrases: [w], label: w })
+  if (!clauses.length) for (const w of words) clauses.push({ phrases: [stem(w)], label: w })
   return clauses
 }
 
@@ -52,50 +70,81 @@ export function parseQuery(query) {
 const has = (haystack, phrase) => haystack.includes(` ${phrase}`)
 const count = (haystack, phrase) => {
   let n = 0
-  for (let at = haystack.indexOf(` ${phrase}`); at !== -1 && n < 3; at = haystack.indexOf(` ${phrase}`, at + 1)) n++
+  for (let at = haystack.indexOf(` ${phrase}`); at !== -1; at = haystack.indexOf(` ${phrase}`, at + 1)) n++
   return n
 }
+const words = (haystack) => haystack.trim().split(" ").filter(Boolean).length
 
-// Normalizes each field once so a search is only string scans
+// Normalizes each field once so a search is only string scans, and measures the catalog for BM25: how many
+// documents there are and the average length of each field
 export function prepare(index) {
-  return index.docs.map((d) => ({
-    doc: d,
-    title: ` ${normalize(d.t)} `,
-    summary: ` ${normalize(`${d.s} ${d.sh} ${d.ty}`)} `,
-    sections: d.k.map(([id, heading, text]) => ({ id, heading, h: ` ${normalize(heading)} `, b: ` ${normalize(text)} `, text })),
-  }))
+  const entries = index.docs.map((d) => {
+    const sections = d.k.map(([id, heading, text]) => ({ id, heading, h: ` ${normalize(heading)} `, b: ` ${normalize(text)} `, text }))
+    const fields = {
+      title: ` ${normalize(d.t)} `,
+      heading: ` ${sections.map((s) => s.h.trim()).join(" ")} `,
+      summary: ` ${normalize(`${d.s} ${d.sh} ${d.ty}`)} `,
+      body: ` ${sections.map((s) => s.b.trim()).join(" ")} `,
+    }
+    const length = Object.fromEntries(Object.entries(fields).map(([f, text]) => [f, words(text)]))
+    return { doc: d, fields, length, sections }
+  })
+  const avg = Object.fromEntries(Object.keys(WEIGHTS).map((f) => [f, Math.max(1, entries.reduce((n, e) => n + e.length[f], 0) / Math.max(1, entries.length))]))
+  return { entries, avg, n: entries.length }
 }
 
-// Score of one clause against one document, with the section that matched best
-function scoreClause(entry, clause) {
-  let score = 0
-  let best = { id: "", weight: 0, text: "", heading: "" }
-  for (const p of clause.phrases) {
-    if (has(entry.title, p)) score = Math.max(score, WEIGHTS.title)
-    if (has(entry.summary, p)) score = Math.max(score, WEIGHTS.summary)
+// The weighted, length-normalized count of a clause in one document (BM25F's pseudo term frequency): each
+// field's count of the clause's phrases, discounted by how long that field is, times the field's weight
+function weightedCount(entry, avg, clause) {
+  let total = 0
+  for (const f of Object.keys(WEIGHTS)) {
+    let tf = 0
+    for (const p of clause.phrases) tf += count(entry.fields[f], p)
+    if (!tf) continue
+    tf = Math.min(tf, TF_CAP[f])
+    const norm = 1 - LENGTH_B[f] + LENGTH_B[f] * (entry.length[f] / avg[f])
+    total += (WEIGHTS[f] * tf) / norm
   }
-  let section = 0
+  return total
+}
+
+// The section where a clause counts most, for the link's anchor and the snippet
+function bestSection(entry, clause) {
+  let best = { id: "", weight: 0, text: "", heading: "" }
   for (const s of entry.sections) {
     let w = 0
     for (const p of clause.phrases) {
       if (s.heading && has(s.h, p)) w = Math.max(w, WEIGHTS.heading)
-      const n = count(s.b, p)
-      if (n) w += Math.min(n, 3) * WEIGHTS.body
+      const n = Math.min(count(s.b, p), 3)
+      if (n) w += n * WEIGHTS.body
     }
     if (w > best.weight) best = { id: s.id, weight: w, text: s.text, heading: s.heading }
-    section = Math.max(section, w)
   }
-  return { score: Math.max(score, section), section: best }
+  return best
 }
 
-// Documents for a query, best first. Every word must match; when nothing does, documents matching any word are
-// returned and `relaxed` says so
+// Documents for a query, best first, each with a similarity from 0 to 1. A clause's score is
+// idf * tf / (k1 + tf): idf makes a rare word count for more than a common one, and tf / (k1 + tf) climbs
+// toward 1 as the word's weighted count grows. The similarity is the document's clause scores over the most
+// they could total (the sum of the idfs), so a query word found once in a title reads about .9 and in a body
+// once about .45, and a document holding every word strongly approaches 1. The same query over the same
+// documents always gives the same numbers. Every word must match; when nothing does, documents matching
+// any word are returned and `relaxed` says so
 export function search(prepared, query) {
   const clauses = parseQuery(query)
   if (!clauses.length) return { clauses, results: [], relaxed: false }
-  const scored = prepared.map((entry) => {
-    const per = clauses.map((c) => scoreClause(entry, c))
-    return { entry, per, all: per.every((p) => p.score > 0), any: per.some((p) => p.score > 0), total: per.reduce((n, p) => n + p.score, 0) }
+  const { entries, avg, n } = prepared
+  // Counts per clause per document, then how many documents hold each clause (its rarity)
+  const counts = entries.map((entry) => clauses.map((c) => weightedCount(entry, avg, c)))
+  const idf = clauses.map((_, i) => {
+    const df = counts.filter((row) => row[i] > 0).length
+    return Math.log(1 + (n - df + 0.5) / (df + 0.5))
+  })
+  const ceiling = idf.reduce((a, b) => a + b, 0) || 1
+  const scored = entries.map((entry, e) => {
+    const per = counts[e].map((tf, i) => (tf > 0 ? (idf[i] * tf) / (K1 + tf) : 0))
+    const total = per.reduce((a, b) => a + b, 0)
+    return { entry, per, all: per.every((p) => p > 0), any: per.some((p) => p > 0), total, similarity: total / ceiling }
   })
   let hits = scored.filter((s) => s.all)
   let relaxed = false
@@ -103,13 +152,14 @@ export function search(prepared, query) {
   hits.sort((a, b) => b.total - a.total || a.entry.doc.t.localeCompare(b.entry.doc.t))
   const results = hits.slice(0, MAX_RESULTS).map((h) => {
     // Link to the section where the most weight landed, with its anchor when it has a heading
-    const top = h.per.reduce((a, b) => (b.section.weight > a.section.weight ? b : a)).section
+    const top = clauses.map((c) => bestSection(h.entry, c)).reduce((a, b) => (b.weight > a.weight ? b : a))
     return {
       url: h.entry.doc.u + (top.id && top.weight ? `#${top.id}` : ""),
       title: h.entry.doc.t,
       shelf: h.entry.doc.sh,
       type: h.entry.doc.ty,
       score: h.total,
+      similarity: Math.min(1, h.similarity),
       section: top.weight ? top.heading : "",
       snippet: snippet(top.weight ? top.text : h.entry.doc.s, clauses),
     }
