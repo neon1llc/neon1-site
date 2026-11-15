@@ -405,7 +405,7 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 @supports (appearance: base-select) {
   .cform select, .cform select::picker(select) { appearance: base-select; }
   .cform select { background-image: none; padding-right: 14px; display: inline-flex; align-items: center; gap: 12px; }
-  .cform select::picker-icon { content: ""; width: .95em; height: .75em; font: 15px var(--sans); background: var(--brand); clip-path: polygon(0 50%, 31% 12%, 40% 20%, 24% 43%, 100% 43%, 100% 57%, 24% 57%, 40% 80%, 31% 88%); align-self: baseline; position: relative; top: calc(.375em - .2575em); margin-left: auto; margin-right: 2px; transition: rotate var(--t-base) var(--ease); }
+  .cform select::picker-icon { content: ""; width: .95em; height: .75em; font: 15px var(--sans); background: var(--brand); clip-path: polygon(0 50%, 31% 12%, 40% 20%, 24% 43%, 100% 43%, 100% 57%, 24% 57%, 40% 80%, 31% 88%); align-self: center; margin-left: auto; margin-right: 2px; transition: rotate var(--t-base) var(--ease); }
   .cform select:open::picker-icon { rotate: -90deg; }
   .cform select::picker(select) { border: 1px solid rgba(18,36,26,.2); border-radius: var(--glass-r); background: #fff; box-shadow: 0 12px 32px rgba(0,0,0,.16); padding: 4px; margin-top: 4px; }
   .cform select:open::picker(select) { animation: n1-unroll var(--t-base) var(--ease); }
