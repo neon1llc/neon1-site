@@ -17,7 +17,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - Section links such as Contact keep their place in the address, so a view can be shared.
 - Less text about the site itself: no posting cadence on the blog, and no document, PDF, or shelf counts in the Knowledge Center.
 - Every production deploy also rebuilds dev.neon1.tech from the new main.
-- Public code shows neon1-corpus v0.46.0 and neon1-1NEON v0.15.0.
+- Public code shows neon1-corpus v0.46.0, neon1-1NEON v0.15.0, and neon1-chat v0.2.4.
 
 ## v0.73.1
 
