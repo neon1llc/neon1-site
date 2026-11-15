@@ -106,7 +106,7 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 .n1-bar.light .links a:not(.btn):hover { color: var(--brand); }
 .n1-bar.light .btn-ghost { color: var(--brand); border-color: var(--brand); }
 .n1-bar.light .links .portal { color: var(--brand); border-color: var(--ctl-line); }
-.n1-bar.light .links .portal:hover { border-color: var(--brand); }
+
 
 /* ---- Theme switch: the last thing in the bar, sun on the left (awake) and moon on the right (matrix) ----
    A quiet peer of the menu button and 1NEON: the same surface and the same thin theme-green border (--ctl-line), no
@@ -117,7 +117,6 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 .theme-sw { position: relative; flex: none; width: 52px; height: 28px; margin-left: 12px; padding: 0; border-radius: 99px; cursor: pointer;
   background: var(--surface); border: 1px solid var(--ctl-line); color: var(--muted-ink);
   transition: opacity var(--t-base) var(--ease), visibility var(--t-base), border-color var(--t-fast) var(--ease); }
-.theme-sw:hover { border-color: var(--brand); }
 /* Both pictures sit on the track, centered in each half */
 .theme-sw svg { position: absolute; top: 50%; width: 14px; height: 14px; margin-top: -7px; z-index: 1; fill: none; stroke: currentColor;
   stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: color var(--t-base) var(--ease), opacity var(--t-base) var(--ease); }
@@ -138,6 +137,12 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 .menu-btn { margin-left: auto; display: none; border-radius: var(--glass-r); }
 /* On the light bar the menu button, the theme switch, and 1NEON share one surface and one thin theme-green border */
 .n1-bar.light .menu-btn { color: var(--brand); background: var(--surface); border-color: var(--ctl-line); }
+/* All three answer a pointer the same way: the border deepens to the brand green while the pointer is over them. Only
+   where hovering is real (a mouse or trackpad), since a phone keeps "hover" on whatever was last tapped and the control
+   would stay outlined. The keyboard's focus ring is :focus-visible, so a tap or click leaves no ring either */
+@media (hover: hover) {
+  .theme-sw:hover, .n1-bar.light .menu-btn:hover, .n1-bar.light .links .portal:hover { border-color: var(--brand); }
+}
 @media (max-width: 1040px) { .links { display: none; } .menu-btn { display: inline-block; margin-left: 10px; } .theme-sw { margin-left: auto; } }
 /* The overlay always scrolls below the bar and its close button. The list's auto margins center it when
  * it fits and let it start at the top when it doesn't, so no height breakpoint decides (1024x600, zoom).
