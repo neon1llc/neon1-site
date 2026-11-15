@@ -12,13 +12,37 @@
   --r: 14px;
 }
 
+/* ---- Theme tokens: everything outside the landing's rain is awake (light) or matrix (dark) ----
+   js/theme.js sets html[data-site-theme] before the first paint. The surfaces below read these tokens instead of fixed
+   colors, so one block per theme recolors the home page's sections, the bar over them, the phone menu, the Knowledge
+   Center, and the blog. The *-rgb forms take an alpha: rgb(var(--ink-rgb) / .12) is a rule in the text's own color.
+   The rain, the hero, and the white rabbit keep their own colors in both themes. */
+:root {
+  --page: var(--paper); --page-rgb: 242 244 242; --ink-rgb: 18 36 26; --brand-rgb: 3 87 4;
+  --surface: #fff; --surface-rgb: 255 255 255; --surface-2: #e8ece8; --ink-soft: #3b4a40; --muted-ink: #56665c; --err: #a12b1f; --warn: #B45309;
+}
+/* Matrix: 1NEON's dark palette (its ground and panels, the rain's pale green text, the logo's neon for the brand) */
+:root[data-site-theme="matrix"] { --page: #0F0A0D; --page-rgb: 15 10 13; color-scheme: dark; }
+:root[data-site-theme="matrix"] :is(.awake, .n1-bar, .menu, .case-layer) {
+  --paper: #0F0A0D; --ink: #D6F5DC; --brand: #6CFFA8; --mark: #00B84F; --deep: #E9FFEE;
+  --page-rgb: 15 10 13; --ink-rgb: 214 245 220; --brand-rgb: 108 255 168;
+  --surface: #17110F; --surface-rgb: 23 17 15; --surface-2: #0A0608; --ink-soft: #BCD6C2; --muted-ink: #8DB096; --err: #FF8A80; --warn: #FFB547;
+}
+/* Switching eases every color at once, for one slow beat (js/theme.js sets the class for just that long); with
+   reduced motion the length is nothing, so it is a plain change */
+:root.theme-shift, :root.theme-shift *, :root.theme-shift *::before, :root.theme-shift *::after {
+  transition: background-color var(--t-slow) var(--ease), color var(--t-slow) var(--ease), border-color var(--t-slow) var(--ease),
+    fill var(--t-slow) var(--ease), stroke var(--t-slow) var(--ease), box-shadow var(--t-slow) var(--ease), text-shadow var(--t-slow) var(--ease),
+    transform var(--t-base) var(--ease-open), opacity var(--t-base) var(--ease), visibility var(--t-base) !important;
+}
+
 /* ---- Base: box model, anchor scrolling clear of the bar, links, and focus rings ---- */
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 72px; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 body { margin: 0; background: var(--void); color: var(--text); font: 16px/1.65 var(--sans); }
-body.woke { background-color: var(--paper); }
+body.woke { background-color: var(--page); }
 /* Arriving at a section: blank paper until the page has landed on it (js/viewport.js sets this, js/views.js clears it) */
-html.arriving { background: var(--paper); }
+html.arriving { background: var(--page); }
 html.arriving body { opacity: 0; }
 body { transition: background-color .4s, opacity var(--t-slow) var(--ease); }
 a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3px; }
@@ -55,8 +79,8 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 /* ---- Top bar: clear over the rain, frosted light once the page is light ---- */
 /* Position, height, and the logo's place come from .n1-bar, .n1-inner, and .n1-logo in /shared/neon1.css */
 .n1-bar { transition: background .24s cubic-bezier(.28,.11,.32,1), box-shadow .24s cubic-bezier(.28,.11,.32,1); }
-.n1-bar.light { background: rgba(242,244,242,.8); -webkit-backdrop-filter: saturate(1.8) blur(20px); backdrop-filter: saturate(1.8) blur(20px);
-  box-shadow: 0 1px 0 rgba(18,36,26,.08); }
+.n1-bar.light { background: rgb(var(--page-rgb) / .8); -webkit-backdrop-filter: saturate(1.8) blur(20px); backdrop-filter: saturate(1.8) blur(20px);
+  box-shadow: 0 1px 0 rgb(var(--ink-rgb) / .08); }
 @media (prefers-reduced-motion: reduce) { .n1-bar { transition: none; } }
 
 /* The middle and right of the bar: section links, then book a call and 1NEON at the far right */
@@ -76,16 +100,43 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 .n1-bar:not(.light) { box-shadow: 0 1px 0 rgba(108,255,168,.14); background: rgba(13,2,8,.4); }
 /* Over the light page: grey links that turn brand green, and brand-green buttons */
 .n1-bar.light .n1-logo { color: var(--brand); text-shadow: none; }
-.n1-bar.light .links a:not(.btn), .n1-bar.light .links .note { color: #56665c; }
+/* In matrix the bar's logo is the landing's: neon with its soft glow */
+:root[data-site-theme="matrix"] .n1-bar.light .n1-logo { text-shadow: 0 0 8px rgba(108, 255, 168, .45); }
+.n1-bar.light .links a:not(.btn), .n1-bar.light .links .note { color: var(--muted-ink); }
 .n1-bar.light .links a:not(.btn):hover { color: var(--brand); }
 .n1-bar.light .btn-ghost { color: var(--brand); border-color: var(--brand); }
-.n1-bar.light .links .portal { color: var(--brand); border-color: rgba(3,87,4,.25); }
+.n1-bar.light .links .portal { color: var(--brand); border-color: rgb(var(--brand-rgb) / .25); }
 .n1-bar.light .links .portal:hover { border-color: var(--brand); }
+
+/* ---- Theme switch: the last thing in the bar, sun on the left (awake) and moon on the right (matrix) ----
+   A 52 by 28 track holds both pictures; the knob slides over to the chosen side and the picture under it lights up,
+   so the switch shows what is on. It belongs to the light bar only: over the landing's rain it fades out and leaves
+   the tab order but keeps its place, so the links never jump as the bar turns light. Without JavaScript it is hidden,
+   since it could do nothing. */
+.theme-sw { position: relative; flex: none; width: 52px; height: 28px; margin-left: 12px; padding: 0; border-radius: 99px; cursor: pointer;
+  background: rgb(var(--brand-rgb) / .08); border: 1px solid rgb(var(--brand-rgb) / .28); color: var(--muted-ink);
+  transition: opacity var(--t-base) var(--ease), visibility var(--t-base), background-color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease); }
+.theme-sw:hover { border-color: var(--brand); }
+/* Both pictures sit on the track, centered in each half; the knob's side shows its picture in the knob's ink */
+.theme-sw svg { position: absolute; top: 50%; width: 15px; height: 15px; margin-top: -7.5px; z-index: 1; fill: none; stroke: currentColor;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: color var(--t-base) var(--ease), opacity var(--t-base) var(--ease); }
+.theme-sun { left: 6px; } .theme-moon { right: 6px; }
+.theme-moon path { fill: currentColor; stroke: none; }
+.theme-knob { position: absolute; top: 2px; left: 2px; width: 22px; height: 22px; border-radius: 50%; background: var(--brand);
+  box-shadow: 0 1px 3px rgb(var(--ink-rgb) / .25); transition: transform var(--t-base) var(--ease-open); }
+.theme-sw[aria-checked="false"] .theme-sun, .theme-sw[aria-checked="true"] .theme-moon { color: var(--paper); }
+.theme-sw[aria-checked="true"] .theme-knob { transform: translateX(24px); box-shadow: 0 0 10px rgb(var(--brand-rgb) / .55); }
+.theme-sw[aria-checked="false"] .theme-moon, .theme-sw[aria-checked="true"] .theme-sun { opacity: .75; }
+.n1-bar.light .theme-sw:focus-visible { outline-color: var(--brand); }
+.n1-bar:not(.light) .theme-sw { opacity: 0; visibility: hidden; pointer-events: none; }
+:root:not([data-site-theme]) .theme-sw { display: none; }
+:root:not([data-site-theme]) .menu-btn { margin-left: auto; }
+@media (forced-colors: active) { .theme-knob { background: ButtonText; } .theme-sw svg { color: ButtonText; } }
 
 /* ---- Phone menu: below the width the links need, they fold into a full-screen menu ---- */
 .menu-btn { margin-left: auto; display: none; border-radius: var(--glass-r); }
-.n1-bar.light .menu-btn { color: var(--brand); background: #fff; border-color: rgba(3,87,4,.25); }
-@media (max-width: 1040px) { .links { display: none; } .menu-btn { display: inline-block; } }
+.n1-bar.light .menu-btn { color: var(--brand); background: var(--surface); border-color: rgb(var(--brand-rgb) / .25); }
+@media (max-width: 1040px) { .links { display: none; } .menu-btn { display: inline-block; margin-left: 10px; } .theme-sw { margin-left: auto; } }
 /* The overlay always scrolls below the bar and its close button. The list's auto margins center it when
  * it fits and let it start at the top when it doesn't, so no height breakpoint decides (1024x600, zoom).
  * The top padding is set so the links read centered between the logo row and the screen's bottom edge:
@@ -114,10 +165,10 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 
 /* ---- Light surface: everything inside .awake reads dark green and ink on paper ---- */
 .awake { position: relative; z-index: 2; color: var(--text);
-  background: linear-gradient(to bottom, rgba(242,244,242,0) 0, rgba(242,244,242,.7) 140px, var(--paper) 280px);
-  --text: var(--ink); --muted: #56665c; --glow: var(--brand); --mid: var(--mark); --panel: #ffffff; --line: rgba(3,87,4,.16); }
+  background: linear-gradient(to bottom, rgb(var(--page-rgb) / 0) 0, rgb(var(--page-rgb) / .7) 140px, var(--paper) 280px);
+  --text: var(--ink); --muted: var(--muted-ink); --glow: var(--brand); --mid: var(--mark); --panel: var(--surface); --line: rgb(var(--brand-rgb) / .16); }
 .awake .btn-primary { background: var(--brand); border-color: var(--brand); color: var(--paper); }
-.awake .btn-primary:hover { box-shadow: 0 6px 18px rgba(3,87,4,.25); }
+.awake .btn-primary:hover { box-shadow: 0 6px 18px rgb(var(--brand-rgb) / .25); }
 /* Ghost buttons on the light page take the brand green, not the dark-mode neon; hover keeps the light green wash */
 .awake .btn-ghost { color: var(--brand); border-color: var(--brand); }
 
@@ -127,7 +178,7 @@ body.leaving .awake { pointer-events: none; }
 
 /* ---- Footer: the mark and slogan, contact, elsewhere, and the legal line ---- */
 footer { position: relative; z-index: 2; border-top: 1px solid var(--line); background: rgba(13,2,8,.92); }
-.awake footer { background: #e8ece8; }
+.awake footer { background: var(--surface-2); }
 .foot { max-width: 1200px; margin: 0 auto; display: grid; gap: 28px; grid-template-columns: 2fr 1fr 1fr; font-size: 14px; color: var(--muted);
   padding: 40px max(24px, env(safe-area-inset-right)) 28px max(24px, env(safe-area-inset-left)); }
 .foot h3 { font: 600 13px var(--mono); color: var(--text); margin: 0 0 10px; }

@@ -54,7 +54,13 @@ import { whiteRabbit } from "/js/white-rabbit.js";
 
   // ---- The "ask neon1" window: optional, so it loads last and a failure leaves the page working ----
   // The contact section and its email and booking links stay the way to reach a person
-  import("/shared/chat.js").then(({ chat }) => chat({ light: () => document.querySelector("header")?.classList.contains("light"), watch: [document.querySelector("header")] })).catch(() => { /* chat unavailable: contact links remain */ });
+  // In the matrix (dark) theme the page below the rain is dark too, so the chat keeps its dark look there
+  const lightPage = () => document.querySelector("header")?.classList.contains("light") && document.documentElement.dataset.siteTheme !== "matrix";
+  import("/shared/chat.js").then(({ chat }) => {
+    chat({ light: lightPage, watch: [document.querySelector("header")] });
+    // The chat re-checks its look on scroll; a theme switch (js/theme.js) asks for the same check
+    document.addEventListener("n1:theme", () => dispatchEvent(new Event("scroll")));
+  }).catch(() => { /* chat unavailable: contact links remain */ });
 
   // ---- Wordmark decode: each letter cycles glyphs, then locks in, left to right ----
   if (!reduce.matches) {

@@ -48,6 +48,8 @@ export function page(frame, { title, description, path, main, kind, ld, current,
   <title>${esc(title)}</title>
   <meta name="description" content="${esc(description)}" />
   <meta name="theme-color" content="#F2F4F2" />
+  <!-- Light or dark, set before the first paint so a dark page never flashes white -->
+  <script src="/js/theme.js"></script>
   <link rel="canonical" href="${url}" />
   <meta property="og:type" content="${kind === "doc" ? "article" : "website"}" />
   <meta property="og:site_name" content="neon1" />
@@ -73,6 +75,7 @@ ${styles.map((s) => `  <link rel="stylesheet" href="${s}" />`).join("\n")}
 ${navLinks}
         ${frame.block("actions")}
       </ul>
+      ${frame.block("theme")}
       ${frame.block("menu-button")}
     </nav>
   </header>
