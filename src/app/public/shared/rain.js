@@ -51,7 +51,7 @@ const RABBIT = { color: "#ffffff", alpha: 1, glow: 6, words: ["🐇"] };
 
 // Rain timing and look
 const WORD_RATE = 0.06; // chance per step that some column starts a word
-const FADE = 0.07;      // lower means longer trails
+const FADE = 0.085;     // lower means longer trails; a little higher keeps the rain from feeling heavy
 const STEP_MS = 66;     // about 15 steps a second
 const HALT_MS = 600;    // the step gap the rain picks up from after a halt
 const HOLD = 30;        // steps a word holds once spelled
@@ -248,7 +248,8 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
       // A random glyph at the head, mostly green with the odd bright one
       const y = (grid ? Math.floor(c.y) : c.y) * size;
       const r = Math.random();
-      ctx.fillStyle = r > 0.96 ? "#e9ffee" : r > 0.45 ? "#22ff7a" : "#00b84f";
+      // The bright head stays; the greens are a step deeper than before so the rain sits back (Pradeep, 2026-11-15)
+      ctx.fillStyle = r > 0.96 ? "#e9ffee" : r > 0.45 ? "#19c963" : "#007a35";
       glyph(chars[(Math.random() * chars.length) | 0], x, y);
       c.y += c.v;
       if (c.y > rows && !c.word && Math.random() > 0.97) {

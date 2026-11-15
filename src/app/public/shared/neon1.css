@@ -26,8 +26,8 @@
 
 /* Rain: the canvas behind everything, and the lens layer that magnifies it behind glass; both
    stay partly see-through so the content in front reads first */
-#rain { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; opacity: .6; }
-#lens { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 1; pointer-events: none; opacity: .6; }
+#rain { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; opacity: .42; }
+#lens { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 1; pointer-events: none; opacity: .42; }
 
 /* Clear glass over the rain: no tint, so the black stays black; the lens draws what shows through */
 .glass { border-radius: var(--glass-r); background: transparent; box-shadow: none; }
