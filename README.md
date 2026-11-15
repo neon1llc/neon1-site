@@ -94,6 +94,8 @@ make deploy verify
 
 `BUCKET`, `DISTRIBUTION`, `RELEASE_STORE`, and `VERIFY_URLS` can be overridden on the command line.
 
+Changes move through neon1's four [release levels](https://github.com/neon1llc/neon1-corpus/blob/main/corpus/standards/versioning.md#release-levels): Implemented, Verified, Released, and Qualified. `make verify` passing and the release tag mark Released. Qualified also needs real use and a tested `make rollback`.
+
 ### Fonts and media never change in place
 
 Everything under `fonts/` and `media/` is served as `immutable` for a year, so a browser that has a file never asks for it again, and CloudFront invalidation can't reach it. The 3D scene also loads after the page, so a tab left open from an older release can still ask for that release's files. One rule covers every font, image, model, recording, and the link-preview card, however it's loaded (CSS, `<meta>`, a fetch, or the three.js loaders):
