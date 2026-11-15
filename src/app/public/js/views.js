@@ -547,8 +547,11 @@
   const landing = () => start > 0 && !lastInput && !touched && !settling && performance.now() < 4000 && Math.abs(scrollY - range(start)[0]) > 2;
   const land = () => { if (start > 0 && !lastInput && !touched && !settling) { scrollTo(0, range(start)[0]); sync(); } };
   land();
+  // The page may show itself now: viewport.js held it as blank paper while it waited to land on the section
+  const arrived = () => document.documentElement.classList.remove("arriving");
+  if (start <= 0) arrived();
   // The browser's own jump to the #fragment can run after load and land 72px low, so land once more after it
-  addEventListener("load", () => { land(); requestAnimationFrame(() => setTimeout(land, 0)); });
+  addEventListener("load", () => { land(); requestAnimationFrame(() => setTimeout(() => { land(); arrived(); }, 0)); });
   if (document.fonts) document.fonts.ready.then(land);
   if (window.ResizeObserver) new ResizeObserver(land).observe(document.body);
 

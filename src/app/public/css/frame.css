@@ -15,8 +15,12 @@
 /* ---- Base: box model, anchor scrolling clear of the bar, links, and focus rings ---- */
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 72px; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
-body { margin: 0; background: var(--void); color: var(--text); font: 16px/1.65 var(--sans); transition: background-color .4s; }
+body { margin: 0; background: var(--void); color: var(--text); font: 16px/1.65 var(--sans); }
 body.woke { background-color: var(--paper); }
+/* Arriving at a section: blank paper until the page has landed on it (js/viewport.js sets this, js/views.js clears it) */
+html.arriving { background: var(--paper); }
+html.arriving body { opacity: 0; }
+body { transition: background-color .4s, opacity var(--t-slow) var(--ease); }
 a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3px; }
 :focus-visible { outline: 2px solid var(--glow); outline-offset: 3px; border-radius: 6px; }
 /* Focus rings take the color that reads on the surface they sit on: brand green on the light bar and the

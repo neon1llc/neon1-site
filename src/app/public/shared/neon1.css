@@ -36,7 +36,7 @@
 /* Going from one page to the next fades between them, where the browser supports it; never with reduced motion */
 @media (prefers-reduced-motion: no-preference) {
   @view-transition { navigation: auto; }
-  ::view-transition-group(root) { animation-duration: var(--t-base); animation-timing-function: var(--ease); }
+  ::view-transition-group(root) { animation-duration: var(--t-slow); animation-timing-function: var(--ease); }
 }
 :root[data-motion="off"]::view-transition-group(*), :root[data-motion="off"]::view-transition-old(*), :root[data-motion="off"]::view-transition-new(*) { animation-duration: 0s; }
 
