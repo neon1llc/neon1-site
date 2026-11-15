@@ -20,6 +20,10 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 - Knowledge Center search knows more words that mean the same thing, chosen from how the documents are worded: cost, price, and "how much"; proposal, quote, and estimate; backup, restore, and recovery; HIPAA and BAA; consultation and "first call"; privacy, cookies, accessibility, incidents and outages, handover, contracts, networks, cloud, the portal, training, and a few more. A test keeps the list tidy, with each word in one group and written the way the search reads text.
 
+## Unreleased
+
+- Knowledge Center: the shelf bar under the title has a left and a right button at its ends for a mouse or trackpad, so no one needs to know that Shift and the wheel scroll it sideways. Each shows only on a side that has more to scroll to. One click moves the bar by nearly a full view and keeps the last two shelf buttons in view so the reader keeps their place, and the buttons beneath fade out. Reduced motion jumps instead of gliding. A touch screen swipes as before and gets no buttons, and a keyboard uses the shelf links themselves, which scroll into view when focused.
+
 ## v0.71.1
 
 - Public code shows neon1-corpus v0.42.1.
