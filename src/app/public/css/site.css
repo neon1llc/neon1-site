@@ -410,9 +410,12 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 .cdone:focus { outline: none; }
 
 /* The link from the process steps to the sample tour */
-.tour-link { margin: 22px 0 0; color: var(--muted); }
+/* It sits under the steps across both columns, so it reads on one line, with a gap about the size of the one under the case cards */
+.tour-link { margin: 22px 0 0; color: var(--muted); max-width: none; }
+.split > .tour-link { grid-column: 1 / -1; margin: -20px 0 0; }
+@media (max-width: 760px) { .split > .tour-link { margin: 16px 0 0; } }
 /* Under the case studies: the next step after the proof */
-.start-line { margin: clamp(14px, 2.5vh, 24px) 0 0; }
+.start-line { margin: clamp(0px, 1vh, 8px) 0 0; max-width: none; }
 /* A case card's role and years, above its glance */
 .case .role { margin: -4px 0 10px; font: 500 13px/1.4 var(--mono); color: var(--muted); }
 
