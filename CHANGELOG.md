@@ -16,6 +16,10 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 - Knowledge Center search ranks with BM25 in place of hand-set points. A word counts for more the rarer it is across the documents, repeats stop adding after a few, a long page no longer beats a short one just by being long, and a word in a title counts as much as twenty in the body. Words are cut back to a root, so "pricing" finds "price" and "How I price my work". Each result shows a match from 0 to 100% beside where it was found. It is the same arithmetic every time, in the browser, with no model and nothing sent anywhere.
 
+## Unreleased
+
+- Knowledge Center search knows more words that mean the same thing, chosen from how the documents are worded: cost, price, and "how much"; proposal, quote, and estimate; backup, restore, and recovery; HIPAA and BAA; consultation and "first call"; privacy, cookies, accessibility, incidents and outages, handover, contracts, networks, cloud, the portal, training, and a few more. A test keeps the list tidy, with each word in one group and written the way the search reads text.
+
 ## v0.71.1
 
 - Public code shows neon1-corpus v0.42.1.
