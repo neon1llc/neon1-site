@@ -4,6 +4,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+- The left arrow beside lowercase text is one drawn shape now (`.arr` in shared/neon1.css, also the dropdown's picker icon), not a typed "←". Its center sits on the center of the lowercase letters, the line through the middle of their x-height, and it turns on that center, so the fold arrow rotates in place. Before, the glyph's own box put it slightly off that line and its turn pivoted about the wrong point.
 - The contact form's "How did you find neon1?" dropdown matches 1NEON's: still a native select, with a brand-green chevron and room for it in Safari and Firefox, and in Chrome and Edge a left arrow that turns down as the list unrolls, both in one --t-base so they finish together.
 - Folds ("send me your use case", the process and FAQ rows) open and close more slowly and smoothly: 0.6 s opening, 15% shorter closing, on one shared curve (--t-open and --ease-open, read by both the stylesheet and js/views.js). The arrow turns on the same curve and length, so it finishes its turn exactly as the fold finishes opening, and turns back as a close begins instead of when it ends. Before, the fold took 0.42 s on a sharp curve and the arrow 0.2 s.
 - Contact form: "Remember, all I'm offering is the truth. Nothing more." sits on its own line under the note.

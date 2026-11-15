@@ -106,3 +106,11 @@
 }
 @media (prefers-reduced-motion: reduce) { .glitch::before, .glitch::after { animation: none; opacity: 0; } }
 
+/* The left arrow that sits beside lowercase text (.arr; the dropdown's picker icon uses the same shape). It is drawn,
+   not typed, so its box is its own: the box is 0.95em by 0.75em with the arrow centered in it, which makes the center
+   of the turn the center of the arrow. --arr-xc is half the text's x-height (Figtree: 0.515em / 2); the arrow sits on
+   the text's baseline and is moved down so its center lands on that line, where the middle of the lowercase letters is.
+   Where the arrow turns, it turns on that center line, in place. */
+.arr { --arr-xc: .2575em; width: .95em; height: .75em; background: currentColor; flex: none;
+  clip-path: polygon(0 50%, 31% 12%, 40% 20%, 24% 43%, 100% 43%, 100% 57%, 24% 57%, 40% 80%, 31% 88%); }
+.arr { display: inline-block; position: relative; top: calc(.375em - var(--arr-xc)); }

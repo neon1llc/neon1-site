@@ -352,11 +352,11 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 /* ---- Contact form: topic chips, common situations, fields, and the engagement facts beside them ---- */
 /* Folds (.fold): a bold dark green label whose arrow sits right beside it, pointing left when closed
    and down when open. No underline, tap flash, or text selection, so a tap only turns the arrow */
-.fold > summary { display: flex; align-items: center; gap: 4px; width: fit-content; list-style: none; cursor: pointer; font: 700 17px var(--sans); color: var(--brand); padding: 6px 0; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+.fold > summary { display: flex; align-items: baseline; gap: 4px; width: fit-content; list-style: none; cursor: pointer; font: 700 17px var(--sans); color: var(--brand); padding: 6px 0; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
 .fold > summary::-webkit-details-marker { display: none; }
 .fold > summary:focus { outline: none; }
 .fold > summary:focus-visible { outline: 2px solid var(--brand); outline-offset: 4px; border-radius: 4px; }
-.fold .arr { display: inline-block; transition: transform var(--t-open) var(--ease-open); }
+.fold .arr { transition: transform var(--t-open) var(--ease-open); }
 .fold[open]:not(.closing) > summary .arr { transform: rotate(-90deg); }
 /* Closing runs 15% shorter than opening (js/views.js), so the arrow does too */
 .fold.closing .arr { transition-duration: calc(var(--t-open) * .85); }
@@ -405,7 +405,7 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 @supports (appearance: base-select) {
   .cform select, .cform select::picker(select) { appearance: base-select; }
   .cform select { background-image: none; padding-right: 14px; display: inline-flex; align-items: center; gap: 12px; }
-  .cform select::picker-icon { content: "\2190"; font: 700 15px/1 var(--sans); color: var(--brand); margin-left: auto; margin-right: 2px; transition: rotate var(--t-base) var(--ease); }
+  .cform select::picker-icon { content: ""; width: .95em; height: .75em; font: 15px var(--sans); background: var(--brand); clip-path: polygon(0 50%, 31% 12%, 40% 20%, 24% 43%, 100% 43%, 100% 57%, 24% 57%, 40% 80%, 31% 88%); align-self: baseline; position: relative; top: calc(.375em - .2575em); margin-left: auto; margin-right: 2px; transition: rotate var(--t-base) var(--ease); }
   .cform select:open::picker-icon { rotate: -90deg; }
   .cform select::picker(select) { border: 1px solid rgba(18,36,26,.2); border-radius: var(--glass-r); background: #fff; box-shadow: 0 12px 32px rgba(0,0,0,.16); padding: 4px; margin-top: 4px; }
   .cform select:open::picker(select) { animation: n1-unroll var(--t-base) var(--ease); }
