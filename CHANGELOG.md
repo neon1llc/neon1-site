@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## Unreleased
+
+- The contact view's free-account invitation links the Knowledge Center's "Free 1NEON accounts" guide. Release with the corpus release that adds the guide, when 1NEON's sign-up opens.
+
 ## v0.72.1
 
 - Public code shows neon1-corpus v0.44.0, neon1-aws-infrastructure v0.8.1, neon1-chat v0.2.2, deploy-ops v0.14.2, refmark v0.1.4, aws-clip v0.1.3, ready-secure-go v0.1.3, and the five education repos at their newest tags.
