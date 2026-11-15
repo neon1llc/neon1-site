@@ -4,7 +4,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
-- While 1NEON's sign-up is open, the home page's start line and the contact view invite visitors to start a free 1NEON account, add their projects' needs and files, and hear back from me. A small script asks 1NEON whether sign-up is open; while it's closed, or without the script, the invitation stays hidden.
+- While 1NEON's sign-up is open, the home page's start line and the contact view invite visitors to start a free 1NEON account, write down what their project needs, and hear back from me. A small script asks 1NEON whether sign-up is open; while it's closed, or without the script, the invitation stays hidden.
 
 ## v0.72.0
 
