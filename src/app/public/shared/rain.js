@@ -52,7 +52,7 @@ const RABBIT = { color: "#ffffff", alpha: 1, glow: 6, words: ["🐇"] };
 // Rain timing and look
 const WORD_RATE = 0.06; // chance per step that some column starts a word
 const FADE = 0.07;      // lower means longer trails
-const STEP_MS = 82;     // about 12 steps a second, a fifth slower than the 66 ms it had (Pradeep, 2026-11-15)
+const STEP_MS = 73;     // about 13.7 steps a second, 10% slower than the original 66 ms (82 looked stuttery; Pradeep, 2026-11-15)
 const HALT_MS = 600;    // the step gap the rain picks up from after a halt
 const HOLD = 30;        // steps a word holds once spelled
 
@@ -355,7 +355,11 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
     const now = performance.now();
     const g = stepGap(now);
     if (glitch) { if (!document.hidden) glitchStep(now); }
-    else if (running && !held && !document.hidden && !idle() && now - last >= g) { last = now; draw(); refract(); }
+    else if (running && !held && !document.hidden && !idle() && now - last >= g) {
+      // Carry the remainder past the frame boundary so the average pace holds at any refresh rate; resync after a long stall
+      last = now - last > g * 2 ? now : last + g;
+      draw(); refract();
+    }
     raf = requestAnimationFrame(loop);
   }
 
