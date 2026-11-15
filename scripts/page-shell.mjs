@@ -201,7 +201,7 @@ export function docMain({ crumbs: trail, flag = "", title, summary, facts, short
     <article class="kc-doc">
       <header class="kc-doc-head">
         <nav class="kc-crumbs" aria-label="Breadcrumb">${trailHtml}</nav>
-        ${flag}<h1>${esc(title)}</h1>
+        ${flag}<h1>${wordmark(esc(title), "sans")}</h1>
         <p class="kc-summary">${esc(summary)}</p>
         <dl class="kc-facts">
 ${facts.map(([k, v, html]) => `          <div><dt>${esc(k)}</dt><dd>${html ? v : esc(v)}</dd></div>`).join("\n")}
