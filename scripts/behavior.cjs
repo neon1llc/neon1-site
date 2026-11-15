@@ -180,6 +180,11 @@ check("browser", "home: the first screen has no offer block, and the bar's conta
     expect(!(await page.locator(".hero .offer, .hero .start").count()), "the offer block is back on the first screen");
     await page.locator('.links a[data-view="contact"]').click();
     await page.waitForFunction(() => Math.abs(document.getElementById("contact").getBoundingClientRect().top - 64) < 3, null, { timeout: 5000 });
+    // The address says where the visitor is, so the view can be shared; only the logo goes home to "/"
+    expect((await page.evaluate(() => location.pathname + location.hash)) === "/#contact", "the bar's contact link leaves #contact in the address");
+    await page.locator('.n1-logo').click();
+    await page.waitForTimeout(600);
+    expect((await page.evaluate(() => location.pathname + location.hash)) === "/", "the logo returns the address to /");
     expect(!errors.length, "page errors", errors);
   } finally { await context.close(); }
 });
