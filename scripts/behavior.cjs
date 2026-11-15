@@ -493,6 +493,49 @@ check("gpu", "rabbit: nothing to press shows at the window, and Tab stays on the
   } finally { await context.close(); }
 });
 
+check("browser", "rabbit: at the end of the card, \"go back\" is the one control, Tab reaches it, and Enter fades back to the landing", async () => {
+  const { page, context, errors } = await open({ init: COUNT_FRAMES });
+  try {
+    await tabToRabbit(page);
+    await page.keyboard.press("Enter");
+    await page.keyboard.press("End");
+    expect(await isState(page, "done"), "End did not finish the card", await rabbit(page));
+    let r = await rabbit(page);
+    expect(r.controls === 1, "\"go back\" is not the one control at the end", r);
+    await page.keyboard.press("Tab");
+    expect(await page.evaluate(() => document.activeElement.classList.contains("white-rabbit-back")), "Tab did not reach \"go back\"", await rabbit(page));
+    await page.keyboard.press("Tab");
+    expect((await rabbit(page)).focus === "whiteRabbitHow", "Tab did not cycle back to the line that says how to move", await rabbit(page));
+    await page.keyboard.press("Tab");
+    await page.keyboard.press("Enter");
+    expect(await isState(page, "idle"), "\"go back\" did not return to the landing", await rabbit(page));
+    r = await rabbit(page);
+    expect(r.focus === "whiteRabbitIn", "focus did not return to the way in", r);
+    expect(!(await sceneFrames(page)), "the card started the scene loop");
+    expect(!errors.length, "page errors", errors);
+  } finally { await context.close(); }
+});
+
+check("gpu", "rabbit: \"go back\" shows only at the end and plays the walk back calmly to the landing", async () => {
+  const { page, context, errors } = await open(SMALL, "/?rabbit=p1");
+  try {
+    expect(await isState(page, "done"), "the scene never reached the end", await rabbit(page));
+    let r = await rabbit(page);
+    expect(r.controls === 1, "\"go back\" is not the one control at the end", r);
+    await page.click(".white-rabbit-back");
+    r = await rabbit(page);
+    expect(r.state === "reversing" && r.controls === 0, "\"go back\" did not start playing back, or stayed on screen", r);
+    // Calm: after two seconds most of the walk is still ahead, and the progress only ever goes down
+    const seen = [];
+    for (let i = 0; i < 8; i++) { await page.waitForTimeout(250); seen.push(+(await rabbit(page)).progress); }
+    expect(seen[seen.length - 1] > 0.6, "\"go back\" rushed: too much of the walk went by in two seconds", seen);
+    expect(seen.every((x, i) => !i || x <= seen[i - 1] + 0.001), "the walk did not play steadily back", seen);
+    expect(await until(page, () => document.getElementById("whiteRabbit").dataset.state === "idle", null, 60000), "\"go back\" never reached the landing", await rabbit(page));
+    expect(!(await sceneFrames(page)), "the scene loop kept running after the landing returned");
+    expect(!errors.length, "page errors", errors);
+  } finally { await context.close(); }
+});
+
 for (const [when, p] of [["at the start", "0.02"], ["midway", "0.5"], ["at the end", "1"]]) {
   check("gpu", `rabbit: context lost ${when}, then the card, then leaving, leaves no scene loop`, async () => {
     const { page, context, errors } = await open(SMALL, `/?rabbit=p${p}`);
