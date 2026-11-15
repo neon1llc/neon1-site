@@ -374,7 +374,13 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 .cfold[open] > .cform, .cfold[open] > .cdone { margin-top: 18px; }
 .cform, .cdone { display: grid; gap: 14px; }
 /* A field's own error, under it, in the same dark red as the summary */
-.cerr { display: block; margin-top: 4px; font-size: 13px; color: #a12b1f; }
+/* A field's message in amber, as in 1NEON: green already means "fine" there, and red clashes with the
+   palette. 4.9:1 on the light glass */
+.cerr { display: block; margin-top: 4px; font-size: 13px; color: #B45309; }
+.cform [aria-invalid="true"] { border-color: #B45309; }
+/* A required field's asterisk, after its label, in the brand green */
+.cform .req { margin-left: 3px; color: var(--brand); font-weight: 700; }
+.cform .cfound-other[hidden] { display: none; }
 .cform[hidden], .cdone[hidden] { display: none; }
 .cform label { display: grid; gap: 6px; font: 500 14px var(--sans); color: var(--ink); }
 .cform .opt { font: 400 12px var(--mono); color: var(--muted); }

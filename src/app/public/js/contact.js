@@ -26,7 +26,8 @@ if (fold && form) {
     const f = form.elements, out = [];
     if (!f.today.value.trim()) out.push(["today", "Say what's going on."]);
     if (!f.name.value.trim()) out.push(["name", "Add your name."]);
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.value.trim())) out.push(["email", "Add an email address I can reply to."]);
+    if (!/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(f.email.value.trim())) out.push(["email", "Enter a full email address, like you@company.com."]);
+    if (f.found.value === "other" && !f.foundOther.value.trim()) out.push(["foundOther", "Say where you found neon1."]);
     return out;
   }
 
@@ -42,6 +43,7 @@ if (fold && form) {
       company: f.company.value,
       // How they found neon1, sent only when picked
       ...(f.found.value ? { found: f.found.value } : {}),
+      ...(f.found.value === "other" ? { foundOther: f.foundOther.value.trim() } : {}),
       website: f.website.value,
     };
   }
@@ -57,6 +59,11 @@ if (fold && form) {
     el.setAttribute("aria-invalid", "true");
     el.setAttribute("aria-describedby", id);
   }
+  // "Somewhere else" asks for their words; any other answer hides the box again
+  const foundOther = form.querySelector(".cfound-other");
+  form.elements.found.addEventListener("change", () => { foundOther.hidden = form.elements.found.value !== "other"; });
+  form.addEventListener("reset", () => { foundOther.hidden = true; });
+
   form.addEventListener("input", (e) => { if (e.target.getAttribute?.("aria-invalid") === "true") fieldError(e.target, ""); });
 
   form.addEventListener("submit", async (e) => {
@@ -92,6 +99,20 @@ if (fold && form) {
       });
       if (!r.ok) {
         const j = await r.json().catch(() => ({}));
+        // The server's checks (a real mail domain, no throwaway mailbox, a real name) answer field by
+        // field: each message goes under its field, and the first such field gets focus
+        const fields = j.error === "check_fields" && j.current?.fields;
+        if (fields) {
+          let first;
+          for (const [name, m] of Object.entries(fields)) {
+            const el = form.elements[name];
+            if (el && !(el instanceof RadioNodeList)) { fieldError(el, m); first ??= el; }
+          }
+          first?.focus();
+          const e2 = new Error(Object.values(fields)[0]);
+          e2.fields = true;
+          throw e2;
+        }
         throw new Error(r.status === 400 ? "Something in the form needs another look. Check the email address and try again." : j.message || "");
       }
       document.getElementById("cdoneTo").textContent = data.email;
@@ -102,7 +123,7 @@ if (fold && form) {
       done.focus();
     } catch (err) {
       // The typed draft is never cleared on a failure or a timeout, so nothing has to be written twice
-      status.textContent = stop.signal.aborted ? UNSURE : `${err.message || "That didn't send."} You can also email hello@neon1.tech.`;
+      status.textContent = stop.signal.aborted ? UNSURE : err.fields ? "A field above needs another look." : `${err.message || "That didn't send."} You can also email hello@neon1.tech.`;
       status.className = "cstatus err";
     } finally {
       clearTimeout(timer);

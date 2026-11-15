@@ -4,7 +4,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
-- The contact form asks, optionally, how you found neon1, with the same list as 1NEON's sign-up.
+- The contact form asks, optionally, how you found neon1, with the same list as 1NEON's sign-up; "Somewhere else" asks where. Required fields carry a green asterisk instead of optional fields saying so. The server's checks (a full email address at a domain that takes mail, not a throwaway mailbox, a real name) answer field by field, each message under its field, in amber.
 
 ## v0.73.1
 

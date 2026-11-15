@@ -342,15 +342,15 @@
             <label class="pick"><input type="checkbox" name="topics" value="security" /> Security</label>
             <label class="pick pick-other"><span class="sr">Something else</span><input name="other" maxlength="120" placeholder="something else" aria-label="Something else, in your words" /></label>
           </fieldset>
-          <label>What's going on?<textarea name="today" rows="4" maxlength="3000" required placeholder="e.g. every Friday we copy orders from email into a spreadsheet by hand."></textarea></label>
+          <label><span>What's going on?<span class="req" aria-hidden="true">*</span></span><textarea name="today" rows="4" maxlength="3000" required placeholder="e.g. every Friday we copy orders from email into a spreadsheet by hand."></textarea></label>
           <div class="crow">
-            <label>Name<input name="name" autocomplete="name" maxlength="100" required /></label>
-            <label>Email<input name="email" type="email" autocomplete="email" maxlength="200" required /></label>
+            <label><span>Name<span class="req" aria-hidden="true">*</span></span><input name="name" autocomplete="name" maxlength="100" required /></label>
+            <label><span>Email<span class="req" aria-hidden="true">*</span></span><input name="email" type="email" autocomplete="email" maxlength="200" required /></label>
           </div>
           <div class="crow">
-            <label><span>Organization <span class="opt">optional</span></span><input name="company" autocomplete="organization" maxlength="120" /></label>
+            <label><span>Organization</span><input name="company" autocomplete="organization" maxlength="120" /></label>
             <!-- The same list as 1NEON's sign-up (FOUND_VIA in its domain package), most likely first -->
-            <label><span>How did you find neon1? <span class="opt">optional</span></span><select name="found">
+            <label><span>How did you find neon1?</span><select name="found">
               <option value="">Choose one</option>
               <option value="google">Google search</option>
               <option value="linkedin">LinkedIn</option>
@@ -363,6 +363,8 @@
               <option value="other">Somewhere else</option>
             </select></label>
           </div>
+          <!-- Their own words, asked only when they pick "Somewhere else" (js/contact.js shows it) -->
+          <label class="cfound-other" hidden><span>Where?<span class="req" aria-hidden="true">*</span></span><input name="foundOther" maxlength="80" placeholder="A podcast, a newsletter, an event" /></label>
           <!-- Hidden from people and screen readers; a bot that fills every field fills this one -->
           <div class="hp" aria-hidden="true"><label>Leave this empty<input name="website" tabindex="-1" autocomplete="off" /></label></div>
           <p class="cnote">Leave out passwords, health details, and payment information. Your message goes only to my inbox. <span class="truth">Remember, all I'm offering is the truth. Nothing more.</span></p>
