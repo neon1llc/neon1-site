@@ -78,7 +78,7 @@ test("same-origin absolute links are internal; other origins open in a new tab",
   for (const tag of html.match(/<a [^>]*>/g)) assert.ok(!(tag.includes("neon1.tech") && tag.includes("_blank")), tag)
 })
 
-test("counts and the PDF claim come from the manifest, in the text and the head", () => {
+test("counts and the PDF claim come from the manifest, in the head only", () => {
   const f = fixture({ noPdf: ["guides-spot-phishing", "faq-1neon-help"] })
   build(f)
   const total = f.list.length
@@ -88,7 +88,8 @@ test("counts and the PDF claim come from the manifest, in the text and the head"
   assert.equal(facts.pdfs, pdfs)
   const html = read(f, "knowledge/index.html")
   const claim = `${total} documents, ${pdfs} with a PDF to download`
-  assert.ok(html.includes(`${claim}.</p>`), "visible lead")
+  // The count line is gone from the title's lead (2026-11-15) but stays in the description meta, so a search snippet can show it
+  assert.ok(!html.includes(`${claim}.</p>`), "no count line under the title")
   assert.ok(html.includes(`content="neon1&#x27;s public documents`) && html.match(/name="description" content="[^"]*"/)[0].includes(claim), "description meta")
   assert.doesNotMatch(html, /each with a PDF/)
   // Every document with a PDF says so, and a document without one does not
