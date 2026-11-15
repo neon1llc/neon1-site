@@ -51,8 +51,8 @@ const RABBIT = { color: "#ffffff", alpha: 1, glow: 6, words: ["🐇"] };
 
 // Rain timing and look
 const WORD_RATE = 0.06; // chance per step that some column starts a word
-const FADE = 0.085;     // lower means longer trails; a little higher keeps the rain from feeling heavy
-const STEP_MS = 66;     // about 15 steps a second
+const FADE = 0.07;      // lower means longer trails
+const STEP_MS = 82;     // about 12 steps a second, a fifth slower than the 66 ms it had (Pradeep, 2026-11-15)
 const HALT_MS = 600;    // the step gap the rain picks up from after a halt
 const HOLD = 30;        // steps a word holds once spelled
 
