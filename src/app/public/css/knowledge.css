@@ -285,6 +285,8 @@ body.kc { background: var(--paper); }
 .kc-none li a { display: inline-block; padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; color: var(--brand); text-decoration: none; }
 .kc-none a { color: var(--brand); }
 .kc-found[hidden], .kc-none[hidden], #kc-browse[hidden] { display: none; }
+/* Search results, the no-match note, and the catalog ease in as they swap */
+.kc-found:not([hidden]), .kc-none:not([hidden]) { animation: n1-appear var(--t-base) var(--ease) both; }
 
 /* --- Diagrams (drawn by neon1-corpus tools/diagrams.mjs): a white card that scrolls sideways on narrow
    screens rather than shrinking labels past reading, with the Mermaid source folded beneath --- */

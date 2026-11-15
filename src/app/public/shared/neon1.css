@@ -24,6 +24,22 @@
   --glass-r: 8px;
 }
 
+/* Motion: one curve and three lengths for every state change on neon1.tech and 1NEON (shared/motion.js holds the same
+   numbers). Reduced motion, or html[data-motion="off"] (1NEON's own switch), sets the lengths to nothing, so every
+   transition and animation that uses them becomes a plain change. A browser without the features simply changes at once. */
+:root { --ease: cubic-bezier(.28, .11, .32, 1); --t-fast: .16s; --t-base: .26s; --t-slow: .42s; }
+@media (prefers-reduced-motion: reduce) { :root { --t-fast: 0s; --t-base: 0s; --t-slow: 0s; } }
+:root[data-motion="off"] { --t-fast: 0s; --t-base: 0s; --t-slow: 0s; }
+/* Something that appears (an error, a result, a panel) eases in from just above its place */
+@keyframes n1-appear { from { opacity: 0; transform: translateY(-6px); } }
+.n1-appear, .n1-appear-self:not([hidden]) { animation: n1-appear var(--t-base) var(--ease) both; }
+/* Going from one page to the next fades between them, where the browser supports it; never with reduced motion */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+  ::view-transition-group(root) { animation-duration: var(--t-base); animation-timing-function: var(--ease); }
+}
+:root[data-motion="off"]::view-transition-group(*), :root[data-motion="off"]::view-transition-old(*), :root[data-motion="off"]::view-transition-new(*) { animation-duration: 0s; }
+
 /* Rain: the canvas behind everything, and the lens layer that magnifies it behind glass; both
    stay partly see-through so the content in front reads first */
 #rain { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; opacity: .35; }

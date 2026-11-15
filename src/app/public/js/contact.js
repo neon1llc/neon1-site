@@ -5,6 +5,8 @@
 // above it do the job. A send waits at most WAIT ms; past that the outcome is unknown, so the draft stays
 // and the visitor is told to check before sending again (no auto-retry).
 
+import { reveal, swap } from "/shared/motion.js";
+
 const fold = document.getElementById("cfold");
 const form = document.getElementById("cform");
 if (fold && form) {
@@ -70,7 +72,7 @@ if (fold && form) {
   }
   // "Somewhere else" asks for their words; any other answer hides the box again
   const foundOther = form.querySelector(".cfound-other");
-  form.elements.found.addEventListener("change", () => { foundOther.hidden = form.elements.found.value !== "other"; });
+  form.elements.found.addEventListener("change", () => reveal(foundOther, form.elements.found.value === "other"));
   form.addEventListener("reset", () => { foundOther.hidden = true; });
 
   form.addEventListener("input", (e) => { if (e.target.getAttribute?.("aria-invalid") === "true") fieldError(e.target, ""); });
@@ -127,8 +129,7 @@ if (fold && form) {
       document.getElementById("cdoneTo").textContent = data.email;
       form.reset();
       status.textContent = "";
-      form.hidden = true;
-      done.hidden = false;
+      await swap(form, done);
       done.focus();
     } catch (err) {
       // The typed draft is never cleared on a failure or a timeout, so nothing has to be written twice
@@ -142,9 +143,7 @@ if (fold && form) {
   });
 
   document.getElementById("cagain").addEventListener("click", () => {
-    done.hidden = true;
-    form.hidden = false;
-    form.elements.today.focus();
+    swap(done, form).then(() => form.elements.today.focus());
   });
 
   fold.hidden = false;
