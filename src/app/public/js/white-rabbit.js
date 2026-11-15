@@ -38,7 +38,7 @@ const STIFF = 90;          // spring stiffness, per second squared
 const DAMP = 2 * Math.sqrt(STIFF);
 const BAND = 0.02;         // the most input can pull past the end
 const IDLE = 160;          // ms without input that ends a gesture
-const REWIND = 8600;       // ms for "go back" to play the whole walk back (15 s / 1.75): calm enough to take in each turn
+const REWIND = 6900;       // ms for "go back" to play the whole walk back (15 s / 2.2): 25% quicker than the 8600 it had (Pradeep, 2026-11-15)
 const SETTLE = 400;        // ms after "go back" during which leftover scroll momentum can't take over
 const FADE = 500;          // ms the card fades out for "go back" (reduced motion: a fade, no movement)
 const DOWN = ["ArrowDown", "PageDown", "End"], UP = ["ArrowUp", "PageUp", "Home"];
