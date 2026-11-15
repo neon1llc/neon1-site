@@ -31,7 +31,7 @@ body.kc { background: var(--paper); }
 /* ---- Shelf links under the band ---- */
 .kc-shelves { position: sticky; top: calc(64px + env(safe-area-inset-top)); z-index: 3; background: rgba(242, 244, 242, .92);
   -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
-.kc-shelves ul { list-style: none; max-width: 1040px; margin: 0 auto; padding: 10px 24px; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.kc-shelves ul { list-style: none; max-width: 1040px; margin: 0 auto; padding: 10px 24px; display: flex; align-items: stretch; gap: 6px; overflow-x: auto; scrollbar-width: none; }
 .kc-shelves ul::-webkit-scrollbar { display: none; }
 .kc-shelves a { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; white-space: nowrap;
   font: 13px var(--mono); color: var(--muted); text-decoration: none; border: 1px solid transparent; }
@@ -61,7 +61,8 @@ body.kc { background: var(--paper); }
 .kc-group-head { padding: 18px 20px; border-radius: 10px; background: var(--void); color: #d6f5dc; }
 .kc-group-head h2 { color: var(--neon); font-size: 13px; }
 .kc-group-head p { margin: 0; color: #a9c9b0; font-size: 15px; }
-.kc-nav-group span { display: inline-block; padding: 6px 4px 6px 10px; font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--mark); white-space: nowrap; }
+.kc-nav-group { display: flex; align-items: center; }
+.kc-nav-group span { display: block; padding: 6px 4px 6px 10px; font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--mark); white-space: nowrap; }
 .kc-nav-group:not(:first-child) { margin-left: 10px; padding-left: 10px; border-left: 1px solid var(--line); }
 
 /* ---- Shelves and cards ---- */
