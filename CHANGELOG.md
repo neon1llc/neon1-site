@@ -4,7 +4,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
-- White rabbit: the closing screen has a "go back" button that plays the whole walk back to the TV on its own, over about 15 seconds, easing out of the window and into the screen, so each part of the room can be taken in on the way. A scroll takes over from wherever the view is, and Esc still leaves at once. With reduced motion, the card fades out instead. Keyboard users reach it with Tab from the closing screen, and Enter or Space presses it. Two behavior checks cover it: the card's keyboard path, and the scene's pace (most of the walk still ahead after two seconds, progress only going down) back to the landing.
+- White rabbit: the closing screen has a "go back" button that plays the whole walk back to the TV on its own, over about 8.5 seconds, easing out of the window and into the screen, so each part of the room can be taken in on the way. A scroll takes over from wherever the view is, and Esc still leaves at once. With reduced motion, the card fades out instead. Keyboard users reach it with Tab from the closing screen, and Enter or Space presses it. Two behavior checks cover it: the card's keyboard path, and the scene's pace (most of the walk still ahead after two seconds, progress only going down) back to the landing.
 
 ## v0.71.1
 
