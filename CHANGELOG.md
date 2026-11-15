@@ -2,10 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
-## Unreleased
+## v0.71.0
 
 - Case study cards and Knowledge Center case pages lead with the kind of work, so one can't be mistaken for another: a neon1 engagement, a partner engagement, founder experience, or an independent demonstration, as in "Partner engagement: As neon1, subcontracted by Xenoss, 2026" or "neon1 engagement, 2025". A role or year the corpus hasn't confirmed reads "not yet confirmed" instead of disappearing. The Knowledge Center's case studies shelf lists neon1 engagements first, then partner work, founder experience, and the fictional bakery proposal as an independent demonstration, each card labeled.
 - Client work: the line above the cards says each one is labeled as a neon1 or a partner engagement, with who did what and what changed, in place of "what was measured before and after". The rail gains the dry cleaner, my first client, from the corpus.
+- Public code shows neon1-corpus v0.42.0, neon1-1NEON v0.11.0, and neon1-chat v0.2.1.
 - Services: each line names who it's for ("you run a small business", "you lead a technical team", "your office or home", "your team or group"), opens with the situation that fits, and links where to start: how a workflow project goes, how a cloud project goes, what a first project costs, and how a security session goes.
 
 ## v0.70.0
