@@ -12,6 +12,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - Every production deploy, including a corpus release picked up on its own, also rebuilds dev.neon1.tech from the new main in the same run, and a dev build pinned to an older corpus branch takes the newest corpus release in first.
 - Cut text that describes the site or its documents instead of helping the reader: post cadence, document and PDF counts, and notes on how a page is kept.
 - The contact form asks, optionally, how you found neon1, with the same list as 1NEON's sign-up.
+- Free-account copy: write down your needs, then ask for an assessment or a call from your account. Reminders the portal sends are no longer worded as mine.
 
 ## v0.73.1
 
