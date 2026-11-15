@@ -202,16 +202,22 @@ body.kc { background: var(--paper); }
 
 .kc-colophon { margin: 40px 0 0; font-size: 13px; color: var(--muted); }
 
-/* Share this post: plain links and two buttons, as small outlined chips that wrap on phones */
-.kc-share { margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--line); }
-.kc-share h2 { margin: 0 0 14px; font: 700 18px var(--sans); color: var(--brand); }
+/* Share: one quiet row after the post, a small label over at most four buttons drawn like the Knowledge
+   Center's actions (.kc-actions .btn-outline), so the row fits one line on a phone */
+.kc-share { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line); }
+.kc-share h2 { margin: 0 0 12px; font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--mark); }
+.kc-share h2::before { content: none; }
 .kc-share ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
 .kc-share li[hidden] { display: none; }
-.kc-share a, .kc-share button { display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; border: 1px solid var(--line);
-  border-radius: 999px; background: #fff; color: var(--ink); font: 600 14px var(--sans); text-decoration: none; cursor: pointer; }
-.kc-share a:hover, .kc-share button:hover { border-color: rgba(3, 87, 4, .45); color: var(--brand); }
+.kc-share a, .kc-share button { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; padding: 0 14px; border: 1px solid rgba(3, 87, 4, .35);
+  border-radius: 4px; background: #fff; color: var(--brand); font: 600 14px var(--sans); text-decoration: none; cursor: pointer; }
+.kc-share a:hover, .kc-share button:hover { border-color: var(--brand); color: var(--brand); }
 .kc-share a:focus-visible, .kc-share button:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
-.kc-share-status { min-height: 1.4em; margin: 10px 0 0; font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+.kc-share svg { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+/* The copy note is for screen readers; the button itself says "Copied". A failed copy shows the link to copy by hand */
+.kc-share-status { position: absolute; width: 1px; height: 1px; margin: 0; overflow: hidden; clip-path: inset(50%); }
+.kc-share-status[data-show] { position: static; width: auto; height: auto; overflow: visible; clip-path: none; margin-top: 10px;
+  font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
 
 @media (max-width: 600px) {
   .kc-band-inner { padding: 44px 16px 36px; }
