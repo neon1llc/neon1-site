@@ -37,8 +37,8 @@ body.kc { background: var(--paper); }
   font: 13px var(--mono); color: var(--muted); text-decoration: none; border: 1px solid transparent; }
 .kc-shelves a:hover { color: var(--brand); border-color: var(--line); background: #fff; }
 .kc-shelves a span { font-size: 11px; color: var(--mark); opacity: .8; }
-/* Left and right buttons (js/knowledge-shelves.js): over each end of the bar for a mouse, fading the shelf buttons
-   beneath them out, and shown only on a side that has more to scroll to. Touch screens swipe, so none are added there */
+/* Left and right buttons (js/knowledge-shelves.js): over each end of the bar, fading the shelf buttons beneath them
+   out, and shown only on a side that has more to scroll to. On a touch screen they are smaller, since the bar swipes too */
 .kc-shelves-btn { position: absolute; top: 0; bottom: 0; z-index: 1; display: grid; place-items: center; width: 84px; padding: 0; border: 0; cursor: pointer; color: var(--brand); background: transparent; }
 .kc-shelves-btn[hidden] { display: none; }
 .kc-shelves-prev { left: max(0px, calc((100% - 1040px) / 2)); justify-items: start; padding-left: 14px; background: linear-gradient(90deg, rgba(242, 244, 242, 1) 45%, rgba(242, 244, 242, 0)); }
@@ -47,6 +47,12 @@ body.kc { background: var(--paper); }
 .kc-shelves-btn:hover svg { border-color: rgba(3, 87, 4, .45); }
 .kc-shelves-prev:hover svg { transform: translateX(-1px); }
 .kc-shelves-next:hover svg { transform: translateX(1px); }
+@media (pointer: coarse) {
+  .kc-shelves-btn { width: 52px; }
+  .kc-shelves-prev { padding-left: 8px; }
+  .kc-shelves-next { padding-right: 8px; }
+  .kc-shelves-btn svg { width: 16px; height: 16px; padding: 4px; }
+}
 @media (prefers-reduced-motion: reduce) { .kc-shelves-btn svg { transition: none; } .kc-shelves-prev:hover svg, .kc-shelves-next:hover svg { transform: none; } }
 
 /* ---- Featured row and the two groups ---- */

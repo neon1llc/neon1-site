@@ -1,14 +1,14 @@
 // src/app/public/js/knowledge-shelves.js - Left and right buttons for the Knowledge Center's shelf bar. The bar
-// scrolls sideways, and a mouse user may not know that Shift plus the wheel moves it, so a button sits at each
-// end for a mouse or trackpad, and shows only on the side that has more to scroll to. One click moves the bar by
-// nearly a full view, keeping the last two shelf buttons in view so the reader never loses their place. A touch
-// screen swipes instead, so the buttons stay hidden there. Keyboard users have the links themselves: focusing one
-// scrolls it into view, so the buttons are left out of the Tab order and the reading order.
+// scrolls sideways, and a reader may not know it does: a mouse user may not know Shift plus the wheel moves it, and
+// on a phone the only sign is a label cut off at the edge. So a button sits at each end, shown only on the side that
+// has more to scroll to, with the shelf buttons fading out beneath it. One tap or click moves the bar by nearly a
+// full view, keeping the last two shelf buttons in view so the reader never loses their place. On a touch screen
+// the buttons are smaller and the bar still swipes. Keyboard users have the links themselves: focusing one scrolls
+// it into view, so the buttons are left out of the Tab order and the reading order.
 
 const nav = document.querySelector(".kc-shelves");
 const track = nav && nav.querySelector("ul");
-// Only where there is a pointer that hovers; the bar still works without these buttons
-if (track && matchMedia("(hover: hover) and (pointer: fine)").matches) {
+if (track) {
   const reduce = matchMedia("(prefers-reduced-motion: reduce)");
   const arrow = (side) => {
     const b = document.createElement("button");
