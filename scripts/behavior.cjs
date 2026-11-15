@@ -90,7 +90,7 @@ const sceneFrames = (page) => page.evaluate(() => [...window.__frames.values()].
 const MARK = "SYNTHETIC-CONTACT-7f3a";
 const fillForm = async (page, email = "dana@example.com") => {
   if (!(await page.locator("#cfold").evaluate((d) => d.open))) await page.locator("#cfold > summary").click();
-  await page.locator('label.pick:has(input[value="business"])').click();
+  await page.locator('label.pick:has(input[value="workflows"])').click();
   await page.locator('label.pick:has(input[value="security"])').click();
   await page.locator("[name=other]").fill("Printer setup");
   await page.locator("[name=today]").type(MARK);
@@ -119,7 +119,7 @@ check("browser", "contact: the fold opens with its arrow turned down, and a send
     await page.locator('#cform [type="submit"]').click();
     await page.waitForSelector("#cdone:not([hidden])");
     const b = sent && sent.body;
-    expect(sent && sent.header === "1" && b.topics.join() === "business,security" && b.other === "Printer setup" && b.today.includes(MARK) && !b.website, "unexpected request", sent);
+    expect(sent && sent.header === "1" && b.topics.join() === "workflows,security" && b.other === "Printer setup" && b.today.includes(MARK) && !b.website, "unexpected request", sent);
     expect((await page.locator("#cdoneTo").textContent()) === "dana@example.com", "the confirmation names the wrong address");
     expect(!page.url().includes(MARK), "the message reached the URL");
     const stored = await page.evaluate(() => JSON.stringify({ ...localStorage }) + JSON.stringify({ ...sessionStorage }));
