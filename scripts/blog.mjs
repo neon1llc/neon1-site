@@ -155,31 +155,42 @@ ${list}
   })
 }
 
-// Share: plain links to each service's own share page, so no outside script ever runs on neon1.tech (the CSP
-// allows none) and nothing tracks the reader. Copy link and the device's own share sheet are buttons that
-// js/blog-share.js reveals only where the browser supports them
-const SHARES = [
-  ["LinkedIn", (u) => `https://www.linkedin.com/sharing/share-offsite/?url=${u}`],
-  ["X", (u, t) => `https://x.com/intent/post?text=${t}&url=${u}`],
-  ["Facebook", (u) => `https://www.facebook.com/sharer/sharer.php?u=${u}`],
-  ["Bluesky", (u, t) => `https://bsky.app/intent/compose?text=${t}%20${u}`],
-  ["Threads", (u, t) => `https://www.threads.com/intent/post?text=${t}%20${u}`],
-  ["Reddit", (u, t) => `https://www.reddit.com/submit?url=${u}&title=${t}`],
-  ["WhatsApp", (u, t) => `https://wa.me/?text=${t}%20${u}`],
+// Share: one short row, after the evidence that share rows are rarely used and that long ones are used least
+// (GOV.UK and Moovweb measured about 2 clicks in 1,000; Big Medium found more than three buttons lowered use).
+// Most people share by copying the address, or through the phone's own share sheet, so the row leads with
+// that: Share (the device's sheet, where there is one) or Copy link (elsewhere), then LinkedIn, then Email.
+// Readers who came from a social network are many times likelier to share back to it, so js/blog-share.js
+// reveals that network's link too. Every service link is a plain link to the service's own share page:
+// no outside script runs on neon1.tech (the CSP allows none) and nothing tracks the reader
+const NETWORKS = [
+  // [name, the referring hosts that reveal it, share address]
+  ["X", "x.com t.co twitter.com", (u, t) => `https://x.com/intent/post?text=${t}&url=${u}`],
+  ["Facebook", "facebook.com", (u) => `https://www.facebook.com/sharer/sharer.php?u=${u}`],
+  ["Bluesky", "bsky.app", (u, t) => `https://bsky.app/intent/compose?text=${t}%20${u}`],
+  ["Threads", "threads.net threads.com", (u, t) => `https://www.threads.com/intent/post?text=${t}%20${u}`],
+  ["Reddit", "reddit.com", (u, t) => `https://www.reddit.com/submit?url=${u}&title=${t}`],
 ]
+const LINKEDIN = (u) => `https://www.linkedin.com/sharing/share-offsite/?url=${u}`
+// Line icons drawn like the Knowledge Center's actions (css/knowledge.css .kc-share svg)
+const ICON_SHARE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>'
+const ICON_LINK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>'
+const ICON_MAIL = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>'
+// An outbound service link: the arrow after its name, as in the text (css/frame.css a.ext)
+const out = (name, href) => `<a class="ext" href="${esc(href)}" target="_blank" rel="noopener"><span class="ext-end">${name}</span><span class="kc-sr"> (opens in a new tab)</span></a>`
 function shareOf(p) {
   const url = `${SITE}${p.url}`
   const [u, t] = [encodeURIComponent(url), encodeURIComponent(p.title)]
   const mail = `mailto:?subject=${t}&body=${encodeURIComponent(`${p.summary}\n\n${url}`)}`
-  const links = SHARES.map(([name, href]) => `          <li><a href="${esc(href(u, t))}" target="_blank" rel="noopener">${name}</a></li>`)
+  const from = NETWORKS.map(([name, hosts, href]) => `          <li hidden data-from="${hosts}">${out(name, href(u, t))}</li>`)
   return `
       <aside class="kc-share" aria-labelledby="kc-share-h" data-url="${esc(url)}" data-title="${esc(p.title)}" data-text="${esc(p.summary)}">
-        <h2 id="kc-share-h">Share this post</h2>
+        <h2 id="kc-share-h">Share</h2>
         <ul>
-          <li hidden><button type="button" class="kc-share-copy">Copy link</button></li>
-          <li hidden><button type="button" class="kc-share-native">Share&hellip;</button></li>
-${links.join("\n")}
-          <li><a href="${esc(mail)}">Email</a></li>
+          <li hidden><button type="button" class="kc-share-native">${ICON_SHARE}Share</button></li>
+          <li hidden><button type="button" class="kc-share-copy">${ICON_LINK}<span>Copy link</span></button></li>
+${from.join("\n")}
+          <li>${out("LinkedIn", LINKEDIN(u))}</li>
+          <li><a href="${esc(mail)}">${ICON_MAIL}Email</a></li>
         </ul>
         <p class="kc-share-status" role="status"></p>
       </aside>`
