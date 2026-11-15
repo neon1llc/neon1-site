@@ -40,6 +40,8 @@ if (fold && form) {
       name: f.name.value,
       email: f.email.value,
       company: f.company.value,
+      // How they found neon1, sent only when picked
+      ...(f.found.value ? { found: f.found.value } : {}),
       website: f.website.value,
     };
   }
