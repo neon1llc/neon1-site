@@ -5,6 +5,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 ## v0.72.1
 
 - Public code shows neon1-corpus v0.44.0, neon1-aws-infrastructure v0.8.1, neon1-chat v0.2.2, deploy-ops v0.14.2, refmark v0.1.4, aws-clip v0.1.3, ready-secure-go v0.1.3, and the five education repos at their newest tags.
+- While 1NEON's sign-up is open, the home page's start line and the contact view invite visitors to start a free 1NEON account, write down what their project needs, and hear back from me. A small script asks 1NEON whether sign-up is open; while it's closed, or without the script, the invitation stays hidden.
 
 ## v0.72.0
 
