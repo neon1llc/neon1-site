@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## Unreleased
+
+- The home page's start line and the contact view invite visitors to start in 1NEON: a free account where they add their projects' needs and files, which I look over and reply to.
+
 ## v0.71.1
 
 - Public code shows neon1-corpus v0.42.1.
