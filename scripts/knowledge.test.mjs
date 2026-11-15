@@ -8,7 +8,7 @@ import { tmpdir } from "node:os"
 import { spawnSync } from "node:child_process"
 import { fileURLToPath } from "node:url"
 import { TASK_PATHS, singleH1, classifyLinks, catalogFacts, keepFields, fillNote, FILL_NOTE, load } from "./knowledge-lib.mjs"
-import { prepare, search, stem } from "../src/app/public/js/knowledge-search-core.js"
+import { prepare, search, stem, SYNONYMS, normalize } from "../src/app/public/js/knowledge-search-core.js"
 
 const here = dirname(fileURLToPath(import.meta.url))
 const SHELVES = { guides: { label: "Guides", description: "How-tos.", group: "resources" }, faq: { label: "Questions", description: "Answers.", group: "resources" } }
@@ -168,6 +168,25 @@ test("ranking is BM25: deterministic, a 0 to 1 similarity, titles over repeats, 
   // "backups" and "pricing"-style endings reduce to a root that also finds the shorter form
   assert.equal(stem("pricing"), "pric"); assert.equal(stem("business"), "business"); assert.equal(stem("backups"), "backup"); assert.equal(stem("use"), "use")
   assert.deepEqual(search(prepared, "backups").results.map((x) => x.url), r.map((x) => x.url))
+})
+
+test("synonym groups are normalized, and no word sits in two groups", () => {
+  const seen = new Map()
+  for (const [g, group] of SYNONYMS.entries()) {
+    for (const v of group) {
+      assert.equal(v, normalize(v), `"${v}" is not written the way normalize() leaves it`)
+      assert.ok(!seen.has(v) || seen.get(v) === g, `"${v}" is in two groups`)
+      seen.set(v, g)
+    }
+  }
+})
+
+test("a reader's plain words find the documents that use the formal ones", () => {
+  const f = fixture()
+  build(f)
+  const prepared = prepare(JSON.parse(read(f, "knowledge/search-index.json")))
+  // "restore" and "recovery" are backup words now: both find the backups guide
+  for (const q of ["restore", "recovery"]) assert.ok(search(prepared, q).results.some((r) => r.title === "Backups you can trust"), `${q} should find the backups guide`)
 })
 
 // The same queries against the real export of CORPUS_TAG, when a checkout has built one (make knowledge-export)

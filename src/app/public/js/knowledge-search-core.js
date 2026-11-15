@@ -10,8 +10,32 @@ export const SYNONYMS = [
   ["wifi", "wi fi", "wireless"],
   ["phishing", "phish"],
   ["ransomware"],
-  ["backup", "backups", "back up", "back ups"],
   ["invoice", "invoices", "billing"],
+  // Added 2026-11-15 from how the documents are worded (and how a reader would ask). Each variant is written the
+  // way normalize() leaves text and is matched from a word start, so keep them specific: "fee" would also find
+  // "feedback", and "phi" would find "phishing". A word may sit in only one group (a test checks)
+  ["cost", "costs", "price", "prices", "pricing", "how much", "expensive", "affordable"],
+  ["proposal", "proposals", "quote", "quotes", "estimate", "estimates", "statement of work"],
+  ["backup", "backups", "back up", "back ups", "restore", "restores", "recover", "recovery"],
+  ["hipaa", "baa", "business associate", "health information"],
+  ["consultation", "book a call", "first call", "discovery call", "fit call", "free call"],
+  ["privacy", "personal information", "personal data", "data policy"],
+  ["cookie", "cookies", "tracker", "trackers", "tracking"],
+  ["accessibility", "accessible", "wcag", "a11y", "screen reader"],
+  ["incident", "incidents", "outage", "outages", "downtime", "breach"],
+  ["handover", "hand over", "handoff", "hand off"],
+  ["contract", "contracts", "agreement", "agreements"],
+  ["network", "networks", "networking", "router", "routers"],
+  ["aws", "amazon web services", "cloud"],
+  ["1neon", "client portal", "portal"],
+  ["vulnerability", "vulnerabilities", "security disclosure", "security issue", "report a problem"],
+  ["training", "seminar", "seminars", "workshop", "workshops", "awareness session"],
+  ["household", "family", "families"],
+  ["open source", "foss"],
+  ["pdf", "download", "printable"],
+  ["hours", "availability", "available"],
+  ["remote", "on site", "onsite", "in person"],
+  ["soc 2", "soc2"],
 ]
 
 // Words too common to narrow anything, unless the query holds nothing else (see parseQuery)
