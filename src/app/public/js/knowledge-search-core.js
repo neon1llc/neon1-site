@@ -14,7 +14,7 @@ export const SYNONYMS = [
   ["invoice", "invoices", "billing"],
 ]
 
-// Words too common to narrow anything
+// Words too common to narrow anything, unless the query holds nothing else (see parseQuery)
 const STOP = new Set(["a", "an", "the", "and", "or", "of", "to", "for", "in", "on", "is", "it", "my", "i", "do", "how", "what", "with"])
 
 // Where a match counts most: the title, then a heading, then the summary, then the body
@@ -39,7 +39,11 @@ export function parseQuery(query) {
       rest = rest.replace(` ${hit} `, " ")
     }
   }
-  for (const w of rest.split(" ").filter((w) => w && !STOP.has(w))) clauses.push({ phrases: [w], label: w })
+  const words = rest.split(" ").filter(Boolean)
+  for (const w of words.filter((w) => !STOP.has(w))) clauses.push({ phrases: [w], label: w })
+  // A query made only of common words ("how", "what is") would otherwise match nothing, though titles such as
+  // "How neon1 works" start with exactly those. Then the common words are the query
+  if (!clauses.length) for (const w of words) clauses.push({ phrases: [w], label: w })
   return clauses
 }
 
