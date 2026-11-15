@@ -6,6 +6,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 ## Unreleased
 
 - Cut text that describes the site or its documents instead of helping the reader: post cadence, document and PDF counts, and notes on how a page is kept.
+- Free-account copy: write down your needs, then ask for an assessment or a call from your account. Reminders the portal sends are no longer worded as mine.
 
 ## v0.73.1
 
