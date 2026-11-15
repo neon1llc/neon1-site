@@ -77,6 +77,8 @@
   padding: 0 max(24px, env(safe-area-inset-right)) 0 max(24px, env(safe-area-inset-left)); }
 .n1-logo { display: inline-flex; align-items: center; gap: 10px; padding: 7px 12px; border-radius: var(--glass-r); color: var(--neon);
   text-decoration: none; font: 700 13px var(--mono); letter-spacing: .06em; text-shadow: 0 0 8px rgba(108, 255, 168, .45); }
+/* The logo's padding is its hover pill, so the pill hangs outside the page padding and the mark itself sits on the content's left line, as the menu button and 1NEON sit on the right one */
+.n1-logo { margin-left: -12px; }
 .n1-logo svg { width: 26px; height: 26px; }
 
 /* Rain controls: three glass chips in the bottom-right corner. The row is as tall as Neo's 48px

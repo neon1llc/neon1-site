@@ -214,6 +214,8 @@ footer { position: relative; z-index: 2; border-top: 1px solid var(--line); back
 .legal a { color: inherit; text-decoration: none; } .legal a:hover { color: var(--glow); }
 .legal .policies { display: flex; gap: 8px; flex-wrap: wrap; align-items: baseline; }
 .legal .sep { opacity: .6; }
+/* The legal line mixes links and plain text ("no ads or trackers"), so its internal links are underlined, thinly and in the line's own gray, to tell them apart; internal links never carry an arrow */
+.legal a:not(.ext) { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: currentColor; }
 /* The copyright line ends with the company's public state record: an internal link, so it carries no arrow */
 .legal .owner { display: inline-flex; gap: 8px; flex-wrap: wrap; align-items: baseline; }
 
