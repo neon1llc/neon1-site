@@ -11,6 +11,9 @@ node_modules/
 # neon1-corpus checkout and export, from make corpus
 .corpus/
 
+# Each repository's changelog for the releases page, from make releases-export
+.releases/
+
 # The Knowledge Center and blog, built from the newest neon1-corpus release by make content (PDFs included,
 # printed in the deploy job by make knowledge-pdf). Never committed, so the repository can't drift from a release
 src/app/public/knowledge/

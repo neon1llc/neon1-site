@@ -2,6 +2,12 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## Unreleased
+
+- The Knowledge Center has a releases page (/knowledge/releases/): each product's current version, then the newest 40 releases across neon1.tech, 1NEON, Neo, the Knowledge Center documents, the AWS infrastructure, and the public tools and guides, newest first. It's written at each deploy from every repository's changelog at its newest release tag (scripts/releases.sh, scripts/releases-lib.mjs), so nobody writes it by hand. The Knowledge Center's Start here line links to it.
+- The 15-minute watch also deploys when any public repository makes a new release, so the releases page keeps up; /knowledge/releases.json names the tags it was written from.
+- After a verified deploy, the pipeline publishes the version's changelog entry as its GitHub release.
+
 ## v0.72.1
 
 - Public code shows neon1-corpus v0.44.0, neon1-aws-infrastructure v0.8.1, neon1-chat v0.2.2, deploy-ops v0.14.2, refmark v0.1.4, aws-clip v0.1.3, ready-secure-go v0.1.3, and the five education repos at their newest tags.
