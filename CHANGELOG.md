@@ -4,7 +4,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## v0.73.0
 
-- Public code shows neon1-corpus v0.45.0, neon1-aws-infrastructure v0.10.0, neon1-1NEON v0.14.0, neon1-chat v0.2.3, deploy-ops v0.14.3, aws-clip v0.1.4, refmark v0.1.5, and ready-secure-go v0.1.4.
+- Public code shows neon1-corpus v0.45.1, neon1-aws-infrastructure v0.10.0, neon1-1NEON v0.14.0, neon1-chat v0.2.3, deploy-ops v0.14.3, aws-clip v0.1.4, refmark v0.1.5, and ready-secure-go v0.1.4.
 - The contact view's free-account invitation links the Knowledge Center's "Free 1NEON accounts" guide.
 - Cut wording that repeats a table, list, or linked page.
 - The Knowledge Center has a releases page (/knowledge/releases/): each product's current version, then the newest 40 releases across neon1.tech, 1NEON, Neo, the Knowledge Center documents, the AWS infrastructure, and the public tools and guides, newest first. It's written at each deploy from every repository's changelog at its newest release tag (scripts/releases.sh, scripts/releases-lib.mjs), so nobody writes it by hand. The Knowledge Center's Start here line links to it.
