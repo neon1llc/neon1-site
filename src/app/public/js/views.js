@@ -313,7 +313,11 @@
   // itself first, and only past its bottom edge does the pull to the next view begin. Closing the last
   // open fold glides the view back to centered. Input waits while a fold moves (folding)
   let folding = 0;
-  const FOLD_TIME = 0.42;
+  // A fold's length and curve come from the shared motion tokens (--t-open, --ease-open in shared/neon1.css), so the
+  // arrow's turn, which the stylesheet times, ends on the same frame as the fold
+  const token = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const FOLD_TIME = parseFloat(token("--t-open")) || 0.6;
+  const foldEase = (token("--ease-open").match(/[\d.]+/g) || [0.25, 0.8, 0.25, 1]).map(Number);
   const TOP_GAP = 28; // the view's spacing above its heading once it sits at the top
   const viewOf = (d) => d.closest(".view");
   const centeredPad = (v) => {
@@ -337,15 +341,15 @@
       d.open = true;
       const h1 = d.getBoundingClientRect().height;
       d.style.height = `${h0}px`;
-      const runs = [animate(d, { height: [`${h0}px`, `${h1}px`] }, { duration: FOLD_TIME, ease: settleEase })];
+      const runs = [animate(d, { height: [`${h0}px`, `${h1}px`] }, { duration: FOLD_TIME, ease: foldEase })];
       // The first fold opened in a centered view: the view glides to its top while the fold opens
       if (v && v.dataset.pinned && !v.dataset.top) {
         v.dataset.top = "1";
         const from = parseFloat(v.style.paddingTop) || 0;
-        runs.push(animate(v, { paddingTop: [`${from}px`, `${TOP_GAP}px`] }, { duration: FOLD_TIME, ease: settleEase }));
+        runs.push(animate(v, { paddingTop: [`${from}px`, `${TOP_GAP}px`] }, { duration: FOLD_TIME, ease: foldEase }));
         // The page lines up with the view's top in the same move, if it wasn't already there
         const top = range(i)[0];
-        if (Math.abs(scrollY - top) > 2) runs.push(animate(scrollY, top, { duration: FOLD_TIME, ease: settleEase, onUpdate: (p) => scrollTo(0, p) }));
+        if (Math.abs(scrollY - top) > 2) runs.push(animate(scrollY, top, { duration: FOLD_TIME, ease: foldEase, onUpdate: (p) => scrollTo(0, p) }));
       }
       Promise.all(runs.map((r) => r.finished ?? r)).then(() => {
         d.style.height = d.style.overflow = "";
@@ -355,19 +359,21 @@
         done();
       }, done);
     } else {
+      d.classList.add("closing"); // the arrow turns back now, not when the fold has finished shrinking
       const h1 = s.getBoundingClientRect().height + (parseFloat(getComputedStyle(d).paddingTop) || 0) + (parseFloat(getComputedStyle(d).paddingBottom) || 0);
       const last = v && v.querySelectorAll("details[open]").length === 1;
-      const runs = [animate(d, { height: [`${h0}px`, `${h1}px`] }, { duration: FOLD_TIME * 0.85, ease: settleEase })];
+      const runs = [animate(d, { height: [`${h0}px`, `${h1}px`] }, { duration: FOLD_TIME * 0.85, ease: foldEase })];
       Promise.all(runs.map((r) => r.finished ?? r)).then(() => {
         d.open = false;
+        d.classList.remove("closing");
         d.style.height = d.style.overflow = "";
         if (last && v.dataset.top) {
           // Back to centered: the page returns to the view's top while the content glides down to center
           delete v.dataset.top;
           const to = centeredPad(v), from = parseFloat(v.style.paddingTop) || 0;
-          const moves = [animate(v, { paddingTop: [`${from}px`, `${to}px`] }, { duration: FOLD_TIME, ease: settleEase })];
+          const moves = [animate(v, { paddingTop: [`${from}px`, `${to}px`] }, { duration: FOLD_TIME, ease: foldEase })];
           const top = range(i)[0];
-          if (Math.abs(scrollY - top) > 2) moves.push(animate(scrollY, top, { duration: FOLD_TIME, ease: settleEase, onUpdate: (p) => scrollTo(0, p) }));
+          if (Math.abs(scrollY - top) > 2) moves.push(animate(scrollY, top, { duration: FOLD_TIME, ease: foldEase, onUpdate: (p) => scrollTo(0, p) }));
           Promise.all(moves.map((r) => r.finished ?? r)).then(() => { unpin(v); done(); }, done);
         } else done();
       }, done);
