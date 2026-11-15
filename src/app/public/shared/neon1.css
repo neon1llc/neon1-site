@@ -34,14 +34,16 @@
 /* A glass pane holding a few lines: room inside it about one and a half times the gap between them */
 .glass-pane { padding: 28px 36px; }
 
-/* The neon1 wordmark, one standard for every page. "neon" is set larger so its letters match the height of the "1",
-   and lighter so its strokes match the "1" stroke. The values are per face, measured as the ratio of the digit's height
-   to the lowercase letters' height and of their stem widths: JetBrains Mono (the logo, eyebrows) 0.73 / 0.56 = 1.3x at 450,
-   Figtree (headings) 0.70 / 0.515 = 1.36x at 520. Font size, color, glow, and background come from the surrounding element. */
-.wm { --wm-ne: 1.3em; --wm-ne-w: 450; text-transform: none; }
-.wm-sans { --wm-ne: 1.36em; --wm-ne-w: 520; }
+/* The neon1 wordmark, one standard for every page. Set apart (the logo, eyebrows), "neon" is larger so its letters match
+   the height of the "1", and lighter so its strokes match the "1" stroke: JetBrains Mono, 1.3x at 450 (digit 0.73 over
+   lowercase 0.56). Set inline in a sentence or heading (.wm-sans, Figtree), the surrounding text decides: "neon" takes its
+   size and weight, and the "1" is drawn smaller so its height equals the letters' (0.515 / 0.70 = .736em) and heavier to
+   keep its stroke equal to theirs (880 against 700, from stem widths). Size, color, glow, and background come from the
+   surrounding element. */
+.wm { --wm-ne: 1.3em; --wm-ne-w: 450; --wm-one: 1em; --wm-one-w: 700; text-transform: none; }
+.wm-sans { --wm-ne: 1em; --wm-ne-w: 700; --wm-one: .736em; --wm-one-w: 880; }
 .ne { font-size: var(--wm-ne, 1.3em); font-weight: var(--wm-ne-w, 450); }
-.one { font-size: 1em; font-weight: 700; }
+.one { font-size: var(--wm-one, 1em); font-weight: var(--wm-one-w, 700); }
 
 /* The top bar and the neon1 logo in it, placed the same on every neon1 page */
 .n1-bar { position: fixed; left: 0; right: 0; top: 0; height: 64px; z-index: 8; }
