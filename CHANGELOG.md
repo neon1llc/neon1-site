@@ -2,7 +2,7 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
-## Unreleased
+## v0.72.0
 
 - Case cards: a neon1 or subcontracted engagement shows just its label and year, such as "neon1 subcontracted engagement, 2026", with no role text and no partner name. The intro line over the cards says "each labeled by kind". The new label wording comes with the next corpus release.
 - Knowledge Center shelf bar: the group titles ("For you", "About neon1") are centered vertically with the shelf buttons and the arrow boxes; they sat a few pixels high.
@@ -14,19 +14,11 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - Links follow one rule everywhere: a link within neon1 has no arrow, and a link that leaves neon1 has the northeast arrow that nudges out on hover. The footer's "state registration" loses its right arrow, and "book a call", "linkedin", "github", and "pradeep on linkedin" in the footer, plus "book a call" in the phone menu, gain the outbound arrow while keeping those places' own colors. Links in running text already followed the rule, and a long Sources list keeps its arrows, since each one says where it goes.
 - Knowledge Center: the line under the title no longer states how many documents there are or how many have a PDF.
 - Knowledge Center search: a search made only of common words, like "how" or "what is", now finds documents instead of nothing, with titles that begin with the word first ("How a project runs", "How I price my work"). Common words are still ignored next to other words, so "how backups" searches for backups. Titles already counted for the most; they just never got the chance when every word was dropped.
-
-## Unreleased
-
 - Knowledge Center search ranks with BM25 in place of hand-set points. A word counts for more the rarer it is across the documents, repeats stop adding after a few, a long page no longer beats a short one just by being long, and a word in a title counts as much as twenty in the body. Words are cut back to a root, so "pricing" finds "price" and "How I price my work". Each result shows a match from 0 to 100% beside where it was found. It is the same arithmetic every time, in the browser, with no model and nothing sent anywhere.
-
-## Unreleased
-
 - Knowledge Center search knows more words that mean the same thing, chosen from how the documents are worded: cost, price, and "how much"; proposal, quote, and estimate; backup, restore, and recovery; HIPAA and BAA; consultation and "first call"; privacy, cookies, accessibility, incidents and outages, handover, contracts, networks, cloud, the portal, training, and a few more. A test keeps the list tidy, with each word in one group and written the way the search reads text.
-
-## Unreleased
-
 - Knowledge Center: the shelf bar under the title has a box at each end, as tall as the bar, with the site's own chevron and the same thin line the bar draws between its groups. Shelf buttons passing under a box end at its line. Each box shows only on a side that has more to scroll to, so no one needs to know that Shift and the wheel scroll the bar sideways, or that a label cut off at a phone's edge means there is more. One click or tap moves the bar by nearly a full view and keeps the last two shelf buttons in view so the reader keeps their place. The boxes are a little narrower on a touch screen, where the bar still swipes. Reduced motion jumps instead of gliding. A keyboard uses the shelf links themselves, which scroll into view when focused.
 - Dev: two runs that finish together, like a push to dev and its branch preview, no longer make one fail after uploading. Each retries its one key write against the store's fresh state, and a run that cleans up old releases keeps any folder changed in the last 15 minutes. Dev's fonts and media revalidate every time, as its pages do.
+- Shorter, plainer wording in the README, docs, and home page.
 
 ## v0.71.1
 
