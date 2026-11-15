@@ -10,6 +10,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - Footer: "state registration" loses its right arrow. Links within neon1 carry no arrow; only links that leave neon1 carry the northeast one.
 - Links follow one rule everywhere: a link within neon1 has no arrow, and a link that leaves neon1 has the northeast arrow that nudges out on hover. The footer's "state registration" loses its right arrow, and "book a call", "linkedin", "github", and "pradeep on linkedin" in the footer, plus "book a call" in the phone menu, gain the outbound arrow while keeping those places' own colors. Links in running text already followed the rule, and a long Sources list keeps its arrows, since each one says where it goes.
 - Knowledge Center: the line under the title no longer states how many documents there are or how many have a PDF.
+- Knowledge Center search: a search made only of common words, like "how" or "what is", now finds documents instead of nothing, with titles that begin with the word first ("How a project runs", "How I price my work"). Common words are still ignored next to other words, so "how backups" searches for backups. Titles already counted for the most; they just never got the chance when every word was dropped.
 
 ## v0.71.1
 
