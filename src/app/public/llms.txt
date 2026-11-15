@@ -33,6 +33,7 @@ neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site
 - [Before you buy a new tool](https://neon1.tech/knowledge/guides/before-you-buy/): Ten questions to ask before adding software to your business, so it fits, lasts, and lets you leave.
 - [Do you need a business associate agreement?](https://neon1.tech/knowledge/guides/do-you-need-a-baa/): A plain guide for health practices on when a vendor needs a BAA, and what to check before signing one.
 - [Getting ready for a first call](https://neon1.tech/knowledge/guides/first-call/): What to bring to a free 15-minute call with neon1.
+- [Free 1NEON accounts](https://neon1.tech/knowledge/guides/free-accounts/): Start without a call: make a free 1NEON account, write down what your project needs, and I'll reply with what I'd do.
 - [A password manager for your family](https://neon1.tech/knowledge/guides/password-manager-for-family/): How to move a household onto a password manager, step by step, without locking anyone out.
 - [Use case: a cloud account you can trust](https://neon1.tech/knowledge/guides/use-case-cloud/): How a typical cloud engineering engagement goes for a small technical team: inventory, infrastructure as code, deploys, and tested recovery.
 - [Use case: security awareness for a team or family](https://neon1.tech/knowledge/guides/use-case-security-awareness/): How a typical plain-language security session goes, and what people leave able to do.
@@ -107,4 +108,5 @@ neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site
 
 ## Blog
 
+- [Why I started neon1, and a free way to start with me](https://neon1.tech/blog/why-neon1/): Why neon1 exists, how I work, and the free 1NEON account that lets you start whenever you have the time. (2026-11-15)
 - [Tax preparers are financial institutions, as far as the FTC is concerned](https://neon1.tech/blog/tax-preparers-are-financial-institutions/): What the FTC Safeguards Rule asks of a small tax or accounting office, and what to get done before tax season. (2026-11-12)
