@@ -143,6 +143,10 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 @media (hover: hover) {
   .theme-sw:hover, .n1-bar.light .menu-btn:hover, .n1-bar.light .links .portal:hover { border-color: var(--brand); }
 }
+/* A tap: no grey box from the phone's own tap highlight, which ignores the controls' shape and colors. Instead the
+   control takes a light wash of the theme's green while pressed, the same on all three */
+.n1-bar a, .n1-bar button { -webkit-tap-highlight-color: transparent; }
+.theme-sw:active, .n1-bar.light .menu-btn:active, .n1-bar.light .links .portal:active { background: rgb(var(--brand-rgb) / .1); }
 @media (max-width: 1040px) { .links { display: none; } .menu-btn { display: inline-block; margin-left: 10px; } .theme-sw { margin-left: auto; } }
 /* The overlay always scrolls below the bar and its close button. The list's auto margins center it when
  * it fits and let it start at the top when it doesn't, so no height breakpoint decides (1024x600, zoom).
