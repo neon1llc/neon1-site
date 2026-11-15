@@ -458,7 +458,7 @@
   });
 
   // In-page links settle at the top of their view, closing the menu first. A link with data-view
-  // (the logo, a real link to neon1.tech) springs to that view instead of reloading
+  // (the logo, and the top bar's Contact, real links to neon1.tech) springs to that view instead of reloading
   document.addEventListener("click", (e) => {
     if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return; // case links route above
     const a = e.target.closest('a[href^="#"], a[data-view]');
@@ -470,7 +470,9 @@
     if (i < 0) return;
     e.preventDefault();
     if (!menu.hidden) document.getElementById("menuBtn").click();
-    history.replaceState(null, "", a.dataset.view ? "/" : a.getAttribute("href"));
+    // Every section link puts its #section in the address, so the view can be shared; only the logo goes home to "/".
+    // The top bar's Contact link points at /#contact so it also works from other pages, which is why it carries data-view
+    history.replaceState(null, "", a.dataset.view === "top" ? "/" : "#" + id);
     goTo(i, { link: true });
     // Keyboard focus follows the view, so the next Tab continues inside it (AS-02); the logo keeps its own
     if (!a.dataset.view) window.n1focus?.(id);
