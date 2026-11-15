@@ -5,7 +5,7 @@
   <!-- /1NEON/example is left out until it is pre-rendered with its own content; the canonical 1NEON help is /knowledge/faq/1neon-help/, listed below -->
   <!-- knowledge -->
   <url><loc>https://neon1.tech/knowledge/</loc><lastmod>2026-11-15</lastmod></url>
-  <url><loc>https://neon1.tech/knowledge/releases/</loc><lastmod>2026-11-15</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/company/releases/</loc><lastmod>2026-11-15</lastmod></url>
   <url><loc>https://neon1.tech/knowledge/company/about/</loc><lastmod>2026-11-15</lastmod></url>
   <url><loc>https://neon1.tech/knowledge/company/architecture/</loc><lastmod>2026-11-15</lastmod></url>
   <url><loc>https://neon1.tech/knowledge/company/capabilities/</loc><lastmod>2026-11-15</lastmod></url>
