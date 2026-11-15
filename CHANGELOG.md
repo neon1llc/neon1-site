@@ -12,6 +12,10 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - Knowledge Center: the line under the title no longer states how many documents there are or how many have a PDF.
 - Knowledge Center search: a search made only of common words, like "how" or "what is", now finds documents instead of nothing, with titles that begin with the word first ("How a project runs", "How I price my work"). Common words are still ignored next to other words, so "how backups" searches for backups. Titles already counted for the most; they just never got the chance when every word was dropped.
 
+## Unreleased
+
+- Knowledge Center search ranks with BM25 in place of hand-set points. A word counts for more the rarer it is across the documents, repeats stop adding after a few, a long page no longer beats a short one just by being long, and a word in a title counts as much as twenty in the body. Words are cut back to a root, so "pricing" finds "price" and "How I price my work". Each result shows a match from 0 to 100% beside where it was found. It is the same arithmetic every time, in the browser, with no model and nothing sent anywhere.
+
 ## v0.71.1
 
 - Public code shows neon1-corpus v0.42.1.
