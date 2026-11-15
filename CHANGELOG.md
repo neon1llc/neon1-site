@@ -6,6 +6,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 - The neon1 logo's mark now sits on the content's left line, as 1NEON and the menu button sit on the right one, on every page and the rain landing, desktop and phone. Its hover pill hangs outside the page padding instead of pushing the mark in.
 - The footer's privacy, browser storage, and terms links go to the site's own policy pages in the Knowledge Center in place of the 1NEON portal's copies, and the footer's legal line underlines its internal links (state registration, privacy, browser storage, terms) so they read as links beside its plain text. Internal links still carry no arrow.
+- The site starts light for everyone. Dark is only by choice: the switch picks it and remembers it. Before, a device set to dark opened the site dark.
 
 ## v0.74.0
 

@@ -4,20 +4,19 @@
 // A plain blocking script in <head>, before the stylesheets, so the first paint already has the right theme and a
 // dark page never flashes white. It sets html[data-site-theme] (not data-theme, which 1NEON uses for its own setting
 // and which the shared stylesheets must never confuse with this). A visitor's pick is kept in localStorage under
-// "neon1.theme"; until they pick, the device's color scheme decides, and a change to it is followed live.
+// "neon1.theme"; until they pick, the site is awake (light), whatever the device's own setting (Pradeep, 2026-11-15).
 
 (() => {
   const KEY = "neon1.theme";
   const root = document.documentElement;
-  const dark = matchMedia("(prefers-color-scheme: dark)");
   const still = matchMedia("(prefers-reduced-motion: reduce)");
 
-  // ---- The theme: the visitor's pick, else the device's ----
-  // Storage can be blocked (private windows, strict settings); then the device decides every time
+  // ---- The theme: the visitor's pick, else awake ----
+  // Storage can be blocked (private windows, strict settings); then each page starts awake
   const saved = () => {
     try { const v = localStorage.getItem(KEY); return v === "matrix" || v === "awake" ? v : null; } catch { return null; }
   };
-  const wanted = () => saved() || (dark.matches ? "matrix" : "awake");
+  const wanted = () => saved() || "awake";
 
   // ---- Applying it: the attribute the CSS keys on, the switch's state, the browser bar's color ----
   function apply(theme) {
@@ -61,8 +60,7 @@
   }
   if (document.readyState === "loading") addEventListener("DOMContentLoaded", wire); else wire();
 
-  // ---- Staying in step: the device's setting (until a pick), other tabs, and a page restored by Back ----
-  dark.addEventListener("change", () => { if (!saved()) { shift(); apply(wanted()); } });
+  // ---- Staying in step: other tabs, and a page restored by Back ----
   addEventListener("storage", (e) => { if (e.key === KEY) { shift(); apply(wanted()); } });
   addEventListener("pageshow", (e) => { if (e.persisted && root.dataset.siteTheme !== wanted()) apply(wanted()); });
 })();

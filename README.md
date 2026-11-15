@@ -40,7 +40,7 @@ Everything is static HTML written at build time, so search engines, link preview
 
 ## Light and dark
 
-Everything below the landing's rain comes in awake (light) or matrix (dark). `js/theme.js` runs in each page's head before the stylesheets, sets `html[data-site-theme]` from the visitor's pick (localStorage `neon1.theme`) or the device's color scheme, and wires the switch in the bar (the `frame:theme` block). Pages color the light surface with the tokens at the top of `css/frame.css` (`--page`, `--surface`, `--ink-rgb`, `--brand-rgb`, and the rest); the matrix block there redefines them, so a new rule that uses the tokens works in both themes. A fixed color on the light surface shows up wrong in matrix. The rain, the hero, and the white rabbit keep their own colors. 1NEON has its own theme setting (`data-theme`), which the site's attribute never touches.
+Everything below the landing's rain comes in awake (light) or matrix (dark). `js/theme.js` runs in each page's head before the stylesheets, sets `html[data-site-theme]` from the visitor's pick (localStorage `neon1.theme`), else awake, and wires the switch in the bar (the `frame:theme` block). Pages color the light surface with the tokens at the top of `css/frame.css` (`--page`, `--surface`, `--ink-rgb`, `--brand-rgb`, and the rest); the matrix block there redefines them, so a new rule that uses the tokens works in both themes. A fixed color on the light surface shows up wrong in matrix. The rain, the hero, and the white rabbit keep their own colors. 1NEON has its own theme setting (`data-theme`), which the site's attribute never touches.
 
 ## Content Security Policy
 
