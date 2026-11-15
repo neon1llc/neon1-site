@@ -8,6 +8,8 @@
   <title>neon1 · workflows and IT for small businesses</title>
   <meta name="description" content="I connect the orders, intake, and invoices an owner-run business types in more than once, in two to four weeks. Also cloud and AI engineering, office networks, and security training. Queens, NY, and remote." />
   <meta name="theme-color" content="#0D0208" />
+  <!-- Light or dark for everything below the rain, set before the first paint so nothing flashes -->
+  <script src="/js/theme.js"></script>
   <link rel="canonical" href="https://neon1.tech/" />
   <link rel="alternate" type="application/rss+xml" title="neon1 blog" href="/blog/feed.xml" />
   <!-- Link previews: the same title and description, with the brand card -->
@@ -117,6 +119,15 @@
           <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="5" aria-hidden="true"><circle cx="32" cy="32" r="28" /><circle cx="32" cy="32" r="19" /><circle cx="32" cy="32" r="10" /><circle cx="32" cy="32" r="2" /></svg>1NEON</a></li>
         <!-- /frame:actions -->
       </ul>
+      <!-- frame:theme -->
+      <!-- Light (awake) or dark (matrix): a switch with the sun on the left and the moon on the right, for every part
+           of the site but the landing's rain, where it stays hidden. js/theme.js sets it and keeps the choice -->
+      <button class="theme-sw" type="button" role="switch" aria-checked="false" aria-label="Dark theme" title="awake or matrix">
+        <svg class="theme-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" /><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6" /></svg>
+        <svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.6A8.2 8.2 0 0 1 9.4 4a8.2 8.2 0 1 0 10.6 10.6Z" /></svg>
+        <span class="theme-knob" aria-hidden="true"></span>
+      </button>
+      <!-- /frame:theme -->
       <!-- frame:menu-button -->
       <button class="chip menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="menu">menu</button>
       <!-- /frame:menu-button -->
