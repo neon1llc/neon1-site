@@ -106,7 +106,11 @@ h2 .pr { display: inline-block; width: .7ex; height: 1ex; margin-right: .3em; ve
 .say .idx { margin: 0 0 10px; font: 500 12px var(--mono); color: var(--glow); }
 .say .line { margin: 0; max-width: 900px; font: 500 clamp(17px, 1.8vw, 22px)/1.4 var(--sans); letter-spacing: -.015em; }
 .say .line strong { color: var(--ink); font-weight: 600; }
-.say .line span { color: #5a6b61; } /* 5.1:1 on the paper surface, enough at phone sizes */
+.say .line span { color: #5a6b61; font-weight: 400; } /* only the service name is bold; its description reads as separate, in regular weight */
+.say .line span a { font-weight: 500; }
+.say { padding: 16px 0 18px; }
+.say .line strong { display: block; margin-bottom: 4px; font-size: 1.08em; letter-spacing: -.02em; }
+.say .line span { display: block; max-width: 88ch; font-size: clamp(15px, 1.3vw, 17px); line-height: 1.5; letter-spacing: -.005em; } /* 5.1:1 on the paper surface, enough at phone sizes */
 .quote { margin-top: 32px; max-width: 680px; }
 
 /* Process: sticky title on the left, a timeline on the right */
