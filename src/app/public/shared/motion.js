@@ -52,7 +52,8 @@ export async function swap(out, inn) {
 
 // A dropdown's arrow needs to know which way the list will open. The browser picks the direction itself and doesn't say,
 // so the page decides: just before the list opens (a press on the select, or Space, Enter, or Alt+Down on it), it measures
-// the room below and above and sets data-dir to "down" or "up" on the select; the stylesheet opens the list that way and
+// the room below and above (in CSS pixels, so browser zoom and window size are already counted) and sets data-dir to
+// "down" or "up" on the select, and --picker-max to the room on that side; the stylesheet opens the list that way and
 // turns the arrow with it (down: counterclockwise a quarter turn; up: clockwise). `rows` and `rowPx` estimate the list's
 // height, `maxPx` is the cap the stylesheet puts on it. Selects whose browser draws its own list still open natively.
 export function watchDirection(select, { rowPx = 38, maxPx = 320, pad = 10 } = {}) {
@@ -60,7 +61,10 @@ export function watchDirection(select, { rowPx = 38, maxPx = 320, pad = 10 } = {
     const r = select.getBoundingClientRect();
     const need = Math.min(maxPx, select.options.length * rowPx + pad, innerHeight * 0.6);
     const below = innerHeight - r.bottom - 8, above = r.top - 8;
-    select.dataset.dir = below < need && above > below ? "up" : "down";
+    const up = below < need && above > below;
+    select.dataset.dir = up ? "up" : "down";
+    // The list may be no taller than the room on the side chosen, so it never has to flip itself and the arrow always agrees
+    select.style.setProperty("--picker-max", `${Math.max(120, Math.min(maxPx, up ? above : below))}px`);
   };
   select.addEventListener("pointerdown", decide);
   select.addEventListener("keydown", (e) => { if (e.key === " " || e.key === "Enter" || (e.altKey && e.key === "ArrowDown")) decide(); });

@@ -411,7 +411,7 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
   .cform select[data-dir="up"]::picker(select) { position-area: block-start span-inline-end; margin: 0 0 4px; }
   .cform select[data-dir="up"]:open::picker-icon { rotate: 90deg; }
   .cform select[data-dir="up"]:open::picker(select) { animation-name: n1-unroll-up; }
-  .cform select::picker(select) { max-height: min(320px, 60vh); }
+  .cform select::picker(select) { max-height: var(--picker-max, min(320px, 60vh)); position-try-fallbacks: none; }
   .cform select::picker(select) { border: 1px solid rgba(18,36,26,.2); border-radius: var(--glass-r); background: #fff; box-shadow: 0 12px 32px rgba(0,0,0,.16); padding: 4px; margin-top: 4px; }
   .cform select:open::picker(select) { animation: n1-unroll var(--t-base) var(--ease); }
   .cform select option { padding: 8px 12px; border-radius: 6px; }
