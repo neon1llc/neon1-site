@@ -34,9 +34,13 @@
 /* A glass pane holding a few lines: room inside it about one and a half times the gap between them */
 .glass-pane { padding: 28px 36px; }
 
-/* neon1 wordmark: "neon" is set 1.3x so its letters match the height of "1"
-   (x-height 0.56em vs digit 0.73em), at weight 450 so its strokes match the 700 "1" */
-.ne { font-size: 1.3em; font-weight: 450; }
+/* The neon1 wordmark, one standard for every page. "neon" is set larger so its letters match the height of the "1",
+   and lighter so its strokes match the "1" stroke. The values are per face, measured as the ratio of the digit's height
+   to the lowercase letters' height and of their stem widths: JetBrains Mono (the logo, eyebrows) 0.73 / 0.56 = 1.3x at 450,
+   Figtree (headings) 0.70 / 0.515 = 1.36x at 520. Font size, color, glow, and background come from the surrounding element. */
+.wm { --wm-ne: 1.3em; --wm-ne-w: 450; text-transform: none; }
+.wm-sans { --wm-ne: 1.36em; --wm-ne-w: 520; }
+.ne { font-size: var(--wm-ne, 1.3em); font-weight: var(--wm-ne-w, 450); }
 .one { font-size: 1em; font-weight: 700; }
 
 /* The top bar and the neon1 logo in it, placed the same on every neon1 page */

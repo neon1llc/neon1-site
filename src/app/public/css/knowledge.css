@@ -18,8 +18,6 @@ body.kc { background: var(--paper); }
   text-shadow: 0 0 8px rgba(108, 255, 168, .35); }
 /* "neon1" stays lowercase. The face's lowercase is 0.55 as tall as its digits (0.73), so "neon" is 1.33 times larger to stand as tall
    as the 1, and its weight drops so the larger strokes read as thick as the 1's */
-.kc-eyebrow .wm { text-transform: none; }
-.kc-eyebrow .wm-neon { font-size: 1.33em; font-weight: 440; }
 .kc-band h1 { margin: 0 0 16px; font: 700 clamp(30px, 4.4vw, 48px)/1.12 var(--sans); letter-spacing: -.01em; color: #e9ffee; max-width: 22ch; }
 .kc-lead { margin: 0; max-width: 62ch; font-size: 17px; color: #a9c9b0; }
 
