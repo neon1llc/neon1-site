@@ -43,8 +43,13 @@ def prepare(site_dir, dev_dir, corpus_tag):
     shutil.rmtree(target, ignore_errors=True)
     shutil.copytree(site_dir, target)
     # A release tag never changes, so its checkout is reused; a branch moves, so it's fetched again,
-    # and its drafts are shown too (a draft branch is how a post is read in place before it's adopted)
+    # and its drafts are shown too (a draft branch is how a post is read in place before it's adopted).
+    # A CORPUS_DIR already holding the branch's tree (the dev workflow's pinned branch with a release merged
+    # in) is used as it is, drafts shown, and not fetched over
     if corpus_tag and not re.fullmatch(r"v\d+\.\d+\.\d+", corpus_tag):
+        if os.environ.get("CORPUS_DIR"):
+            show_drafts(os.path.join(os.environ["CORPUS_DIR"], "tools", "export.mjs"))
+            return
         checkout = os.path.realpath(os.path.join(".corpus", corpus_tag))
         if not checkout.startswith(os.path.realpath(".corpus") + os.sep):
             sys.exit(f"dev-build: bad corpus ref {corpus_tag}")

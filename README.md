@@ -66,7 +66,7 @@ The scene's models and images are in `media/white-rabbit/`, with credits in `med
 dev.neon1.tech is a private copy of the site for looking at changes before they ship. Its hosting and sign-in are described under `site-dev/` in neon1-aws-infrastructure.
 
 - **Any branch but main** deploys on push, in about 30 seconds, as a preview at `dev.neon1.tech/__preview?b=<branch>`. `/__preview` alone goes back to the dev release.
-- **The `dev` branch** is the dev release. `dev-sync` merges main into it after every push to main and rebuilds it. Merge work branches into `dev` to see them together, but each one goes to main on its own.
+- **The `dev` branch** is the dev release. `dev-sync` runs inside every production deploy, including a corpus release picked up by the 15-minute watch: it merges main into `dev` and rebuilds it beside the deploy job, so a dev failure shows red on the deploy run. A `.dev-corpus-ref` pin that lacks the corpus release production uses gets that release merged in on the runner (never pushed); if that conflicts, the build fails and the pinned corpus branch needs the release merged by hand. Merge work branches into `dev` to see them together, but each one goes to main on its own.
 - **Corpus drafts:** run the dev workflow by hand with `corpus_ref` set to a neon1-corpus branch, and that branch's documents, drafts included, are built into dev.
 - **Never a release.** Dev runs only the quick checks (`make dev-check`) and is never tagged. Changelog entries wait under `## Unreleased` until the batch goes to main.
 

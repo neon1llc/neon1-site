@@ -4,6 +4,9 @@
 # the newest corpus release (corpus_ref: draft/<post>), drafts included, as its own preview. Only the
 # quick checks run here; the browser contracts and PDF printing run on the way to main (deploy.yml).
 # Dev deploys are never tagged, announced, or verified against neon1.tech.
+# dev-sync.yml calls this on every production deploy to rebuild the dev release (ref dev) from the new main.
+# A dev release pinned to a neon1-corpus branch first takes in the corpus release production uses, so dev's
+# words never fall behind production's.
 
 name: dev
 
@@ -16,14 +19,26 @@ on:
         description: A neon1-corpus branch to show (e.g. draft/my-post); empty takes the newest release
         type: string
         default: ""
+  workflow_call:
+    inputs:
+      ref:
+        description: The branch to build
+        type: string
+        default: dev
+      corpus_tag:
+        description: The neon1-corpus release production uses; empty takes the newest
+        type: string
+        default: ""
 
 # Read-only by default; the job adds an OIDC token for the dev deploy role
 permissions:
   contents: read
 
-# One run per branch (or corpus branch); a newer push replaces a queued or running one
+# One run per branch (or corpus branch); a newer push replaces a queued or running one. A called run reads
+# github.ref_name as the caller's branch (main), so it names its own branch, and lands in the same group as a push
+# to dev: two builds of the dev release can't race, and the newest holds everything the older one did
 concurrency:
-  group: dev-${{ github.ref_name }}-${{ inputs.corpus_ref }}
+  group: dev-${{ inputs.ref || github.ref_name }}-${{ inputs.corpus_ref }}
   cancel-in-progress: true
 
 jobs:
@@ -35,8 +50,10 @@ jobs:
       contents: read
       id-token: write
     steps:
+      # A call names the branch to build; a push or manual run builds the one it ran on
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.ref }}
           persist-credentials: false
 
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
@@ -48,18 +65,57 @@ jobs:
       - name: Pick the corpus
         id: corpus
         env:
-          BRANCH: ${{ github.ref_name }}
+          BRANCH: ${{ inputs.ref || github.ref_name }}
           CORPUS_REF: ${{ inputs.corpus_ref }}
         run: |
           ref="$CORPUS_REF"
-          if [ -z "$ref" ] && [ "$BRANCH" = dev ] && [ -s .dev-corpus-ref ]; then ref=$(tr -d '[:space:]' < .dev-corpus-ref); fi
+          pinned=
+          if [ -z "$ref" ] && [ "$BRANCH" = dev ] && [ -s .dev-corpus-ref ]; then ref=$(tr -d '[:space:]' < .dev-corpus-ref); pinned=yes; fi
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
+          echo "pinned=$pinned" >> "$GITHUB_OUTPUT"
+
+      # A pinned corpus branch must hold the corpus release production uses, or dev would show older words than
+      # production. If it doesn't, the release is merged into the pinned branch in a throwaway clone here (never
+      # pushed) and the build reads that tree through CORPUS_DIR. A conflict stops the build
+      - name: Keep the pinned corpus branch current
+        if: steps.corpus.outputs.pinned == 'yes'
+        env:
+          PIN: ${{ steps.corpus.outputs.ref }}
+          PROD_TAG: ${{ inputs.corpus_tag }}
+        run: |
+          repo=https://github.com/neon1llc/neon1-corpus
+          tag="$PROD_TAG"
+          if [ -z "$tag" ]; then
+            tag=$(git ls-remote --tags --refs --sort=-v:refname "$repo" 'v*' \
+              | sed -n 's|.*refs/tags/\(v[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)$|\1|p' | head -1)
+          fi
+          test -n "$tag" || { echo "::error::no neon1-corpus release found"; exit 1; }
+          dir="$RUNNER_TEMP/corpus-merged"
+          git clone -q --no-checkout "$repo" "$dir"
+          git -C "$dir" rev-parse -q --verify "refs/remotes/origin/$PIN" >/dev/null \
+            || { echo "::error::.dev-corpus-ref names $PIN, which is not a neon1-corpus branch"; exit 1; }
+          if git -C "$dir" merge-base --is-ancestor "refs/tags/$tag" "refs/remotes/origin/$PIN"; then
+            echo "$PIN already has neon1-corpus $tag"
+            exit 0
+          fi
+          git -C "$dir" config user.name "github-actions[bot]"
+          git -C "$dir" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C "$dir" checkout -q -B pinned "refs/remotes/origin/$PIN"
+          if ! git -C "$dir" merge --no-edit -m "Merge $tag into $PIN" "refs/tags/$tag" >/dev/null; then
+            git -C "$dir" merge --abort
+            echo "::error::neon1-corpus $PIN and $tag conflict; merge main or the release into $PIN by hand"
+            echo "### neon1-corpus $PIN needs main (the $tag release) merged by hand" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          echo "$PIN did not have $tag; built from $PIN with $tag merged in"
+          echo "### neon1-corpus $PIN did not have $tag; dev is built from it with the release merged in (not pushed)" >> "$GITHUB_STEP_SUMMARY"
+          echo "CORPUS_DIR=$dir" >> "$GITHUB_ENV"
 
       # The preview this run writes: the dev release, a branch, or a corpus branch
       - name: Pick the dev key
         id: key
         env:
-          BRANCH: ${{ github.ref_name }}
+          BRANCH: ${{ inputs.ref || github.ref_name }}
           CORPUS_REF: ${{ steps.corpus.outputs.ref }}
           ASKED: ${{ inputs.corpus_ref }}
         run: |
@@ -69,12 +125,15 @@ jobs:
           echo "name=$name" >> "$GITHUB_OUTPUT"
           echo "key=$key" >> "$GITHUB_OUTPUT"
 
-      # Same build as make dev-build: a copy of the site, the corpus words, and the live site's PDFs
+      # Same build as make dev-build: a copy of the site, the corpus words, and the live site's PDFs. Without a
+      # corpus branch it takes the release production uses, when a call names one, and otherwise the newest
       - name: make dev-build
         env:
           CORPUS_REF: ${{ steps.corpus.outputs.ref }}
+          PROD_TAG: ${{ inputs.corpus_tag }}
         run: |
-          if [ -n "$CORPUS_REF" ]; then make dev-build CORPUS_TAG="$CORPUS_REF"; else make dev-build; fi
+          want="${CORPUS_REF:-$PROD_TAG}"
+          if [ -n "$want" ]; then make dev-build CORPUS_TAG="$want"; else make dev-build; fi
 
       - run: make dev-check
 

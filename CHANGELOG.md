@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## Unreleased
+
+- Every production deploy, including a corpus release picked up on its own, also rebuilds dev.neon1.tech from the new main in the same run, and a dev build pinned to an older corpus branch takes the newest corpus release in first.
+
 ## v0.73.1
 
 - The releases page moves to /knowledge/company/releases/. At /knowledge/releases/, neon1.tech sent readers to the Knowledge Center's front page, as it does for every one-level folder.
