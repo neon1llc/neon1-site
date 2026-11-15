@@ -2,6 +2,10 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.71.1
+
+- Public code shows neon1-corpus v0.42.1.
+
 ## v0.71.0
 
 - Case study cards and Knowledge Center case pages lead with the kind of work, so one can't be mistaken for another: a neon1 engagement, a partner engagement, founder experience, or an independent demonstration, as in "Partner engagement: As neon1, subcontracted by Xenoss, 2026" or "neon1 engagement, 2025". A role or year the corpus hasn't confirmed reads "not yet confirmed" instead of disappearing. The Knowledge Center's case studies shelf lists neon1 engagements first, then partner work, founder experience, and the fictional bakery proposal as an independent demonstration, each card labeled.
