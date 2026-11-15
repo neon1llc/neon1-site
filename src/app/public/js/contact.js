@@ -5,7 +5,7 @@
 // above it do the job. A send waits at most WAIT ms; past that the outcome is unknown, so the draft stays
 // and the visitor is told to check before sending again (no auto-retry).
 
-import { reveal, swap } from "/shared/motion.js";
+import { reveal, swap, watchDirection } from "/shared/motion.js";
 
 const fold = document.getElementById("cfold");
 const form = document.getElementById("cform");
@@ -70,6 +70,8 @@ if (fold && form) {
     el.setAttribute("aria-invalid", "true");
     el.setAttribute("aria-describedby", id);
   }
+  // The dropdown's arrow turns toward the way its list opens (shared/motion.js)
+  watchDirection(form.elements.found);
   // "Somewhere else" asks for their words; any other answer hides the box again
   const foundOther = form.querySelector(".cfound-other");
   form.elements.found.addEventListener("change", () => reveal(foundOther, form.elements.found.value === "other"));

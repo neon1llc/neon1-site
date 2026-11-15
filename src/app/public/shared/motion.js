@@ -49,3 +49,20 @@ export async function swap(out, inn) {
   inn.hidden = false;
   inn.animate([{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: T.base, easing: EASE });
 }
+
+// A dropdown's arrow needs to know which way the list will open. The browser picks the direction itself and doesn't say,
+// so the page decides: just before the list opens (a press on the select, or Space, Enter, or Alt+Down on it), it measures
+// the room below and above and sets data-dir to "down" or "up" on the select; the stylesheet opens the list that way and
+// turns the arrow with it (down: counterclockwise a quarter turn; up: clockwise). `rows` and `rowPx` estimate the list's
+// height, `maxPx` is the cap the stylesheet puts on it. Selects whose browser draws its own list still open natively.
+export function watchDirection(select, { rowPx = 38, maxPx = 320, pad = 10 } = {}) {
+  const decide = () => {
+    const r = select.getBoundingClientRect();
+    const need = Math.min(maxPx, select.options.length * rowPx + pad, innerHeight * 0.6);
+    const below = innerHeight - r.bottom - 8, above = r.top - 8;
+    select.dataset.dir = below < need && above > below ? "up" : "down";
+  };
+  select.addEventListener("pointerdown", decide);
+  select.addEventListener("keydown", (e) => { if (e.key === " " || e.key === "Enter" || (e.altKey && e.key === "ArrowDown")) decide(); });
+  decide();
+}
