@@ -313,6 +313,17 @@ body.white-rabbit-scene > :not(.white-rabbit) { visibility: hidden; }
   border-radius: 3px 3px 9px 9px / 3px 3px 12px 12px; box-shadow: 0 7px 10px rgba(0,0,0,.4); position: relative; }
 .white-rabbit-sill::after { content: ""; position: absolute; left: 14px; right: 14px; top: 100%; height: 7px; background: #E4E1D6; border-radius: 0 0 4px 4px; }
 
+/* "go back" at the end of the walk (js/white-rabbit.js): a chip like the keyboard way in, shown only once the walk is
+   done, fading in with the closing line; pressing it hides it again while the walk plays back */
+.white-rabbit-back { display: none; min-height: 44px; padding: 10px 18px; border-radius: var(--glass-r); font: 500 14px var(--mono); color: var(--neon);
+  background: rgba(13,2,8,.86); border: 1px solid rgba(0,255,65,.3); cursor: pointer; }
+.white-rabbit[data-state="done"] .white-rabbit-back { display: inline-block; animation: white-rabbit-back-in .6s ease both; }
+.white-rabbit-back:hover { border-color: rgba(0,255,65,.6); }
+.white-rabbit-back:focus-visible { outline: 2px solid var(--neon); outline-offset: 3px; }
+@keyframes white-rabbit-back-in { from { opacity: 0; } to { opacity: 1; } }
+/* With reduced motion, "go back" fades the card out rather than moving anything */
+.white-rabbit.white-rabbit-fading .white-rabbit-end { opacity: 0; transition: opacity .5s ease; }
+
 /* The keyboard way in: a chip over the rain only while it has keyboard focus, like the skip link. Otherwise it is
    clipped to nothing and transparent, not just moved below the screen: phone browsers draw the page under a
    see-through bottom bar, where a chip parked off the bottom still showed, over the landing and the sections below */
