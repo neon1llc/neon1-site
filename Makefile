@@ -36,7 +36,7 @@ GITLEAKS_IMAGE := ghcr.io/gitleaks/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79
 
 # Plain make shows the help
 .DEFAULT_GOAL := help
-.PHONY: help content corpus-tag static corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf blog blog-check blog-export check html js links logic frame frame-check release rollback manifest rehash models budget secrets behavior perf serve three icons deploy invalidate verify indexnow dev-build dev-check dev-push dev-drop dev-rollback dev-gate dev-signout dev-allow dev-deny
+.PHONY: help content corpus-tag static corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf releases-export blog blog-check blog-export check html js links logic frame frame-check release rollback manifest rehash models budget secrets behavior perf serve three icons deploy invalidate verify indexnow dev-build dev-check dev-push dev-drop dev-rollback dev-gate dev-signout dev-allow dev-deny
 
 
 ##@ Checks
@@ -68,7 +68,7 @@ logic: ## Check the white rabbit's scene lifetime, and that the links check fail
 	@command -v node >/dev/null 2>&1 || { echo "logic: install Node.js"; exit 1; }
 	@node scripts/rabbit_lifecycle.cjs $(SITE_DIR)
 	@python3 scripts/test_check_page.py
-	@node --test scripts/knowledge.test.mjs
+	@node --test scripts/knowledge.test.mjs scripts/releases.test.mjs
 
 # The bar and footer markup lives once, in index.html; other pages get copies
 frame: ## Copy the shared bar and footer blocks from index.html into the other pages
@@ -101,12 +101,17 @@ corpus-check: corpus-export ## Fail if the case studies or questions differ from
 knowledge-export: corpus-export
 	@node $(CORPUS_DIR)/tools/export.mjs --target knowledge --out "$(abspath .corpus/export)" >/dev/null
 
-# llms.txt, written whole by scripts/knowledge.mjs, lists the blog's posts too, so the knowledge targets read both bundles
-knowledge: knowledge-export blog-export ## Rewrite the knowledge center under /knowledge/ from CORPUS_TAG
-	@node scripts/knowledge.mjs sync $(SITE_DIR) .corpus/export/knowledge .corpus/export/blog
+# The releases page (/knowledge/releases/) reads every public repository's changelog at its newest release tag.
+# RELEASES_PIN (repo@tag,...) fixes the tags, as the deploy job does (scripts/releases.sh)
+releases-export:
+	@scripts/releases.sh .releases
 
-knowledge-check: knowledge-export blog-export ## Fail if the knowledge center differs from CORPUS_TAG
-	@node scripts/knowledge.mjs check $(SITE_DIR) .corpus/export/knowledge .corpus/export/blog
+# llms.txt, written whole by scripts/knowledge.mjs, lists the blog's posts too, so the knowledge targets read both bundles
+knowledge: knowledge-export blog-export releases-export ## Rewrite the knowledge center under /knowledge/ from CORPUS_TAG
+	@node scripts/knowledge.mjs sync $(SITE_DIR) .corpus/export/knowledge .corpus/export/blog .releases
+
+knowledge-check: knowledge-export blog-export releases-export ## Fail if the knowledge center differs from CORPUS_TAG
+	@node scripts/knowledge.mjs check $(SITE_DIR) .corpus/export/knowledge .corpus/export/blog .releases
 
 # The blog: every post the blog bundle holds, as a page under /blog/, with an RSS feed. Links to other corpus
 # documents open their knowledge center pages, so it reads the knowledge bundle too

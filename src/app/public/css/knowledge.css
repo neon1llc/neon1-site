@@ -297,3 +297,11 @@ body.kc { background: var(--paper); }
 .diagram pre { overflow-x: auto; padding: 12px; border-radius: 8px; background: #f4f6f5; font: 12px/1.5 var(--mono); }
 .diagram-open { margin: 8px 0 0; font: 13px var(--mono); }
 .diagram-open a { color: var(--brand); }
+
+/* The releases page (/knowledge/releases/): one block per release, its date under the heading, and the
+   changelog's Added, Changed, and Fixed as small labels instead of headings */
+.kc-rel { margin: 0 0 8px; padding: 4px 0 12px; border-bottom: 1px solid var(--line); }
+.kc-rel h3 { margin: 22px 0 2px; scroll-margin-top: 90px; }
+.kc-text .kc-rel-date { margin: 0 0 10px; font: 13px var(--mono); color: var(--muted); }
+.kc-text .kc-rel-kind { margin: 12px 0 4px; font: 600 12px var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--brand); }
+.kc-text a.kc-plain { font-family: var(--mono); font-size: .9em; }
