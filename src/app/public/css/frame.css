@@ -155,3 +155,6 @@ a.ext .ext-end::after, a.ext:not(:has(.ext-end))::after { content: ""; display: 
 a.ext:hover .ext-end::after, a.ext:focus-visible .ext-end::after, a.ext:hover::after, a.ext:focus-visible::after { transform: translate(1px, -1px); }
 a.ext:hover { color: var(--brand); }
 @media (prefers-reduced-motion: reduce) { a.ext::after, a.ext .ext-end::after { transition: none; } }
+/* Outbound links in the footer and phone menu keep those places' own colours and weight; only the arrow is added */
+.foot a.ext { color: var(--muted); font-weight: inherit; } .foot a.ext:hover { color: var(--glow); }
+.menu a.ext { color: var(--neon); font-weight: inherit; } .menu a.ext:hover, .menu a.ext:focus-visible { color: #e9ffee; }

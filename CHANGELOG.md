@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## Unreleased
+
+- Links follow one rule everywhere: a link within neon1 has no arrow, and a link that leaves neon1 has the northeast arrow that nudges out on hover. The footer's "state registration" loses its right arrow, and "book a call", "linkedin", "github", and "pradeep on linkedin" in the footer, plus "book a call" in the phone menu, gain the outbound arrow while keeping those places' own colors. Links in running text already followed the rule, and a long Sources list keeps its arrows, since each one says where it goes.
+- Knowledge Center: the line under the title no longer states how many documents there are or how many have a PDF.
+
 ## v0.71.1
 
 - Public code shows neon1-corpus v0.42.1.
