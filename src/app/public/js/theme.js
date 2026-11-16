@@ -48,7 +48,7 @@
     void root.offsetWidth; // restart the animation if it was still running
     root.classList.add(next === "matrix" ? "flick-on" : "flick-off");
     clearTimeout(flicker);
-    flicker = setTimeout(() => root.classList.remove("flick-on", "flick-off"), 1800);
+    flicker = setTimeout(() => root.classList.remove("flick-on", "flick-off"), 2400);
   }
 
   apply(wanted());
