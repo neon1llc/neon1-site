@@ -18,7 +18,7 @@ neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site
 - [Glossary](https://neon1.tech/knowledge/company/glossary/): The names and technical terms used across neon1's documents, each in a sentence or two.
 - [Mission and promise](https://neon1.tech/knowledge/company/mission/): Why neon1 exists and the five things every client can count on.
 - [The names](https://neon1.tech/knowledge/company/names/): Where neon1, its slogan and its products get their names.
-- [How I price my work](https://neon1.tech/knowledge/company/pricing/): How a neon1 project is priced: a fixed price or a capped estimate, what most projects cost, what the price includes, when it can change, how paying works, and why the website shows ranges while each proposal shows the hours.
+- [How I price my work](https://neon1.tech/knowledge/company/pricing/): How a neon1 project is priced: a fixed price or a capped estimate, rough ranges, what the price includes, when it can change, and how paying works.
 - [How a project runs](https://neon1.tech/knowledge/company/process/): Listen, propose, decide, build and hand over.
 - [Publishing client work](https://neon1.tech/knowledge/company/publishing-client-work/): When and how a client's work appears as a case study: permission, anonymity, quotes, and figures.
 - [State registration](https://neon1.tech/knowledge/company/registration/): neon1 LLC's public record with the New York Department of State: its ID, status, filings, registered agent, and assumed name, and how to check the live record yourself.
@@ -43,7 +43,7 @@ neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site
 ## Questions
 
 - [1NEON help](https://neon1.tech/knowledge/faq/1neon-help/): Short answers about using the 1NEON client portal.
-- [Working with neon1](https://neon1.tech/knowledge/faq/working-with-neon1/): Short answers on where, when, how long, how much, and how data is handled.
+- [Working with neon1](https://neon1.tech/knowledge/faq/working-with-neon1/): Short answers on where, when, how long, cost, and how data is handled.
 
 ## Case studies
 
