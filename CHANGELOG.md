@@ -4,6 +4,8 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+## v0.79.0
+
 - The footer's last row has room for Neo's button: it rests at the bottom left of the page's end, as far above the legal line as it is from the screen's bottom, so it never covers footer text at any width. "report a bug" sits in the same row at the bottom right, centered on Neo's button, its right edge on the top bar's rightmost item at every width. The bug mark's gap to the text is the arrow's gap to the text. Neo's own "report a bug" link has the mark too.
 - The contact table separates its choices with the footer's backslash, with room each side, instead of a slash.
 - A page whose stylesheet failed to load reloads itself once, instead of staying as plain unstyled text.
