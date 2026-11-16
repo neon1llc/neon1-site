@@ -545,7 +545,8 @@ export function whiteRabbit({ rain, root }) {
       clearInterval(tries);
       setTimeout(() => {
         catchIt();
-        step(Math.max(0.001, clamp(+jump[1], 0, 1)));
+        // The still card scales every step by CARD_GAIN, so the flag divides it out to land on the progress it names
+        step(Math.max(0.001, clamp(+jump[1], 0, 1)) / (mode === "card" ? CARD_GAIN : 1));
         target = p = clamp(+jump[1], 0, 1);
       }, 300);
     }, 300);
