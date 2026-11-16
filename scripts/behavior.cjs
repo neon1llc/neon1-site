@@ -420,7 +420,8 @@ check("browser", "rabbit: keyboard entry, no controls on screen, Tab, Esc, and f
     let r = await rabbit(page);
     expect(r.state === "caught" && r.mode === "card" && r.focus === "whiteRabbitHow", "Enter did not catch and focus the line that says how to move", r);
     expect(!r.howShown && /Esc leaves/.test(r.howText) && r.controls === 0, "something explains or controls the scene on screen", r);
-    for (let i = 0; i < 6; i++) await page.keyboard.press("PageDown");
+    // Each press moves the card 0.15 x CARD_GAIN, so two presses play it without reaching the end, where a control shows
+    for (let i = 0; i < 2; i++) await page.keyboard.press("PageDown");
     r = await rabbit(page);
     expect(r.state === "playing" || r.state === "done", "the down keys did not play the card", r);
     expect(r.controls === 0, "a control showed over the card", r);
