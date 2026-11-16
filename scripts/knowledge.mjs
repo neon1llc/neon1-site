@@ -145,10 +145,6 @@ ${g.shelves.map((s) => `        <li><a href="#${s.key}">${esc(s.label)}${shelfMa
           <p class="kc-results" id="kc-results" role="status" aria-live="polite" aria-atomic="true"></p>
         </form>` })}
 
-    <section class="kc-found" id="kc-found" aria-label="Search results" hidden>
-      <ol class="kc-hits" id="kc-found-list"></ol>
-    </section>
-
     <section class="kc-none" id="kc-none" aria-label="No results" hidden>
       <h2>I don't have a page for that yet</h2>
       <p>Try one of these, or ask me directly.</p>
@@ -159,6 +155,10 @@ ${g.shelves.map((s) => `        <li><a href="#${s.key}">${esc(s.label)}${shelfMa
         <li><a href="${BASE}?q=privacy" data-term="privacy">privacy</a></li>
       </ul>
       <p><a href="${BASE}faq/1neon-help/">1NEON help</a> answers portal questions, and <a href="/#contact">contact</a> reaches me.</p>
+    </section>
+
+    <section class="kc-found" id="kc-found" aria-label="Search results" hidden>
+      <div id="kc-found-list"></div>
     </section>
 
     <div id="kc-browse">

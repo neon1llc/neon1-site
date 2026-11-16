@@ -168,7 +168,11 @@ export function search(prepared, query) {
   const scored = entries.map((entry, e) => {
     const per = counts[e].map((tf, i) => (tf > 0 ? (idf[i] * tf) / (K1 + tf) : 0))
     const total = per.reduce((a, b) => a + b, 0)
-    return { entry, per, all: per.every((p) => p > 0), any: per.some((p) => p > 0), total, similarity: total / ceiling }
+    // Whether the document is about the search rather than passing it by: the query words in its title or a
+    // heading carry at least half the query's weight (rarity), so a common word such as "does" can't decide it
+    const named = clauses.reduce((sum, c, i) => sum + (c.phrases.some((p) => has(entry.fields.title, p) || has(entry.fields.heading, p)) ? idf[i] : 0), 0)
+    const about = named / ceiling >= 0.5
+    return { entry, per, all: per.every((p) => p > 0), any: per.some((p) => p > 0), about, total, similarity: total / ceiling }
   })
   let hits = scored.filter((s) => s.all)
   let relaxed = false
@@ -184,6 +188,9 @@ export function search(prepared, query) {
       type: h.entry.doc.ty,
       score: h.total,
       similarity: Math.min(1, h.similarity),
+      // How the page groups it: strong holds every word in its title or headings, partial holds every word but
+      // only in its text, and weak holds only some of the words (a relaxed search)
+      strength: relaxed ? "weak" : h.about ? "strong" : "partial",
       section: top.weight ? top.heading : "",
       snippet: snippet(top.weight ? top.text : h.entry.doc.s, clauses),
     }

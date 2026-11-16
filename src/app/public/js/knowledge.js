@@ -39,9 +39,10 @@ if (box && input && status && found && list && none && browse) {
     const link = make("a");
     link.href = r.url;
     link.append(make("span", "kc-card-title", r.title));
-    // The match, 0 to 100, is search-core's similarity: how much of the query the document holds, weighted by where and how rare
+    // Where the match landed. No score is shown: the ranking's similarity is not a chance the page answers the
+    // question, so a number such as "98%" would claim more than it knows; the groups below say how close it is
     const where = r.section ? `${r.shelf} · ${r.section}` : `${r.shelf} · ${r.type}`;
-    link.append(make("span", "kc-hit-where", `${where} · ${Math.round(r.similarity * 100)}% match`));
+    link.append(make("span", "kc-hit-where", where));
     const p = make("span", "kc-card-summary");
     for (const part of r.snippet) {
       if (part.hit) p.append(make("mark", "", part.text));
@@ -50,6 +51,22 @@ if (box && input && status && found && list && none && browse) {
     link.append(p);
     item.append(link);
     return item;
+  }
+
+  // Results in three groups, each best first: pages about the search (its words in a title or heading), pages
+  // that only mention it, and, when no page holds every word, pages with some of them (search-core's strength)
+  const GROUPS = [["strong", "Best matches"], ["partial", "Also mentioned in"], ["weak", "Pages with only some of your words"]];
+  function groups(results) {
+    return GROUPS.map(([key, label]) => [label, results.filter((r) => r.strength === key)])
+      .filter(([, rs]) => rs.length)
+      .map(([label, rs]) => {
+        const group = make("div", "kc-rgroup");
+        group.append(make("h2", "kc-rgroup-title", label));
+        const ol = make("ol", "kc-hits");
+        ol.append(...rs.map(resultItem));
+        group.append(ol);
+        return group;
+      });
   }
 
   let token = 0;
@@ -70,13 +87,15 @@ if (box && input && status && found && list && none && browse) {
     const active = Boolean(res);
     browse.hidden = active;
     found.hidden = !active || !res.results.length;
-    none.hidden = !active || res.results.length > 0;
-    list.replaceChildren(...(active ? res.results.map(resultItem) : []));
+    // When no page holds every word, the suggestions show too, above the pages with only some of the words
+    none.hidden = !active || (res.results.length > 0 && !res.relaxed);
+    list.replaceChildren(...(active ? groups(res.results) : []));
     if (!active) { if (!failed) status.textContent = ""; return; }
     const n = res.results.length;
-    status.textContent = n
-      ? `${res.total} ${res.total === 1 ? "document" : "documents"}${res.relaxed ? ` match some of your words` : ""}`
-      : `No documents match "${q}"`;
+    const docs = (k) => `${k} ${k === 1 ? "page" : "pages"}`;
+    status.textContent = !n ? `No pages match "${q}"`
+      : res.relaxed ? `No page has all your words. ${docs(res.total)} ${res.total === 1 ? "has" : "have"} some of them.`
+      : docs(res.total);
     try {
       const url = new URL(location.href);
       url.searchParams.set("q", q);
