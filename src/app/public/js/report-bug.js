@@ -209,8 +209,8 @@ if (form) {
     for (let i = 0; i < picked.length; i++) {
       status.textContent = `Sending screenshot ${i + 1} of ${picked.length}…`;
       try {
-        const r = await post(`/1NEON/api/bug/${answer.ref}/image`, {
-          headers: { "content-type": picked[i].type, "x-1neon": "1", "x-bug-token": answer.token },
+        const r = await post(`/1NEON/api/bug/${answer.ref}/${answer.token}/image`, {
+          headers: { "content-type": picked[i].type, "x-1neon": "1" },
           body: picked[i].file,
         }, WAIT_IMAGE);
         if (!r.ok) failed.push(picked[i].file.name);
