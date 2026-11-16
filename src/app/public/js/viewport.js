@@ -21,7 +21,9 @@
   // Opened at a section (/#services, from the Knowledge Center's bar for one), the page would first paint its top, the black
   // hero and wordmark, and only then scroll to the section. Until js/views.js has landed there (it removes this class), the page
   // shows blank paper. It is hidden (opacity 0, with no transition so focus still works), not faded: the browser's page transition is the only fade on a move. A timer clears it if that script never does.
-  if (/^#(services|projects|process|why|work|faq|contact|case-[\w-]+)$/.test(location.hash)) {
+  // A remembered position (Back, Forward, reload) holds the page the same way
+  const memo = history.state && history.state.pos;
+  if (/^#(services|projects|process|why|work|faq|contact|case-[\w-]+)$/.test(location.hash) || (memo && (memo.v || memo.dy > 2))) {
     root.classList.add("arriving");
     setTimeout(() => root.classList.remove("arriving"), 2500);
     addEventListener("pageshow", (e) => { if (e.persisted) root.classList.remove("arriving"); });
