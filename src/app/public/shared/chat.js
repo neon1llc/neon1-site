@@ -219,14 +219,15 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
   // Bottom right: "report bug \\ feedback", each a form page in a new tab, so a bug seen or a thought had while talking to Neo is one
   // click away (?from=neo picks "Neo chat" on the page). Each is left off its own page, where it would open the page you're on
   const bug = el("p", "n1chat-bug");
+  bug.append(el("span", "n1chat-lead", "report"));
   if (!location.pathname.startsWith("/report-bug")) {
-    const link = el("a", "n1chat-plain n1chat-ext n1chat-buglink n1chat-bugfirst", "", { href: "/report-bug/?from=neo", target: "_blank", rel: "noopener" });
-    link.append("report", bugMark(), "bug");
+    const link = el("a", "n1chat-plain n1chat-ext n1chat-buglink", "", { href: "/report-bug/?from=neo", target: "_blank", rel: "noopener", "aria-label": "report a bug" });
+    link.append(bugMark(), "bug");
     bug.append(link);
   }
   if (!location.pathname.startsWith("/feedback")) {
-    if (bug.hasChildNodes()) bug.append(el("span", "n1chat-sep", "\\", { "aria-hidden": "true" }));
-    const link = el("a", "n1chat-plain n1chat-ext n1chat-buglink", "", { href: "/feedback/?from=neo", target: "_blank", rel: "noopener" });
+    if (bug.children.length > 1) bug.append(el("span", "n1chat-sep", "\\", { "aria-hidden": "true" }));
+    const link = el("a", "n1chat-plain n1chat-ext n1chat-buglink", "", { href: "/feedback/?from=neo", target: "_blank", rel: "noopener", "aria-label": "report feedback" });
     link.append(feedbackMark(), "feedback");
     bug.append(link);
   }

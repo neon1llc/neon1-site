@@ -4,7 +4,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
-- "report a bug" in the footer becomes "report bug \ feedback": the bug drawing sits between "report" and "bug", the speech bubble before "feedback", each ends in the outbound arrow, with the same .18em gap, the footer's backslash between them, and the pair's right edge and centering on Neo as before. Neo's panel has the same pair on its last row.
+- "report a bug" in the footer becomes "report bug \ feedback": "report" is a plain muted word that leads both, the bug drawing sits before "bug" and the speech bubble before "feedback", each link ends in the outbound arrow, with the same .18em gap, the footer's backslash between them, and the pair's right edge and centering on Neo as before. Neo's panel has the same pair on its last row, with more room above it from the links over it.
 - neon1.tech/feedback is a page of its own for a comment, a complaint, a concern, or a suggestion: what kind, what it is about (the report page's places, filled in from a `?from=` link or the page you came from), what you wrote, and an optional email for a reply. The page you came from, your theme, browser, and window size go with it, and the page says so. It sends to feedback@ through 1NEON's feedback route, and the confirmation shows a reference to quote.
 
 ## v0.79.0

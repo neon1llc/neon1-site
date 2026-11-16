@@ -308,14 +308,15 @@ a.ext:hover { color: var(--brand); }
 .chip.arrow .arr { top: 0; --arr-t: .12em; }
 
 /* ---- "report bug \ feedback": two footer links at the legal line's bottom right, each opening its form in a new tab ----
-   The footer's own mono face at its size, semibold, each with a small line drawing (the bug between "report" and "bug", the speech bubble before
-   "feedback"), so they read as items of the legal line and still stand out by weight and mark. The pair is placed against the footer (the nearest
+   The footer's own mono face at its size, semibold, each with a small line drawing (a bug before "bug", a speech bubble before "feedback", under a plain "report"), so they read as items of the legal line and still stand out by weight and mark. The pair is placed against the footer (the nearest
    positioned box) so its right edge lines up with the bar's rightmost control at every width: the theme
    switch's right edge on a wide desktop (see the switch's own rule, which sits in the page margin), the menu button's or the switch's
    24px in from the edge everywhere narrower. Vertically it is centered on Neo's launcher (the bottom offset is the launcher's middle). A drawing's gap
    to the text is the outbound arrow's gap to the text, .18em */
 .legal .report-links { position: absolute; right: max(24px, env(safe-area-inset-right)); bottom: calc(var(--foot-gap) + var(--foot-neo) / 2); translate: 0 50%; display: inline-flex; align-items: center; white-space: nowrap; }
 .legal .report-links .sep { margin: 0 .5em; }
+/* "report" leads both links, as a plain muted word, so the pair reads "report bug" or "report feedback", the drawings sitting alike before each name */
+.legal .report-links .report-lead { color: var(--muted); margin-right: .7em; }
 .legal a.report-bug, .legal a.report-bug.ext, .legal a.report-feedback, .legal a.report-feedback.ext { display: inline-flex; align-items: center; gap: .18em;
   font: 600 12px var(--mono); color: var(--glow); text-decoration: none; }
 .legal :is(a.report-bug, a.report-feedback) svg { width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
