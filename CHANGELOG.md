@@ -4,6 +4,8 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+- The phone menu says where each item goes. The sections of the home page come first in the order the page tells them, each with the same > as its heading (in the heading's own accent, so it follows the theme). A hairline then sets apart the other places: knowledge and blog take the shared right arrow, book a call keeps the outbound arrow, and "1NEON client portal" is now "1NEON portal" with 1NEON's mark to its left and the right arrow. The desktop bar is unchanged. I did not group the sections into dropdowns: no two or three groups tell the page's story in order, and a dropdown would hide the sections the menu exists to show.
+
 - A tab left open across a release reloads when it is looked at again, so an old page never runs with the newer release's scripts (the cause of a white rabbit that would not scroll back in a tab opened before a release). It asks `/version.json` what is live, and skips the reload while a form holds typed words, a case study is open, or the white rabbit is showing, then asks again the next time the tab is shown.
 
 - The Knowledge Center shows how many documents each group holds, quietly beside its title in the shelf strip and in the group's header (32 for "For you", 34 for "About neon1" today). Not a total at the top. The counts are taken from the same lists that draw the cards, so they cannot drift from the page.

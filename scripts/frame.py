@@ -26,7 +26,12 @@ def blocks(text):
 
 
 # The bar's links before its shared actions, and the phone menu's links, as (href, words) pairs
-LINK = re.compile(r'<a [^>]*?href="([^"]+)"[^>]*>([^<]+)</a>')
+LINK = re.compile(r'<a [^>]*?href="([^"]+)"[^>]*>(.*?)</a>', re.S)
+
+
+def links(html):
+    """(href, words) for each link; marks inside it (a > or an arrow) are not words."""
+    return [(href, re.sub(r"<[^>]+>", "", inner).strip()) for href, inner in LINK.findall(html)]
 BAR = re.compile(r'<ul class="links">(.*?)<!-- frame:actions -->', re.S)
 MENU = re.compile(r'<div class="menu" id="menu" hidden>\s*<ul>(.*?)</ul>', re.S)
 
@@ -36,9 +41,9 @@ def menu_problems(home):
     bar, menu = BAR.search(home), MENU.search(home)
     if not bar or not menu:
         return [f"{SOURCE}: bar links or phone menu not found"]
-    have = set(LINK.findall(menu.group(1)))
+    have = set(links(menu.group(1)))
     return [f"{SOURCE}: the phone menu lacks the bar's link {words!r} ({href})"
-            for href, words in LINK.findall(bar.group(1)) if (href, words) not in have]
+            for href, words in links(bar.group(1)) if (href, words) not in have]
 
 
 def main():
