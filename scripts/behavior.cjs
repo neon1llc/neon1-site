@@ -22,6 +22,9 @@ try { ({ chromium } = require("playwright")); } catch {
 
 const SITE = path.resolve(process.argv[2] || "src/app/public");
 const ONLY = process.env.ONLY ? new RegExp(process.env.ONLY) : null;
+// SHARD="k/n" runs every nth check starting at k (0-based), so CI can split the run across jobs; each shard
+// still holds the whole-run guarantees below for the checks it ran
+const SHARD = /^(\d+)\/(\d+)$/.exec(process.env.SHARD || "");
 
 // ---- Server: SITE_DIR on loopback, with the production policy's shape and per-test overrides ----
 // Production (neon1-aws-infrastructure) allows scripts, styles, fonts, and connections from the site
@@ -716,8 +719,9 @@ check("browser", "AS-09: an empty send marks each required field with its own de
   origin = `http://127.0.0.1:${server.address().port}`;
   browser = await chromium.launch();
   let failed = 0;
-  for (const { tag, name, fn } of checks) {
+  for (const [at, { tag, name, fn }] of checks.entries()) {
     if (ONLY && !ONLY.test(name)) continue;
+    if (SHARD && at % Number(SHARD[2]) !== Number(SHARD[1])) continue;
     const t0 = Date.now();
     try { await fn(); console.log(`ok   [${tag}] ${name} (${Date.now() - t0} ms)`); }
     catch (e) { failed++; console.log(`FAIL [${tag}] ${name}: ${e.message}`); }

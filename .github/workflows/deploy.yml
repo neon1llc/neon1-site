@@ -64,6 +64,64 @@ jobs:
           echo "releases_pin=$releases" >> "$GITHUB_OUTPUT"
           echo "go=$go" >> "$GITHUB_OUTPUT"
 
+  # The site's generated parts, written once and packed. The browser checks run on these exact bytes and the
+  # deploy job uploads them, so what shipped is what was tested. (The Knowledge Center's PDFs are printed beside it.)
+  build:
+    needs: plan
+    if: needs.plan.outputs.go == 'true'
+    runs-on: ubuntu-latest
+    env:
+      CORPUS_TAG: ${{ needs.plan.outputs.corpus_tag }}
+      RELEASES_PIN: ${{ needs.plan.outputs.releases_pin }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: knowledge/package-lock.json
+      - run: make content
+      # A tar keeps hidden files (.well-known) and modes exactly
+      - run: tar czf "$RUNNER_TEMP/site.tgz" -C src/app/public .
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: site
+          path: ${{ runner.temp }}/site.tgz
+          retention-days: 3
+
+  # The Knowledge Center's PDFs, printed beside the pages from the same corpus release, in parallel with the checks
+  pdf:
+    needs: plan
+    if: needs.plan.outputs.go == 'true' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    env:
+      CORPUS_TAG: ${{ needs.plan.outputs.corpus_tag }}
+      RELEASES_PIN: ${{ needs.plan.outputs.releases_pin }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: knowledge/package-lock.json
+      - name: make content and knowledge-pdf
+        run: |
+          make content
+          npm ci --prefix knowledge
+          npx --prefix knowledge playwright install --with-deps chromium
+          make knowledge-pdf
+      - run: (cd src/app/public && find knowledge -name '*.pdf' -print0 | tar czf "$RUNNER_TEMP/pdfs.tgz" --null -T -)
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: pdfs
+          path: ${{ runner.temp }}/pdfs.tgz
+          retention-days: 3
+
+  # The static checks, on their own build of the same corpus release
   check:
     needs: plan
     if: needs.plan.outputs.go == 'true'
@@ -77,38 +135,57 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-
-      # The npm cache is keyed on the printer's lockfile, which also pins the Playwright the browser checks use
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: knowledge/package-lock.json
-
       # The corpus-made pages aren't committed, so they're written first, from the planned corpus release
       - run: make content
-
       # A push compares fonts and media with the commit before it; a pull request, with origin/main
       - run: make check
         env:
           IMMUTABLE_BASE: ${{ github.event.before }}
 
-      # Browser contracts, gating the deploy job like make check: the contact form (including a send that
-      # never answers), case studies and case links, the first screen and section snap, the tool cards, the
-      # white rabbit's entry, controls, and lifetime, and the chat window. Both scripts serve the site on
-      # loopback and stub every API, aborting anything that leaves it, so nothing reaches a live service.
-      # Playwright comes from knowledge/package-lock.json, the same locked version the PDF printer uses
+  # Browser contracts, gating the deploy job like make check: the contact form (including a send that never
+  # answers), case studies and case links, the first screen and section snap, the tool cards, the white rabbit's
+  # entry, controls, and lifetime, and the chat window. They run in three shards at once (every third check each,
+  # about a minute apiece instead of three), on the built site's exact bytes. Both scripts serve the site on
+  # loopback and stub every API, aborting anything that leaves it, so nothing reaches a live service. Playwright
+  # comes from knowledge/package-lock.json, the same locked version the PDF printer uses
+  behavior:
+    needs: [plan, build]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: knowledge/package-lock.json
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: site
+          path: ${{ runner.temp }}/site
+      - run: tar xzf "$RUNNER_TEMP/site/site.tgz" -C src/app/public
       - name: Install Playwright and Chromium
         run: |
           npm ci --prefix knowledge
           npx --prefix knowledge playwright install --with-deps chromium
-
-      - name: make behavior
+      - name: make behavior (shard ${{ matrix.shard }} of 3)
         env:
           NODE_PATH: ${{ github.workspace }}/knowledge/node_modules
+          SHARD: ${{ matrix.shard }}/3
         run: make behavior
-
+      # The chat window's checks ride with the lightest shard
       - name: Chat window checks
+        if: matrix.shard == 0
         env:
           NODE_PATH: ${{ github.workspace }}/knowledge/node_modules
         run: node scripts/chat_check.cjs
@@ -117,7 +194,7 @@ jobs:
   # schedule run that found a new corpus release comes here too, since dev must show the release production does.
   # The called workflows need contents to push dev and an OIDC token for the dev deploy role
   dev:
-    needs: [plan, check]
+    needs: [plan, check, behavior]
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.plan.outputs.go == 'true'
     uses: ./.github/workflows/dev-sync.yml
     with:
@@ -126,10 +203,10 @@ jobs:
       contents: write
       id-token: write
 
-  # Deploys only from main, after the static checks and the browser contracts in check pass; nothing
-  # touches S3 or CloudFront before then
+  # Deploys only from main, after the static checks and the browser contracts pass; nothing touches S3 or
+  # CloudFront before then. It uploads the site the checks ran on, so it needs no Node, Playwright, or build
   deploy:
-    needs: [plan, check]
+    needs: [plan, check, behavior, pdf]
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     env:
@@ -156,20 +233,15 @@ jobs:
           role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
           aws-region: us-east-1
 
-      # The knowledge center's pages and PDFs are written here, from the planned corpus release, never committed
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      # The exact site the browser checks ran on, and the PDFs printed from the same corpus release
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: knowledge/package-lock.json
-
-      # The same corpus release the checks passed, written again here, then printed
-      - name: make content and knowledge-pdf
+          path: ${{ runner.temp }}/built
+      - name: Unpack the tested site
         run: |
-          make content
-          npm ci --prefix knowledge
-          npx --prefix knowledge playwright install --with-deps chromium
-          make knowledge-pdf
+          tar xzf "$RUNNER_TEMP/built/site/site.tgz" -C src/app/public
+          tar xzf "$RUNNER_TEMP/built/pdfs/pdfs.tgz" -C src/app/public
+          test -f src/app/public/index.html
 
       - run: make deploy
 
