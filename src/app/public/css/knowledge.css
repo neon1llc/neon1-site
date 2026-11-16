@@ -35,6 +35,7 @@ body.kc { background: var(--page); }
   -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
 .kc-shelves ul { list-style: none; max-width: 1040px; margin: 0 auto; padding: 10px 24px; display: flex; align-items: stretch; gap: 6px; overflow-x: auto; scrollbar-width: none; }
 .kc-shelves ul::-webkit-scrollbar { display: none; }
+.kc-shelves li { display: flex; align-items: center; } /* every item centers its own content in the strip's height, titles and links alike, whatever line box a browser gives each */
 .kc-shelves a { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; white-space: nowrap;
   font: 13px var(--mono); color: var(--muted); text-decoration: none; border: 1px solid transparent; }
 .kc-shelves a:hover { color: var(--brand); border-color: var(--line); background: var(--surface); }
@@ -76,8 +77,7 @@ body.kc { background: var(--page); }
 .kc-fold[hidden] { display: none; }
 .kc-fold > summary { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; font: 500 14px var(--mono); color: var(--brand); list-style: none; }
 .kc-fold > summary::-webkit-details-marker { display: none; }
-.kc-fold > summary::after { content: "+"; font-weight: 700; }
-.kc-fold[open] > summary::after { content: "\2212"; }
+.kc-fold { --arr-t: .109em; }
 .kc-fold > summary span { color: var(--muted); }
 .kc-fold > summary:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 .kc-fold > .kc-cards { margin-top: 12px; }
@@ -138,8 +138,8 @@ body.kc { background: var(--page); }
 .kc-toc-fold > summary::-webkit-details-marker { display: none; }
 .kc-toc-fold > summary span { flex: 1; min-width: 0; margin-left: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: right;
   font: 12px var(--mono); color: var(--muted); }
-.kc-toc-fold > summary::after { content: "+"; width: 14px; margin-left: 6px; text-align: center; font: 700 14px var(--mono); color: var(--brand); }
-.kc-toc-fold[open] > summary::after { content: "\2212"; }
+.kc-toc-fold { --fold-arrow: var(--brand); --arr-t: .13em; }
+.kc-toc-fold > summary::after { margin-left: 10px; }
 .kc-toc-fold ol { padding: 0 14px 10px; }
 
 /* The section being read, marked as the reader scrolls (js/knowledge-toc.js) */

@@ -114,7 +114,7 @@ check("browser", "contact: the fold opens with its arrow turned down, and a send
     await page.locator("#contact").scrollIntoViewIfNeeded();
     expect(!(await page.locator("#cform").isVisible()), "the form shows before the fold is opened");
     await fillForm(page);
-    const turned = await page.locator("#cfold .arr").evaluate((a) => getComputedStyle(a).transform);
+    const turned = await page.locator("#cfold > summary").evaluate((s) => getComputedStyle(s, "::after").transform);
     expect(turned !== "none", "the arrow did not turn when the fold opened", turned);
     await page.locator('#cform [type="submit"]').click();
     await page.waitForSelector("#cdone:not([hidden])");
@@ -209,7 +209,7 @@ check("browser", "public code: three folds open with their arrows turned, every 
     expect((await folds.count()) === 3, "there aren't three groups");
     for (let i = 0; i < 3; i++) {
       await folds.nth(i).locator("summary").click();
-      expect(await folds.nth(i).evaluate((d) => d.open && getComputedStyle(d.querySelector(".arr")).transform !== "none"), "a group did not open with its arrow turned");
+      expect(await folds.nth(i).evaluate((d) => d.open && getComputedStyle(d.querySelector(":scope > summary"), "::after").transform !== "none"), "a group did not open with its arrow turned");
     }
     const rows = await page.$$eval("#work .repo", (rs) => rs.map((r) => ({ state: r.querySelector(".state").textContent, links: [...r.querySelectorAll("a")].map((a) => [a.href, a.target, a.rel]) })));
     expect(rows.length >= 8, "rows are missing", rows);

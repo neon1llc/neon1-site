@@ -103,7 +103,7 @@ const page = (opts) => page_(frame, {
   current: "blog",
   generator: "scripts/blog.mjs from neon1-corpus. Edit the corpus, then run make blog",
   styles: ["/css/knowledge.css"],
-  scripts: ["/js/knowledge-toc.js", "/js/blog-share.js"],
+  scripts: ["/js/fold.js", "/js/knowledge-toc.js", "/js/blog-share.js"],
   head: feedLink,
 })
 

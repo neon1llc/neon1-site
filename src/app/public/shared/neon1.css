@@ -135,3 +135,18 @@
 .req { margin-left: 3px; font: 700 1em/0 var(--sans); vertical-align: baseline; color: var(--req-color, currentColor); }
 /* The right-hand button of a pair (next): the same arrow, turned around by the independent rotate property so a hover nudge can still use transform */
 .arr-next { rotate: 180deg; }
+
+/* The expandable, one component for every site (neon1.tech's folds, questions, the Knowledge Center's index, 1NEON): put
+   .n1-fold on a <details>. Its summary's ::after is the shared arrow, turning counterclockwise to point down as it opens and
+   back as it closes, on the panel's own length and curve (--t-open, --ease-open), so the turn and the panel finish together.
+   .closing is set by whatever eases the panel (js/views.js on the home page, js/fold.js elsewhere) as a close begins, so
+   the arrow turns back at once. The defaults suit both themes (the arrow takes --fold-arrow, which is the summary's own text
+   color unless a place sets it, and its stroke is --arr-t); a place restyles it by setting those, or the summary around it. */
+.n1-fold > summary::after { content: ""; display: block; flex: none; width: .95em; height: .8em; background: var(--fold-arrow, currentColor);
+  clip-path: var(--arr-shape); transition: transform var(--t-open) var(--ease-open); }
+.n1-fold[open]:not(.closing) > summary::after { transform: rotate(-90deg); }
+.n1-fold.closing > summary::after { transition-duration: calc(var(--t-open) * .85); }
+/* In a baseline-aligned summary (the home page's lowercase labels) the arrow sits on the middle of the lowercase letters like .arr */
+.n1-fold.fold > summary::after { position: relative; top: calc(.375em - var(--arr-xc)); --arr-xc: .2575em; --arr-t: .156em; }
+@media (prefers-reduced-motion: reduce) { .n1-fold > summary::after { transition: none; } }
+:root[data-motion="off"] .n1-fold > summary::after { transition: none; }

@@ -93,7 +93,7 @@ function caseCard(c) {
 }
 
 // One question from the FAQ, as a details element
-const question = (s) => `        <details class="reveal-on"><summary>${s.headingHtml}</summary>${forPage(s.html).replace(/\n/g, "")}</details>`
+const question = (s) => `        <details class="n1-fold reveal-on"><summary>${s.headingHtml}</summary>${forPage(s.html).replace(/\n/g, "")}</details>`
 
 
 // The contact view's "where, when, size" list already answers these, so the home page doesn't ask them

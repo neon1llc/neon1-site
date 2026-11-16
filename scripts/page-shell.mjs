@@ -172,7 +172,7 @@ ${links}
       </ol>
     </nav>`,
     fold: `
-        <details class="kc-toc kc-toc-fold">
+        <details class="n1-fold kc-toc kc-toc-fold">
           <summary>On this page <span>${heads.length} sections</span></summary>
           <ol>
 ${links}
