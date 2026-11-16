@@ -44,17 +44,17 @@
 :root.flick-on, :root.flick-off { --lo: .08; --lo-soft: .5; }
 /* What takes the soft run: every part that turns from dark green to matrix green, in the page, the bar, the phone menu, the case panel, and the footer.
    SOFT lists the text and icons; a button with a filled background is left out, since its fill is the color that changes and it keeps its own */
-/* Links in the page, the bar, the phone menu, the case panel, and the footer, headings, and the arrows (the drawn arrows and the dropdowns') take the soft run.
-   Text that only turns a shade (labels, counts, stats) stays steady, so the effect stays light */
+/* What takes the soft run: every part that turns from dark green to matrix green, in the page, the bar, the phone menu, the case panel, and the footer.
+   SOFT lists the text and icons; a button with a filled background is left out, since its fill is the color that changes and it keeps its own */
 :root.theme-shift :is(.n1-logo, .n1chat-launch, .n1-logo *, .n1chat-launch *),
-:root.theme-shift :is(.awake, .n1-bar, .menu, .case-layer, main, footer) :is(a, h1, h2, h3, .arr, .pr, .kc-n) { transition: none !important; }
+:root.theme-shift :is(.awake, .n1-bar, .menu, .case-layer, main, footer) :is(a, h1, h2, h3, .arr, .pr, .kc-n, .idx, dt, th, strong, summary, .stat b, .state, .req, .mark-light, .kc-eyebrow, .kc-toc-title, .kc-nav-group span, .cstatus, .truth, button.open, .case-close, .kc-share-copy, .kc-share-native, .chip.menu-btn, .btn-ghost, .btn-outline, .btn.portal, .theme-sun, svg) { transition: none !important; }
 :root.flick-on :is(.n1-logo, .n1chat-launch) { animation: neon-on 2.23s linear both; }
 :root.flick-off :is(.n1-logo, .n1chat-launch) { animation: neon-off .5s ease-out both; }
-:root.flick-on :is(.awake, .n1-bar, .menu, .case-layer, main, footer) :is(a:not(.btn), h1, h2, h3, .arr, .pr, .kc-n) { animation: soft-on 2.23s linear both; }
-:root.flick-off :is(.awake, .n1-bar, .menu, .case-layer, main, footer) :is(a:not(.btn), h1, h2, h3, .arr, .pr, .kc-n) { animation: soft-off .5s ease-out both; }
-/* The dropdown arrow is the summary's ::after, so it takes the run on its own, and the summary's words stay steady */
-:root.flick-on .n1-fold > summary::after { animation: soft-on 2.23s linear both; }
-:root.flick-off .n1-fold > summary::after { animation: soft-off .5s ease-out both; }
+:root.flick-on :is(.awake, .n1-bar, .menu, .case-layer, main, footer) :is(a:not(.btn-primary), h1, h2, h3, .arr, .pr, .kc-n, .idx, dt, th, strong, summary, .stat b, .state, .req, .mark-light, .kc-eyebrow, .kc-toc-title, .kc-nav-group span, .cstatus, .truth, button.open, .case-close, .kc-share-copy, .kc-share-native, .chip.menu-btn, .btn-ghost, .btn-outline, .theme-sun) { animation: soft-on 2.23s linear both; }
+:root.flick-off :is(.awake, .n1-bar, .menu, .case-layer, main, footer) :is(a:not(.btn-primary), h1, h2, h3, .arr, .pr, .kc-n, .idx, dt, th, strong, summary, .stat b, .state, .req, .mark-light, .kc-eyebrow, .kc-toc-title, .kc-nav-group span, .cstatus, .truth, button.open, .case-close, .kc-share-copy, .kc-share-native, .chip.menu-btn, .btn-ghost, .btn-outline, .theme-sun) { animation: soft-off .5s ease-out both; }
+/* The small marks drawn by pseudo-elements: the process timeline's numbers and dots, and the dropdown arrow on each summary */
+:root.flick-on .steps.timeline > *::before, :root.flick-on .steps.timeline > *::after, :root.flick-on .n1-fold > summary::after { animation: soft-on 2.23s linear both; }
+:root.flick-off .steps.timeline > *::before, :root.flick-off .steps.timeline > *::after, :root.flick-off .n1-fold > summary::after { animation: soft-off .5s ease-out both; }
 @keyframes neon-on {
   0% { opacity: var(--lo); } 4% { opacity: 1; } 8% { opacity: var(--lo); } 13% { opacity: var(--lo); }
   14.5% { opacity: 1; } 19% { opacity: 1; } 22% { opacity: var(--lo); } 28% { opacity: var(--lo); }
