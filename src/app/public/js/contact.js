@@ -56,6 +56,8 @@ if (fold && form) {
       ...(f.found.value ? { found: f.found.value } : {}),
       ...(f.found.value === "other" ? { foundOther: f.foundOther.value.trim() } : {}),
       website: f.website.value,
+      // The visitor's time zone, so the message can show their local time
+      timeZone: (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch { return ""; } })(),
     };
   }
 

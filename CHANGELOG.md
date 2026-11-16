@@ -4,6 +4,8 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+- The contact form sends the visitor's time zone with the message, so the email to neon1 can show their local time.
+
 ## v0.78.2
 
 - In the dark (matrix) theme, Neo's "ask Neo" button no longer glows over the landing's rain; below the rain it still does.
