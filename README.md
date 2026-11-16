@@ -87,7 +87,9 @@ To release, merge the finished branches to main with the version set. The deploy
 
 ## Deploy
 
-Pushing to `main` runs the checks, then deploys from GitHub Actions. The `check` job runs `make check`, then `make behavior` and `scripts/chat_check.cjs` in headless Chromium with every API stubbed. The deploy job starts only after all three pass. The workflow assumes an AWS role through OIDC, so the repo holds no AWS keys. The role ARN is the repository variable `AWS_DEPLOY_ROLE_ARN`.
+Pushing to `main` runs the checks, then deploys from GitHub Actions. The site is built once and packed (`build`), and the deploy uploads those same bytes. `make check` runs in `check`. The browser checks (`scripts/behavior.cjs`) run in three shards at once, and the chat checks (`scripts/chat_check.cjs`) in their own job, in headless Chromium with every API stubbed. The Knowledge Center PDFs print beside them. The deploy job starts only after everything that ran has passed. The workflow assumes an AWS role through OIDC, so the repo holds no AWS keys. The role ARN is the repository variable `AWS_DEPLOY_ROLE_ARN`.
+
+`scripts/change_map.py` reads the files a push changed and runs only the browser checks, chat checks, and PDF printing they need: a rabbit file runs the rabbit checks, a Knowledge Center file prints the PDFs, and docs run neither. A shared file (css, templates, version, scripts, the workflow), a schedule or manual run, or any doubt runs everything, and a deploy that prints no PDFs reuses the live ones. `make check` always runs. A manual run with `force_full` runs everything, and `compare_to` shows what a change would run.
 
 To deploy by hand:
 
