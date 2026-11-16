@@ -28,11 +28,11 @@
   --page-rgb: 15 10 13; --ink-rgb: 214 245 220; --brand-rgb: 108 255 168;
   --ctl-line: rgb(var(--brand-rgb) / .3); --surface: #17110F; --surface-rgb: 23 17 15; --surface-2: #0A0608; --ink-soft: #BCD6C2; --muted-ink: #8DB096; --err: #FF8A80; --warn: #FFB547;
 }
-/* Switching eases every color at once, for one slow beat (js/theme.js sets the class for just that long); with
-   reduced motion the length is nothing, so it is a plain change */
+/* Switching is one plain change of every color, all at once (js/theme.js sets the class for a beat around it): the page, its text, and its
+   lines cut over together, and the neon parts then flicker as the sign comes on, so no text trails behind the rest. The motion of
+   things that move (transform, opacity, visibility) keeps its own timing */
 :root.theme-shift, :root.theme-shift *, :root.theme-shift *::before, :root.theme-shift *::after {
-  transition: background-color var(--t-slow) var(--ease), color var(--t-slow) var(--ease), border-color var(--t-slow) var(--ease),
-    fill var(--t-slow) var(--ease), stroke var(--t-slow) var(--ease), box-shadow var(--t-slow) var(--ease), text-shadow var(--t-slow) var(--ease),
+  transition: background-color 0s, color 0s, border-color 0s, fill 0s, stroke 0s, box-shadow 0s, text-shadow 0s,
     transform var(--t-base) var(--ease-open), opacity var(--t-base) var(--ease), visibility var(--t-base) !important;
 }
 
@@ -283,6 +283,15 @@ a.ext .ext-end { white-space: nowrap; }
 a.ext .ext-end::after, a.ext:not(:has(.ext-end))::after { content: ""; display: inline-block; width: .7em; height: .7em; margin-left: .18em; vertical-align: .02em; background: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.8 12.2 12 4M5.2 4H12v6.8'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.8 12.2 12 4M5.2 4H12v6.8'/%3E%3C/svg%3E") center / contain no-repeat; transition: transform .15s ease; }
 a.ext:hover .ext-end::after, a.ext:focus-visible .ext-end::after, a.ext:hover::after, a.ext:focus-visible::after { transform: translate(1px, -1px); }
 a.ext:hover { color: var(--brand); }
+/* An in-site link that leads somewhere (an invitation into 1NEON, a menu link to another page) ends in the same light arrow the outbound
+   links have, the same size and stroke at the text's size, turned to point right (the outbound arrow turned an eighth of a turn clockwise). The heavy arrow stays on what expands or moves: dropdowns and the case cards' previous and next */
+a.in1 { color: var(--brand); font-weight: 600; text-decoration: none; }
+a.in1 .ext-end { white-space: nowrap; }
+a.in1 .ext-end::after { content: ""; display: inline-block; width: .7em; height: .7em; margin-left: .18em; vertical-align: .02em; background: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.8 12.2 12 4M5.2 4H12v6.8'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.8 12.2 12 4M5.2 4H12v6.8'/%3E%3C/svg%3E") center / contain no-repeat; transition: transform .15s ease; rotate: 45deg; }
+a.in1:hover .ext-end::after, a.in1:focus-visible .ext-end::after { transform: translate(1px, -1px); }
+@media (prefers-reduced-motion: reduce) { a.in1 .ext-end::after { transition: none; } }
+.menu .arr.arr-next { clip-path: none; font-size: 1em; top: 0; margin-left: .18em; vertical-align: .02em; width: .7em; height: .7em; rotate: 45deg;
+  background: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.8 12.2 12 4M5.2 4H12v6.8'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.8 12.2 12 4M5.2 4H12v6.8'/%3E%3C/svg%3E") center / contain no-repeat; }
 @media (prefers-reduced-motion: reduce) { a.ext::after, a.ext .ext-end::after { transition: none; } }
 /* Outbound links in the footer and phone menu keep those places' own colours and weight; only the arrow is added */
 .foot a.ext { color: var(--muted); font-weight: inherit; } .foot a.ext:hover { color: var(--glow); }
