@@ -29,6 +29,18 @@
   --page-rgb: 15 10 13; --ink-rgb: 237 241 237; /* = --m-ink as a triple */ --brand-rgb: 108 255 168;
   --ctl-line: rgb(var(--brand-rgb) / .3); --surface: #17110F; --surface-rgb: 23 17 15; --surface-2: #0A0608; --ink-soft: var(--m-ink-soft); --muted-ink: var(--m-muted); --err: #FF8A80; --warn: #FFB547;
 }
+/* Matrix controls: the browser's own and the custom ones follow the dark theme (color-scheme: dark above makes native popups,
+   scrollbars, and date, number, and file controls render dark). Ranges, progress bars, and checkboxes take the neon; selected text
+   a wash of it; an unstyled dropdown's list takes the surface; autofill keeps the field's dark fill, which Chrome would paint pale
+   blue; Neo's window uses the shared text levels, and its disabled send stays at .6 or above. Awake is untouched. */
+:root[data-site-theme="matrix"] { accent-color: var(--neon); }
+:root[data-site-theme="matrix"] ::selection { background: rgb(108 255 168 / .3); color: var(--m-ink); }
+:where(:root[data-site-theme="matrix"]) .awake :is(option, optgroup) { background-color: var(--surface); color: var(--ink); }
+:root[data-site-theme="matrix"] :is(input, textarea, select):-webkit-autofill, :root[data-site-theme="matrix"] :is(input, textarea, select):-webkit-autofill:is(:hover, :focus) {
+  -webkit-text-fill-color: var(--m-ink); caret-color: var(--m-ink); box-shadow: 0 0 0 100px var(--page) inset; transition: background-color 9999s; }
+:root[data-site-theme="matrix"] .awake :is(input, textarea, select):-webkit-autofill, :root[data-site-theme="matrix"] .awake :is(input, textarea, select):-webkit-autofill:is(:hover, :focus) { box-shadow: 0 0 0 100px var(--surface) inset; }
+:root[data-site-theme="matrix"] .n1chat:not(.n1chat-light) { --fg: var(--m-ink); --muted: var(--m-muted); }
+:root[data-site-theme="matrix"] .n1chat-send:disabled { opacity: .6; }
 /* Switching is one plain change of every color, all at once (js/theme.js sets the class for a beat around it): the page, its text, and its
    lines cut over together, and the neon parts then flicker as the sign comes on, so no text trails behind the rest. The motion of
    things that move (transform, opacity, visibility) keeps its own timing */
