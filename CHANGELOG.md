@@ -4,6 +4,8 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+- On a phone, opening Neo or tapping its box no longer moves the page behind it, and the page scrolls normally after Neo closes. iOS scrolls the page when the box takes focus and the keyboard rises; the page now holds its position while Neo is open and starts its own scroll steering fresh when Neo closes.
+
 ## v0.78.0
 
 - The cross-fade between pages runs only on a move from one neon1 page to the next. A page opened from outside the site, from an email link or a typed address, shows without it.

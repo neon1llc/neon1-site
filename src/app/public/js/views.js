@@ -132,7 +132,7 @@
   const visited = new Set([hero]);
   const menu = document.getElementById("menu");
   let off = false; // reduced motion turned on mid-visit
-  const paused = () => off || !menu.hidden || document.body.classList.contains("case-open") || document.body.classList.contains("white-rabbit-on");
+  const paused = () => off || !menu.hidden || document.body.classList.contains("case-open") || document.body.classList.contains("n1chat-open") || document.body.classList.contains("white-rabbit-on");
   // The ask neon1 window scrolls on its own; page steering never takes its wheel, touch, or keys
   const inChat = (node) => node instanceof Element && !!node.closest(".n1chat");
   // A box that scrolls on its own (the contact message, a long answer) keeps the wheel or finger while it
@@ -538,6 +538,17 @@
     if (!settling && !pullDir && Math.abs(scrollY - y) > 2) sync();
   }, { passive: true });
 
+  // The chat window pins the page while it is open on a narrow screen (shared/chat.js). When it lets go, the
+  // steering starts again from wherever the page is: no settle, pull, or swallowed momentum left over
+  addEventListener("n1chat-pin", () => {
+    if (document.body.classList.contains("n1chat-open")) return;
+    if (settling) { settling.stop(); settling = null; }
+    if (pullDir) release();
+    pull = 0; pullDir = 0; blockUntilIdle = false; fingers = 0;
+    sync();
+    rest(300);
+  });
+
   // A resize keeps the position inside the current view
   addEventListener("resize", () => {
     if (settling) return;
@@ -559,7 +570,7 @@
   function rest(wait = 160) {
     clearTimeout(restTimer);
     restTimer = setTimeout(function check() {
-      if (off || !menu.hidden || document.body.classList.contains("case-open") || document.body.classList.contains("white-rabbit-on")) return;
+      if (off || !menu.hidden || document.body.classList.contains("case-open") || document.body.classList.contains("n1chat-open") || document.body.classList.contains("white-rabbit-on")) return;
       if (settling || folding || pullDir || fingers || typing() || performance.now() - lastInput < IDLE) { restTimer = setTimeout(check, 200); return; }
       const at = scrollY;
       const i = indexAt(at), [, bottom] = range(i);
@@ -608,7 +619,7 @@
   function remember() {
     // Until the visitor has moved, a restored or linked page is still landing: keep the older memory
     if (wantsLanding && !lastInput && !touched && performance.now() < 4000) return;
-    if (document.body.classList.contains("case-open") || off) return;
+    if (document.body.classList.contains("case-open") || document.body.classList.contains("n1chat-open") || off) return;
     const i = indexAt(scrollY), v = views[i];
     const pos = { v: v.id || "", i, dy: Math.max(0, Math.round(scrollY - range(i)[0])) };
     const key = pos.v + "|" + pos.i + "|" + pos.dy;
