@@ -342,14 +342,28 @@
       const h1 = d.getBoundingClientRect().height;
       d.style.height = `${h0}px`;
       const runs = [animate(d, { height: [`${h0}px`, `${h1}px`] }, { duration: FOLD_TIME, ease: foldEase })];
+      const wasTop = !(v && v.dataset.pinned && !v.dataset.top), padFrom = v ? parseFloat(v.style.paddingTop) || 0 : 0;
       // The first fold opened in a centered view: the view glides to its top while the fold opens
       if (v && v.dataset.pinned && !v.dataset.top) {
         v.dataset.top = "1";
         const from = parseFloat(v.style.paddingTop) || 0;
         runs.push(animate(v, { paddingTop: [`${from}px`, `${TOP_GAP}px`] }, { duration: FOLD_TIME, ease: foldEase }));
         // The page lines up with the view's top in the same move, if it wasn't already there
+        // A fold that wants its label at the top (the contact form) scrolls there below instead of to the view's top
         const top = range(i)[0];
-        if (Math.abs(scrollY - top) > 2) runs.push(animate(scrollY, top, { duration: FOLD_TIME, ease: foldEase, onUpdate: (p) => scrollTo(0, p) }));
+        if (!d.hasAttribute("data-focus-label") && Math.abs(scrollY - top) > 2) runs.push(animate(scrollY, top, { duration: FOLD_TIME, ease: foldEase, onUpdate: (p) => scrollTo(0, p) }));
+      }
+      // data-focus-label: the page glides, in the fold's own time and curve, until the label sits under the bar with the
+      // usual spacing and the form runs down from it, from wherever the visitor was, even at the bottom of the view
+      if (d.hasAttribute("data-focus-label")) {
+        // Where the label will be once the fold is open and the view has settled at its top
+        const labelY = s.getBoundingClientRect().top + scrollY - (wasTop ? 0 : Math.max(0, padFrom - TOP_GAP));
+        const finalMax = maxY() + (h1 - h0) - (wasTop ? 0 : Math.max(0, padFrom - TOP_GAP));
+        // The space above the label (under the bar) equals the space between the label and the form's first field
+        const first = s.nextElementSibling, below = first ? first.getBoundingClientRect().top - s.getBoundingClientRect().bottom : TOP_GAP;
+        const gap = Math.max(12, Math.min(96, Math.round(below)));
+        const dest = Math.max(range(i)[0], Math.min(finalMax, Math.round(labelY - HEADER - gap)));
+        if (Math.abs(scrollY - dest) > 2) runs.push(animate(scrollY, dest, { duration: FOLD_TIME, ease: foldEase, onUpdate: (p) => scrollTo(0, p) }));
       }
       Promise.all(runs.map((r) => r.finished ?? r)).then(() => {
         d.style.height = d.style.overflow = "";
@@ -546,7 +560,7 @@
     clearTimeout(restTimer);
     restTimer = setTimeout(function check() {
       if (off || !menu.hidden || document.body.classList.contains("case-open") || document.body.classList.contains("white-rabbit-on")) return;
-      if (settling || pullDir || fingers || typing() || performance.now() - lastInput < IDLE) { restTimer = setTimeout(check, 200); return; }
+      if (settling || folding || pullDir || fingers || typing() || performance.now() - lastInput < IDLE) { restTimer = setTimeout(check, 200); return; }
       const at = scrollY;
       const i = indexAt(at), [, bottom] = range(i);
       if (at <= bottom + 2 || i === views.length - 1) return; // inside a view

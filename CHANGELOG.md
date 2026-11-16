@@ -4,6 +4,12 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+- Knowledge Center: the two groups and each shelf keep their heading in view while you read. The description eases away as it sticks, and the heading fades at the last card.
+- The group headings sit on a panel that reads in light and dark. The title block and the blog's match in spacing.
+- Shelf links in the bar land the shelf title with equal space above and below. The current shelf is highlighted, and each shelf and group shows its article count.
+- "Send me your use case" opens with equal space above and below its label.
+- Client work ends with three next steps: book a call, tell me what's going on, or define your use case in the 1NEON portal.
+
 ## v0.75.0
 
 - The site starts light for everyone. Dark is only by choice: the switch picks it and remembers it.

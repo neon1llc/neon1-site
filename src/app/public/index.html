@@ -245,8 +245,8 @@
       </div>
         <div class="rail-nav"><button class="chip arrow" type="button" data-rail="-1" aria-label="Previous"><span class="arr" aria-hidden="true"></span></button><button class="chip arrow" type="button" data-rail="1" aria-label="Next"><span class="arr arr-next" aria-hidden="true"></span></button></div>
       </div>
-      <!-- The path from proof to a start: book the free call, start in 1NEON, or write in on the contact view -->
-      <p class="lead start-line reveal-on">Something similar going on? <a class="ext" href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">Book a free 15-minute <span class="ext-end">call</span></a><span data-signup hidden>, <a href="/1NEON/?signup=1" data-handoff>start a free 1NEON account</a>,</span> or <a href="#contact" data-view="contact">tell me what's going on</a>.</p>
+      <!-- The path from proof to a start: book the free call, write in on the contact view, or define the use case in 1NEON (once sign-up is open) -->
+      <p class="lead start-line reveal-on">Something similar going on? <a class="ext" href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">Book a free 15-minute <span class="ext-end">call</span></a>, <span class="start-or">or </span><a href="#contact" data-view="contact">tell me what's going on</a><span data-signup hidden>, or get straight to defining your use case in <a href="/1NEON/?signup=1" data-handoff>the 1NEON <span class="nw">portal<span class="arr arr-mixed arr-next" aria-hidden="true"></span></span></a></span>.</p>
     </section>
 
     <section id="process" class="view split" aria-labelledby="process-h">
@@ -345,7 +345,7 @@
       </dl>
       <!-- The form, folded until asked for. It appears once js/contact.js runs; without it, the email and
            phone links above do the job. It posts to 1NEON's contact route, which mails neon1's inbox only -->
-      <details class="n1-fold fold cfold reveal-on" id="cfold" hidden>
+      <details class="n1-fold fold cfold reveal-on" id="cfold" data-focus-label hidden>
         <summary>send me your use case</summary>
         <form class="cform" id="cform" novalidate>
           <fieldset class="ctopic">

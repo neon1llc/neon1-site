@@ -45,7 +45,7 @@ const page = (opts) => page_(frame, {
   current: "knowledge",
   generator: "scripts/knowledge.mjs from neon1-corpus. Edit the corpus, then run make knowledge",
   styles: ["/css/knowledge.css"],
-  scripts: ["/js/fold.js", "/js/knowledge.js", "/js/knowledge-toc.js", "/js/knowledge-shelves.js"],
+  scripts: ["/js/fold.js", "/js/knowledge.js", "/js/knowledge-toc.js", "/js/knowledge-shelves.js", "/js/knowledge-groups.js"],
 })
 
 
@@ -103,6 +103,8 @@ function shelfDocs(s) {
 }
 const groupCount = (g) => new Set(g.shelves.flatMap((s) => Object.values(shelfDocs(s)).flat().map((d) => d.id))).size
 const countMark = (g) => `<span class="kc-n"> ${groupCount(g)}</span>`
+const shelfCount = (s) => new Set(Object.values(shelfDocs(s)).flat().map((d) => d.id)).size
+const shelfMark = (s) => `<span class="kc-n"> ${shelfCount(s)}</span>`
 
 function shelfSection(s) {
   const { lead, rest, dev } = shelfDocs(s)
@@ -115,8 +117,8 @@ function shelfSection(s) {
     : ""
   return `      <section class="kc-shelf" id="${s.key}" aria-labelledby="${s.key}-h">
         <div class="kc-shelf-head">
-          <h3 id="${s.key}-h">${esc(s.label)}</h3>
-          <p>${esc(s.description)}</p>
+          <h3 id="${s.key}-h">${esc(s.label)}${shelfMark(s)}</h3>
+          <div class="kc-shelf-desc"><p>${esc(s.description)}</p></div>
         </div>
         ${cardList([...lead, ...rest])}${fold}
       </section>`
@@ -127,14 +129,14 @@ function indexPage() {
     .map((g) => `    <section class="kc-group" id="${g.key}" aria-labelledby="${g.key}-h">
       <div class="kc-group-head">
         <h2 id="${g.key}-h">${esc(g.label)}${countMark(g)}</h2>
-        <p>${esc(g.description)}</p>
+        <div class="kc-group-desc"><p>${esc(g.description)}</p></div>
       </div>
 ${g.shelves.map(shelfSection).join("\n\n")}
     </section>`)
     .join("\n\n")
   const nav = corpus.groups
     .map((g) => `        <li class="kc-nav-group"><span>${esc(g.label)}${countMark(g)}</span></li>
-${g.shelves.map((s) => `        <li><a href="#${s.key}">${esc(s.label)}</a></li>`).join("\n")}`)
+${g.shelves.map((s) => `        <li><a href="#${s.key}">${esc(s.label)}${shelfMark(s)}</a></li>`).join("\n")}`)
     .join("\n")
   const main = `${band({ id: "kc-title", eyebrow: "neon1 · knowledge center", title: "Everything neon1", lead: "Guides, policies, and answers.", after: `
         <form class="kc-search" role="search" action="${BASE}" method="get">
