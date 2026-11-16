@@ -27,6 +27,7 @@ const WHERE = [
   ["site", "Main site"],
   ["1neon", "1NEON"],
   ["demo", "1NEON demo"],
+  ["walkthrough", "1NEON live walkthrough"],
   ["neo", "Neo chat"],
   ["kc", "Knowledge Center"],
   ["blog", "Blog"],
@@ -67,6 +68,7 @@ ${WHERE.map(([v, t]) => `            <option value="${v}">${t}</option>`).join("
           <p class="rb-help" id="rb-done-note">Quote it if you write to <a href="mailto:hello@neon1.tech">hello@neon1.tech</a>.</p>
           <button class="btn btn-ghost" type="button" id="rb-again">Report another</button>
         </div>
+        <p class="rb-help rb-security">Found a security issue? <a class="ext" href="mailto:security@neon1.tech"><span class="ext-end">Email security@neon1.tech</span></a> instead.</p>
       </div>
     </section>`
 

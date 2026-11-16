@@ -13,6 +13,7 @@
 .rb-form label { display: grid; gap: 6px; font: 500 14px var(--sans); color: var(--ink); }
 .rb-form .opt { font: 400 12px var(--mono); color: var(--muted); margin-left: 4px; }
 .rb-help { margin: 0; font-size: 13px; color: var(--muted); }
+.rb-security { margin-top: 24px; }
 .rb-form label > .rb-help { font-weight: 400; }
 
 .rb-form textarea, .rb-form input:not([type="file"]), .rb-form select { font: 15px/1.45 var(--sans); color: var(--ink); background: var(--surface); border: 1px solid rgb(var(--ink-rgb) / .2); border-radius: var(--glass-r); padding: 9px 11px; width: 100%; box-sizing: border-box; min-height: 44px; }

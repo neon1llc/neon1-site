@@ -9,6 +9,8 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - Neo's panel: "book" opens in a new tab with the outbound arrow, and outbound links there follow the same underline rules.
 
 - neon1.tech/report-bug is a page of its own for reporting a bug: where it happened (main site, 1NEON, 1NEON demo, Neo chat, Knowledge Center, blog, or other, filled in from a `?from=` link or the page you came from), what happened, an optional email for a reply, and up to three PNG or JPEG screenshots. The page you came from, your theme, browser, and window size go with it, and the page says so. The confirmation shows a reference to quote. It sends to hello@ through 1NEON's bug route, and screenshots are kept privately and scanned for malware.
+- The "Where" choices include "1NEON live walkthrough" (`?from=walkthrough`, or a visit from /1NEON/live). The walkthrough itself still has no report link.
+- The report page ends with "Found a security issue? Email security@neon1.tech instead." so security reports stay apart from bug reports.
 - Neo's window has a "report a bug" link at the bottom right that opens the report page in a new tab.
 
 - "report a bug" in the footer's bottom right opens the report page in a new tab, from every page, with the page it came from passed along.
