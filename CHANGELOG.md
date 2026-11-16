@@ -4,6 +4,8 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+- Contact: the lead line reads "Tell me what's going on with an email, a call or text to (424) 32-neon1, or a free 15-minute call", with "How can I help?" above it and one gap between the lines. The facts table is now availability, where, size, and first call, each slash-separated, with weekday evenings as 6-9pm (Fri to 8pm). The home page's structured data lists opening hours.
+- Knowledge Center: group headers are a band edge to edge with a line above and below, in type larger and heavier than the shelf titles. One gap (the one above the "On this page" bar) separates the bar, bands, shelf titles, and the cards. The bar is as thin as the document pages' bar, the group names in its menu are links, counts sit beside names (the current one in the current style), and the menu stays open when the theme changes.
 - Knowledge Center "On this page" bar: once it reaches the top it eases out to a square bar edge to edge, as on document pages, with its contents on the content column's edges (document pages had a small overhang at mid widths). The separate sticky group bar is gone; the bar says "2 of 11 · FOR YOU / Alternatives". Group headers are boxed with the brand line, and larger in the dropdown. Dropdowns carry a rule under the default choice (or under the collapsed bar) in the arrow's color.
 - Only one white rabbit shows in the rain at a time, and the next comes a random 7 to 10 seconds after the last one is gone, whether it faded or was caught.
 - The white rabbit logs one line to the browser console saying why the still card is showing (reduced motion, no WebGL, a failed load, a lost context), so an unexpected fallback can be checked in DevTools.

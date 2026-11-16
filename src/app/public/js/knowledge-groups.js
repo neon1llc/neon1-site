@@ -9,7 +9,8 @@ if (bar) {
   const fold = bar.querySelector("details");
   const label = fold && fold.querySelector("summary span");
   const resting = label ? label.textContent : "";
-  const links = [...bar.querySelectorAll("a[href^='#']")];
+  const links = [...bar.querySelectorAll("a[href^='#']:not([data-group])")];
+  const groupLinks = [...bar.querySelectorAll("a[data-group]")].map((a) => ({ a, el: document.getElementById(a.getAttribute("href").slice(1)) })).filter((g) => g.el);
   const shelves = links.map((a) => ({ a, el: document.getElementById(a.getAttribute("href").slice(1)) })).filter((s) => s.el);
   const reduce = matchMedia("(prefers-reduced-motion: reduce)");
   let queued = false;
@@ -53,14 +54,15 @@ if (bar) {
   };
   // A shelf link lands the shelf's title a title-to-description gap under the bar
   const land = (el, smooth) => {
-    const title = el.querySelector(".kc-shelf-head h3");
+    // A group lands its band, a shelf its title
+    const title = el.querySelector(".kc-group-head") || el.querySelector(".kc-shelf-head h3");
     if (!title) return false;
     const t = title.getBoundingClientRect();
-    const gap = 14;
+    const gap = el.classList.contains("kc-group") ? 0 : 14;
     scrollTo({ top: Math.max(0, Math.round(t.top + scrollY - stickAt() - gap)), behavior: smooth && !reduce.matches ? "smooth" : "auto" });
     return true;
   };
-  for (const s of shelves) s.a.addEventListener("click", (e) => {
+  for (const s of [...shelves, ...groupLinks]) s.a.addEventListener("click", (e) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
     if (fold) fold.open = false;
     if (land(s.el, true)) { e.preventDefault(); history.pushState(null, "", `#${s.el.id}`); }
@@ -68,7 +70,8 @@ if (bar) {
   const queue = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
 
   // Outside a tap, or Escape, shuts the list
-  document.addEventListener("click", (e) => { if (fold && fold.open && !bar.contains(e.target)) fold.open = false; });
+  // (the theme switch is the exception, so the list stays open as the page changes theme, as on the document pages)
+  document.addEventListener("click", (e) => { if (fold && fold.open && !bar.contains(e.target) && !e.target.closest(".theme-sw")) fold.open = false; });
   addEventListener("keydown", (e) => { if (e.key === "Escape" && fold && fold.open) { fold.open = false; fold.querySelector("summary").focus(); } });
   addEventListener("scroll", queue, { passive: true });
   addEventListener("resize", queue);

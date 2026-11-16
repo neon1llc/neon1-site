@@ -138,7 +138,7 @@ ${g.shelves.map(shelfSection).join("\n\n")}
     </section>`)
     .join("\n\n")
   const nav = corpus.groups
-    .map((g) => `        <li class="kc-nav-group"><span>${esc(g.label)}${countMark(g)}</span></li>
+    .map((g) => `        <li class="kc-nav-group"><a href="#${g.key}" data-group>${esc(g.label)}${countMark(g)}</a></li>
 ${g.shelves.map((s) => `        <li><a href="#${s.key}">${esc(s.label)}${shelfMark(s)}</a></li>`).join("\n")}`)
     .join("\n")
   const main = `${band({ id: "kc-title", eyebrow: "neon1 · knowledge center", title: "Everything neon1", lead: "Guides, policies, and answers.", after: `

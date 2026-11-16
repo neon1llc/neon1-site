@@ -43,6 +43,11 @@
           "slogan": "1 is glad to be of service.",
           "description": "Business workflows for owner-run small businesses: orders, intake, and invoices connected end to end. Also cloud and AI engineering, office networks and devices, and security training.",
           "areaServed": "Remote across the US, or on site within about 30 miles of Queens, NY",
+          "openingHoursSpecification": [
+            { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday"], "opens": "18:00", "closes": "21:00" },
+            { "@type": "OpeningHoursSpecification", "dayOfWeek": "Friday", "opens": "18:00", "closes": "20:00" },
+            { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday", "Sunday"], "opens": "08:00", "closes": "20:00" }
+          ],
           "email": "hello@neon1.tech",
           "telephone": "+1-424-326-3661",
           "founder": { "@type": "Person", "@id": "https://neon1.tech/#pradeep", "name": "Pradeep Tathineni", "sameAs": "https://www.linkedin.com/in/pradeep-tathineni/" },
@@ -330,16 +335,17 @@
     </section>
     <section id="contact" class="view contact" aria-labelledby="contact-h">
       <h2 id="contact-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>contact</h2>
-      <p class="lead reveal-on">Tell me what's going on and I'll reply by email. Or <a class="ext" href="mailto:hello@neon1.tech"><span class="ext-end">email</span></a>, call or text <a class="ext" href="tel:+14243263661" title="(424) 326-3661">(424) <span class="ext-end">32-neon1</span></a>, or <a class="ext" href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a 15-minute <span class="ext-end">call</span></a>.</p>
+      <p class="lead reveal-on">How can I help?</p>
+      <p class="lead reveal-on">Tell me what's going on with an <a class="ext" href="mailto:hello@neon1.tech"><span class="ext-end">email</span></a>, a call or text to <a class="ext" href="tel:+14243263661" title="(424) 326-3661">(424) <span class="ext-end">32-neon1</span></a>, or a <a class="ext" href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">free 15-minute <span class="ext-end">call</span></a>.</p>
       <!-- Self sign-up: a free, limited 1NEON account where a visitor writes down their needs before any call.
            Hidden until js/signup.js hears that 1NEON's sign-up is open -->
       <p class="lead reveal-on" data-signup hidden>Rather write it down first? <a href="/1NEON/?signup=1">Start a free 1NEON account</a>, write down what your project needs, then ask for an assessment or a call from your account. It holds up to 3 projects and is kept 30 days after your last change. <a href="/knowledge/guides/free-accounts/">How free accounts work</a>.</p>
       <!-- Engagement fit: where, when, what size, and the first call, in one glance -->
       <dl class="fit reveal-on">
-        <div><dt>where</dt><dd>Remote across the US, or on site within about 30 miles of Queens, NY. Outside the US, ask</dd></div>
-        <div><dt>when</dt><dd>Weekends 8am to 8pm and weekday evenings, Eastern time</dd></div>
-        <div><dt>size</dt><dd>A week or two up to six weeks, with at most two clients at a time</dd></div>
-        <div><dt>first call</dt><dd>Free and 15 minutes: the main problem and your options</dd></div>
+        <div><dt>availability</dt><dd>Weekday evenings (6&ndash;9pm, Fri to 8pm) / Weekends (8am&ndash;8pm) / Eastern time</dd></div>
+        <div><dt>where</dt><dd>Local on-site (within 30 miles of Queens, NY) / US remote / Global remote (ask)</dd></div>
+        <div><dt>size</dt><dd><a href="/knowledge/services/services/#which-one-sounds-like-you">1&ndash;2 weeks up to 6 weeks</a> / At most 2 clients at a time</dd></div>
+        <div><dt>first call</dt><dd>Free, 15 minutes / Any need, any size</dd></div>
       </dl>
       <!-- The form, folded until asked for. It appears once js/contact.js runs; without it, the email and
            phone links above do the job. It posts to 1NEON's contact route, which mails neon1's inbox only -->
