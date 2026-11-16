@@ -146,8 +146,9 @@ h2 .pr { display: inline-block; width: .7ex; height: 1ex; margin-right: .3em; ve
 .case { flex: 0 0 clamp(290px, 31vw, 392px); scroll-snap-align: start; }
 
 /* Previous and next buttons, kept on phones too, so the cards never need a swipe */
-.rail-nav { display: flex; gap: 8px; justify-content: flex-end; max-width: 1152px; margin: 6px auto 0; padding: 0 24px; }
-@media (max-width: 640px) { .case { flex-basis: 82vw; } .rail-nav { justify-content: center; } }
+/* The previous and next buttons sit centered on the page at every width, as on a phone, instead of at the rail's right end where nothing lines up */
+.rail-nav { display: flex; gap: 8px; justify-content: center; max-width: 1152px; margin: 6px auto 0; padding: 0 24px; }
+@media (max-width: 640px) { .case { flex-basis: 82vw; } }
 
 /* Card face: label, title, NEON rows, and a stat pinned to the bottom */
 .case { background: var(--surface); border: 1px solid rgb(var(--ink-rgb) / .1); border-radius: 6px; padding: clamp(20px, 2.6vh, 26px); display: flex; flex-direction: column; }
