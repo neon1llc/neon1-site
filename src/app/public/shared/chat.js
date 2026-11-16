@@ -196,7 +196,14 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
     ".",
   );
 
-  panel.append(head, log, form, note, human);
+  // Bottom right: the report-a-bug page in a new tab, so a bug seen while talking to Neo is one click away (?from=neo
+  // picks "Neo chat" on the page). Left off the report page itself, where it would open the page you're on
+  const bug = el("p", "n1chat-bug");
+  if (!location.pathname.startsWith("/report-bug")) {
+    bug.append(el("a", "n1chat-plain n1chat-ext", "report a bug", { href: "/report-bug/?from=neo", target: "_blank", rel: "noopener" }));
+  }
+
+  panel.append(head, log, form, note, human, ...(bug.hasChildNodes() ? [bug] : []));
   for (const cls of className.split(/\s+/).filter(Boolean)) for (const node of [launcher, panel]) node.classList.add(cls);
   root.append(launcher, panel);
 

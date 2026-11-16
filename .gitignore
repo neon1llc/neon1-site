@@ -18,6 +18,8 @@ node_modules/
 # printed in the deploy job by make knowledge-pdf). Never committed, so the repository can't drift from a release
 src/app/public/knowledge/
 src/app/public/blog/
+# The report-a-bug page, written from the page shell by make content
+src/app/public/report-bug/
 
 # dev.neon1.tech builds, from make dev-build
 .dev-build/
