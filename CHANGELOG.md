@@ -6,7 +6,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## v0.78.0
 
-- A neon1 page opened from outside the site (a link in an email, or an address typed into a new tab) shows at once in DuckDuckGo on iPhone. It had stayed black until the address was entered again. The cross-fade between pages now starts only on a move from one neon1 page to the next, so an arrival from outside never waits on it.
+- The cross-fade between pages runs only on a move from one neon1 page to the next. A page opened from outside the site, from an email link or a typed address, shows without it.
 - Back, Forward, and reload return to the exact spot on the home page, however the visitor got there: a menu link, the wheel, the keys, or touch. Each history entry remembers its view and how far into it the page was scrolled. Before, a Back from the Knowledge Center after scrolling without the menu landed at the top, and a section link could show another screen than its address.
 - The free 1NEON account invitations in the home page's services, start, and contact lines open the sign-up in a new tab with the outbound arrow, which reads more smoothly inside a sentence than the right-pointing arrow did.
 - The home page questions are short: five questions, each showing the first paragraph of its answer, chosen by the FAQ's `home` list in neon1-corpus. "How do I pay?" leaves the home page; the Knowledge Center keeps every question in full.
