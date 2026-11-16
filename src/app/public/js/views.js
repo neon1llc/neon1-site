@@ -584,17 +584,47 @@
   // Opened with a section link, or a case link's card: land on that view once fonts and layout settle
   const start = views.indexOf(first ? first.closest(".view") : document.getElementById(location.hash.slice(1)));
   history.scrollRestoration = "manual";
+
+  // Where this history entry was last scrolled, kept in the entry itself (history.state), so Back, Forward and
+  // reload return to the exact spot however the visitor got there (menu link, wheel, keys, touch, scrollbar).
+  // It is stored as a view plus the distance inside it, which survives font and layout shifts better than raw pixels.
+  const memo = history.state && history.state.pos;
+  const memoAt = memo ? (memo.v ? views.findIndex((v) => v.id === memo.v) : memo.i) : -1;
+  const aimAt = memo && memoAt >= 0 && (memoAt > 0 || memo.dy > 2) ? memoAt : -1;
+  // The scroll position to land on: the remembered spot, else the top of the linked view
+  const aim = () => (aimAt >= 0 ? Math.min(range(aimAt)[0] + memo.dy, maxY()) : range(start)[0]);
+  const wantsLanding = aimAt >= 0 || start > 0;
+
   // Fonts can change heights after the first paint, so land again until the visitor scrolls
-  // The first few seconds of a visit opened at a #section, until the visitor scrolls, clicks, or types
+  // The first few seconds of a visit opened at a #section or restored, until the visitor scrolls, clicks, or types
   let touched = false;
   for (const ev of ["pointerdown", "keydown", "touchstart", "popstate", "hashchange"]) addEventListener(ev, () => { touched = true; }, { capture: true, once: true });
-  const landing = () => start > 0 && !lastInput && !touched && !settling && performance.now() < 4000 && Math.abs(scrollY - range(start)[0]) > 2;
-  const land = () => { if (start > 0 && !lastInput && !touched && !settling) { scrollTo(0, range(start)[0]); sync(); } };
+  const landing = () => wantsLanding && !lastInput && !touched && !settling && performance.now() < 4000 && Math.abs(scrollY - aim()) > 2;
+  const land = () => { if (wantsLanding && !lastInput && !touched && !settling) { scrollTo(0, aim()); sync(); } };
   land();
+
+  // Remember the position: once the page rests, when it is hidden or left, and just before a link is followed
+  let lastSaved = "";
+  function remember() {
+    // Until the visitor has moved, a restored or linked page is still landing: keep the older memory
+    if (wantsLanding && !lastInput && !touched && performance.now() < 4000) return;
+    if (document.body.classList.contains("case-open") || off) return;
+    const i = indexAt(scrollY), v = views[i];
+    const pos = { v: v.id || "", i, dy: Math.max(0, Math.round(scrollY - range(i)[0])) };
+    const key = pos.v + "|" + pos.i + "|" + pos.dy;
+    if (key === lastSaved) return;
+    try { history.replaceState({ ...history.state, pos }, ""); lastSaved = key; } catch { /* Safari limits how often the entry may change */ }
+  }
+  let rememberTimer = 0;
+  addEventListener("scroll", () => { clearTimeout(rememberTimer); rememberTimer = setTimeout(remember, 250); }, { passive: true });
+  addEventListener("pagehide", remember);
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") remember(); });
+  document.addEventListener("click", (e) => { if (e.target.closest && e.target.closest("a[href]")) remember(); }, true);
+
   // The page may show itself now: viewport.js held it as blank paper while it waited to land on the section
   const arrived = () => document.documentElement.classList.remove("arriving");
   // Landing is a single scroll, so the page shows itself two frames after it; a later correction (fonts, the load event) moves it by a few pixels at most
-  if (start <= 0) arrived(); else requestAnimationFrame(() => requestAnimationFrame(arrived));
+  if (!wantsLanding) arrived(); else requestAnimationFrame(() => requestAnimationFrame(arrived));
   // The browser's own jump to the #fragment can run after load and land 72px low, so land once more after it
   addEventListener("load", () => { land(); requestAnimationFrame(() => setTimeout(() => { land(); arrived(); }, 0)); });
   if (document.fonts) document.fonts.ready.then(land);
