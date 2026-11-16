@@ -95,6 +95,12 @@
 @media (prefers-reduced-motion: reduce) { .n1chat-ext::after { transition: none; } }
 .n1chat-plain { color: var(--link); font-weight: 600; text-decoration: none; }
 .n1chat-plain:hover { text-decoration: underline; }
+.n1chat-plain.n1chat-ext:hover { text-decoration: none; }
+/* Outbound links (the arrow ones) follow the site's rule: in the light look no underline, even on hover; in the dark look (matrix, or over the
+ * rain) a dim underline that turns the link's full color on hover */
+.n1chat:not(.n1chat-light) :is(.n1chat-link, .n1chat-ext) { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, var(--link) 55%, transparent); }
+.n1chat:not(.n1chat-light) :is(.n1chat-link, .n1chat-ext):is(:hover, :focus-visible) { text-decoration-color: var(--link); }
 
 .n1chat-launch:focus-visible, .n1chat button:focus-visible, .n1chat a:focus-visible, .n1chat-input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .n1chat-launch.n1chat-light:focus-visible { outline-color: var(--brand); }

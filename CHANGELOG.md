@@ -4,6 +4,10 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+- Footer "report a bug" is in the footer's mono face on the legal line's baseline, right-aligned with the top bar's rightmost control at every width, in the theme's green. In the dark theme the version link and "report a bug" carry the dim underline that turns bright on hover; in the light theme outbound links have no underline.
+
+- Neo's panel: "book" opens in a new tab with the outbound arrow, and outbound links there follow the same underline rules.
+
 - neon1.tech/report-bug is a page of its own for reporting a bug: where it happened (main site, 1NEON, 1NEON demo, Neo chat, Knowledge Center, blog, or other, filled in from a `?from=` link or the page you came from), what happened, an optional email for a reply, and up to three PNG or JPEG screenshots. The page you came from, your theme, browser, and window size go with it, and the page says so. The confirmation shows a reference to quote. It sends to hello@ through 1NEON's bug route, and screenshots are kept privately and scanned for malware.
 - Neo's window has a "report a bug" link at the bottom right that opens the report page in a new tab.
 

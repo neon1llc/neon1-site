@@ -188,7 +188,7 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
   const human = el("p", "n1chat-human");
   human.append(
     "Reach a person: ",
-    el("a", "n1chat-plain", "book", { href: BOOKING, target: "_blank", rel: "noopener" }),
+    el("a", "n1chat-plain n1chat-ext", "book", { href: BOOKING, target: "_blank", rel: "noopener" }),
     ", ",
     el("a", "n1chat-plain", "email", { href: EMAIL }),
     ", or ",
