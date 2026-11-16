@@ -271,7 +271,7 @@ footer { position: relative; z-index: 2; border-top: 1px solid var(--line); back
 @media (max-width: 700px) { .foot { grid-template-columns: 1fr 1fr; } .foot > div:first-child { grid-column: 1 / -1; } }
 /* Legal line. Its bottom padding is a resting place for Neo's launcher (fixed, bottom left, 48px tall, 16px from the bottom edge): the
    launcher's own distance from the edge is also its distance above the line's last row, so at the end of any page it never covers text.
-   "report a bug" sits in the same strip at the right, centered on the launcher (see its rule below) */
+   "report bug \\ feedback" sits in the same strip at the right, centered on the launcher (see its rule below) */
 :root { --foot-gap: max(16px, env(safe-area-inset-bottom)); --foot-neo: 48px; }
 .legal { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
   font: 12px var(--mono); color: var(--muted); border-top: 1px solid var(--line);
@@ -307,22 +307,25 @@ a.ext:hover { color: var(--brand); }
 .menu a.ext { color: var(--neon); font-weight: 500; } .menu a.ext:hover, .menu a.ext:focus-visible { color: #e9ffee; }
 .chip.arrow .arr { top: 0; --arr-t: .12em; }
 
-/* ---- "report a bug": a footer link at the legal line's bottom right, opening the report page in a new tab ----
-   The footer's own mono face at its size, semibold with a small bug mark, so it reads as one of the legal line's items and still stands out by weight and the mark.
-   It is placed against the footer (the nearest positioned box) so it lines up with the bar's rightmost control at every width: the theme
+/* ---- "report bug \ feedback": two footer links at the legal line's bottom right, each opening its form in a new tab ----
+   The footer's own mono face at its size, semibold, each with a small line drawing (the bug between "report" and "bug", the speech bubble before
+   "feedback"), so they read as items of the legal line and still stand out by weight and mark. The pair is placed against the footer (the nearest
+   positioned box) so its right edge lines up with the bar's rightmost control at every width: the theme
    switch's right edge on a wide desktop (see the switch's own rule, which sits in the page margin), the menu button's or the switch's
-   24px in from the edge everywhere narrower. Vertically it is centered on Neo's launcher (the bottom offset is the launcher's middle), and the
-   bug's gap to the text is the outbound arrow's gap to the text, .18em */
-.legal a.report-bug, .legal a.report-bug.ext { position: absolute; right: max(24px, env(safe-area-inset-right)); bottom: calc(var(--foot-gap) + var(--foot-neo) / 2); translate: 0 50%; display: inline-flex; align-items: center; gap: .18em;
+   24px in from the edge everywhere narrower. Vertically it is centered on Neo's launcher (the bottom offset is the launcher's middle). A drawing's gap
+   to the text is the outbound arrow's gap to the text, .18em */
+.legal .report-links { position: absolute; right: max(24px, env(safe-area-inset-right)); bottom: calc(var(--foot-gap) + var(--foot-neo) / 2); translate: 0 50%; display: inline-flex; align-items: center; white-space: nowrap; }
+.legal .report-links .sep { margin: 0 .5em; }
+.legal a.report-bug, .legal a.report-bug.ext, .legal a.report-feedback, .legal a.report-feedback.ext { display: inline-flex; align-items: center; gap: .18em;
   font: 600 12px var(--mono); color: var(--glow); text-decoration: none; }
-.legal a.report-bug svg { width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-@media (min-width: 1200px) and (max-width: 1319px) { .legal a.report-bug, .legal a.report-bug.ext { right: calc((100% - 1200px) / 2 + 24px); } }
-@media (min-width: 1320px) { .legal a.report-bug, .legal a.report-bug.ext { right: calc((100% - 1200px) / 4 - 14px); } }
+.legal :is(a.report-bug, a.report-feedback) svg { width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+@media (min-width: 1200px) and (max-width: 1319px) { .legal .report-links { right: calc((100% - 1200px) / 2 + 24px); } }
+@media (min-width: 1320px) { .legal .report-links { right: calc((100% - 1200px) / 4 - 14px); } }
 /* Outbound links in the footer's legal line (the version, "report a bug"): the theme's green and no underline in awake, even on hover;
    in matrix a dim underline that turns the full green on hover, as the links in running text do */
-:root[data-site-theme="matrix"] .legal :is(a.report-bug, a.ext) { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px;
+:root[data-site-theme="matrix"] .legal :is(a.report-bug, a.report-feedback, a.ext) { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px;
   text-decoration-color: rgb(var(--brand-rgb) / .55); }
-:root[data-site-theme="matrix"] .legal :is(a.report-bug, a.ext):is(:hover, :focus-visible) { text-decoration-color: var(--glow); }
+:root[data-site-theme="matrix"] .legal :is(a.report-bug, a.report-feedback, a.ext):is(:hover, :focus-visible) { text-decoration-color: var(--glow); }
 
 /* ---- Links, one rule for the whole site ----
    Links that leave the page (another site, mailto:, tel:) end in the northeast arrow and, in the light look, carry no underline, since the

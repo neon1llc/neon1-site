@@ -51,6 +51,16 @@ function bugMark() {
   return svg;
 }
 
+// The speech bubble the footer's "feedback" uses, in the same 16px outline style
+function feedbackMark() {
+  const svg = document.createElementNS(SVG, "svg");
+  for (const [k, v] of Object.entries({ viewBox: "0 0 16 16", "aria-hidden": "true", class: "n1chat-bugmark" })) svg.setAttribute(k, v);
+  const path = document.createElementNS(SVG, "path");
+  path.setAttribute("d", "M2.5 3h11v7.2H8.4L5.2 13v-2.8H2.5zM5.4 5.8h5.2M5.4 7.6h3.2");
+  svg.append(path);
+  return svg;
+}
+
 // The neon1 mark (the same paths as the favicon), drawn in the current text color
 function mark() {
   const svg = document.createElementNS(SVG, "svg");
@@ -206,12 +216,18 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
     ".",
   );
 
-  // Bottom right: the report-a-bug page in a new tab, so a bug seen while talking to Neo is one click away (?from=neo
-  // picks "Neo chat" on the page). Left off the report page itself, where it would open the page you're on
+  // Bottom right: "report bug \\ feedback", each a form page in a new tab, so a bug seen or a thought had while talking to Neo is one
+  // click away (?from=neo picks "Neo chat" on the page). Each is left off its own page, where it would open the page you're on
   const bug = el("p", "n1chat-bug");
   if (!location.pathname.startsWith("/report-bug")) {
-    const link = el("a", "n1chat-plain n1chat-ext n1chat-buglink", "", { href: "/report-bug/?from=neo", target: "_blank", rel: "noopener" });
-    link.append(bugMark(), "report a bug");
+    const link = el("a", "n1chat-plain n1chat-ext n1chat-buglink n1chat-bugfirst", "", { href: "/report-bug/?from=neo", target: "_blank", rel: "noopener" });
+    link.append("report", bugMark(), "bug");
+    bug.append(link);
+  }
+  if (!location.pathname.startsWith("/feedback")) {
+    if (bug.hasChildNodes()) bug.append(el("span", "n1chat-sep", "\\", { "aria-hidden": "true" }));
+    const link = el("a", "n1chat-plain n1chat-ext n1chat-buglink", "", { href: "/feedback/?from=neo", target: "_blank", rel: "noopener" });
+    link.append(feedbackMark(), "feedback");
     bug.append(link);
   }
 
