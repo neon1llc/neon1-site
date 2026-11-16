@@ -4,10 +4,13 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+## v0.77.3
+
+- The neon flicker also reaches the links in the top bar, the phone menu, and the case panel, and the dropdown arrows.
+
 ## v0.77.2
 
 - The right arrow on the free 1NEON account invitations is the site's own in-site arrow at full size, like the other in-site arrows.
-- Everything that turns from dark green to matrix green now takes the neon flicker: the case-study labels, numbers, and stats, the code-row states, the code and guide rows, required-field asterisks, the footer wordmark, the Knowledge Center's eyebrow, counts, and contents title, the share buttons, ghost buttons, the top bar and phone menu links, and their icons.
 
 ## v0.77.1
 
