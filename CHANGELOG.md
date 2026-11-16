@@ -4,27 +4,18 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
-- On the phone menu, the right arrows beside knowledge, blog, and 1NEON portal sit with their center at half the height of the label's tallest letter: half the x-height for the lowercase labels, half the cap height for 1NEON portal.
-- The phone menu stays visible when you take a screenshot: once its entrance has played its animations are dropped, so a screenshot or restyle no longer replays them from the first, blank frame. The arrows beside knowledge, blog, and 1NEON portal are now the size of the arrow after book a call.
-- On phones the page no longer rests between two views. After the keyboard opens over Neo, the toolbar moves, or a position is restored, the page eases to the nearer edge once the finger, the keyboard, and any motion are done.
-- The phone menu has three sets: the seven sections, then knowledge, blog, and 1NEON portal (the places on neon1), then book a call alone at the end. A hairline, in the theme's green and clearly visible in both, sits in a larger gap before each of the last two sets. The arrows beside knowledge, blog, and 1NEON portal match the weight of their text and of the > markers.
-- The drawn arrow's stroke now follows the weight set for its own text everywhere. Before, a place's `--arr-t` was ignored and every arrow used the bold default, so arrows beside regular or medium text (the questions, the Knowledge Center's folds, the dropdown, the menu) were heavier than their words. The shape is now declared where it is drawn instead of once on the root.
+## v0.75.0
 
-- The phone menu says where each item goes. The sections of the home page come first in the order the page tells them, each with the same > as its heading (in the heading's own accent, so it follows the theme). A hairline then sets apart the other places: knowledge and blog take the shared right arrow, book a call keeps the outbound arrow, and "1NEON client portal" is now "1NEON portal" with 1NEON's mark to its left and the right arrow. The desktop bar is unchanged. I did not group the sections into dropdowns: no two or three groups tell the page's story in order, and a dropdown would hide the sections the menu exists to show.
-
-- A tab left open across a release reloads when it is looked at again, so an old page never runs with the newer release's scripts (the cause of a white rabbit that would not scroll back in a tab opened before a release). It asks `/version.json` what is live, and skips the reload while a form holds typed words, a case study is open, or the white rabbit is showing, then asks again the next time the tab is shown.
-
-- The Knowledge Center shows how many documents each group holds, quietly beside its title in the shelf strip and in the group's header (32 for "For you", 34 for "About neon1" today). Not a total at the top. The counts are taken from the same lists that draw the cards, so they cannot drift from the page.
-
-- Every expandable is one component, `.n1-fold` in shared/neon1.css (1NEON can use it too): the home page's folds and questions, and the Knowledge Center's index ("On this page") and standards fold. Its arrow is the shared left arrow, turning counterclockwise to point down as the panel opens and back as it closes, finishing with the panel's own motion (0.6 s opening, 15% shorter closing, the shared curve). The "+" and "−" and "+" and "×" marks are gone. The Knowledge Center's panels now ease open and shut like the home page's (js/fold.js). Colors follow the text by default, in both themes, and a place changes them with `--fold-arrow` and `--arr-t`.
-- Knowledge Center shelf strip: every item, group titles and links alike, centers itself in the strip's height.
-
-- Moving between pages is one short cross-fade, done only by the browser's own page transitions, and the bar holds still while the page under it changes. Before, three fades could stack: the browser's, one on the links that hand over to 1NEON, and one when a section loaded, which made a double fade going from the Knowledge Center or blog to a home section and left some moves without a clear fade. The home page now waits as blank paper until it has landed on a section, with reduced motion too, then shows without a second fade. Browsers without page transitions change pages at once.
-- The Knowledge Center's search box and its label are in the page itself, so they are there from the first paint instead of appearing after the page's script ran.
-
-- The neon1 logo's mark now sits on the content's left line, as 1NEON and the menu button sit on the right one, on every page and the rain landing, desktop and phone. Its hover pill hangs outside the page padding instead of pushing the mark in.
-- The footer's privacy, browser storage, and terms links go to the site's own policy pages in the Knowledge Center in place of the 1NEON portal's copies, and the footer's legal line underlines its internal links (state registration, privacy, browser storage, terms) so they read as links beside its plain text. Internal links still carry no arrow.
-- The site starts light for everyone. Dark is only by choice: the switch picks it and remembers it. Before, a device set to dark opened the site dark.
+- The site starts light for everyone. Dark is only by choice: the switch picks it and remembers it.
+- Phone menu in three sets: the sections, each with a ">"; then knowledge, blog, and 1NEON portal, each with a right arrow; then book a call alone at the end. A hairline sets off each set. The links stay visible in a screenshot.
+- Phones no longer stop between two views: after the keyboard opens over Neo, the toolbar moves, or a position is restored, the page eases to the nearer view.
+- Every expandable is one component with the shared arrow, which turns as it opens and closes. The Knowledge Center's panels ease too.
+- Arrows follow their text: the stroke matches the label's weight, and the right arrows in the menu are as large as the northeast arrow and centered on half the label's tallest letter.
+- Moving between pages is one short cross-fade, and the bar holds still while the page changes. The Knowledge Center's search box is in the page from the first paint.
+- The Knowledge Center shows how many documents each group holds, beside the group's title in the shelf strip and in its header.
+- The logo mark sits on the content's left line. The footer's privacy, browser storage, and terms links go to the Knowledge Center's policy pages.
+- A tab left open across a release reloads when you look at it again, so an old page never runs with a newer release's scripts.
+- Faster releases: the site is built once and checked in parallel, and a release runs only the checks its changes need.
 
 ## v0.74.0
 
