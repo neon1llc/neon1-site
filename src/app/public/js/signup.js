@@ -4,10 +4,11 @@
 
 const marked = document.querySelectorAll("[data-signup]");
 if (marked.length) {
+  // Same-origin credentials, so the private dev site's gate cookie goes along (without it the gate answers 404 and the invitations never showed on dev).
   // A slow or missing answer just leaves them hidden
   const ctl = new AbortController();
   setTimeout(() => ctl.abort(), 5000);
-  fetch("/1NEON/api/auth/signup", { signal: ctl.signal, credentials: "omit" })
+  fetch("/1NEON/api/auth/signup", { signal: ctl.signal, credentials: "same-origin" })
     .then((r) => (r.ok ? r.json() : null))
     .then((info) => {
       if (info?.open === true) for (const el of marked) el.hidden = false;
