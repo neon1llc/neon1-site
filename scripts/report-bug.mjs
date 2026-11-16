@@ -27,6 +27,7 @@ const WHERE = [
   ["site", "Main site"],
   ["1neon", "1NEON"],
   ["demo", "1NEON demo"],
+  ["walkthrough", "1NEON walkthrough"],
   ["neo", "Neo chat"],
   ["kc", "Knowledge Center"],
   ["blog", "Blog"],

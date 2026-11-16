@@ -29,12 +29,13 @@ if (form) {
 
   // ---- What the page captures ----
   // A link from another neon1 page names where it is (?from=), else the page it came from says; a person can change it
-  const FROM = new Set(["site", "1neon", "demo", "neo", "kc", "blog", "other"]);
+  const FROM = new Set(["site", "1neon", "demo", "walkthrough", "neo", "kc", "blog", "other"]);
   function guessWhere(ref) {
     const from = new URLSearchParams(location.search).get("from")?.toLowerCase();
     if (from && FROM.has(from)) return from;
     let p = "";
     try { const u = new URL(ref); if (u.origin === location.origin) p = u.pathname; } catch { /* no referrer */ }
+    if (/^\/1NEON\/live/i.test(p)) return "walkthrough";
     if (/^\/1NEON\/(example|demo)/i.test(p)) return "demo";
     if (/^\/1NEON/i.test(p)) return "1neon";
     if (p.startsWith("/knowledge")) return "kc";
