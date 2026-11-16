@@ -4,7 +4,7 @@
 
 neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site within about 30 miles of Queens, NY, or over a secure temporary connection. Contact: hello@neon1.tech, +1 424-326-3661, or the form at https://neon1.tech/#contact.
 
-- [Home page](https://neon1.tech/): services, client work, process, public code and resources, and questions
+- [Home page](https://neon1.tech/): services, client work, process, code and resources, and questions
 - [Knowledge center](https://neon1.tech/knowledge/): every public document below, most with a PDF to download
 - [Blog](https://neon1.tech/blog/): posts on local businesses' questions, the whats and whys of neon1, and lessons from its public repositories ([RSS](https://neon1.tech/blog/feed.xml))
 - Source for these documents: https://github.com/neon1llc/neon1-corpus (CC BY-ND 4.0)
@@ -13,20 +13,21 @@ neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site
 
 - [About neon1](https://neon1.tech/knowledge/company/about/): Who does the work, a few case studies, and how the practice is set up.
 - [How neon1 is built](https://neon1.tech/knowledge/company/architecture/): Diagrams of the website, the Knowledge Center, the 1NEON portal, Neo, and the infrastructure: how each runs in production and on the private dev copy, what data each keeps and why, and how a change reaches them.
-- [Capability statement](https://neon1.tech/knowledge/company/capabilities/): neon1 on one page for a buyer, partner, or procurement office: what it does, how it differs, work it has delivered, and the company's details.
-- [Contact](https://neon1.tech/knowledge/company/contact/): How to reach neon1, when, and what the first call covers.
 - [Glossary](https://neon1.tech/knowledge/company/glossary/): The names and technical terms used across neon1's documents, each in a sentence or two.
 - [Mission and promise](https://neon1.tech/knowledge/company/mission/): Why neon1 exists and the five things every client can count on.
 - [The names](https://neon1.tech/knowledge/company/names/): Where neon1, its slogan and its products get their names.
-- [How I price my work](https://neon1.tech/knowledge/company/pricing/): How a neon1 project is priced: a fixed price or a capped estimate, what most projects cost, what the price includes, when it can change, how paying works, and why the website shows ranges while each proposal shows the hours.
-- [How a project runs](https://neon1.tech/knowledge/company/process/): Listen, propose, decide, build and hand over.
-- [Publishing client work](https://neon1.tech/knowledge/company/publishing-client-work/): When and how a client's work appears as a case study: permission, anonymity, quotes, and figures.
 - [State registration](https://neon1.tech/knowledge/company/registration/): neon1 LLC's public record with the New York Department of State: its ID, status, filings, registered agent, and assumed name, and how to check the live record yourself.
 - [Where I learn from](https://neon1.tech/knowledge/company/sources/): The standards bodies, government guides, and practitioners whose published work shapes how neon1 works, grouped by topic, with what each one is for.
 
-## Services
+## Engagement
 
-- [Services](https://neon1.tech/knowledge/services/services/): Mostly workflow projects for owner-run businesses, plus cloud engineering, office networks, and security training.
+- [Capability statement](https://neon1.tech/knowledge/engagement/capabilities/): neon1 on one page for a buyer, partner, or procurement office: what it does, how it differs, work it has delivered, and the company's details.
+- [Contact](https://neon1.tech/knowledge/engagement/contact/): How to reach neon1, when, and what the first call covers.
+- [Services](https://neon1.tech/knowledge/engagement/services/): Mostly workflow projects for owner-run businesses, plus cloud engineering, office networks, and security training.
+- [How I price my work](https://neon1.tech/knowledge/engagement/pricing/): How a neon1 project is priced: a fixed price or a capped estimate, rough ranges, what the price includes, when it can change, and how paying works.
+- [How a project runs](https://neon1.tech/knowledge/engagement/process/): Listen, propose, decide, build and hand over.
+- [Publishing client work](https://neon1.tech/knowledge/engagement/publishing-client-work/): When and how a client's work appears as a case study: permission, anonymity, quotes, and figures.
+- [Service agreement](https://neon1.tech/knowledge/engagement/service-agreement/): neon1's service agreement, as a client organization signs it once in 1NEON: how work is agreed, purchases, paying, ownership, confidentiality, records, quality, limits, and ending.
 
 ## Guides
 
@@ -43,7 +44,7 @@ neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site
 ## Questions
 
 - [1NEON help](https://neon1.tech/knowledge/faq/1neon-help/): Short answers about using the 1NEON client portal.
-- [Working with neon1](https://neon1.tech/knowledge/faq/working-with-neon1/): Short answers on where, when, how long, how much, and how data is handled.
+- [Working with neon1](https://neon1.tech/knowledge/faq/working-with-neon1/): Short answers on where, when, how long, cost, and how data is handled.
 
 ## Case studies
 
@@ -104,7 +105,6 @@ neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site
 - [Cookie and browser storage notice](https://neon1.tech/knowledge/policies/cookies/): The only cookies and browser storage neon1.tech and 1NEON use, and why.
 - [Privacy and data policy](https://neon1.tech/knowledge/policies/privacy/): What neon1 collects on neon1.tech, in Neo, in the 1NEON portal, and in client work, where it goes, how long it's kept, and what you can do about it.
 - [Security disclosure](https://neon1.tech/knowledge/policies/security/): How to report a security problem in neon1.tech, the 1NEON portal, or a neon1 repository, and what happens after you do.
-- [Service agreement](https://neon1.tech/knowledge/policies/service-agreement/): neon1's service agreement, as a client organization signs it once in 1NEON: how work is agreed, purchases, paying, ownership, confidentiality, records, quality, limits, and ending.
 - [Terms of use](https://neon1.tech/knowledge/policies/terms/): The terms for using neon1.tech and the 1NEON portal.
 
 ## Blog

@@ -71,7 +71,10 @@ for (const p of PATHS) for (const id of p.ids) if (!corpus.byId.has(id)) {
 
 function pathsSection() {
   return `    <section class="kc-paths" aria-labelledby="kc-paths-h">
-      <h2 id="kc-paths-h">Start here</h2>
+      <div class="kc-shelf-head">
+        <h2 id="kc-paths-h">Start here<span class="kc-n"> ${new Set(PATHS.flatMap((p) => p.ids)).size}</span></h2>
+        <div class="kc-shelf-desc"><p>Four ways in, by what you need.</p></div>
+      </div>
       <ul class="kc-path-list">
 ${PATHS.map((p) => `        <li class="kc-path">
           <h3>${esc(p.title)}</h3>
@@ -135,7 +138,7 @@ ${g.shelves.map(shelfSection).join("\n\n")}
     </section>`)
     .join("\n\n")
   const nav = corpus.groups
-    .map((g) => `        <li class="kc-nav-group"><span>${esc(g.label)}${countMark(g)}</span></li>
+    .map((g) => `        <li class="kc-nav-group"><a href="#${g.key}" data-group>${esc(g.label)}${countMark(g)}</a></li>
 ${g.shelves.map((s) => `        <li><a href="#${s.key}">${esc(s.label)}${shelfMark(s)}</a></li>`).join("\n")}`)
     .join("\n")
   const main = `${band({ id: "kc-title", eyebrow: "neon1 · knowledge center", title: "Everything neon1", lead: "Guides, policies, and answers.", after: `
@@ -164,13 +167,15 @@ ${g.shelves.map((s) => `        <li><a href="#${s.key}">${esc(s.label)}${shelfMa
     <div id="kc-browse">
 ${pathsSection()}
 
-    <nav class="kc-shelves" aria-label="Shelves">
+    <nav class="kc-shelves" aria-label="On this page">
+      <div class="kc-shelves-in">
       <details class="n1-fold kc-shelves-fold">
-        <summary>Shelves <span>${corpus.shelves.length} shelves</span></summary>
+        <summary>On this page <span>${corpus.shelves.length} sections</span></summary>
         <ul>
 ${nav}
         </ul>
       </details>
+      </div>
     </nav>
 
     <div class="kc-body">
@@ -362,7 +367,7 @@ const llmsWant = `# neon1
 
 neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site within about 30 miles of Queens, NY, or over a secure temporary connection. Contact: hello@neon1.tech, +1 424-326-3661, or the form at ${SITE}/#contact.
 
-- [Home page](${SITE}/): services, client work, process, public code and resources, and questions
+- [Home page](${SITE}/): services, client work, process, code and resources, and questions
 - [Knowledge center](${SITE}${BASE}): every public document below, most with a PDF to download
 ${blogPosts.length ? `- [Blog](${SITE}/blog/): posts on local businesses' questions, the whats and whys of neon1, and lessons from its public repositories ([RSS](${SITE}/blog/feed.xml))\n` : ""}- Source for these documents: https://github.com/neon1llc/neon1-corpus (CC BY-ND 4.0)
 ${llmsShelves}${llmsBlog}`

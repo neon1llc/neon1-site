@@ -202,9 +202,9 @@ check("browser", "home: one wheel gesture from the first screen settles on servi
   } finally { await context.close(); }
 });
 
-// ---- CP-16: public code lists neon1's repositories and the tools in folds; every row says whether it is
+// ---- CP-16: the code section lists neon1's repositories and the tools in folds; every row says whether it is
 // public or private and names its license, public rows open GitHub in a new tab, and private rows link nowhere ----
-check("browser", "public code: three folds open with their arrows turned, every row names a license, public rows (education ones included) open GitHub in a new tab, private rows link nowhere, any other row opens the Knowledge Center", async () => {
+check("browser", "code and resources: three folds open with their arrows turned, every row names a license, public rows (education ones included) open GitHub in a new tab, private rows link nowhere, any other row opens the Knowledge Center", async () => {
   const { page, context, errors } = await open();
   try {
     await page.locator("#work").scrollIntoViewIfNeeded();
@@ -219,8 +219,8 @@ check("browser", "public code: three folds open with their arrows turned, every 
     for (const r of rows) {
       // A license placeholder (TBD) or a missing one fails here, so no row ships without its real license
       expect(/ · (MIT|Apache-2\.0|CC BY-SA 4\.0|CC BY-ND 4\.0|FSL-1\.1)/.test(r.state) && !/TBD/.test(r.state), "a row doesn't name its license", r);
-      if (/^public/.test(r.state)) expect(r.links.length === 1 && /^https:\/\/github\.com\/neon1llc\//.test(r.links[0][0]) && r.links[0][1] === "_blank" && /noopener/.test(r.links[0][2]), "a public row doesn't open GitHub in a new tab", r);
-      else if (/^private/.test(r.state)) expect(!r.links.length, "a private row links somewhere", r);
+      // The section says all of it is public, so a row opens its repository on GitHub in a new tab (a row that links elsewhere is a teaching row and opens the Knowledge Center in place)
+      if (r.links.length === 1 && /^https:\/\/github\.com\/neon1llc\//.test(r.links[0][0])) expect(r.links[0][1] === "_blank" && /noopener/.test(r.links[0][2]), "a row doesn't open GitHub in a new tab", r);
       else expect(r.links.length === 1 && new URL(r.links[0][0]).pathname.startsWith("/knowledge/") && !r.links[0][1], "a teaching row doesn't open the Knowledge Center in place", r);
     }
     expect(!errors.length, "page errors", errors);

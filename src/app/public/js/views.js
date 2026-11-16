@@ -361,7 +361,9 @@
         const finalMax = maxY() + (h1 - h0) - (wasTop ? 0 : Math.max(0, padFrom - TOP_GAP));
         // The space above the label (under the bar) equals the space between the label and the form's first field
         const first = s.nextElementSibling, below = first ? first.getBoundingClientRect().top - s.getBoundingClientRect().bottom : TOP_GAP;
-        const gap = Math.max(12, Math.min(96, Math.round(below)));
+        // On a short window the space shrinks (down to 12px) so the form's send button stays in view with the label under the bar
+        const room = innerHeight - HEADER - h1 - 12;
+        const gap = Math.max(12, Math.min(96, Math.round(below), Math.floor(room)));
         const dest = Math.max(range(i)[0], Math.min(finalMax, Math.round(labelY - HEADER - gap)));
         if (Math.abs(scrollY - dest) > 2) runs.push(animate(scrollY, dest, { duration: FOLD_TIME, ease: foldEase, onUpdate: (p) => scrollTo(0, p) }));
       }

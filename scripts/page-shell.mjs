@@ -62,6 +62,7 @@ export function page(frame, { title, description, path, main, kind, ld, current,
   <script type="application/ld+json">${jsonLd(ld)}</script>` : ""}${head}
   ${frame.block("icons")}
   <link rel="stylesheet" href="/shared/neon1.css" />
+  <link rel="stylesheet" href="/shared/chat.css" />
   <link rel="stylesheet" href="/css/frame.css" />
 ${styles.map((s) => `  <link rel="stylesheet" href="${s}" />`).join("\n")}
 </head>
@@ -95,6 +96,7 @@ ${main}
   </div>
 
   <script type="module" src="/js/frame.js"></script>
+  <script type="module" src="/js/neo.js"></script>
 ${scripts.map((s) => `  <script type="module" src="${s}"></script>`).join("\n")}
 </body>
 </html>

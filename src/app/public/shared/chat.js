@@ -41,6 +41,16 @@ function el(tag, cls, text, attrs = {}) {
   return node;
 }
 
+// The bug's line drawing, the one the footer's and 1NEON's "report a bug" use (16px grid, outline, current text color)
+function bugMark() {
+  const svg = document.createElementNS(SVG, "svg");
+  for (const [k, v] of Object.entries({ viewBox: "0 0 16 16", "aria-hidden": "true", class: "n1chat-bugmark" })) svg.setAttribute(k, v);
+  const path = document.createElementNS(SVG, "path");
+  path.setAttribute("d", "M5.5 5.2V4a2.5 2.5 0 0 1 5 0v1.2M4.4 6.2h7.2v3.6a3.6 3.6 0 0 1-7.2 0zM8 6.4v7M1.8 7.6l2.6.9M14.2 7.6l-2.6.9M2.2 12.2l2.5-1.2M13.8 12.2 11.3 11");
+  svg.append(path);
+  return svg;
+}
+
 // The neon1 mark (the same paths as the favicon), drawn in the current text color
 function mark() {
   const svg = document.createElementNS(SVG, "svg");
@@ -188,15 +198,24 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
   const human = el("p", "n1chat-human");
   human.append(
     "Reach a person: ",
-    el("a", "n1chat-plain", "book", { href: BOOKING, target: "_blank", rel: "noopener" }),
+    el("a", "n1chat-plain n1chat-ext", "book", { href: BOOKING, target: "_blank", rel: "noopener" }),
     ", ",
-    el("a", "n1chat-plain", "email", { href: EMAIL }),
+    el("a", "n1chat-plain n1chat-ext", "email", { href: EMAIL, target: "_blank", rel: "noopener" }),
     ", or ",
-    el("a", "n1chat-plain", "call", { href: PHONE }),
+    el("a", "n1chat-plain n1chat-ext", "call", { href: PHONE }),
     ".",
   );
 
-  panel.append(head, log, form, note, human);
+  // Bottom right: the report-a-bug page in a new tab, so a bug seen while talking to Neo is one click away (?from=neo
+  // picks "Neo chat" on the page). Left off the report page itself, where it would open the page you're on
+  const bug = el("p", "n1chat-bug");
+  if (!location.pathname.startsWith("/report-bug")) {
+    const link = el("a", "n1chat-plain n1chat-ext n1chat-buglink", "", { href: "/report-bug/?from=neo", target: "_blank", rel: "noopener" });
+    link.append(bugMark(), "report a bug");
+    bug.append(link);
+  }
+
+  panel.append(head, log, form, note, human, ...(bug.hasChildNodes() ? [bug] : []));
   for (const cls of className.split(/\s+/).filter(Boolean)) for (const node of [launcher, panel]) node.classList.add(cls);
   root.append(launcher, panel);
 

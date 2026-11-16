@@ -29,15 +29,34 @@ def linked_pdfs(root):
     return sorted(found)
 
 
+# A document that moved to the Engagement shelf has its PDF at the old address until production prints it again
+MOVED = {
+    "services": "services/services", "capabilities": "company/capabilities", "contact": "company/contact",
+    "pricing": "company/pricing", "process": "company/process",
+    "publishing-client-work": "company/publishing-client-work", "service-agreement": "policies/service-agreement",
+}
+
+
+def former(path):
+    """The live address a moved document's PDF had before the move, if this path is one."""
+    m = re.match(r"/knowledge/engagement/([a-z-]+)/(neon1-[a-z-]+\.pdf)$", path)
+    return [f"/knowledge/{MOVED[m.group(1)]}/{m.group(2)}"] if m and m.group(1) in MOVED else []
+
+
 def fetch(root, path):
     """Copy one PDF from the live site; return the path when it isn't there."""
     out = os.path.join(root, path.lstrip("/"))
     if os.path.exists(out):
         return None
-    try:
-        with urllib.request.urlopen(LIVE + path, timeout=20) as r:
-            body = r.read()
-    except urllib.error.URLError:
+    body = None
+    for url in [path, *former(path)]:
+        try:
+            with urllib.request.urlopen(LIVE + url, timeout=20) as r:
+                body = r.read()
+            break
+        except urllib.error.URLError:
+            continue
+    if body is None:
         return path
     os.makedirs(os.path.dirname(out), exist_ok=True)
     with open(out, "wb") as f:

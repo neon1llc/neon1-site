@@ -23,11 +23,24 @@
 }
 /* Matrix: 1NEON's dark palette (its ground and panels, the rain's pale green text, the logo's neon for the brand) */
 :root[data-site-theme="matrix"] { --page: #0F0A0D; --page-rgb: 15 10 13; color-scheme: dark; }
+/* The text tokens come from --m-* in shared/neon1.css: near-neutral off-whites with a faint green cast, so the brand green is left for headings, links, and buttons */
 :root[data-site-theme="matrix"] :is(.awake, .n1-bar, .menu, .case-layer) {
-  --paper: #0F0A0D; --ink: #D6F5DC; --brand: #6CFFA8; --mark: #00B84F; --deep: #E9FFEE;
-  --page-rgb: 15 10 13; --ink-rgb: 214 245 220; --brand-rgb: 108 255 168;
-  --ctl-line: rgb(var(--brand-rgb) / .3); --surface: #17110F; --surface-rgb: 23 17 15; --surface-2: #0A0608; --ink-soft: #BCD6C2; --muted-ink: #8DB096; --err: #FF8A80; --warn: #FFB547;
+  --paper: #0F0A0D; --ink: var(--m-ink); --brand: #6CFFA8; --mark: #00B84F; --deep: #E9FFEE;
+  --page-rgb: 15 10 13; --ink-rgb: 237 241 237; /* = --m-ink as a triple */ --brand-rgb: 108 255 168;
+  --ctl-line: rgb(var(--brand-rgb) / .3); --surface: #17110F; --surface-rgb: 23 17 15; --surface-2: #0A0608; --ink-soft: var(--m-ink-soft); --muted-ink: var(--m-muted); --err: #FF8A80; --warn: #FFB547;
 }
+/* Matrix controls: the browser's own and the custom ones follow the dark theme (color-scheme: dark above makes native popups,
+   scrollbars, and date, number, and file controls render dark). Ranges, progress bars, and checkboxes take the neon; selected text
+   a wash of it; an unstyled dropdown's list takes the surface; autofill keeps the field's dark fill, which Chrome would paint pale
+   blue; Neo's window uses the shared text levels, and its disabled send stays at .6 or above. Awake is untouched. */
+:root[data-site-theme="matrix"] { accent-color: var(--neon); }
+:root[data-site-theme="matrix"] ::selection { background: rgb(108 255 168 / .3); color: var(--m-ink); }
+:where(:root[data-site-theme="matrix"]) .awake :is(option, optgroup) { background-color: var(--surface); color: var(--ink); }
+:root[data-site-theme="matrix"] :is(input, textarea, select):-webkit-autofill, :root[data-site-theme="matrix"] :is(input, textarea, select):-webkit-autofill:is(:hover, :focus) {
+  -webkit-text-fill-color: var(--m-ink); caret-color: var(--m-ink); box-shadow: 0 0 0 100px var(--page) inset; transition: background-color 9999s; }
+:root[data-site-theme="matrix"] .awake :is(input, textarea, select):-webkit-autofill, :root[data-site-theme="matrix"] .awake :is(input, textarea, select):-webkit-autofill:is(:hover, :focus) { box-shadow: 0 0 0 100px var(--surface) inset; }
+:root[data-site-theme="matrix"] .n1chat:not(.n1chat-light) { --fg: var(--m-ink); --muted: var(--m-muted); }
+:root[data-site-theme="matrix"] .n1chat-send:disabled { opacity: .6; }
 /* Switching is one plain change of every color, all at once (js/theme.js sets the class for a beat around it): the page, its text, and its
    lines cut over together, and the neon parts then flicker as the sign comes on, so no text trails behind the rest. The motion of
    things that move (transform, opacity, visibility) keeps its own timing */
@@ -57,12 +70,6 @@
 /* The small marks drawn by pseudo-elements: the process timeline's numbers and dots, and the dropdown arrow on each summary */
 :root.flick-on .steps.timeline > *::before, :root.flick-on .steps.timeline > *::after, :root.flick-on .n1-fold > summary::after { animation: soft-on 2.23s linear both; }
 :root.flick-off .steps.timeline > *::before, :root.flick-off .steps.timeline > *::after, :root.flick-off .n1-fold > summary::after { animation: soft-off .5s ease-out both; }
-@keyframes neon-on {
-  0% { opacity: var(--lo); } 4% { opacity: 1; } 8% { opacity: var(--lo); } 13% { opacity: var(--lo); }
-  14.5% { opacity: 1; } 19% { opacity: 1; } 22% { opacity: var(--lo); } 28% { opacity: var(--lo); }
-  30% { opacity: 1; } 44% { opacity: 1; } 48% { opacity: var(--lo); } 52% { opacity: var(--lo); }
-  78% { opacity: .4; } 100% { opacity: 1; }
-}
 @keyframes glow-in { 0% { opacity: var(--lo); } 100% { opacity: 1; } }
 @keyframes neon-off { 0% { opacity: var(--lo); } 35% { opacity: var(--lo); } 100% { opacity: 1; } }
 @keyframes soft-on {
@@ -119,9 +126,6 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 .chip:hover, .chip[aria-pressed="true"] { color: var(--glow); border-color: rgba(0,230,118,.45); }
 /* A square arrow chip: the case-study rail's previous and next, and the tour's back-to-top */
 .chip.arrow { display: inline-grid; place-items: center; min-width: 44px; min-height: 44px; padding: 6px 14px; font-size: 15px; text-decoration: none; }
-
-/* N, E, O, N: the first letter of each stage in brand green, the rest of the word in the text color */
-.nl { color: var(--brand); font-weight: 700; }
 
 /* ---- Top bar: clear over the rain, frosted light once the page is light ---- */
 /* Position, height, and the logo's place come from .n1-bar, .n1-inner, and .n1-logo in /shared/neon1.css */
@@ -265,13 +269,18 @@ footer { position: relative; z-index: 2; border-top: 1px solid var(--line); back
 .foot .slogan { margin: 0; }
 .mark-light { font: 700 17px var(--mono); letter-spacing: .06em; color: var(--brand); margin: 0 0 10px; }
 @media (max-width: 700px) { .foot { grid-template-columns: 1fr 1fr; } .foot > div:first-child { grid-column: 1 / -1; } }
-/* Legal line: the right padding keeps it clear of the home page's rain controls */
+/* Legal line. Its bottom padding is a resting place for Neo's launcher (fixed, bottom left, 48px tall, 16px from the bottom edge): the
+   launcher's own distance from the edge is also its distance above the line's last row, so at the end of any page it never covers text.
+   "report a bug" sits in the same strip at the right, centered on the launcher (see its rule below) */
+:root { --foot-gap: max(16px, env(safe-area-inset-bottom)); --foot-neo: 48px; }
 .legal { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
-  font: 12px var(--mono); color: var(--muted); border-top: 1px solid var(--line); padding: 16px 140px 28px max(24px, env(safe-area-inset-left)); }
-@media (max-width: 700px) { .legal { padding-right: 20px; padding-bottom: 72px; } }
+  font: 12px var(--mono); color: var(--muted); border-top: 1px solid var(--line);
+  padding: 16px max(24px, env(safe-area-inset-right)) calc(var(--foot-gap) * 2 + var(--foot-neo)) max(24px, env(safe-area-inset-left)); }
 .legal a { color: inherit; text-decoration: none; } .legal a:hover { color: var(--glow); }
 .legal .policies { display: flex; gap: 8px; flex-wrap: wrap; align-items: baseline; }
 .legal .sep { opacity: .6; }
+/* A separator inside running text (the contact table): the footer's backslash, with room on both sides */
+.sep { font-family: var(--mono); opacity: .6; margin: 0 .2em; }
 /* The legal line mixes links and plain text ("no ads or trackers"), so its internal links are underlined, thinly and in the line's own gray, to tell them apart; internal links never carry an arrow */
 .legal a:not(.ext) { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: currentColor; }
 /* The copyright line ends with the company's public state record: an internal link, so it carries no arrow */
@@ -297,3 +306,31 @@ a.ext:hover { color: var(--brand); }
 .foot a.ext { color: var(--muted); font-weight: inherit; } .foot a.ext:hover { color: var(--glow); }
 .menu a.ext { color: var(--neon); font-weight: 500; } .menu a.ext:hover, .menu a.ext:focus-visible { color: #e9ffee; }
 .chip.arrow .arr { top: 0; --arr-t: .12em; }
+
+/* ---- "report a bug": a footer link at the legal line's bottom right, opening the report page in a new tab ----
+   The footer's own mono face at its size, semibold with a small bug mark, so it reads as one of the legal line's items and still stands out by weight and the mark.
+   It is placed against the footer (the nearest positioned box) so it lines up with the bar's rightmost control at every width: the theme
+   switch's right edge on a wide desktop (see the switch's own rule, which sits in the page margin), the menu button's or the switch's
+   24px in from the edge everywhere narrower. Vertically it is centered on Neo's launcher (the bottom offset is the launcher's middle), and the
+   bug's gap to the text is the outbound arrow's gap to the text, .18em */
+.legal a.report-bug, .legal a.report-bug.ext { position: absolute; right: max(24px, env(safe-area-inset-right)); bottom: calc(var(--foot-gap) + var(--foot-neo) / 2); translate: 0 50%; display: inline-flex; align-items: center; gap: .18em;
+  font: 600 12px var(--mono); color: var(--glow); text-decoration: none; }
+.legal a.report-bug svg { width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+@media (min-width: 1200px) and (max-width: 1319px) { .legal a.report-bug, .legal a.report-bug.ext { right: calc((100% - 1200px) / 2 + 24px); } }
+@media (min-width: 1320px) { .legal a.report-bug, .legal a.report-bug.ext { right: calc((100% - 1200px) / 4 - 14px); } }
+/* Outbound links in the footer's legal line (the version, "report a bug"): the theme's green and no underline in awake, even on hover;
+   in matrix a dim underline that turns the full green on hover, as the links in running text do */
+:root[data-site-theme="matrix"] .legal :is(a.report-bug, a.ext) { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px;
+  text-decoration-color: rgb(var(--brand-rgb) / .55); }
+:root[data-site-theme="matrix"] .legal :is(a.report-bug, a.ext):is(:hover, :focus-visible) { text-decoration-color: var(--glow); }
+
+/* ---- Links, one rule for the whole site ----
+   Links that leave the page (another site, mailto:, tel:) end in the northeast arrow and, in the light look, carry no underline, since the
+   arrow marks them. Links that stay on the site are underlined, thinly, so they never rely on color alone. In matrix every link shows a dimmed
+   underline that turns the link's full color on hover. (Bar, menu, buttons, and cards are controls, not links in text, and are left alone.) */
+.foot a:not(.ext) { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+:root[data-site-theme="matrix"] :is(main, footer, .n1chat) a.ext:not([class*="btn"], .card) { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, currentColor 55%, transparent); }
+:root[data-site-theme="matrix"] :is(main, footer, .n1chat) a.ext:not([class*="btn"], .card):is(:hover, :focus-visible) { text-decoration-color: currentColor; }
+:root[data-site-theme="matrix"] .foot a:not(.ext) { text-decoration-color: color-mix(in srgb, currentColor 55%, transparent); }
+:root[data-site-theme="matrix"] .foot a:not(.ext):is(:hover, :focus-visible) { text-decoration-color: currentColor; }

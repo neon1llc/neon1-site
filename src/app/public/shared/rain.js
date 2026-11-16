@@ -81,7 +81,7 @@ function save(s) {
  * panes() lists the glass elements to magnify; lensOff() pauses the lens while it returns true.
  * words replaces the word groups. Returns the controls and a stop() for cleanup.
  * rabbit, when given, lets a rabbit drop in: { rate, every, hold, ok, avoid }. rate is the chance per
- * step; every, in ms, replaces it with a fixed beat: a rabbit drops in that long after the last one started. hold its steps on screen, ok() allows one, and avoid() lists elements it must not sit under.
+ * step; every, in ms, replaces it with a fixed beat: one rabbit at a time, and the next drops in that long after the last one is gone. every may be [min, max], a new random wait each time. hold its steps on screen, ok() allows one, and avoid() lists elements it must not sit under.
  * Without it there are no rabbits and the rain is unchanged.
  * idle() skips drawing while it returns true, such as while the rain is scrolled out of sight.
  */
@@ -100,7 +100,7 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
   // Reduced motion switched on mid-visit stops the rain, like on load; the saved choice is untouched
   reduce.addEventListener?.("change", (e) => { if (e.matches && running) { running = false; emit(); } });
   // The live rabbit, the step count, and a halt that is not saved as a pause
-  let nextRabbit = 0;
+  let nextRabbit = 0, rabbitOut = false;
   const bunny = rabbit && { rate: 0.005, hold: 60, ok: () => true, avoid: () => [], ...rabbit };
   // The canvas's own size in CSS pixels, set on resize
   let W = innerWidth, H = innerHeight;
@@ -223,10 +223,15 @@ export function rain({ canvas, lens = null, panes = () => [], lensOff = () => fa
     ctx.fillRect(0, 0, W, H);
     if (Math.random() < WORD_RATE) startWord();
     if (rab && steps > rab.until) rab = null;
+    // With a fixed beat there is only ever one rabbit, and the wait counts from when it is gone: faded, run off, or caught
+    if (bunny && bunny.every) {
+      if (rab) rabbitOut = true;
+      else if (rabbitOut) { rabbitOut = false; const e = bunny.every; nextRabbit = performance.now() + (Array.isArray(e) ? e[0] + Math.random() * (e[1] - e[0]) : e); }
+    }
     if (bunny && !prefill && !rab && bunny.ok()) {
       // A fixed beat when "every" is given (the clock keeps time while the egg is busy, so one comes as soon as it's free); otherwise a chance per step
       const now = performance.now();
-      if (bunny.every ? now >= nextRabbit : Math.random() < bunny.rate) { if (startRabbit() && bunny.every) nextRabbit = now + bunny.every; }
+      if (bunny.every ? now >= nextRabbit : Math.random() < bunny.rate) startRabbit();
     }
     const chars = SETS[set].chars;
     cols.forEach((c, i) => {

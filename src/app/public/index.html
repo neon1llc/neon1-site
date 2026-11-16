@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.78.2" />
+  <meta name="version" content="0.79.0" />
   <title>neon1 · workflows and IT for small businesses</title>
   <meta name="description" content="I connect the orders, intake, and invoices an owner-run business types in more than once, in two to four weeks. Also cloud and AI engineering, office networks, and security training. Queens, NY, and remote." />
   <meta name="theme-color" content="#0D0208" />
@@ -43,6 +43,11 @@
           "slogan": "1 is glad to be of service.",
           "description": "Business workflows for owner-run small businesses: orders, intake, and invoices connected end to end. Also cloud and AI engineering, office networks and devices, and security training.",
           "areaServed": "Remote across the US, or on site within about 30 miles of Queens, NY",
+          "openingHoursSpecification": [
+            { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday"], "opens": "18:00", "closes": "21:00" },
+            { "@type": "OpeningHoursSpecification", "dayOfWeek": "Friday", "opens": "18:00", "closes": "20:00" },
+            { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday", "Sunday"], "opens": "08:00", "closes": "20:00" }
+          ],
           "email": "hello@neon1.tech",
           "telephone": "+1-424-326-3661",
           "founder": { "@type": "Person", "@id": "https://neon1.tech/#pradeep", "name": "Pradeep Tathineni", "sameAs": "https://www.linkedin.com/in/pradeep-tathineni/" },
@@ -107,7 +112,7 @@
         <li><a href="#projects">client work</a></li>
         <li><a href="#process">process</a></li>
         <li><a href="#why">about</a></li>
-        <li><a href="#work">public code</a></li>
+        <li><a href="#work">code</a></li>
         <li><a href="/knowledge/">knowledge</a></li>
         <li><a href="/blog/">blog</a></li>
         <!-- frame:actions -->
@@ -143,7 +148,7 @@
       <li class="m-sec"><a href="#projects"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>client work</a></li>
       <li class="m-sec"><a href="#process"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>process</a></li>
       <li class="m-sec"><a href="#why"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>about</a></li>
-      <li class="m-sec"><a href="#work"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>public code</a></li>
+      <li class="m-sec"><a href="#work"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>code</a></li>
       <li class="m-sec"><a href="#faq"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>questions</a></li>
       <li class="m-sec"><a href="#contact"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>contact</a></li>
       <li class="m-to m-first"><a href="/knowledge/">knowledge<span class="arr arr-next" aria-hidden="true"></span></a></li>
@@ -187,7 +192,7 @@
           <p class="line"><strong>Security training and readiness.</strong> <span>If your people need to spot phishing, or you're heading into a SOC 2 audit: plain-language sessions and readiness work. <a href="/knowledge/guides/use-case-security-awareness/">How a session goes</a></span></p>
         </div>
       </div>
-      <p class="lead quote reveal-on">Every proposal lays out its <a href="/knowledge/company/pricing/">options and costs</a> before you decide<span data-signup hidden>, and a <a href="/1NEON/?signup=1">free 1NEON account</a> lets you start before any call</span>.</p>
+      <p class="lead quote reveal-on">Every proposal lays out its <a href="/knowledge/engagement/pricing/">options and costs</a> before you decide<span data-signup hidden>, and a <a href="/1NEON/?signup=1">free 1NEON account</a> lets you start before any call</span>.</p>
     </section>
 
     <section id="projects" class="view" aria-labelledby="projects-h">
@@ -267,8 +272,8 @@
       <div class="about">
       <figure class="portrait reveal-on">
         <picture>
-          <source type="image/webp" srcset="/media/pradeep-480.webp 480w, /media/pradeep-960.webp 960w" sizes="137px" />
-          <img src="/media/pradeep-480.jpg" srcset="/media/pradeep-480.jpg 480w, /media/pradeep-960.jpg 960w" sizes="137px" width="480" height="480" loading="lazy" decoding="async" alt="Pradeep smiling in a shirt and tie beside a large NASA insignia" />
+          <source type="image/webp" srcset="/media/pradeep-480.webp 480w, /media/pradeep-960.webp 960w" sizes="154px" />
+          <img src="/media/pradeep-480.jpg" srcset="/media/pradeep-480.jpg 480w, /media/pradeep-960.jpg 960w" sizes="154px" width="480" height="480" loading="lazy" decoding="async" alt="Pradeep smiling in a shirt and tie beside a large NASA insignia" />
         </picture>
       </figure>
       <div class="story">
@@ -279,7 +284,7 @@
     </section>
 
     <section id="work" class="view" aria-labelledby="work-h">
-      <h2 id="work-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>Public code and resources</h2>
+      <h2 id="work-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>code and resources</h2>
       <!-- What I publish on GitHub: tools for others, a security guide with its companions, then the code behind this
            site. Each row is a short description with its visibility, release, and license (from the repository's
            LICENSE files); each opens on GitHub in a new tab -->
@@ -287,30 +292,30 @@
       <details class="n1-fold fold group reveal-on">
         <summary>tools</summary>
         <div class="rows repos">
-          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/aws-clip" target="_blank" rel="noopener">AWS <span class="ext-end">CLIP</span></a></h3><p class="state">public · v0.1.4 · <span class="lic">MIT</span></p><p>Account guards and approval checks around the AWS CLI.</p></div>
-          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/deploy-ops" target="_blank" rel="noopener"><span class="ext-end">DeployOps</span></a></h3><p class="state">public · v0.14.3 · <span class="lic">Apache-2.0</span></p><p>Deploy pipelines with checks, approvals, and rollback, with a local preview.</p></div>
-          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/refmark" target="_blank" rel="noopener"><span class="ext-end">refmark</span></a></h3><p class="state">public · v0.1.5 · <span class="lic">MIT</span></p><p>Flags the sources your documents cite when they change, so a person can review them.</p></div>
+          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/aws-clip" target="_blank" rel="noopener">AWS <span class="ext-end">CLIP</span></a></h3><p class="state">v0.1.4 · <span class="lic">MIT</span></p><p>Account guards and approval checks around the AWS CLI.</p></div>
+          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/deploy-ops" target="_blank" rel="noopener"><span class="ext-end">DeployOps</span></a></h3><p class="state">v0.14.3 · <span class="lic">Apache-2.0</span></p><p>Deploy pipelines with checks, approvals, and rollback, with a local preview.</p></div>
+          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/refmark" target="_blank" rel="noopener"><span class="ext-end">refmark</span></a></h3><p class="state">v0.1.5 · <span class="lic">MIT</span></p><p>Flags the sources your documents cite when they change, so a person can review them.</p></div>
         </div>
       </details>
       <details class="n1-fold fold group reveal-on">
         <summary>security guides</summary>
         <div class="rows repos">
-          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/ready-secure-go" target="_blank" rel="noopener">Ready, Secure, <span class="ext-end">Go</span></a></h3><p class="state">public · v0.1.4 · <span class="lic">CC BY-SA 4.0 text, MIT code</span></p><p>Security steps for each kind of space, from a home network to an office preparing for SOC 2, with the companion guides below.</p></div>
-          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/soc-2-readiness" target="_blank" rel="noopener">SOC 2 readiness, step by <span class="ext-end">step</span></a></h3><p class="state">public · v0.1.4 · <span class="lic">CC BY-SA 4.0 text, MIT code</span></p><p>A control map, evidence checklists, and what to fix before an audit.</p></div>
-          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/incident-response-for-small-teams" target="_blank" rel="noopener">Incident response for small <span class="ext-end">teams</span></a></h3><p class="state">public · v0.1.2 · <span class="lic">CC BY-SA 4.0 text, MIT code</span></p><p>A runbook, playbooks, tabletop exercises, and templates.</p></div>
-          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/compliance-basics" target="_blank" rel="noopener">Compliance <span class="ext-end">basics</span></a></h3><p class="state">public · v0.1.3 · <span class="lic">CC BY-SA 4.0 text, MIT code</span></p><p>Short explanations of HIPAA, PCI DSS, privacy, accessibility, and more, as a starting point, not legal advice.</p></div>
-          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/phishing-awareness-kit" target="_blank" rel="noopener">Phishing awareness session <span class="ext-end">kit</span></a></h3><p class="state">public · v0.1.4 · <span class="lic">CC BY-SA 4.0 text, MIT code</span></p><p>Slides, exercises, and a one-page takeaway for an hour on scams and safer accounts.</p></div>
-          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/household-tech-handbook" target="_blank" rel="noopener">Household tech <span class="ext-end">handbook</span></a></h3><p class="state">public · v0.1.4 · <span class="lic">CC BY-SA 4.0 text, MIT code</span></p><p>Passwords, backups, the router, kids' devices, and helping aging parents.</p></div>
+          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/ready-secure-go" target="_blank" rel="noopener">Ready, Secure, <span class="ext-end">Go</span></a></h3><p class="state">v0.1.4 · <span class="lic">CC BY-SA 4.0 text, MIT code</span></p><p>Security steps for each kind of space, from a home network to an office preparing for SOC 2, with the companion guides below.</p></div>
+          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/soc-2-readiness" target="_blank" rel="noopener">SOC 2 readiness, step by <span class="ext-end">step</span></a></h3><p class="state">v0.1.4 · <span class="lic">CC BY-SA 4.0 text, MIT code</span></p><p>A control map, evidence checklists, and what to fix before an audit.</p></div>
+          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/incident-response-for-small-teams" target="_blank" rel="noopener">Incident response for small <span class="ext-end">teams</span></a></h3><p class="state">v0.1.2 · <span class="lic">CC BY-SA 4.0 text, MIT code</span></p><p>A runbook, playbooks, tabletop exercises, and templates.</p></div>
+          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/compliance-basics" target="_blank" rel="noopener">Compliance <span class="ext-end">basics</span></a></h3><p class="state">v0.1.3 · <span class="lic">CC BY-SA 4.0 text, MIT code</span></p><p>Short explanations of HIPAA, PCI DSS, privacy, accessibility, and more, as a starting point, not legal advice.</p></div>
+          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/phishing-awareness-kit" target="_blank" rel="noopener">Phishing awareness session <span class="ext-end">kit</span></a></h3><p class="state">v0.1.4 · <span class="lic">CC BY-SA 4.0 text, MIT code</span></p><p>Slides, exercises, and a one-page takeaway for an hour on scams and safer accounts.</p></div>
+          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/household-tech-handbook" target="_blank" rel="noopener">Household tech <span class="ext-end">handbook</span></a></h3><p class="state">v0.1.4 · <span class="lic">CC BY-SA 4.0 text, MIT code</span></p><p>Passwords, backups, the router, kids' devices, and helping aging parents.</p></div>
         </div>
       </details>
       <details class="n1-fold fold group reveal-on">
         <summary>this site</summary>
         <div class="rows repos">
-          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-corpus" target="_blank" rel="noopener"><span class="ext-end">neon1-corpus</span></a></h3><p class="state">public · v0.47.1 · <span class="lic">CC BY-ND 4.0 text, FSL-1.1 tools</span></p><p>neon1's public writing, in Markdown, shared by the site, 1NEON, and Neo.</p></div>
-          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-aws-infrastructure" target="_blank" rel="noopener"><span class="ext-end">neon1-aws-infrastructure</span></a></h3><p class="state">public · v0.11.1 · <span class="lic">FSL-1.1 code, CC BY-ND 4.0 text</span></p><p>Terraform for neon1.tech on AWS.</p></div>
-          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener"><span class="ext-end">neon1-site</span></a></h3><p class="state">public · v0.78.2 · <span class="lic">FSL-1.1 code, CC BY-ND 4.0 text</span></p><p>The neon1.tech website, its Knowledge Center, and its blog.</p></div>
-          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-1NEON" target="_blank" rel="noopener"><span class="ext-end">neon1-1NEON</span></a></h3><p class="state">public · v0.17.1 · <span class="lic">MIT</span></p><p>1NEON, the client portal.</p></div>
-          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-chat" target="_blank" rel="noopener"><span class="ext-end">neon1-chat</span></a></h3><p class="state">public · v0.2.9 · <span class="lic">FSL-1.1 code, CC BY-ND 4.0 text</span></p><p>Neo, the site's assistant, answering from neon1's public pages.</p></div>
+          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-corpus" target="_blank" rel="noopener"><span class="ext-end">neon1-corpus</span></a></h3><p class="state">v0.48.0 · <span class="lic">CC BY-ND 4.0 text, FSL-1.1 tools</span></p><p>neon1's public writing, in Markdown, shared by the site, 1NEON, and Neo.</p></div>
+          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-aws-infrastructure" target="_blank" rel="noopener"><span class="ext-end">neon1-aws-infrastructure</span></a></h3><p class="state">v0.12.0 · <span class="lic">FSL-1.1 code, CC BY-ND 4.0 text</span></p><p>Terraform for neon1.tech on AWS.</p></div>
+          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener"><span class="ext-end">neon1-site</span></a></h3><p class="state">v0.79.0 · <span class="lic">FSL-1.1 code, CC BY-ND 4.0 text</span></p><p>The neon1.tech website, its Knowledge Center, and its blog.</p></div>
+          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-1NEON" target="_blank" rel="noopener"><span class="ext-end">neon1-1NEON</span></a></h3><p class="state">v0.18.0 · <span class="lic">MIT</span></p><p>1NEON, the client portal.</p></div>
+          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-chat" target="_blank" rel="noopener"><span class="ext-end">neon1-chat</span></a></h3><p class="state">v0.3.0 · <span class="lic">FSL-1.1 code, CC BY-ND 4.0 text</span></p><p>Neo, the site's assistant, answering from neon1's public pages.</p></div>
         </div>
       </details>
     </section>
@@ -320,7 +325,7 @@
       <div class="faq">
         <!-- corpus:questions generated by scripts/corpus.mjs from neon1-corpus. Edit there, then run make corpus -->
         <details class="n1-fold reveal-on"><summary>Can I start without a call?</summary><p>Yes. <a href="/1NEON/?signup=1">Start a free 1NEON account</a>, write down what you need, and ask for an assessment or a call when you're ready.</p></details>
-        <details class="n1-fold reveal-on"><summary>How do you treat our data and accounts?</summary><p>I use only the access the job needs, keep your information confidential, and remove my access when we're done. We sign a short <a href="/knowledge/policies/service-agreement/">service agreement</a> once, before any paid work.</p></details>
+        <details class="n1-fold reveal-on"><summary>How do you treat our data and accounts?</summary><p>I use only the access the job needs, keep your information confidential, and remove my access when we're done. We sign a short <a href="/knowledge/engagement/service-agreement/">service agreement</a> once, before any paid work.</p></details>
         <details class="n1-fold reveal-on"><summary>What if something urgent comes up?</summary><p>I work in planned appointments, with no 24/7 or emergency response. An incident in progress or an outage needs a provider with emergency coverage first.</p></details>
         <details class="n1-fold reveal-on"><summary>How is the cost worked out?</summary><p>After we talk, I send a short proposal with a few options, each with what it covers, its upkeep, and its cost. You pick, and the cost changes only if you approve a change.</p></details>
         <details class="n1-fold reveal-on"><summary>What don't you do?</summary><p>I don't repair electronics, give legal advice, or handle personal or health data before the right agreements and insurance are in place. I can help you get those agreements, and I'll work with your lawyer on the technical side.</p></details>
@@ -330,16 +335,17 @@
     </section>
     <section id="contact" class="view contact" aria-labelledby="contact-h">
       <h2 id="contact-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>contact</h2>
-      <p class="lead reveal-on">Tell me what's going on and I'll reply by email. Or <a class="ext" href="mailto:hello@neon1.tech"><span class="ext-end">email</span></a>, call or text <a class="ext" href="tel:+14243263661" title="(424) 326-3661">(424) <span class="ext-end">32-neon1</span></a>, or <a class="ext" href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">book a 15-minute <span class="ext-end">call</span></a>.</p>
+      <p class="lead reveal-on">How can I help?</p>
+      <p class="lead reveal-on">Tell me what's going on with an <a class="ext" href="mailto:hello@neon1.tech"><span class="ext-end">email</span></a>, a call or text to <a class="ext" href="tel:+14243263661" title="(424) 326-3661">(424) <span class="ext-end">32-neon1</span></a>, or a <a class="ext" href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">free 15-minute <span class="ext-end">call</span></a>.</p>
       <!-- Self sign-up: a free, limited 1NEON account where a visitor writes down their needs before any call.
            Hidden until js/signup.js hears that 1NEON's sign-up is open -->
       <p class="lead reveal-on" data-signup hidden>Rather write it down first? <a href="/1NEON/?signup=1">Start a free 1NEON account</a>, write down what your project needs, then ask for an assessment or a call from your account. It holds up to 3 projects and is kept 30 days after your last change. <a href="/knowledge/guides/free-accounts/">How free accounts work</a>.</p>
       <!-- Engagement fit: where, when, what size, and the first call, in one glance -->
       <dl class="fit reveal-on">
-        <div><dt>where</dt><dd>Remote across the US, or on site within about 30 miles of Queens, NY. Outside the US, ask</dd></div>
-        <div><dt>when</dt><dd>Weekends 8am to 8pm and weekday evenings, Eastern time</dd></div>
-        <div><dt>size</dt><dd>A week or two up to six weeks, with at most two clients at a time</dd></div>
-        <div><dt>first call</dt><dd>Free and 15 minutes: the main problem and your options</dd></div>
+        <div><dt>availability</dt><dd>Weekday evenings (6&ndash;9pm, Fri to 8pm) <span class="sep" aria-hidden="true">\</span> Weekends (8am&ndash;8pm) <span class="sep" aria-hidden="true">\</span> Eastern time</dd></div>
+        <div><dt>where</dt><dd>Local on-site (within 30 miles of Queens, NY) <span class="sep" aria-hidden="true">\</span> US remote <span class="sep" aria-hidden="true">\</span> Global remote (ask)</dd></div>
+        <div><dt>size</dt><dd><a href="/knowledge/engagement/services/#which-one-sounds-like-you">1&ndash;2 weeks up to 6 weeks</a> <span class="sep" aria-hidden="true">\</span> A few clients at a time, so each gets my full attention</dd></div>
+        <div><dt>first call</dt><dd>Free, 15 minutes <span class="sep" aria-hidden="true">\</span> Any need, any size</dd></div>
       </dl>
       <!-- The form, folded until asked for. It appears once js/contact.js runs; without it, the email and
            phone links above do the job. It posts to 1NEON's contact route, which mails neon1's inbox only -->
@@ -405,9 +411,9 @@
         <h3>contact</h3>
         <ul>
           <li><a class="ext" href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener"><span class="ext-end">book a call</span></a></li>
-          <li><a href="mailto:hello@neon1.tech">email</a></li>
+          <li><a class="ext" href="mailto:hello@neon1.tech" target="_blank" rel="noopener"><span class="ext-end">email</span></a></li>
           <li><a class="ext" href="https://www.linkedin.com/company/neon1llc" target="_blank" rel="noopener"><span class="ext-end">linkedin</span></a></li>
-          <li><a href="tel:+14243263661" title="(424) 326-3661">(424) 32-neon1</a></li>
+          <li><a class="ext" href="tel:+14243263661" title="(424) 326-3661"><span class="ext-end">(424) 32-neon1</span></a></li>
         </ul>
       </div>
       <div>
@@ -427,8 +433,9 @@
         <a href="/knowledge/policies/cookies/">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/knowledge/policies/terms/">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener"><span class="ext-end">v0.78.2</span></a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener"><span class="ext-end">v0.79.0</span></a>
       </span>
+      <a class="report-bug ext" href="/report-bug/?from=site" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5.5 5.2V4a2.5 2.5 0 0 1 5 0v1.2M4.4 6.2h7.2v3.6a3.6 3.6 0 0 1-7.2 0zM8 6.4v7M1.8 7.6l2.6.9M14.2 7.6l-2.6.9M2.2 12.2l2.5-1.2M13.8 12.2 11.3 11"/></svg><span class="ext-end">report a bug</span></a>
     </div>
   </footer>
   <!-- /frame:footer -->
@@ -480,7 +487,7 @@
 
   <!-- The shared frame (menu, footer year, 1NEON fade), then rain, wordmark, chat, and the white rabbit -->
   <script type="module" src="/js/frame.js"></script>
-  <script type="module" src="/js/page.js"></script>
+    <script type="module" src="/js/page.js"></script>
   <script type="module" src="/js/contact.js"></script>
   <script type="module" src="/js/signup.js"></script>
 </body>

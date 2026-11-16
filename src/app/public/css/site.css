@@ -24,9 +24,13 @@ h2::before { content: "> "; color: var(--mid); }
   border-bottom: 1px solid var(--line); color: inherit; text-decoration: none; }
 .row h3 { margin: 0; font-size: 17px; }
 .row .price, .row .state { margin: 0; font: 500 14px var(--mono); color: var(--glow); }
-.row .state.dim { color: var(--muted); }
+:root[data-site-theme="matrix"] .row .price, :root[data-site-theme="matrix"] .row .state { color: var(--ink-soft); }
+.row .state.dim, :root[data-site-theme="matrix"] .row .state.dim { color: var(--muted); }
 /* A public code row's license, quieter than its visibility and version */
 .row .state .lic { color: var(--muted); }
+/* Matrix: mono metadata and index labels are neutral; green stays on headings, links, row titles, and bold stats */
+:root[data-site-theme="matrix"] :is(.case .idx, .say .idx, .case-body .idx, .fit dt) { color: var(--muted-ink); }
+:root[data-site-theme="matrix"] .steps div::before { color: var(--muted-ink); }
 .row p:last-child { margin: 0; color: var(--muted); font-size: 15px; }
 a.row:hover h3 { color: var(--glow); }
 @media (max-width: 700px) { .row { grid-template-columns: 1fr auto; gap: 6px 16px; } .row p:last-child { grid-column: 1 / -1; } }
@@ -142,8 +146,9 @@ h2 .pr { display: inline-block; width: .7ex; height: 1ex; margin-right: .3em; ve
 .case { flex: 0 0 clamp(290px, 31vw, 392px); scroll-snap-align: start; }
 
 /* Previous and next buttons, kept on phones too, so the cards never need a swipe */
-.rail-nav { display: flex; gap: 8px; justify-content: flex-end; max-width: 1152px; margin: 6px auto 0; padding: 0 24px; }
-@media (max-width: 640px) { .case { flex-basis: 82vw; } .rail-nav { justify-content: center; } }
+/* The previous and next buttons sit centered on the page at every width, as on a phone, instead of at the rail's right end where nothing lines up */
+.rail-nav { display: flex; gap: 8px; justify-content: center; max-width: 1152px; margin: 6px auto 0; padding: 0 24px; }
+@media (max-width: 640px) { .case { flex-basis: 82vw; } }
 
 /* Card face: label, title, NEON rows, and a stat pinned to the bottom */
 .case { background: var(--surface); border: 1px solid rgb(var(--ink-rgb) / .1); border-radius: 6px; padding: clamp(20px, 2.6vh, 26px); display: flex; flex-direction: column; }
@@ -219,16 +224,17 @@ html.case-lock { overflow: hidden; }
 @media (pointer: coarse) { .view { padding-bottom: calc(clamp(28px, 5vh, 56px) + 72px); } }
 
 /* Views set their own spacing; the about story reads as one column */
-.story { display: block; max-width: 720px; }
+.story { display: block; max-width: 760px; }
 .story p { font-size: 18px; line-height: 1.65; margin: 0 0 18px; }
 
-/* About: the photo beside the story, above it on a phone. The photo is one fixed size everywhere: 137px, the
-   height of the two paragraphs beside it on a desktop, so it matches them there and doesn't grow on a phone */
-.about { display: grid; grid-template-columns: 137px minmax(0, 720px); gap: clamp(24px, 4vw, 48px); align-items: center; }
-.portrait { margin: 0; }
-.portrait img { display: block; width: 137px; height: 137px; aspect-ratio: 1; object-fit: cover; border-radius: 12px; border: 1px solid var(--line); }
+/* About: the photo beside the story, above it on a phone. The photo is one fixed size everywhere (no scaling on a phone): 154px square,
+   so on a desktop its top lines up with the top of the first line's letters and its bottom with the foot of the last line's, over the two
+   paragraphs' five lines (18px type on a 1.65 line, with the 18px between paragraphs) */
+.about { --photo: 154px; display: grid; grid-template-columns: var(--photo) minmax(0, 760px); gap: clamp(24px, 4vw, 48px); align-items: start; }
+.portrait { margin: 7px 0 0; }
+.portrait img { display: block; width: var(--photo); height: var(--photo); aspect-ratio: 1; object-fit: cover; border-radius: 12px; border: 1px solid var(--line); }
 .about .story p:last-child { margin-bottom: 0; }
-@media (max-width: 760px) { .about { grid-template-columns: 1fr; } }
+@media (max-width: 760px) { .about { grid-template-columns: 1fr; } .portrait { margin-top: 0; } }
 /* "More" links: a line of its own under a section, in the site's usual bold link style (.ext) */
 .more { margin: 18px 0 0; }
 .row p b { color: var(--ink); font-weight: 600; }
@@ -241,9 +247,8 @@ html.case-lock { overflow: hidden; }
 /* The page steers itself; the browser's own scroll anchoring would fight it when content changes size */
 .glide { overflow-anchor: none; }
 
-/* Case studies intro line, with the four stages on a line of their own */
+/* Case studies intro line */
 .intro { margin: -6px 0 clamp(18px, 3vh, 30px); }
-.intro .stages { display: block; }
 
 /* Notched phones in landscape: the page runs edge to edge, with content kept inside the safe area
    (the rain controls and Neo keep clear of it in shared/neon1.css and shared/chat.css) */
@@ -291,7 +296,7 @@ body.white-rabbit-scene > :not(.white-rabbit) { visibility: hidden; }
 
 /* The casing, then the view: the same Blender-rendered sky, clouds, and two rows of trees as the scene */
 .white-rabbit-casing { padding: 12px; background: #E8ECE8; border-radius: 2px; box-shadow: 0 0 60px rgba(255, 244, 220, .18); }
-.white-rabbit-window { position: relative; overflow: hidden; width: min(54vw, 34vh, 300px); aspect-ratio: 4 / 5; background: #6f9fd8; }
+.white-rabbit-window { position: relative; overflow: hidden; width: min(54vw, 34vh, 300px); aspect-ratio: 4 / 5; background: #6f9fd8; container-type: inline-size; }
 .white-rabbit-window > span { position: absolute; inset: 0; background-repeat: no-repeat; }
 .white-rabbit-sky { background: url("/media/white-rabbit/sky.webp") 62% 58% / 260% auto; filter: saturate(1.9) hue-rotate(-6deg) brightness(.95); }
 .white-rabbit-clouds { background-image: url("/media/white-rabbit/clouds.webp"); background-size: 300% auto; background-position: 55% 30%; filter: brightness(1.3) contrast(.9); }
@@ -300,7 +305,8 @@ body.white-rabbit-scene > :not(.white-rabbit) { visibility: hidden; }
 .white-rabbit-near { background-image: url("/media/white-rabbit/trees-far.webp"); background-size: 300% auto; background-position: 52% 100%; top: 58%; filter: brightness(.72) saturate(1.1); }
 
 /* The closing line rises from behind the treetops into the sky of the upper sash, a small move, mostly a fade */
-.white-rabbit-window > .white-rabbit-rise { inset: auto 0 69% 0; text-align: center; font: 500 clamp(18px, 3.2vw, 26px)/1.3 var(--mono);
+/* Sized to the window (cqw), centered in the sky above the trees, so two lines always fit at any width */
+.white-rabbit-window > .white-rabbit-rise { inset: 4% 0 74% 0; display: flex; align-items: center; justify-content: center; padding: 0 5cqw; text-align: center; text-wrap: balance; font: 500 6.4cqw/1.25 var(--mono);
   color: var(--brand); text-shadow: 0 0 12px rgba(255, 255, 255, .7); opacity: var(--card-rise, 0);
   transform: translateY(calc((1 - var(--card-rise, 0)) * 36px)); }
 
@@ -343,7 +349,7 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 
 /* ---- Engagement fit: five short facts beside the booking button ---- */
 .fit { max-width: 760px; margin: 0 auto 26px; display: grid; gap: 10px; padding-top: 10px; border-top: 1px solid rgb(var(--ink-rgb) / .12); text-align: left; align-content: start; }
-.fit div { display: grid; grid-template-columns: 90px 1fr; gap: 12px; padding-bottom: 10px; border-bottom: 1px solid rgb(var(--ink-rgb) / .12); }
+.fit div { display: grid; grid-template-columns: 108px 1fr; gap: 12px; padding-bottom: 10px; border-bottom: 1px solid rgb(var(--ink-rgb) / .12); }
 .fit dt { font: 500 12px/1.9 var(--mono); color: var(--glow); }
 .fit dd { margin: 0; color: var(--ink); font-size: 16px; }
 @media (max-width: 480px) { .fit div { grid-template-columns: 1fr; gap: 2px; } }
@@ -387,6 +393,9 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 .cform .opt { font: 400 12px var(--mono); color: var(--muted); }
 .cform textarea, .cform input, .cform select { font: 15px/1.45 var(--sans); color: var(--ink); background: var(--surface); border: 1px solid rgb(var(--ink-rgb) / .2); border-radius: var(--glass-r); padding: 9px 11px; width: 100%; box-sizing: border-box; min-height: 44px; }
 .cform :is(textarea, input, select):focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
+/* A dropdown takes the same ring as a text field from the click that opens it (a mouse click on a select is not :focus-visible) until focus leaves; a pointer over it shows it is clickable */
+.cform select:is(:focus, :open) { outline: 2px solid var(--brand); outline-offset: 1px; }
+.cform select, .cform select option { cursor: pointer; }
 .cform [aria-invalid="true"] { border-color: var(--err); }
 /* Fields, picks, and the send button ease between their states, and a status line eases in */
 .cform textarea, .cform input, .cform select, .ctopic .pick { transition: border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease), background-color var(--t-fast) var(--ease), opacity var(--t-fast) var(--ease); }
@@ -400,7 +409,7 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 @supports (appearance: base-select) {
   .cform select, .cform select::picker(select) { appearance: base-select; }
   .cform select { background-image: none; padding-right: 14px; display: inline-flex; align-items: center; gap: 12px; }
-  .cform select { --arr-t: .09em; } /* the select's text is regular weight, so its arrow's stroke is too */
+  .cform select { --arr-t: .105em; } /* the stroke 1NEON's dropdown arrows draw (about 1.6px at 15px), so every dropdown arrow matches */
   .cform select::picker-icon { content: ""; width: .95em; height: .75em; font: 15px var(--sans); background: var(--brand); clip-path: var(--arr-shape); align-self: center; margin-left: auto; margin-right: 2px; transition: rotate var(--t-base) var(--ease); }
   .cform select:open::picker-icon { rotate: -90deg; }
   /* The list opens above when there isn't room below (js/motion.js sets data-dir), and the arrow turns clockwise to point up */
@@ -412,8 +421,10 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
   .cform select:open::picker(select) { animation: n1-unroll var(--t-base) var(--ease); }
   .cform select option { padding: 8px 12px; border-radius: 6px; }
   .cform select option::checkmark { display: none; }
+  /* A line under the default choice (the word for what is being chosen), from padding to padding, in the arrow's color */
+  .cform select option[value=""] { background-image: linear-gradient(var(--brand), var(--brand)); background-repeat: no-repeat; background-size: calc(100% - 24px) 1.5px; background-position: 12px 100%; margin-bottom: 5px; padding-bottom: 9px; border-radius: 6px 6px 0 0; }
   .cform select option:checked { color: var(--brand); font-weight: 600; }
-  .cform select option:is(:hover, :focus-visible) { background: rgb(var(--brand-rgb) / .08); outline: none; }
+  .cform select option:is(:hover, :focus-visible) { background-color: rgb(var(--brand-rgb) / .08); outline: none; }
 }
 @keyframes n1-unroll-up { from { opacity: 0; clip-path: inset(100% 0 0 0 round 8px); } to { opacity: 1; clip-path: inset(0 0 0 0 round 8px); } }
 @keyframes n1-unroll { from { opacity: 0; clip-path: inset(0 0 100% 0 round 8px); } to { opacity: 1; clip-path: inset(0 0 0 0 round 8px); } }
@@ -452,8 +463,6 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 @media (max-width: 760px) { .split > .tour-link { margin: 16px 0 0; } }
 /* Under the case studies: the next step after the proof */
 .start-line { margin: clamp(0px, 1vh, 8px) 0 0; max-width: none; }
-/* "or" before the last choice moves into the signup clause once 1NEON's sign-up is open */
-.start-line:has([data-signup]:not([hidden])) .start-or { display: none; }
 /* A case card's role and years, above its glance */
 .case .role { margin: -4px 0 10px; font: 500 13px/1.4 var(--mono); color: var(--muted); }
 
@@ -463,3 +472,17 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 
 /* Matrix (dark) theme: the launcher's dark ground and glow live in frame.css, shared with every page; hover lifts it a little */
 :root[data-site-theme="matrix"]:has(.n1-bar.light) .n1chat-launch:not(.n1chat-light):hover { background: rgb(18 34 24 / .96); }
+
+/* ---- Matrix readability: light text on dark ---- */
+/* A little more tracking for running text (not headings, mono, nav, or the landing) */
+:root[data-site-theme="matrix"] :is(.awake, .kc-text, .case-body) :is(p, li):not(.idx, .stat, .price, .state, .tag) { letter-spacing: .01em; }
+:root[data-site-theme="matrix"] :is(.foot, .legal, .cform, .n1-bar, .menu) :is(p, li) { letter-spacing: normal; }
+/* Inline links in running text carry an underline, so they do not rely on color alone */
+:root[data-site-theme="matrix"] :is(.awake :is(p, li), .kc-text, .case-body, .say) a:not(.btn, .btn-primary, .row, .card, .kc-card, .go) {
+  text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: rgb(var(--brand-rgb) / .55); }
+:root[data-site-theme="matrix"] :is(.awake :is(p, li), .kc-text, .case-body, .say) a:not(.btn, .btn-primary, .row, .card, .kc-card, .go):hover { text-decoration-color: var(--brand); }
+/* Fields: a visible edge (>= 3:1 on the surface), labels one step softer than typed text, placeholders at the faint level */
+:root[data-site-theme="matrix"] .cform :is(textarea, input, select), :root[data-site-theme="matrix"] .ctopic .pick { border-color: rgb(var(--ink-rgb) / .45); }
+:root[data-site-theme="matrix"] .cform [aria-invalid="true"] { border-color: var(--err); }
+:root[data-site-theme="matrix"] :is(.cform label, .ctopic legend) { color: var(--ink-soft); }
+:root[data-site-theme="matrix"] .cform :is(textarea, input)::placeholder { color: var(--m-faint); opacity: 1; }

@@ -4,6 +4,57 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+## v0.79.0
+
+- The footer's last row has room for Neo's button: it rests at the bottom left of the page's end, as far above the legal line as it is from the screen's bottom, so it never covers footer text at any width. "report a bug" sits in the same row at the bottom right, centered on Neo's button, its right edge on the top bar's rightmost item at every width. The bug mark's gap to the text is the arrow's gap to the text. Neo's own "report a bug" link has the mark too.
+- The contact table separates its choices with the footer's backslash, with room each side, instead of a slash.
+- A page whose stylesheet failed to load reloads itself once, instead of staying as plain unstyled text.
+- The home page's service-agreement link and the corpus's contact links use the Engagement addresses, so none goes through a redirect.
+
+- Knowledge Center: the Services shelf is now Engagement and holds Services, pricing, how a project runs, the capability statement, contact, publishing client work, and the service agreement (from the corpus branch refactor/engagement-shelf, shown on dev until it is released). Old addresses redirect.
+- Contact: the lead line reads "Tell me what's going on with an email, a call or text to (424) 32-neon1, or a free 15-minute call", with "How can I help?" above it and one gap between the lines. The facts table is now availability, where, size, and first call, each slash-separated, with weekday evenings as 6-9pm (Fri to 8pm); a few clients at a time. The home page's structured data lists opening hours.
+- Knowledge Center: group headers are a band edge to edge with a line above and below, in type larger and heavier than the shelf titles. One gap (the one above the "On this page" bar) separates the bar, bands, shelf titles, and the cards. The bar is as thin as the document pages' bar, the group names in its menu are links, counts sit beside names (the current one in the current style), and the menu stays open when the theme changes.
+- Knowledge Center "On this page" bar: once it reaches the top it eases out to a square bar edge to edge, as on document pages, with its contents on the content column's edges (document pages had a small overhang at mid widths). The separate sticky group bar is gone; the bar says "2 of 11 · FOR YOU / Alternatives". Group headers are boxed with the brand line, and larger in the dropdown. Dropdowns carry a rule under the default choice (or under the collapsed bar) in the arrow's color.
+- Only one white rabbit shows in the rain at a time, and the next comes a random 7 to 10 seconds after the last one is gone, whether it faded or was caught.
+- The white rabbit logs one line to the browser console saying why the still card is showing (reduced motion, no WebGL, a failed load, a lost context), so an unexpected fallback can be checked in DevTools.
+- The still card (reduced motion, or no WebGL) now fits "Thanks for following the rabbit." inside the upper pane at every width, and opens with less than half the scrolling.
+- The client work carousel's previous and next buttons are centered on the page at every width, as on a phone.
+- Links follow one rule across the site. Links that leave the page, including email and phone, end in the northeast arrow (no underline in the light look); links that stay on the site are underlined, thinly; in the dark look every link has a dimmed underline that turns full green on hover. Neo's "email" and "call" now carry the arrow ("email" opens in a new tab), "Privacy" is underlined, and the footer's email and phone links and internal links follow the same rule.
+
+- Dropdowns (the contact form's "How did you find neon1?" and the report page's "Where?") show the theme's focus ring from the click that opens them until focus leaves, show a hand over them, and carry the same heavier arrow as the section arrows and 1NEON's dropdowns.
+
+- Footer "report a bug" is in the footer's mono face on the legal line's baseline, right-aligned with the top bar's rightmost control at every width, in the theme's green. In the dark theme the version link and "report a bug" carry the dim underline that turns bright on hover; in the light theme outbound links have no underline.
+
+- Neo's panel: "book" opens in a new tab with the outbound arrow, and outbound links there follow the same underline rules.
+
+- neon1.tech/report-bug is a page of its own for reporting a bug: where it happened (main site, 1NEON, 1NEON demo, Neo chat, Knowledge Center, blog, or other, filled in from a `?from=` link or the page you came from), what happened, an optional email for a reply, and up to three PNG or JPEG screenshots. The page you came from, your theme, browser, and window size go with it, and the page says so. The confirmation shows a reference to quote. It sends to hello@ through 1NEON's bug route, and screenshots are kept privately and scanned for malware.
+- The "Where" choices include "1NEON live walkthrough" (`?from=walkthrough`, or a visit from /1NEON/live). The walkthrough itself still has no report link.
+- The report page ends with "Found a security issue? Email security@neon1.tech instead." so security reports stay apart from bug reports.
+- Neo's window has a "report a bug" link at the bottom right that opens the report page in a new tab.
+
+- "report a bug" in the footer's bottom right opens the report page in a new tab, from every page, with the page it came from passed along.
+
+- Knowledge Center: "Shelves" is now "On this page", an inset card in the style of the documents' own, set apart from the "Not sure where you fit" line. The group headings ("For you", "About neon1") are flat lines in line with the shelf headings, and a single sticky bar shows the shelf you are reading, fading its name in beside the group's.
+
+- Knowledge Center: "Start here" has a count, a one-line description, and the green rule under it, like the other headings.
+
+- Code and resources: each repository's line starts at its version ("v0.1.4 · MIT"); the "public" label is gone, since the description says it all is.
+
+- The about photo is one fixed size, lined up with the top of the first line and the foot of the last line of the text beside it, on a phone too.
+
+- Knowledge Center and blog headers are the brand's flat dark green in the light theme, with the bar's gray hairline and a soft shadow along their foot.
+
+- Opening "send me your use case" moves the page and the form together in one eased motion, and on shorter windows keeps the send button in view.
+
+- The bar and menu item reads "code", and the section heading reads "code and resources", lowercase like the other headings. "Public" is gone from both, since the line under the heading already says it's all on GitHub.
+
+- Neo, the "ask neon1" window, is on every Knowledge Center and blog page, not only the home page. It follows the page's light or dark look, and holds the page still on a phone as it does on the home page.
+
+- Matrix theme: text is off-white with green kept for headings and links, links are underlined in running text, and form fields and focus rings are easier to see.
+
+- Dark theme: dropdowns, menus, and other controls now follow the dark theme.
+- The contact form sends the visitor's time zone with the message, so the email to neon1 can show their local time.
+
 ## v0.78.2
 
 - In the dark (matrix) theme, Neo's "ask Neo" button no longer glows over the landing's rain; below the rain it still does.
@@ -11,7 +62,8 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## v0.78.1
 
-- In the dark (matrix) theme, Neo's "ask Neo" button glows like a neon tube everywhere, the landing's rain included, with the same dark ground, border glow, and flicker 1NEON's public screens have. Before, the landing's button was a plain outline, and below it the glow on the border was covered by a plain shadow.
+- In the dark (matrix) theme below the landing's rain, Neo's "ask Neo" button glows like 1NEON's: the dark ground and the border glow, which a plain shadow had been covering. Over the rain it stays the plain outline.
+- Switching to the dark theme, the top-left logo and Neo's button ease up smoothly to full brightness once instead of flickering; links, headings, and the other green parts keep their flicker.
 - The free 1NEON account invitations open the sign-up in the same tab, as plain in-site links with no arrow. Back returns to the same spot on the home page. A Knowledge Center question that links to neon1.tech itself now does the same on the home page.
 - The contact section's invitation says what a free account holds before anyone signs up: up to 3 projects, kept 30 days after the last change.
 - On a phone, opening Neo or tapping its box no longer moves the page behind it, and the page scrolls normally after Neo closes. iOS scrolls the page when the box takes focus and the keyboard rises; the page now holds its position while Neo is open and starts its own scroll steering fresh when Neo closes.

@@ -32,6 +32,7 @@
 const PASS_TOUCH = 7;      // viewport heights of finger travel for the whole walk
 const PASS_WHEEL = 9;      // viewport heights of touchpad or smooth wheel scrolling
 const NOTCH = 1 / 45;      // one click of a notched mouse wheel
+const CARD_GAIN = 2.2;     // the still card needs about 45% of the scroll the scene does (Pradeep, 2026-11-16)
 const FLICK = 320;         // ms of a flick's speed carried on after the finger lifts
 const TOP = 0.45;          // the most of the walk shown per second, so a burst of input can't spin the view
 const STIFF = 90;          // spring stiffness, per second squared
@@ -207,6 +208,7 @@ export function whiteRabbit({ rain, root }) {
     body.classList.remove("white-rabbit-hover");
     target = p = v = 0; halted = prepared = handed = false; escape = rewind = null; cardP = 0;
     mode = reduce.matches ? "card" : "scene";
+    if (mode === "card") why("reduced motion is on (prefers-reduced-motion: reduce), from the browser or the system's animation setting");
     root.dataset.mode = mode;
     openAudio();
     rain.halt((kind, ms) => sound && sound.glitch(kind, ms)).then(() => { if (g !== gen) return; halted = true; prepare(); });
@@ -230,10 +232,12 @@ export function whiteRabbit({ rain, root }) {
     loading = loading || import(SCENE);
     loading.then((m) => {
       if (g !== gen || scene || state === "idle" || mode !== "scene") return;
-      const made = m.createScene({ onLost: () => { if (made === scene) fallback(); }, onSound: (kind) => sound && sound.car(kind) });
+      let made;
+      try { made = m.createScene({ onLost: () => { if (made === scene) { why("the WebGL context was lost"); fallback(); } }, onSound: (kind) => sound && sound.car(kind) }); }
+      catch (e) { why("building the scene failed, usually no WebGL or GPU acceleration off", e); fallback(); return; }
       scene = made;
       prepare();
-    }).catch(() => { loading = null; if (g === gen) fallback(); });
+    }).catch((e) => { loading = null; if (g === gen) { why("loading the scene module failed", e); fallback(); } });
   }
 
   // Draws the landing into the TV picture once the rain is still and the scene exists; the result
@@ -242,12 +246,17 @@ export function whiteRabbit({ rain, root }) {
     if (!halted || !scene || state === "idle" || mode !== "scene") return;
     const s = scene, g = gen;
     const current = () => s === scene && g === gen;
-    s.compose().then(() => { if (current()) prepared = true; }).catch(() => { if (current()) fallback(); });
+    s.compose().then(() => { if (current()) prepared = true; }).catch((e) => { if (current()) { why("drawing the scene's first frame failed", e); fallback(); } });
   }
 
   // No WebGL, a failed import, a lost context, or reduced motion turned on mid-scene: the still card
   // takes over from the same point. The scene loop stops at once and the scene is freed; a leave
   // already under way (Esc, or the back button) carries on in the card
+  // Says in the console why the still card is showing, so a browser that gets it unexpectedly can be checked in DevTools
+  function why(reason, err) {
+    console.info("[white rabbit] showing the still card: " + reason + (err ? " (" + (err.message || err) + ")" : ""));
+  }
+
   function fallback() {
     if (state === "idle" || mode === "card") return;
     if (state === "exiting") { drop(); return; } // the landing is already back; nothing to hand over
@@ -320,7 +329,7 @@ export function whiteRabbit({ rain, root }) {
       if (mode === "card") cover(true, "card");
       else start();
     }
-    if (mode === "card") { card(d); return; }
+    if (mode === "card") { card(d * CARD_GAIN); return; }
     if (state === "done" && d > 0) { target = Math.min(1 + BAND, target + d * 0.3); band(); return; }
     set(d > 0 ? "playing" : "reversing");
     target = target + d > 1 ? Math.min(1 + BAND, 1 + (target + d - 1) * 0.3) : Math.max(0, target + d);
@@ -466,7 +475,7 @@ export function whiteRabbit({ rain, root }) {
 
   // Reduced motion turned on during an entry: the still card takes over at once, silently. Turned off,
   // the card stays until the entry ends; the next catch reads the preference again
-  reduce.addEventListener("change", (e) => { if (e.matches) fallback(); });
+  reduce.addEventListener("change", (e) => { if (e.matches) { why("reduced motion was turned on"); fallback(); } });
 
   // ---- The card (reduced motion and fallbacks) ----
   // Scroll-linked and reversible, with nothing moving on its own: the page goes dark, the window and

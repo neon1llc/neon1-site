@@ -56,6 +56,8 @@ if (fold && form) {
       ...(f.found.value ? { found: f.found.value } : {}),
       ...(f.found.value === "other" ? { foundOther: f.foundOther.value.trim() } : {}),
       website: f.website.value,
+      // The visitor's time zone, so the message can show their local time
+      timeZone: (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch { return ""; } })(),
     };
   }
 
@@ -72,6 +74,8 @@ if (fold && form) {
   }
   // The dropdown's arrow turns toward the way its list opens (shared/motion.js)
   watchDirection(form.elements.found);
+  // Safari does not focus a dropdown when it is pressed, so the focus ring would wait until a choice; press focuses it, as in 1NEON
+  form.elements.found.addEventListener("pointerdown", (e) => { if (document.activeElement !== e.currentTarget) e.currentTarget.focus({ preventScroll: true }); });
   // "Somewhere else" asks for their words; any other answer hides the box again
   const foundOther = form.querySelector(".cfound-other");
   form.elements.found.addEventListener("change", () => reveal(foundOther, form.elements.found.value === "other"));

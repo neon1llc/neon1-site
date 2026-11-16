@@ -21,6 +21,8 @@ const PREFIXES = {
   policies: ["policies-", "policy-"],
   products: ["products-", "product-"],
   "case-studies": ["case-studies-", "case-"],
+  // The shelf took documents from company, services, and policies, keeping their ids, so those prefixes still give the short address
+  engagement: ["engagement-", "company-", "policy-"],
 }
 export function slugOf(id, section) {
   for (const p of PREFIXES[section] ?? [`${section}-`]) if (id.startsWith(p) && id.length > p.length) return id.slice(p.length)
