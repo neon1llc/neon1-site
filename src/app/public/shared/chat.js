@@ -248,12 +248,28 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
     if (panel.getAnimations && !panel.getAnimations().length) complete();
   }
 
+  // While the window is open on a narrow screen, the page behind it holds its position
+  let pinnedAt = null;
+  const holdPage = () => { if (pinnedAt !== null && scrollY !== pinnedAt) scrollTo({ top: pinnedAt, left: 0, behavior: "instant" }); };
+  function pin(on) {
+    if (on === (pinnedAt !== null)) return;
+    document.body.classList.toggle("n1chat-open", on);
+    dispatchEvent(new Event("n1chat-pin"));
+    if (on) { pinnedAt = scrollY; addEventListener("scroll", holdPage, { passive: true }); if (window.visualViewport) visualViewport.addEventListener("scroll", holdPage); }
+    else { removeEventListener("scroll", holdPage); if (window.visualViewport) visualViewport.removeEventListener("scroll", holdPage); pinnedAt = null; }
+  }
+
   let folding = false;
   function open(show) {
     // Already there, or already on the way out; otherwise any animation still running ends now
     if (folding ? !show : show === !panel.hidden) return;
     finish?.();
     launcher.setAttribute("aria-expanded", String(show));
+
+    // On a narrow screen the open window covers the page, so the page stays exactly where it was: iOS
+    // scrolls the page when the box takes focus and the keyboard rises, and the page's own scroll steering
+    // would then follow it, one step at a time. The window's own log still scrolls
+    pin(show && narrow.matches);
 
     if (show) {
       launcher.classList.add("n1chat-hidden");
