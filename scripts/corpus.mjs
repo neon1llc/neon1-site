@@ -96,9 +96,17 @@ function caseCard(c) {
 const question = (s) => `        <details class="n1-fold reveal-on"><summary>${s.headingHtml}</summary>${forPage(s.html).replace(/\n/g, "")}</details>`
 
 
-// The contact view's "where, when, size" list already answers these, so the home page doesn't ask them
-// twice. Neo and the Knowledge Center still carry the full FAQ
-const ON_CONTACT = new Set(["Do you come on site?", "When do you work?", "How long does a project take?"])
+// The home page keeps its questions short: the FAQ's `home` list (corpus v0.47 on) names which questions it
+// shows and in what order, and each shows only its answer's first paragraph. The Knowledge Center and Neo carry
+// every question in full, from the same text, so the short and long answers can't disagree
+const firstParagraph = (s) => ({ ...s, html: (s.html.match(/<p>[\s\S]*?<\/p>/) ?? [s.html])[0] })
+const homeQuestions = (faq) => {
+  const asked = faq.sections.filter((s) => s.heading)
+  if (Array.isArray(faq.data.home)) return faq.data.home.map((q) => asked.find((s) => s.heading === q)).filter(Boolean).map(firstParagraph)
+  // An older corpus without the list: every question but those the contact view's "where, when, size" list answers
+  const onContact = new Set(["Do you come on site?", "When do you work?", "How long does a project take?"])
+  return asked.filter((s) => !onContact.has(s.heading))
+}
 
 const BLOCKS = {
   "case-studies": () =>
@@ -108,8 +116,7 @@ const BLOCKS = {
       .map(caseCard)
       .join("\n"),
   questions: () =>
-    doc(manifest.files.find((f) => f.id === "faq-working-with-neon1"))
-      .sections.filter((s) => s.heading && !ON_CONTACT.has(s.heading))
+    homeQuestions(doc(manifest.files.find((f) => f.id === "faq-working-with-neon1")))
       .map(question)
       .join("\n"),
 }
