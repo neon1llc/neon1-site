@@ -8,6 +8,8 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 - Knowledge Center: "Shelves" is now "On this page", an inset card in the style of the documents' own, set apart from the "Not sure where you fit" line. The group headings ("For you", "About neon1") are flat lines in line with the shelf headings, and a single sticky bar shows the shelf you are reading, fading its name in beside the group's.
 
+- Knowledge Center: "Start here" has a count, a one-line description, and the green rule under it, like the other headings.
+
 - The about photo is one fixed size, lined up with the top of the first line and the foot of the last line of the text beside it, on a phone too.
 
 - Knowledge Center and blog headers are the brand's flat dark green in the light theme, with the bar's gray hairline and a soft shadow along their foot.
