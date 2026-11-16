@@ -461,7 +461,5 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 /* Invitations to start a free 1NEON account stay hidden until js/signup.js hears sign-up is open */
 [data-signup][hidden] { display: none !important; }
 
-/* Matrix (dark) theme: below the rain the chat keeps its dark look (js/page.js), so its launcher, clear glass over the rain,
-   gets the page's dark ground behind it once the bar has turned, and text never shows through it */
-:root[data-site-theme="matrix"]:has(.n1-bar.light) .n1chat-launch { background: rgb(15 10 13 / .94); box-shadow: 0 4px 14px rgba(0, 0, 0, .5); }
-:root[data-site-theme="matrix"]:has(.n1-bar.light) .n1chat-launch:hover { background: rgb(18 34 24 / .96); }
+/* Matrix (dark) theme: the launcher's dark ground and glow live in frame.css, shared with every page; hover lifts it a little */
+:root[data-site-theme="matrix"] .n1chat-launch:not(.n1chat-light):hover { background: rgb(18 34 24 / .96); }

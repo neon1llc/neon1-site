@@ -74,9 +74,11 @@
 :root[data-site-theme="matrix"] .n1-bar.light .n1-logo { color: #8CFFBE;
   text-shadow: 0 0 2px #C4FFDC, 0 0 7px rgba(108, 255, 168, .95), 0 0 16px rgba(60, 255, 140, .8), 0 0 34px rgba(0, 230, 118, .6); }
 :root[data-site-theme="matrix"] .n1-bar.light .n1-logo svg { filter: drop-shadow(0 0 2px #C4FFDC) drop-shadow(0 0 7px rgba(108, 255, 168, .95)) drop-shadow(0 0 16px rgba(0, 230, 118, .7)); }
-:root[data-site-theme="matrix"]:has(.n1-bar.light) .n1chat-launch { border-color: #6CFFA8; color: #8CFFBE;
+/* Neo's launcher glows in matrix everywhere, the landing's rain included, as on 1NEON's public screens: the page's dark ground
+   behind it so nothing shows through, and the same tube glow on its border and mark */
+:root[data-site-theme="matrix"] .n1chat-launch:not(.n1chat-light) { border-color: #6CFFA8; color: #8CFFBE; background: rgb(15 10 13 / .94);
   box-shadow: 0 0 3px rgba(196, 255, 220, .9), 0 0 11px rgba(108, 255, 168, .85), 0 0 26px rgba(0, 230, 118, .55), inset 0 0 9px rgba(108, 255, 168, .4); }
-:root[data-site-theme="matrix"]:has(.n1-bar.light) .n1chat-launch svg { filter: drop-shadow(0 0 2px #C4FFDC) drop-shadow(0 0 7px rgba(108, 255, 168, .95)) drop-shadow(0 0 14px rgba(0, 230, 118, .6)); }
+:root[data-site-theme="matrix"] .n1chat-launch:not(.n1chat-light) svg { filter: drop-shadow(0 0 2px #C4FFDC) drop-shadow(0 0 7px rgba(108, 255, 168, .95)) drop-shadow(0 0 14px rgba(0, 230, 118, .6)); }
 
 /* ---- Base: box model, anchor scrolling clear of the bar, links, and focus rings ---- */
 * { box-sizing: border-box; }
