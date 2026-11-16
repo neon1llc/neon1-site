@@ -4,6 +4,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+- Only one white rabbit shows in the rain at a time, and the next comes a random 7 to 10 seconds after the last one is gone, whether it faded or was caught.
 - The white rabbit logs one line to the browser console saying why the still card is showing (reduced motion, no WebGL, a failed load, a lost context), so an unexpected fallback can be checked in DevTools.
 - The still card (reduced motion, or no WebGL) now fits "Thanks for following the rabbit." inside the upper pane at every width, and opens with less than half the scrolling.
 - The client work carousel's previous and next buttons are centered on the page at every width, as on a phone.
