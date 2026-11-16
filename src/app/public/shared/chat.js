@@ -190,9 +190,9 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
     "Reach a person: ",
     el("a", "n1chat-plain n1chat-ext", "book", { href: BOOKING, target: "_blank", rel: "noopener" }),
     ", ",
-    el("a", "n1chat-plain", "email", { href: EMAIL }),
+    el("a", "n1chat-plain n1chat-ext", "email", { href: EMAIL, target: "_blank", rel: "noopener" }),
     ", or ",
-    el("a", "n1chat-plain", "call", { href: PHONE }),
+    el("a", "n1chat-plain n1chat-ext", "call", { href: PHONE }),
     ".",
   );
 

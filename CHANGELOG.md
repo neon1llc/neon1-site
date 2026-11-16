@@ -4,6 +4,8 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+- Links follow one rule across the site. Links that leave the page, including email and phone, end in the northeast arrow (no underline in the light look); links that stay on the site are underlined, thinly; in the dark look every link has a dimmed underline that turns full green on hover. Neo's "email" and "call" now carry the arrow ("email" opens in a new tab), "Privacy" is underlined, and the footer's email and phone links and internal links follow the same rule.
+
 - Dropdowns (the contact form's "How did you find neon1?" and the report page's "Where?") show the theme's focus ring from the click that opens them until focus leaves, show a hand over them, and carry the same heavier arrow as the section arrows and 1NEON's dropdowns.
 
 - Footer "report a bug" is in the footer's mono face on the legal line's baseline, right-aligned with the top bar's rightmost control at every width, in the theme's green. In the dark theme the version link and "report a bug" carry the dim underline that turns bright on hover; in the light theme outbound links have no underline.

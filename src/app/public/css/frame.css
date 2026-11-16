@@ -328,3 +328,14 @@ a.ext:hover { color: var(--brand); }
 :root[data-site-theme="matrix"] .legal :is(a.report-bug, a.ext) { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px;
   text-decoration-color: rgb(var(--brand-rgb) / .55); }
 :root[data-site-theme="matrix"] .legal :is(a.report-bug, a.ext):is(:hover, :focus-visible) { text-decoration-color: var(--glow); }
+
+/* ---- Links, one rule for the whole site ----
+   Links that leave the page (another site, mailto:, tel:) end in the northeast arrow and, in the light look, carry no underline, since the
+   arrow marks them. Links that stay on the site are underlined, thinly, so they never rely on color alone. In matrix every link shows a dimmed
+   underline that turns the link's full color on hover. (Bar, menu, buttons, and cards are controls, not links in text, and are left alone.) */
+.foot a:not(.ext) { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+:root[data-site-theme="matrix"] :is(main, footer, .n1chat) a.ext:not([class*="btn"], .card) { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, currentColor 55%, transparent); }
+:root[data-site-theme="matrix"] :is(main, footer, .n1chat) a.ext:not([class*="btn"], .card):is(:hover, :focus-visible) { text-decoration-color: currentColor; }
+:root[data-site-theme="matrix"] .foot a:not(.ext) { text-decoration-color: color-mix(in srgb, currentColor 55%, transparent); }
+:root[data-site-theme="matrix"] .foot a:not(.ext):is(:hover, :focus-visible) { text-decoration-color: currentColor; }
