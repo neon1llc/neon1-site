@@ -71,3 +71,28 @@
   addEventListener("storage", (e) => { if (e.key === KEY) { shift(wanted()); apply(wanted()); } });
   addEventListener("pageshow", (e) => { if (e.persisted && root.dataset.siteTheme !== wanted()) apply(wanted()); });
 })();
+
+// ---- The cross-fade between pages: only for a move from one neon1 page to the next ----
+// The browser's own page transition (@view-transition) runs only when both pages opt in. Opting in from the stylesheet
+// left a page blank on first open in some iPhone browsers built on WebKit (DuckDuckGo: a link from Gmail, or a typed
+// address, showed a black page until the address was entered again), so a page opts in from here instead:
+// - at once, before the first paint, when the visitor came from another neon1 page (a same-site referrer), so that move fades;
+// - otherwise only once the page is showing, so an arrival from outside never waits on a transition, and the next move
+//   inside the site still fades.
+// Script-built stylesheets are not inline styles, so the strict CSP allows them. Reduced motion never fades.
+(() => {
+  if (!("adoptedStyleSheets" in document) || typeof CSSStyleSheet !== "function") return;
+  const optIn = () => {
+    try {
+      const sheet = new CSSStyleSheet();
+      sheet.replaceSync("@media (prefers-reduced-motion: no-preference) { @view-transition { navigation: auto; } }");
+      document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
+    } catch { /* no fade: pages simply change */ }
+  };
+  let inside = false;
+  try { inside = !!document.referrer && new URL(document.referrer).origin === location.origin; } catch { /* treat as outside */ }
+  if (inside) optIn();
+  // A browser with page transitions also has pagereveal, which fires just before the first paint; a frame after it the
+  // page is showing, and opting in then only affects the next move
+  else if ("onpagereveal" in window) addEventListener("pagereveal", () => requestAnimationFrame(() => setTimeout(optIn)), { once: true });
+})();

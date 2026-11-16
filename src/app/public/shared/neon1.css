@@ -35,9 +35,9 @@
 .n1-appear, .n1-appear-self:not([hidden]) { animation: n1-appear var(--t-base) var(--ease) both; }
 /* Going from one page to the next is one short cross-fade, done only by the browser's own page transitions (nothing in the
    page fades itself in or out on a move, so the two never stack into a double fade). A browser without them, and reduced
-   motion, change pages at once. */
+   motion, change pages at once. The opt-in itself (@view-transition) is set by js/theme.js, only for a move from another
+   neon1 page: set here, it left a page opened from outside blank in some iPhone browsers. */
 @media (prefers-reduced-motion: no-preference) {
-  @view-transition { navigation: auto; }
   /* The bar is the same on every page, so it holds still while the page under it changes */
   .n1-bar { view-transition-name: n1-bar; }
   ::view-transition-group(root), ::view-transition-group(n1-bar) { animation-duration: var(--t-base); animation-timing-function: var(--ease); }
