@@ -6,7 +6,8 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## v0.78.1
 
-- In the dark (matrix) theme, Neo's "ask Neo" button glows like a neon tube everywhere, the landing's rain included, with the same dark ground, border glow, and flicker 1NEON's public screens have. Before, the landing's button was a plain outline, and below it the glow on the border was covered by a plain shadow.
+- In the dark (matrix) theme below the landing's rain, Neo's "ask Neo" button glows like 1NEON's: the dark ground and the border glow, which a plain shadow had been covering. Over the rain it stays the plain outline.
+- Switching to the dark theme, the top-left logo and Neo's button ease up smoothly to full brightness once instead of flickering; links, headings, and the other green parts keep their flicker.
 - The free 1NEON account invitations open the sign-up in the same tab, as plain in-site links with no arrow. Back returns to the same spot on the home page. A Knowledge Center question that links to neon1.tech itself now does the same on the home page.
 - The contact section's invitation says what a free account holds before anyone signs up: up to 3 projects, kept 30 days after the last change.
 - On a phone, opening Neo or tapping its box no longer moves the page behind it, and the page scrolls normally after Neo closes. iOS scrolls the page when the box takes focus and the keyboard rises; the page now holds its position while Neo is open and starts its own scroll steering fresh when Neo closes.
