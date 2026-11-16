@@ -45,7 +45,7 @@ const page = (opts) => page_(frame, {
   current: "knowledge",
   generator: "scripts/knowledge.mjs from neon1-corpus. Edit the corpus, then run make knowledge",
   styles: ["/css/knowledge.css"],
-  scripts: ["/js/fold.js", "/js/knowledge.js", "/js/knowledge-toc.js", "/js/knowledge-shelves.js", "/js/knowledge-groups.js"],
+  scripts: ["/js/fold.js", "/js/knowledge.js", "/js/knowledge-toc.js", "/js/knowledge-groups.js"],
 })
 
 
@@ -165,9 +165,12 @@ ${g.shelves.map((s) => `        <li><a href="#${s.key}">${esc(s.label)}${shelfMa
 ${pathsSection()}
 
     <nav class="kc-shelves" aria-label="Shelves">
-      <ul>
+      <details class="n1-fold kc-shelves-fold">
+        <summary>Shelves <span>${corpus.shelves.length} shelves</span></summary>
+        <ul>
 ${nav}
-      </ul>
+        </ul>
+      </details>
     </nav>
 
     <div class="kc-body">

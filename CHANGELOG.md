@@ -4,6 +4,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+- Knowledge Center: the shelf bar is now one line, like "On this page" on a document: it names the shelf you are in and opens a list of every shelf by group, with counts. No more sideways scrolling.
 - Knowledge Center: the two groups and each shelf keep their heading in view while you read. The description eases away as it sticks, and the heading fades at the last card.
 - The group headings sit on a panel that reads in light and dark. The title block and the blog's match in spacing.
 - Shelf links in the bar land the shelf title with equal space above and below. The current shelf is highlighted, and each shelf and group shows its article count.

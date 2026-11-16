@@ -21,7 +21,9 @@ const bar = document.querySelector(".kc-shelves");
 
 if (heads.length && bar) {
   const root = document.documentElement;
-  const track = bar.querySelector("ul");
+  const fold = bar.querySelector("details");
+  const label = fold && fold.querySelector("summary span");
+  const resting = label ? label.textContent : "";
   const links = [...bar.querySelectorAll("a[href^='#']")];
   const shelves = links.map((a) => ({ a, el: document.getElementById(a.getAttribute("href").slice(1)) })).filter((s) => s.el);
   const reduce = matchMedia("(prefers-reduced-motion: reduce)");
@@ -69,14 +71,8 @@ if (heads.length && bar) {
       const on = s === current;
       if (on) s.a.setAttribute("aria-current", "true"); else s.a.removeAttribute("aria-current");
     }
-    if (current && current !== update.last && track) {
-      update.last = current;
-      // Keep the link inside the bar's visible width, with a little room each side
-      const t = track.getBoundingClientRect(), a = current.a.getBoundingClientRect();
-      if (a.left < t.left + 48 || a.right > t.right - 48) {
-        track.scrollTo({ left: track.scrollLeft + a.left - t.left - 56, behavior: reduce.matches ? "auto" : "smooth" });
-      }
-    }
+    // The stuck bar names the shelf in view, as the document pages' index names its section
+    if (label) label.textContent = current ? `${shelves.indexOf(current) + 1} of ${shelves.length} \u00b7 ${current.a.firstChild.textContent.trim()}` : resting;
   };
   // A shelf link lands the shelf's title so the gap under the stuck group heading equals the gap between the title and its description
   const land = (el, smooth) => {
@@ -91,10 +87,14 @@ if (heads.length && bar) {
   };
   for (const s of shelves) s.a.addEventListener("click", (e) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+    if (fold) fold.open = false;
     if (land(s.el, true)) { e.preventDefault(); history.pushState(null, "", `#${s.el.id}`); }
   });
   const queue = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
 
+  // Outside a tap, or Escape, shuts the list
+  document.addEventListener("click", (e) => { if (fold && fold.open && !bar.contains(e.target)) fold.open = false; });
+  addEventListener("keydown", (e) => { if (e.key === "Escape" && fold && fold.open) { fold.open = false; fold.querySelector("summary").focus(); } });
   addEventListener("scroll", queue, { passive: true });
   addEventListener("resize", () => { measure(); queue(); });
   if (window.ResizeObserver) new ResizeObserver(() => { measure(); queue(); }).observe(bar);

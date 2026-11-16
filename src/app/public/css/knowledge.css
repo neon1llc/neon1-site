@@ -45,32 +45,23 @@ body.kc { background: var(--page); }
 .kc-results { min-height: 1.4em; margin: 8px 0 0; font: 13px var(--mono); color: var(--band-soft); }
 
 /* ---- Shelf links under the band ---- */
-.kc-shelves { position: sticky; top: calc(64px + env(safe-area-inset-top)); z-index: 3; background: rgb(var(--page-rgb) / .92);
-  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
-.kc-shelves ul { list-style: none; max-width: 1040px; margin: 0 auto; padding: 10px 24px; display: flex; align-items: stretch; gap: 6px; overflow-x: auto; scrollbar-width: none; }
-.kc-shelves ul::-webkit-scrollbar { display: none; }
-.kc-shelves li { display: flex; align-items: center; } /* every item centers its own content in the strip's height, titles and links alike, whatever line box a browser gives each */
-.kc-shelves a { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; white-space: nowrap;
-  font: 13px var(--mono); color: var(--muted); text-decoration: none; border: 1px solid transparent; }
-.kc-shelves a[aria-current] { color: var(--brand); border-color: rgb(var(--brand-rgb) / .45); background: var(--surface); }
-.kc-shelves a:hover { color: var(--brand); border-color: var(--line); background: var(--surface); }
-
-/* Left and right buttons (js/knowledge-shelves.js): a box at each end of the bar, as tall as the bar, with the same
-   thin line between it and the shelf buttons that the bar draws between its groups. A box covers the shelf buttons
-   that scroll under it, so they end at its line, and it shows only on a side that has more to scroll to. The arrow is
-   the site's own chevron (the one beside each heading), pointing the way the bar will move */
-.kc-shelves-btn { position: absolute; top: 0; bottom: 0; z-index: 1; display: grid; place-items: center; width: 44px; padding: 0; border: 0; cursor: pointer;
-  color: var(--brand); background: var(--paper); transition: background-color .15s; }
-.kc-shelves-btn[hidden] { display: none; }
-.kc-shelves-prev { left: max(0px, calc((100% - 1040px) / 2)); border-right: 1px solid var(--line); }
-.kc-shelves-next { right: max(0px, calc((100% - 1040px) / 2)); border-left: 1px solid var(--line); }
-.kc-shelves-btn:hover { background: var(--surface); }
-.kc-shelves-btn .arr { top: 0; width: 1em; height: .8em; font-size: 15px; --arr-t: .12em; transition: transform .15s; }
-.kc-shelves-prev:hover .arr { transform: translateX(-2px); }
-.kc-shelves-next:hover .arr { transform: translateX(2px); }
-.kc-shelves-prev:hover svg { transform: scaleX(-1) translateX(2px); }
-@media (pointer: coarse) { .kc-shelves-btn { width: 40px; } }
-@media (prefers-reduced-motion: reduce) { .kc-shelves-btn, .kc-shelves-btn .arr { transition: none; } .kc-shelves-btn:hover .arr { transform: none; } }
+/* The shelf bar is "On this page" for the whole library: one stuck line under the site's bar naming the shelf in view, which opens a
+ * list of every shelf by group, over the page, like the document pages' docked index (js/knowledge-groups.js names the shelf, closes it) */
+.kc-shelves { position: sticky; top: calc(64px + env(safe-area-inset-top)); z-index: 3; height: 48px; }
+.kc-shelves-fold { --fold-arrow: var(--brand); --arr-t: .13em; position: absolute; top: 0; left: 0; right: 0; background: rgb(var(--surface-rgb) / .98);
+  -webkit-backdrop-filter: saturate(1.8) blur(16px); backdrop-filter: saturate(1.8) blur(16px); border-bottom: 1px solid var(--line); }
+.kc-shelves-fold[open] { box-shadow: 0 8px 20px rgba(18,36,26,.07); }
+.kc-shelves-fold > summary { display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; height: 47px; max-width: 1040px; margin: 0 auto;
+  padding: 0 24px; cursor: pointer; list-style: none; font: 600 14px var(--sans); color: var(--brand); }
+.kc-shelves-fold > summary::-webkit-details-marker { display: none; }
+.kc-shelves-fold > summary span { flex: 1; min-width: 0; margin-left: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: right; font: 12px var(--mono); color: var(--muted); }
+.kc-shelves-fold > summary::after { margin-left: 10px; }
+.kc-shelves-fold > summary:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; }
+.kc-shelves ul { list-style: none; max-width: 1040px; margin: 0 auto; padding: 0 24px 12px; max-height: min(60vh, 460px); overflow-y: auto; overscroll-behavior: contain; }
+.kc-shelves li { display: flex; align-items: center; }
+.kc-shelves a { display: flex; flex: 1; align-items: baseline; justify-content: space-between; gap: 12px; padding: 7px 0; font: 14px/1.4 var(--sans); color: var(--muted); text-decoration: none; }
+.kc-shelves a:hover { color: var(--brand); }
+.kc-shelves a[aria-current] { color: var(--brand); font-weight: 600; }
 
 /* ---- Featured row and the two groups ---- */
 .kc-group { padding-top: 56px; scroll-margin-top: 120px; }
@@ -93,13 +84,12 @@ body.kc { background: var(--page); }
 .kc-group-head.is-stuck .kc-group-desc { grid-template-rows: 0fr; opacity: 0; }
 @media (prefers-reduced-motion: reduce) { .kc-group-head, .kc-group-desc { transition: none; } }
 .kc-nav-group { display: flex; align-items: center; }
-.kc-nav-group span { display: block; padding: 6px 4px 6px 10px; font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--mark); white-space: nowrap; }
+.kc-nav-group span { display: block; padding: 10px 0 4px; font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--mark); white-space: nowrap; }
 .kc-n, .kc-nav-group .kc-n, .kc-shelves a .kc-n { display: inline; padding: 0; font: 400 .85em var(--mono); letter-spacing: 0; opacity: 1; font-variant-numeric: tabular-nums;
   color: var(--muted-ink); color: color-mix(in srgb, var(--brand) 62%, var(--page)); } /* an article count: the brand color, dulled toward the page, beside its title */
 .kc-shelf-head h3 .kc-n { margin-left: .35em; font-weight: 500; }
   color: var(--muted-ink); color: color-mix(in srgb, var(--brand) 62%, var(--page)); } /* an article count: the brand color, dulled toward the page, beside its title */
 .kc-shelf-head h3 .kc-n { margin-left: .35em; font-weight: 500; }
-.kc-nav-group:not(:first-child) { margin-left: 10px; padding-left: 10px; border-left: 1px solid var(--line); }
 
 /* ---- Shelves and cards ---- */
 .kc-body { max-width: 1040px; margin: 0 auto; padding: 8px 24px 64px; }
@@ -286,7 +276,7 @@ body.kc { background: var(--page); }
 @media (max-width: 600px) {
   .kc-band-inner { --band-y: 36px; padding-left: 16px; padding-right: 16px; }
   .kc-body, .kc-doc { padding-left: 16px; padding-right: 16px; }
-  .kc-shelves ul { padding: 10px 16px; }
+  .kc-shelves-fold > summary, .kc-shelves ul { padding-left: 16px; padding-right: 16px; }
   .kc-text { font-size: 16px; }
   .kc-text .blank { min-width: 8em; }
   /* Phones list many cards, so each one is tighter: two lines of summary, the PDF tag beside the title */
