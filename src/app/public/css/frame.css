@@ -171,6 +171,9 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 @keyframes menu-in { from { opacity: 0; } }
 @keyframes menu-rise { from { transform: translateY(10px); opacity: 0; } }
 @keyframes menu-out { to { opacity: 0; } }
+/* Once the entrance has played, js/frame.js marks the menu .shown and the animations are dropped: a screenshot or any restyle
+ * would otherwise restart them at their first frame, and the links, held at opacity 0, vanish from the picture */
+.menu.shown:not(.closing), .menu.shown ul { animation: none; }
 @media (prefers-reduced-motion: reduce) { .menu:not([hidden]), .menu:not([hidden]) ul, .menu.closing { animation: none; } }
 .menu ul { list-style: none; margin: auto; padding: 0; display: grid; gap: 18px; text-align: center; }
 /* Menu links in the logo's neon, glowing brighter under a finger or focus */
@@ -180,7 +183,7 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 .menu a { display: inline-flex; align-items: baseline; justify-content: center; }
 .menu .pr { display: inline-block; width: .7ex; height: 1ex; margin-right: .3em; overflow: visible; fill: none; stroke: currentColor; stroke-width: 2.4;
   stroke-linecap: round; stroke-linejoin: round; color: var(--mark); opacity: .9; }
-.menu .arr { margin-left: .35em; --arr-t: .1em; }
+.menu .arr { margin-left: .4em; font-size: .74em; --arr-t: .135em; } /* the arrow is as big as the one after book a call (.7em wide), its stroke the same weight as before */
 .menu .mp { width: .9em; height: .9em; margin-right: .4em; align-self: center; flex: none; }
 .menu .m-first, .menu .m-split { position: relative; margin-top: 20px; }
 .menu .m-first::before, .menu .m-split::before { content: ""; position: absolute; top: -19px; left: 50%; width: 56px; margin-left: -28px; border-top: 1.5px solid rgba(108, 255, 168, .4); }

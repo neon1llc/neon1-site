@@ -67,6 +67,7 @@
   let fading = 0;
   function setMenu(open, restore = true) {
     clearTimeout(fading);
+    menu.classList.remove("shown"); // the entrance plays again on the next open
     menu.classList.toggle("closing", !open && !menu.hidden && !still.matches);
     if (open || !menu.classList.contains("closing")) menu.hidden = !open;
     else fading = setTimeout(() => { menu.hidden = true; menu.classList.remove("closing"); }, 220);
@@ -81,6 +82,8 @@
     if (open) menu.querySelector("a").focus(); else if (restore) menuBtn.focus();
   }
   if (menu && menuBtn) {
+    // The entrance is over: drop its animations so a screenshot or restyle can't replay them from the first frame
+    menu.querySelector("ul").addEventListener("animationend", () => { if (!menu.hidden && !menu.classList.contains("closing")) menu.classList.add("shown"); });
     menuBtn.addEventListener("click", () => setMenu(menu.hidden));
     menu.addEventListener("click", (e) => {
       const a = e.target.closest("a");
