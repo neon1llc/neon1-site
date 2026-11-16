@@ -4,6 +4,11 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+## v0.78.2
+
+- In the dark (matrix) theme, Neo's "ask Neo" button no longer glows over the landing's rain; below the rain it still does.
+- Switching to the dark theme, the top-left logo and Neo's button ease up smoothly to full brightness once instead of flickering; links, headings, and the other green parts keep their flicker.
+
 ## v0.78.1
 
 - In the dark (matrix) theme, Neo's "ask Neo" button glows like a neon tube everywhere, the landing's rain included, with the same dark ground, border glow, and flicker 1NEON's public screens have. Before, the landing's button was a plain outline, and below it the glow on the border was covered by a plain shadow.

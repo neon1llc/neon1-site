@@ -37,7 +37,7 @@
 }
 
 /* ---- Neon: the theme switch flickers like a sign ----
-   The logo, its wordmark, and Neo's launcher are the neon: lighting up (matrix) runs on, off, on (longer), off, then a slow on;
+   The logo, its wordmark, and Neo's launcher are the neon: lighting up (matrix) they ease up smoothly once and hold;
    going dark is one quick flick. Dark-green links, arrows, and headings take the same run with a shallower dip, so they read as
    lit by the same current. Their colors change at once under the flicker rather than easing (js/theme.js sets html.flick-on or
    html.flick-off for the length of the run; reduced motion never sets it). --lo is how far a part dips */
@@ -48,10 +48,12 @@
    SOFT lists the text and icons; a button with a filled background is left out, since its fill is the color that changes and it keeps its own */
 :root.theme-shift :is(.n1-logo, .n1chat-launch, .n1-logo *, .n1chat-launch *),
 :root.theme-shift :is(.awake, .n1-bar, .menu, .case-layer, main, footer) :is(a, h1, h2, h3, .arr, .pr, .kc-n, .idx, dt, th, strong, summary, .stat b, .state, .req, .mark-light, .kc-eyebrow, .kc-toc-title, .kc-nav-group span, .cstatus, .truth, button.open, .case-close, .kc-share-copy, .kc-share-native, .chip.menu-btn, .btn-ghost, .btn-outline, .btn.portal, .theme-sun, svg) { transition: none !important; }
-:root.flick-on :is(.n1-logo, .n1chat-launch) { animation: neon-on 2.23s linear both; }
+/* The logo and Neo's launcher are the brightest neon, so they don't flicker: they ease up once from off to full and hold (Pradeep, 2026-11-16).
+   The soft run below leaves the bar's logo and its parts out, so nothing in it flickers */
+:root.flick-on :is(.n1-logo, .n1chat-launch) { animation: glow-in 2.23s ease-in-out both; }
 :root.flick-off :is(.n1-logo, .n1chat-launch) { animation: neon-off .5s ease-out both; }
-:root.flick-on :is(.awake, .n1-bar, .menu, .case-layer, main, footer) :is(a:not(.btn-primary), h1, h2, h3, .arr, .pr, .kc-n, .idx, dt, th, strong, summary, .stat b, .state, .req, .mark-light, .kc-eyebrow, .kc-toc-title, .kc-nav-group span, .cstatus, .truth, button.open, .case-close, .kc-share-copy, .kc-share-native, .chip.menu-btn, .btn-ghost, .btn-outline, .theme-sun) { animation: soft-on 2.23s linear both; }
-:root.flick-off :is(.awake, .n1-bar, .menu, .case-layer, main, footer) :is(a:not(.btn-primary), h1, h2, h3, .arr, .pr, .kc-n, .idx, dt, th, strong, summary, .stat b, .state, .req, .mark-light, .kc-eyebrow, .kc-toc-title, .kc-nav-group span, .cstatus, .truth, button.open, .case-close, .kc-share-copy, .kc-share-native, .chip.menu-btn, .btn-ghost, .btn-outline, .theme-sun) { animation: soft-off .5s ease-out both; }
+:root.flick-on :is(.awake, .n1-bar, .menu, .case-layer, main, footer) :is(a:not(.btn-primary), h1, h2, h3, .arr, .pr, .kc-n, .idx, dt, th, strong, summary, .stat b, .state, .req, .mark-light, .kc-eyebrow, .kc-toc-title, .kc-nav-group span, .cstatus, .truth, button.open, .case-close, .kc-share-copy, .kc-share-native, .chip.menu-btn, .btn-ghost, .btn-outline, .theme-sun):not(.n1-bar .n1-logo, .n1-bar .n1-logo *) { animation: soft-on 2.23s linear both; }
+:root.flick-off :is(.awake, .n1-bar, .menu, .case-layer, main, footer) :is(a:not(.btn-primary), h1, h2, h3, .arr, .pr, .kc-n, .idx, dt, th, strong, summary, .stat b, .state, .req, .mark-light, .kc-eyebrow, .kc-toc-title, .kc-nav-group span, .cstatus, .truth, button.open, .case-close, .kc-share-copy, .kc-share-native, .chip.menu-btn, .btn-ghost, .btn-outline, .theme-sun):not(.n1-bar .n1-logo, .n1-bar .n1-logo *) { animation: soft-off .5s ease-out both; }
 /* The small marks drawn by pseudo-elements: the process timeline's numbers and dots, and the dropdown arrow on each summary */
 :root.flick-on .steps.timeline > *::before, :root.flick-on .steps.timeline > *::after, :root.flick-on .n1-fold > summary::after { animation: soft-on 2.23s linear both; }
 :root.flick-off .steps.timeline > *::before, :root.flick-off .steps.timeline > *::after, :root.flick-off .n1-fold > summary::after { animation: soft-off .5s ease-out both; }
@@ -61,6 +63,7 @@
   30% { opacity: 1; } 44% { opacity: 1; } 48% { opacity: var(--lo); } 52% { opacity: var(--lo); }
   78% { opacity: .4; } 100% { opacity: 1; }
 }
+@keyframes glow-in { 0% { opacity: var(--lo); } 100% { opacity: 1; } }
 @keyframes neon-off { 0% { opacity: var(--lo); } 35% { opacity: var(--lo); } 100% { opacity: 1; } }
 @keyframes soft-on {
   0% { opacity: var(--lo-soft); } 4% { opacity: 1; } 8% { opacity: var(--lo-soft); } 13% { opacity: var(--lo-soft); }
@@ -74,11 +77,11 @@
 :root[data-site-theme="matrix"] .n1-bar.light .n1-logo { color: #8CFFBE;
   text-shadow: 0 0 2px #C4FFDC, 0 0 7px rgba(108, 255, 168, .95), 0 0 16px rgba(60, 255, 140, .8), 0 0 34px rgba(0, 230, 118, .6); }
 :root[data-site-theme="matrix"] .n1-bar.light .n1-logo svg { filter: drop-shadow(0 0 2px #C4FFDC) drop-shadow(0 0 7px rgba(108, 255, 168, .95)) drop-shadow(0 0 16px rgba(0, 230, 118, .7)); }
-/* Neo's launcher glows in matrix everywhere, the landing's rain included, as on 1NEON's public screens: the page's dark ground
-   behind it so nothing shows through, and the same tube glow on its border and mark */
-:root[data-site-theme="matrix"] .n1chat-launch:not(.n1chat-light) { border-color: #6CFFA8; color: #8CFFBE; background: rgb(15 10 13 / .94);
+/* Below the rain, Neo's launcher glows in matrix as on 1NEON's public screens: the page's dark ground behind it so nothing shows
+   through, and the same tube glow on its border and mark. Over the landing's rain it stays the plain outline */
+:root[data-site-theme="matrix"]:has(.n1-bar.light) .n1chat-launch:not(.n1chat-light) { border-color: #6CFFA8; color: #8CFFBE; background: rgb(15 10 13 / .94);
   box-shadow: 0 0 3px rgba(196, 255, 220, .9), 0 0 11px rgba(108, 255, 168, .85), 0 0 26px rgba(0, 230, 118, .55), inset 0 0 9px rgba(108, 255, 168, .4); }
-:root[data-site-theme="matrix"] .n1chat-launch:not(.n1chat-light) svg { filter: drop-shadow(0 0 2px #C4FFDC) drop-shadow(0 0 7px rgba(108, 255, 168, .95)) drop-shadow(0 0 14px rgba(0, 230, 118, .6)); }
+:root[data-site-theme="matrix"]:has(.n1-bar.light) .n1chat-launch:not(.n1chat-light) svg { filter: drop-shadow(0 0 2px #C4FFDC) drop-shadow(0 0 7px rgba(108, 255, 168, .95)) drop-shadow(0 0 14px rgba(0, 230, 118, .6)); }
 
 /* ---- Base: box model, anchor scrolling clear of the bar, links, and focus rings ---- */
 * { box-sizing: border-box; }
