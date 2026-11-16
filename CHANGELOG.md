@@ -4,6 +4,10 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+## v0.77.0
+
+- The free 1NEON account is offered where it fits, with the 15-minute call kept to the contact view, the footer, and the menu. The services line points to a free account for starting before any call, and the line after the case studies offers it beside "tell me what's going on" instead of repeating the call. Both show only while sign-up is open.
+
 ## v0.76.0
 
 - The free-account invitations now also show on the private dev site (its sign-up check was refused without the dev cookie). Nothing changes on neon1.tech.
