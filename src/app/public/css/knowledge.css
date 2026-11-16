@@ -90,8 +90,6 @@ body.kc { background: var(--page); }
 .kc-n, .kc-nav-group .kc-n, .kc-shelves a .kc-n { display: inline; padding: 0; font: 400 .85em var(--mono); letter-spacing: 0; opacity: 1; font-variant-numeric: tabular-nums;
   color: var(--muted-ink); color: color-mix(in srgb, var(--brand) 62%, var(--page)); } /* an article count: the brand color, dulled toward the page, beside its title */
 .kc-shelf-head :is(h2, h3) .kc-n { margin-left: .35em; font-weight: 500; }
-  color: var(--muted-ink); color: color-mix(in srgb, var(--brand) 62%, var(--page)); } /* an article count: the brand color, dulled toward the page, beside its title */
-.kc-shelf-head :is(h2, h3) .kc-n { margin-left: .35em; font-weight: 500; }
 
 /* ---- Shelves and cards ---- */
 .kc-body { max-width: 1040px; margin: 0 auto; padding: 8px 24px 64px; }
