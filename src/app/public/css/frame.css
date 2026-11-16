@@ -36,6 +36,33 @@
     transform var(--t-base) var(--ease-open), opacity var(--t-base) var(--ease), visibility var(--t-base) !important;
 }
 
+/* ---- Neon: the theme switch flickers like a sign ----
+   The logo, its wordmark, and Neo's launcher are the neon: lighting up (matrix) runs on, off, on (longer), off, then a slow on;
+   going dark is one quick flick. Dark-green links, arrows, and headings take the same run with a shallower dip, so they read as
+   lit by the same current. Their colors change at once under the flicker rather than easing (js/theme.js sets html.flick-on or
+   html.flick-off for the length of the run; reduced motion never sets it). --lo is how far a part dips */
+:root.flick-on, :root.flick-off { --lo: .08; --lo-soft: .5; }
+:root.theme-shift :is(.n1-logo, .n1chat-launch, .n1-logo *, .n1chat-launch *),
+:root.theme-shift :is(.awake, main, footer) :is(a, h1, h2, h3, .arr, .pr, .kc-n) { transition: none !important; }
+:root.flick-on :is(.n1-logo, .n1chat-launch) { animation: neon-on 1.5s linear both; }
+:root.flick-off :is(.n1-logo, .n1chat-launch) { animation: neon-off .5s ease-out both; }
+:root.flick-on :is(.awake, main, footer) :is(a:not(.btn), h1, h2, h3, .arr, .pr, .kc-n) { animation: soft-on 1.5s linear both; }
+:root.flick-off :is(.awake, main, footer) :is(a:not(.btn), h1, h2, h3, .arr, .pr, .kc-n) { animation: soft-off .5s ease-out both; }
+@keyframes neon-on {
+  0% { opacity: var(--lo); } 7% { opacity: 1; } 14% { opacity: var(--lo); } 23% { opacity: var(--lo); }
+  25% { opacity: 1; } 45% { opacity: 1; } 51% { opacity: var(--lo); } 59% { opacity: var(--lo); }
+  78% { opacity: .4; } 100% { opacity: 1; }
+}
+@keyframes neon-off { 0% { opacity: var(--lo); } 35% { opacity: var(--lo); } 100% { opacity: 1; } }
+@keyframes soft-on {
+  0% { opacity: var(--lo-soft); } 7% { opacity: 1; } 14% { opacity: var(--lo-soft); } 23% { opacity: var(--lo-soft); }
+  25% { opacity: 1; } 45% { opacity: 1; } 51% { opacity: var(--lo-soft); } 59% { opacity: var(--lo-soft); }
+  78% { opacity: .8; } 100% { opacity: 1; }
+}
+@keyframes soft-off { 0% { opacity: var(--lo-soft); } 35% { opacity: var(--lo-soft); } 100% { opacity: 1; } }
+/* In matrix the mark glows as the wordmark does */
+:root[data-site-theme="matrix"] :is(.n1-logo, .n1chat-launch) svg { filter: drop-shadow(0 0 4px rgba(108, 255, 168, .55)); }
+
 /* ---- Base: box model, anchor scrolling clear of the bar, links, and focus rings ---- */
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 72px; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }

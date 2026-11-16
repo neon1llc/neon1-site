@@ -35,13 +35,20 @@
   // ---- A change eases, on the shared motion length; reduced motion makes it a plain change ----
   // css/frame.css gives every element a color transition only while html.theme-shift is set, so scrolling and hover
   // keep their own timing the rest of the time
-  let easing = 0;
-  function shift() {
+  // The neon parts flicker instead of easing: going dark is one quick flick, and lighting up is a run of on, off, on, off, then a slow
+  // on (css/frame.css, "Neon"). The class for it stays on for the longest of those runs
+  let easing = 0, flicker = 0;
+  function shift(next) {
     if (still.matches || root.dataset.motion === "off") return;
     const ms = parseFloat(getComputedStyle(root).getPropertyValue("--t-slow")) * 1000 || 450;
     root.classList.add("theme-shift");
     clearTimeout(easing);
     easing = setTimeout(() => root.classList.remove("theme-shift"), ms + 80);
+    root.classList.remove("flick-on", "flick-off");
+    void root.offsetWidth; // restart the animation if it was still running
+    root.classList.add(next === "matrix" ? "flick-on" : "flick-off");
+    clearTimeout(flicker);
+    flicker = setTimeout(() => root.classList.remove("flick-on", "flick-off"), 1800);
   }
 
   apply(wanted());
@@ -53,7 +60,7 @@
       b.addEventListener("click", () => {
         const next = root.dataset.siteTheme === "matrix" ? "awake" : "matrix";
         try { localStorage.setItem(KEY, next); } catch { /* not kept: this page still switches */ }
-        shift();
+        shift(next);
         apply(next);
       });
     });
@@ -61,6 +68,6 @@
   if (document.readyState === "loading") addEventListener("DOMContentLoaded", wire); else wire();
 
   // ---- Staying in step: other tabs, and a page restored by Back ----
-  addEventListener("storage", (e) => { if (e.key === KEY) { shift(); apply(wanted()); } });
+  addEventListener("storage", (e) => { if (e.key === KEY) { shift(wanted()); apply(wanted()); } });
   addEventListener("pageshow", (e) => { if (e.persisted && root.dataset.siteTheme !== wanted()) apply(wanted()); });
 })();
