@@ -4,6 +4,10 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+## v0.77.1
+
+- The 1NEON link after the case studies is bold with no underline, like the call link, and its right arrow is drawn at the size of the northeast arrow beside it.
+
 ## v0.77.0
 
 - The free 1NEON account is offered where it fits, with the 15-minute call kept to the contact view, the footer, and the menu. The services line points to a free account for starting before any call, and the line after the case studies offers it beside "tell me what's going on" instead of repeating the call. Both show only while sign-up is open.

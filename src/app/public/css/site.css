@@ -455,7 +455,8 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 /* "or" before the last choice moves into the signup clause once 1NEON's sign-up is open */
 .start-line:has([data-signup]:not([hidden])) .start-or { display: none; }
 .start-line .nw { white-space: nowrap; }
-.start-line .arr { margin-left: .4em; }
+.start-line .arr { margin-left: .4em; font-size: .74em; --arr-t: .135em; --arr-xc: .4818em; } /* the arrow after the 1NEON link is drawn at the size of the northeast arrow after the call link (.7em wide), as in the menu */
+.start-line a[data-handoff] { font-weight: 600; text-decoration: none; } /* the portal link is bold with no underline, like the call link it sits beside */
 /* A case card's role and years, above its glance */
 .case .role { margin: -4px 0 10px; font: 500 13px/1.4 var(--mono); color: var(--muted); }
 
