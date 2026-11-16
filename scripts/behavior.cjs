@@ -202,9 +202,9 @@ check("browser", "home: one wheel gesture from the first screen settles on servi
   } finally { await context.close(); }
 });
 
-// ---- CP-16: public code lists neon1's repositories and the tools in folds; every row says whether it is
+// ---- CP-16: the code section lists neon1's repositories and the tools in folds; every row says whether it is
 // public or private and names its license, public rows open GitHub in a new tab, and private rows link nowhere ----
-check("browser", "public code: three folds open with their arrows turned, every row names a license, public rows (education ones included) open GitHub in a new tab, private rows link nowhere, any other row opens the Knowledge Center", async () => {
+check("browser", "code and resources: three folds open with their arrows turned, every row names a license, public rows (education ones included) open GitHub in a new tab, private rows link nowhere, any other row opens the Knowledge Center", async () => {
   const { page, context, errors } = await open();
   try {
     await page.locator("#work").scrollIntoViewIfNeeded();
