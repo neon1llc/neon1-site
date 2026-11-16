@@ -4,6 +4,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+- Knowledge Center "On this page" bar: once it reaches the top it eases out to a square bar edge to edge, as on document pages, with its contents on the content column's edges (document pages had a small overhang at mid widths). The separate sticky group bar is gone; the bar says "2 of 11 · FOR YOU / Alternatives". Group headers are boxed with the brand line, and larger in the dropdown. Dropdowns carry a rule under the default choice (or under the collapsed bar) in the arrow's color.
 - Only one white rabbit shows in the rain at a time, and the next comes a random 7 to 10 seconds after the last one is gone, whether it faded or was caught.
 - The white rabbit logs one line to the browser console saying why the still card is showing (reduced motion, no WebGL, a failed load, a lost context), so an unexpected fallback can be checked in DevTools.
 - The still card (reduced motion, or no WebGL) now fits "Thanks for following the rabbit." inside the upper pane at every width, and opens with less than half the scrolling.

@@ -131,7 +131,7 @@ function indexPage() {
   const groups = corpus.groups
     .map((g) => `    <section class="kc-group" id="${g.key}" aria-labelledby="${g.key}-h">
       <div class="kc-group-head">
-        <div class="kc-group-row"><h2 id="${g.key}-h">${esc(g.label)}${countMark(g)}</h2><span class="kc-crumb" aria-hidden="true"></span></div>
+        <h2 id="${g.key}-h">${esc(g.label)}${countMark(g)}</h2>
         <div class="kc-group-desc"><p>${esc(g.description)}</p></div>
       </div>
 ${g.shelves.map(shelfSection).join("\n\n")}

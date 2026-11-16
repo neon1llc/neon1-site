@@ -422,8 +422,10 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
   .cform select:open::picker(select) { animation: n1-unroll var(--t-base) var(--ease); }
   .cform select option { padding: 8px 12px; border-radius: 6px; }
   .cform select option::checkmark { display: none; }
+  /* A line under the default choice (the word for what is being chosen), from padding to padding, in the arrow's color */
+  .cform select option[value=""] { background-image: linear-gradient(var(--brand), var(--brand)); background-repeat: no-repeat; background-size: calc(100% - 24px) 1.5px; background-position: 12px 100%; margin-bottom: 5px; padding-bottom: 9px; border-radius: 6px 6px 0 0; }
   .cform select option:checked { color: var(--brand); font-weight: 600; }
-  .cform select option:is(:hover, :focus-visible) { background: rgb(var(--brand-rgb) / .08); outline: none; }
+  .cform select option:is(:hover, :focus-visible) { background-color: rgb(var(--brand-rgb) / .08); outline: none; }
 }
 @keyframes n1-unroll-up { from { opacity: 0; clip-path: inset(100% 0 0 0 round 8px); } to { opacity: 1; clip-path: inset(0 0 0 0 round 8px); } }
 @keyframes n1-unroll { from { opacity: 0; clip-path: inset(0 0 100% 0 round 8px); } to { opacity: 1; clip-path: inset(0 0 0 0 round 8px); } }

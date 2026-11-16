@@ -43,8 +43,10 @@
   .rb-form select[data-dir="up"]:open::picker(select) { animation-name: rb-unroll-up; }
   .rb-form select option { padding: 8px 12px; border-radius: 6px; }
   .rb-form select option::checkmark { display: none; }
+  /* A line under the default choice (the word for what is being chosen), from padding to padding, in the arrow's color */
+  .rb-form select option[value=""] { background-image: linear-gradient(var(--brand), var(--brand)); background-repeat: no-repeat; background-size: calc(100% - 24px) 1.5px; background-position: 12px 100%; margin-bottom: 5px; padding-bottom: 9px; border-radius: 6px 6px 0 0; }
   .rb-form select option:checked { color: var(--brand); font-weight: 600; }
-  .rb-form select option:is(:hover, :focus-visible) { background: rgb(var(--brand-rgb) / .08); outline: none; }
+  .rb-form select option:is(:hover, :focus-visible) { background-color: rgb(var(--brand-rgb) / .08); outline: none; }
 }
 @keyframes rb-unroll { from { opacity: 0; clip-path: inset(0 0 100% 0 round 8px); } to { opacity: 1; clip-path: inset(0 0 0 0 round 8px); } }
 @keyframes rb-unroll-up { from { opacity: 0; clip-path: inset(100% 0 0 0 round 8px); } to { opacity: 1; clip-path: inset(0 0 0 0 round 8px); } }

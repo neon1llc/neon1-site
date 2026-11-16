@@ -49,16 +49,28 @@ body.kc { background: var(--page); }
 /* "On this page" for the whole library, in the document pages' own look: an inset card (the page's side padding, rounded, ruled) that holds
  * under the site's bar naming the section in view, and opens a list of every section by group, over the page (js/knowledge-groups.js
  * names it and closes it). Its strip is page-colored so cards scrolling under the gaps around it don't show through */
-.kc-shelves { position: sticky; top: calc(64px + env(safe-area-inset-top)); z-index: 3; height: 56px; margin-top: 36px; background: var(--page); }
+/* Rest: an inset rounded box. Stuck under the site's bar (js/knowledge-groups.js adds .is-stuck): it eases out to the screen's edges as a square bar,
+ * as the document pages' index does, and its contents move to the content column's own edges (--bar-pad) */
+.kc-shelves { --kc-pad: 24px; --bar-pad: 14px; position: sticky; top: calc(64px + env(safe-area-inset-top)); z-index: 3; height: 56px; margin-top: 36px; background: var(--page); }
 .kc-shelves-in { position: relative; max-width: 1040px; height: 100%; margin: 0 auto; padding: 0 24px; box-sizing: border-box; }
-.kc-shelves-fold { --fold-arrow: var(--brand); --arr-t: .13em; position: absolute; top: 6px; left: 24px; right: 24px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.kc-shelves-fold { --fold-arrow: var(--brand); --arr-t: .13em; position: absolute; top: 6px; left: 24px; right: 24px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface);
+  transition: left .34s cubic-bezier(.28,.11,.32,1), right .34s cubic-bezier(.28,.11,.32,1), top .34s cubic-bezier(.28,.11,.32,1), border-radius .34s cubic-bezier(.28,.11,.32,1), box-shadow .34s cubic-bezier(.28,.11,.32,1), background-color .34s, border-color .34s; }
 .kc-shelves-fold[open] { box-shadow: 0 8px 20px rgba(18,36,26,.07); }
-.kc-shelves-fold > summary { display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; min-height: 44px; padding: 0 14px; cursor: pointer; list-style: none; font: 600 14px var(--sans); color: var(--brand); }
+.kc-shelves.is-stuck { --bar-pad: calc((100vw - min(100vw, 1040px)) / 2 + var(--kc-pad)); }
+.kc-shelves.is-stuck .kc-shelves-fold { top: 0; left: calc((100% - 100vw) / 2); right: calc((100% - 100vw) / 2); border-radius: 0; border-color: transparent transparent var(--line);
+  background: rgb(var(--surface-rgb) / .94); -webkit-backdrop-filter: saturate(1.8) blur(16px); backdrop-filter: saturate(1.8) blur(16px); box-shadow: 0 8px 20px rgba(18,36,26,.07); }
+.kc-shelves-fold > summary { display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; min-height: 44px; padding: 0 var(--bar-pad); cursor: pointer; list-style: none; font: 600 14px var(--sans); color: var(--brand);
+  transition: padding .34s cubic-bezier(.28,.11,.32,1), min-height .34s cubic-bezier(.28,.11,.32,1); }
+.kc-shelves.is-stuck .kc-shelves-fold > summary { min-height: 56px; }
 .kc-shelves-fold > summary::-webkit-details-marker { display: none; }
 .kc-shelves-fold > summary span { flex: 1; min-width: 0; margin-left: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: right; font: 12px var(--mono); color: var(--muted); }
+.kc-shelves-fold > summary span b { font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--brand); }
 .kc-shelves-fold > summary::after { margin-left: 10px; }
 .kc-shelves-fold > summary:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; }
-.kc-shelves ul { list-style: none; margin: 0; padding: 0 14px 10px; max-height: min(60vh, 460px); overflow-y: auto; overscroll-behavior: contain; }
+/* A line under the collapsed bar once it opens, from padding to padding, in the arrow's and focus ring's color */
+.kc-shelves ul { list-style: none; margin: 0; padding: 0 var(--bar-pad) 10px; max-height: min(60vh, 460px); overflow-y: auto; overscroll-behavior: contain; transition: padding .34s cubic-bezier(.28,.11,.32,1); }
+.kc-shelves ul::before { content: ""; display: block; height: 1.5px; margin-bottom: 4px; background: var(--brand); }
+@media (prefers-reduced-motion: reduce) { .kc-shelves-fold, .kc-shelves-fold > summary, .kc-shelves ul { transition: none; } }
 .kc-shelves li { display: flex; align-items: center; }
 .kc-shelves a { display: flex; flex: 1; align-items: baseline; justify-content: space-between; gap: 12px; padding: 7px 0; font: 14px/1.4 var(--sans); color: var(--muted); text-decoration: none; }
 .kc-shelves a:hover { color: var(--brand); }
@@ -66,27 +78,14 @@ body.kc { background: var(--page); }
 
 /* ---- Featured row and the two groups ---- */
 .kc-group { padding-top: 56px; scroll-margin-top: 120px; }
-.kc-group-head h2 { font: 600 12px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--mark); }
 .kc-group[hidden] { display: none; }
-/* A group's heading is a flat line in the page's own color, in line with the shelf headings below it, not a box. It sticks under the
- * "On this page" card while its group is read; stuck, its description eases away and, in its empty space, the title of the shelf being read
- * fades in after the group's name (the crumb), so one bar does the work of two. --kc-give (on the group) hands the lost height to the
- * first shelf's top padding, so the page below never moves, and the heading can sit right down to the group's last card before it ends
- * (js/knowledge-groups.js sets it, --kc-stick, the crumb, and the fade near the group's end) */
-.kc-group-head { position: sticky; top: var(--kc-stick, calc(120px + env(safe-area-inset-top))); z-index: 2; padding: 10px 0; background: var(--page); color: var(--ink);
-  transition: box-shadow var(--t-open) var(--ease-open); }
-.kc-group-row { display: flex; align-items: baseline; min-height: 22px; margin: 0 0 6px; transition: margin-bottom var(--t-open) var(--ease-open); }
-.kc-group-head h2 { margin: 0; flex: none; color: var(--brand); font-size: 13px; }
-.kc-crumb { min-width: 0; margin-left: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 16px var(--sans); color: var(--brand); opacity: 0; }
-.kc-crumb:not(:empty)::before { content: "/"; margin-right: 12px; font-weight: 400; color: var(--muted); }
-.kc-group-desc { display: grid; grid-template-rows: 1fr; transition: grid-template-rows var(--t-open) var(--ease-open), opacity var(--t-open) var(--ease-open); }
-.kc-group-desc p { min-height: 0; overflow: hidden; margin: 0; color: var(--muted-ink); font-size: 15px; }
-.kc-group-head.is-stuck { box-shadow: 0 1px 0 var(--line), 0 8px 14px -10px rgb(var(--ink-rgb) / .45); }
-.kc-group-head.is-stuck .kc-group-row { margin-bottom: 0; }
-.kc-group-head.is-stuck .kc-group-desc { grid-template-rows: 0fr; opacity: 0; }
-@media (prefers-reduced-motion: reduce) { .kc-group-head, .kc-group-row, .kc-group-desc { transition: none; } }
+/* A group's heading is a full-width box in the brand color, the standard 8px corners and the same 1.5px line as the rules under the shelf headings.
+ * It scrolls with the page: the "On this page" bar names the group and shelf being read (js/knowledge-groups.js) */
+.kc-group-head { margin: 0 0 4px; padding: 16px 20px 14px; border: 1.5px solid var(--brand); border-radius: 8px; color: var(--ink); }
+.kc-group-head h2 { margin: 0 0 6px; font: 700 15px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--brand); }
+.kc-group-desc p { margin: 0; color: var(--muted-ink); font-size: 15px; }
 .kc-nav-group { display: flex; align-items: center; }
-.kc-nav-group span { display: block; padding: 10px 0 4px; font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--mark); white-space: nowrap; }
+.kc-nav-group span { display: block; padding: 14px 0 6px; font: 700 15px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--brand); white-space: nowrap; }
 .kc-n, .kc-nav-group .kc-n, .kc-shelves a .kc-n { display: inline; padding: 0; font: 400 .85em var(--mono); letter-spacing: 0; opacity: 1; font-variant-numeric: tabular-nums;
   color: var(--muted-ink); color: color-mix(in srgb, var(--brand) 62%, var(--page)); } /* an article count: the brand color, dulled toward the page, beside its title */
 .kc-shelf-head :is(h2, h3) .kc-n { margin-left: .35em; font-weight: 500; }
@@ -94,9 +93,6 @@ body.kc { background: var(--page); }
 /* ---- Shelves and cards ---- */
 .kc-body { max-width: 1040px; margin: 0 auto; padding: 8px 24px 64px; }
 .kc-shelf { --shelf-pt: 40px; padding-top: var(--shelf-pt); scroll-margin-top: 120px; }
-.kc-group-head + .kc-shelf { transition: padding-top var(--t-open) var(--ease-open); }
-.kc-group-head.is-stuck + .kc-shelf { padding-top: calc(var(--shelf-pt) + var(--kc-give, 0px)); }
-@media (prefers-reduced-motion: reduce) { .kc-group-head + .kc-shelf { transition: none; } }
 .kc-shelf[hidden] { display: none; }
 /* Developer standards: a closed fold at the end of their shelf, opened by a click or a search */
 .kc-fold { margin-top: 16px; }
@@ -168,6 +164,7 @@ body.kc { background: var(--page); }
 .kc-toc-fold { --fold-arrow: var(--brand); --arr-t: .13em; }
 .kc-toc-fold > summary::after { margin-left: 10px; }
 .kc-toc-fold ol { padding: 0 14px 10px; }
+.kc-toc-fold[open] ol::before { content: ""; display: block; height: 1.5px; margin-bottom: 4px; background: var(--brand); }
 
 /* The section being read, marked as the reader scrolls (js/knowledge-toc.js) */
 .kc-toc a { position: relative; transition: color .2s; }
@@ -183,6 +180,8 @@ body.kc { background: var(--page); }
 .kc-toc-fold.docked.wide { left: 0; right: 0; border-radius: 0; border-color: transparent transparent var(--line); background: rgb(var(--surface-rgb) / .94);
   -webkit-backdrop-filter: saturate(1.8) blur(16px); backdrop-filter: saturate(1.8) blur(16px); box-shadow: 0 8px 20px rgba(18,36,26,.07); }
 .kc-toc-fold.docked > summary { padding: 0 max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left)); }
+.kc-toc-fold.docked.wide > summary, .kc-toc-fold.docked.wide ol { padding-left: max(24px, env(safe-area-inset-left)); padding-right: max(24px, env(safe-area-inset-right)); }
+@media (max-width: 600px) { .kc-toc-fold.docked.wide > summary, .kc-toc-fold.docked.wide ol { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); } }
 .kc-toc-fold.docked.wide > summary, .kc-toc-fold.docked.wide ol { max-width: 780px; margin: 0 auto; }
 .kc-toc-fold.docked ol { max-height: min(60vh, 420px); overflow-y: auto; overscroll-behavior: contain; padding: 0 max(16px, env(safe-area-inset-left)) 12px; }
 /* Undocked: back in the page at once, then easing from full width (negative margins) to its resting size */
@@ -268,7 +267,7 @@ body.kc { background: var(--page); }
 @media (max-width: 600px) {
   .kc-band-inner { --band-y: 36px; padding-left: 16px; padding-right: 16px; }
   .kc-body, .kc-doc { padding-left: 16px; padding-right: 16px; }
-  .kc-shelves-in { padding: 0 16px; } .kc-shelves-fold { left: 16px; right: 16px; }
+  .kc-shelves { --kc-pad: 16px; } .kc-shelves-in { padding: 0 16px; } .kc-shelves-fold { left: 16px; right: 16px; }
   .kc-text { font-size: 16px; }
   .kc-text .blank { min-width: 8em; }
   /* Phones list many cards, so each one is tighter: two lines of summary, the PDF tag beside the title */
