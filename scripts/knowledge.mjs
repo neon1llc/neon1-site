@@ -71,7 +71,10 @@ for (const p of PATHS) for (const id of p.ids) if (!corpus.byId.has(id)) {
 
 function pathsSection() {
   return `    <section class="kc-paths" aria-labelledby="kc-paths-h">
-      <h2 id="kc-paths-h">Start here</h2>
+      <div class="kc-shelf-head">
+        <h2 id="kc-paths-h">Start here<span class="kc-n"> ${new Set(PATHS.flatMap((p) => p.ids)).size}</span></h2>
+        <div class="kc-shelf-desc"><p>Four ways in, by what you need.</p></div>
+      </div>
       <ul class="kc-path-list">
 ${PATHS.map((p) => `        <li class="kc-path">
           <h3>${esc(p.title)}</h3>
