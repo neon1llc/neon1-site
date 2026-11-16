@@ -4,6 +4,10 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+## v0.77.2
+
+- The right arrow on the free 1NEON account invitations is the site's own in-site arrow at full size, like the other in-site arrows.
+
 ## v0.77.1
 
 - The invitations to start a free 1NEON account (after the case studies, on the services line, and on the contact view) are bold with no underline, like the call link, and end in a right arrow drawn at the size of the northeast arrow.
