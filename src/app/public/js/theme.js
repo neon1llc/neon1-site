@@ -96,3 +96,18 @@
   // page is showing, and opting in then only affects the next move
   else if ("onpagereveal" in window) addEventListener("pagereveal", () => requestAnimationFrame(() => setTimeout(optIn)), { once: true });
 })();
+
+// ---- A stylesheet that failed to load: one reload ----
+// A page whose own stylesheet failed (a request cut short by a release switch or a dropped connection) shows as plain
+// unstyled text. A failed stylesheet leaves link.sheet null or empty (an error page parses to no rules), so after load the
+// page asks once more, and only once per tab and address, so a stylesheet that stays down can never loop
+addEventListener("load", () => {
+  try {
+    const failed = [...document.querySelectorAll('link[rel="stylesheet"]')].some((l) => !l.sheet || l.sheet.cssRules.length === 0);
+    const key = "neon1.reload:" + location.pathname;
+    if (!failed) { sessionStorage.removeItem(key); return; }
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, "1");
+    location.reload();
+  } catch { /* storage blocked: leave the page as it is */ }
+});

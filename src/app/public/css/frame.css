@@ -278,13 +278,18 @@ footer { position: relative; z-index: 2; border-top: 1px solid var(--line); back
 .foot .slogan { margin: 0; }
 .mark-light { font: 700 17px var(--mono); letter-spacing: .06em; color: var(--brand); margin: 0 0 10px; }
 @media (max-width: 700px) { .foot { grid-template-columns: 1fr 1fr; } .foot > div:first-child { grid-column: 1 / -1; } }
-/* Legal line: the right padding keeps it clear of the home page's rain controls */
+/* Legal line. Its bottom padding is a resting place for Neo's launcher (fixed, bottom left, 48px tall, 16px from the bottom edge): the
+   launcher's own distance from the edge is also its distance above the line's last row, so at the end of any page it never covers text.
+   "report a bug" sits in the same strip at the right, centered on the launcher (see its rule below) */
+:root { --foot-gap: max(16px, env(safe-area-inset-bottom)); --foot-neo: 48px; }
 .legal { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
-  font: 12px var(--mono); color: var(--muted); border-top: 1px solid var(--line); padding: 16px 140px 28px max(24px, env(safe-area-inset-left)); }
-@media (max-width: 700px) { .legal { padding-right: 20px; padding-bottom: 72px; } }
+  font: 12px var(--mono); color: var(--muted); border-top: 1px solid var(--line);
+  padding: 16px max(24px, env(safe-area-inset-right)) calc(var(--foot-gap) * 2 + var(--foot-neo)) max(24px, env(safe-area-inset-left)); }
 .legal a { color: inherit; text-decoration: none; } .legal a:hover { color: var(--glow); }
 .legal .policies { display: flex; gap: 8px; flex-wrap: wrap; align-items: baseline; }
 .legal .sep { opacity: .6; }
+/* A separator inside running text (the contact table): the footer's backslash, with room on both sides */
+.sep { font-family: var(--mono); opacity: .6; margin: 0 .2em; }
 /* The legal line mixes links and plain text ("no ads or trackers"), so its internal links are underlined, thinly and in the line's own gray, to tell them apart; internal links never carry an arrow */
 .legal a:not(.ext) { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: currentColor; }
 /* The copyright line ends with the company's public state record: an internal link, so it carries no arrow */
@@ -315,14 +320,13 @@ a.ext:hover { color: var(--brand); }
    The footer's own mono face at its size, semibold with a small bug mark, so it reads as one of the legal line's items and still stands out by weight and the mark.
    It is placed against the footer (the nearest positioned box) so it lines up with the bar's rightmost control at every width: the theme
    switch's right edge on a wide desktop (see the switch's own rule, which sits in the page margin), the menu button's or the switch's
-   24px in from the edge everywhere narrower */
-.legal a.report-bug, .legal a.report-bug.ext { position: absolute; right: max(24px, env(safe-area-inset-right)); bottom: 28px; display: inline-flex; align-items: center; gap: 6px;
+   24px in from the edge everywhere narrower. Vertically it is centered on Neo's launcher (the bottom offset is the launcher's middle), and the
+   bug's gap to the text is the outbound arrow's gap to the text, .18em */
+.legal a.report-bug, .legal a.report-bug.ext { position: absolute; right: max(24px, env(safe-area-inset-right)); bottom: calc(var(--foot-gap) + var(--foot-neo) / 2); translate: 0 50%; display: inline-flex; align-items: center; gap: .18em;
   font: 600 12px var(--mono); color: var(--glow); text-decoration: none; }
 .legal a.report-bug svg { width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 @media (min-width: 1200px) and (max-width: 1319px) { .legal a.report-bug, .legal a.report-bug.ext { right: calc((100% - 1200px) / 2 + 24px); } }
 @media (min-width: 1320px) { .legal a.report-bug, .legal a.report-bug.ext { right: calc((100% - 1200px) / 4 - 14px); } }
-/* On a phone it sits under the legal lines, in line with the menu button above and as far from the bottom as from the right edge */
-@media (max-width: 700px) { .legal a.report-bug, .legal a.report-bug.ext { right: max(24px, env(safe-area-inset-right)); bottom: 24px; } }
 /* Outbound links in the footer's legal line (the version, "report a bug"): the theme's green and no underline in awake, even on hover;
    in matrix a dim underline that turns the full green on hover, as the links in running text do */
 :root[data-site-theme="matrix"] .legal :is(a.report-bug, a.ext) { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px;

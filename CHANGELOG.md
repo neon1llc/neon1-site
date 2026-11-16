@@ -4,6 +4,9 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+- The footer's last row has room for Neo's button: it rests at the bottom left of the page's end, as far above the legal line as it is from the screen's bottom, so it never covers footer text at any width. "report a bug" sits in the same row at the bottom right, centered on Neo's button, its right edge on the top bar's rightmost item at every width. The bug mark's gap to the text is the arrow's gap to the text. Neo's own "report a bug" link has the mark too.
+- The contact table separates its choices with the footer's backslash, with room each side, instead of a slash.
+- A page whose stylesheet failed to load reloads itself once, instead of staying as plain unstyled text.
 - The home page's service-agreement link and the corpus's contact links use the Engagement addresses, so none goes through a redirect.
 
 - Knowledge Center: the Services shelf is now Engagement and holds Services, pricing, how a project runs, the capability statement, contact, publishing client work, and the service agreement (from the corpus branch refactor/engagement-shelf, shown on dev until it is released). Old addresses redirect.
