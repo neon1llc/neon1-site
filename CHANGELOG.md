@@ -5,6 +5,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 ## Unreleased
 
 - neon1.tech/report-bug is a page of its own for reporting a bug: where it happened (main site, 1NEON, 1NEON demo, Neo chat, Knowledge Center, blog, or other, filled in from a `?from=` link or the page you came from), what happened, an optional email for a reply, and up to three PNG or JPEG screenshots. The page you came from, your theme, browser, and window size go with it, and the page says so. The confirmation shows a reference to quote. It sends to hello@ through 1NEON's bug route, and screenshots are kept privately and scanned for malware.
+- The report page ends with "Found a security issue? Email security@neon1.tech instead." so security reports stay apart from bug reports.
 - Neo's window has a "report a bug" link at the bottom right that opens the report page in a new tab.
 
 - "report a bug" in the footer's bottom right opens a short form (what happened, an optional email for a reply) from every page; the page and theme go along automatically. It sends to hello@ and falls back to an email link without scripts.
