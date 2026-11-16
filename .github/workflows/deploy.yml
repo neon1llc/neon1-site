@@ -295,10 +295,18 @@ jobs:
           role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
           aws-region: us-east-1
 
-      # The exact site the browser checks ran on, and the PDFs printed from the same corpus release
+      # The exact site the browser checks ran on, and the PDFs printed from the same corpus release. Each artifact
+      # is fetched by name into its own folder: an unnamed download puts each artifact in a subfolder only when
+      # there are two or more, so a run that skipped the pdf job found site.tgz one level up and failed
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
-          path: ${{ runner.temp }}/built
+          name: site
+          path: ${{ runner.temp }}/built/site
+      - if: needs.pdf.result == 'success'
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: pdfs
+          path: ${{ runner.temp }}/built/pdfs
       - name: Unpack the tested site
         run: |
           tar xzf "$RUNNER_TEMP/built/site/site.tgz" -C src/app/public
