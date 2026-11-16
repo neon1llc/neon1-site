@@ -4,6 +4,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+- On the phone menu, the right arrows beside knowledge, blog, and 1NEON portal sit with their center at half the height of the label's tallest letter: half the x-height for the lowercase labels, half the cap height for 1NEON portal.
 - The phone menu stays visible when you take a screenshot: once its entrance has played its animations are dropped, so a screenshot or restyle no longer replays them from the first, blank frame. The arrows beside knowledge, blog, and 1NEON portal are now the size of the arrow after book a call.
 - On phones the page no longer rests between two views. After the keyboard opens over Neo, the toolbar moves, or a position is restored, the page eases to the nearer edge once the finger, the keyboard, and any motion are done.
 - The phone menu has three sets: the seven sections, then knowledge, blog, and 1NEON portal (the places on neon1), then book a call alone at the end. A hairline, in the theme's green and clearly visible in both, sits in a larger gap before each of the last two sets. The arrows beside knowledge, blog, and 1NEON portal match the weight of their text and of the > markers.
