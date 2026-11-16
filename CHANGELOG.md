@@ -4,6 +4,8 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+- A neon1 page opened from outside the site (a link in an email, or an address typed into a new tab) shows at once in DuckDuckGo on iPhone. It had stayed black until the address was entered again. The cross-fade between pages now starts only on a move from one neon1 page to the next, so an arrival from outside never waits on it.
+
 ## v0.77.5
 
 - In-site links that lead somewhere (the free 1NEON account invitations and the phone menu's links to other pages) end in the light arrow the outbound links have, the same size and stroke at the text's size, turned to point right. The heavy arrow stays on what expands or moves: dropdowns and the case cards' previous and next.
