@@ -4,6 +4,10 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+## v0.77.5
+
+- In-site links that lead somewhere (the free 1NEON account invitations and the phone menu's links to other pages) end in the light arrow the outbound links have, the same size and stroke at the text's size, turned to point right. The heavy arrow stays on what expands or moves: dropdowns and the case cards' previous and next.
+
 ## v0.77.4
 
 - Switching themes is one plain change: the page, its text, and its lines cut over together, and the neon parts flicker as the sign comes on. Before, plain text eased over a beat while the neon parts snapped, so some text lagged behind.

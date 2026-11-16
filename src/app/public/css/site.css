@@ -454,9 +454,6 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 .start-line { margin: clamp(0px, 1vh, 8px) 0 0; max-width: none; }
 /* "or" before the last choice moves into the signup clause once 1NEON's sign-up is open */
 .start-line:has([data-signup]:not([hidden])) .start-or { display: none; }
-.in1 { font-weight: 600; text-decoration: none; } /* an invitation into 1NEON: bold with no underline, like the call link beside it */
-.in1 .nw { white-space: nowrap; }
-.in1 .arr { margin-left: .4em; } /* its right arrow is the site's own in-site arrow at full size, as on "send me your use case" and the code rows */
 /* A case card's role and years, above its glance */
 .case .role { margin: -4px 0 10px; font: 500 13px/1.4 var(--mono); color: var(--muted); }
 
