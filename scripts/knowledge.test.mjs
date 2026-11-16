@@ -170,6 +170,19 @@ test("ranking is BM25: deterministic, a 0 to 1 similarity, titles over repeats, 
   assert.deepEqual(search(prepared, "backups").results.map((x) => x.url), r.map((x) => x.url))
 })
 
+test("results carry a strength: strong in a title or heading, partial in the text, weak when only some words match", () => {
+  const f = fixture()
+  build(f)
+  const prepared = prepare(JSON.parse(read(f, "knowledge/search-index.json")))
+  const r = search(prepared, "backup").results
+  assert.equal(r[0].strength, "strong")
+  for (const x of r) assert.ok(["strong", "partial"].includes(x.strength), `a full match was ${x.strength}`)
+  // A word no document holds relaxes the search: what's left holds only some words, so all of it is weak
+  const some = search(prepared, "backup zzqx")
+  assert.ok(some.relaxed && some.results.length)
+  for (const x of some.results) assert.equal(x.strength, "weak")
+})
+
 test("synonym groups are normalized, and no word sits in two groups", () => {
   const seen = new Map()
   for (const [g, group] of SYNONYMS.entries()) {
