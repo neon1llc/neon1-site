@@ -454,9 +454,9 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 .start-line { margin: clamp(0px, 1vh, 8px) 0 0; max-width: none; }
 /* "or" before the last choice moves into the signup clause once 1NEON's sign-up is open */
 .start-line:has([data-signup]:not([hidden])) .start-or { display: none; }
-.start-line .nw { white-space: nowrap; }
-.start-line .arr { margin-left: .4em; font-size: .74em; --arr-t: .135em; --arr-xc: .4818em; } /* the arrow after the 1NEON link is drawn at the size of the northeast arrow after the call link (.7em wide), as in the menu */
-.start-line a[data-handoff] { font-weight: 600; text-decoration: none; } /* the portal link is bold with no underline, like the call link it sits beside */
+.in1 { font-weight: 600; text-decoration: none; } /* an invitation into 1NEON: bold with no underline, like the call link beside it */
+.in1 .nw { white-space: nowrap; }
+.in1 .arr { margin-left: .4em; font-size: .74em; --arr-t: .135em; --arr-xc: .4818em; } /* its right arrow is drawn at the size of the northeast arrow after the call link (.7em wide), as in the menu */
 /* A case card's role and years, above its glance */
 .case .role { margin: -4px 0 10px; font: 500 13px/1.4 var(--mono); color: var(--muted); }
 

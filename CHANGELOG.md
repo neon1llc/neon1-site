@@ -6,7 +6,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## v0.77.1
 
-- The 1NEON link after the case studies is bold with no underline, like the call link, and its right arrow is drawn at the size of the northeast arrow beside it.
+- The invitations to start a free 1NEON account (after the case studies, on the services line, and on the contact view) are bold with no underline, like the call link, and end in a right arrow drawn at the size of the northeast arrow.
 
 ## v0.77.0
 
