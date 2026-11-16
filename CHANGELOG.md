@@ -4,6 +4,8 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+- Opening "send me your use case" moves the page and the form together in one eased motion, and on shorter windows keeps the send button in view.
+
 - The bar and menu item reads "code", and the section heading reads "code and resources", lowercase like the other headings. "Public" is gone from both, since the line under the heading already says it's all on GitHub.
 
 - Neo, the "ask neon1" window, is on every Knowledge Center and blog page, not only the home page. It follows the page's light or dark look, and holds the page still on a phone as it does on the home page.
