@@ -28,11 +28,11 @@
   --page-rgb: 15 10 13; --ink-rgb: 214 245 220; --brand-rgb: 108 255 168;
   --ctl-line: rgb(var(--brand-rgb) / .3); --surface: #17110F; --surface-rgb: 23 17 15; --surface-2: #0A0608; --ink-soft: #BCD6C2; --muted-ink: #8DB096; --err: #FF8A80; --warn: #FFB547;
 }
-/* Switching eases every color at once, for one slow beat (js/theme.js sets the class for just that long); with
-   reduced motion the length is nothing, so it is a plain change */
+/* Switching is one plain change of every color, all at once (js/theme.js sets the class for a beat around it): the page, its text, and its
+   lines cut over together, and the neon parts then flicker as the sign comes on, so no text trails behind the rest. The motion of
+   things that move (transform, opacity, visibility) keeps its own timing */
 :root.theme-shift, :root.theme-shift *, :root.theme-shift *::before, :root.theme-shift *::after {
-  transition: background-color var(--t-slow) var(--ease), color var(--t-slow) var(--ease), border-color var(--t-slow) var(--ease),
-    fill var(--t-slow) var(--ease), stroke var(--t-slow) var(--ease), box-shadow var(--t-slow) var(--ease), text-shadow var(--t-slow) var(--ease),
+  transition: background-color 0s, color 0s, border-color 0s, fill 0s, stroke 0s, box-shadow 0s, text-shadow 0s,
     transform var(--t-base) var(--ease-open), opacity var(--t-base) var(--ease), visibility var(--t-base) !important;
 }
 

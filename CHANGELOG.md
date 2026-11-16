@@ -4,6 +4,10 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+## v0.77.4
+
+- Switching themes is one plain change: the page, its text, and its lines cut over together, and the neon parts flicker as the sign comes on. Before, plain text eased over a beat while the neon parts snapped, so some text lagged behind.
+
 ## v0.77.3
 
 - Everything that turns from dark green to matrix green takes the neon flicker: the case-study labels, numbers, and stats, the code-row states, required-field asterisks, the footer wordmark, the Knowledge Center's eyebrow, counts, and contents title, the share buttons, the process timeline's numbers and dots, the dropdown arrows, and the links, headings, and icons in the top bar and phone menu.
