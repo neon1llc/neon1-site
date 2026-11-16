@@ -1,0 +1,77 @@
+/* src/app/public/css/report-bug.css - The report-a-bug page's form. The band, bar, and footer come from css/knowledge.css
+   and css/frame.css; the colors are the shared tokens, so both themes work without rules of their own. The fields,
+   dropdown, and messages mirror the contact form's in css/site.css (.cform), which the home page alone loads. */
+
+.rb { background: var(--paper); }
+.rb-inner { max-width: 1040px; margin: 0 auto; padding: 32px 24px 96px; box-sizing: border-box; }
+.rb-form, .rb-done { display: grid; gap: 18px; max-width: 620px; }
+.rb-form[hidden], .rb-done[hidden], .rb-nojs[hidden] { display: none; }
+.rb-nojs { margin: 0; color: var(--muted); }
+.rb-form { --req-color: var(--brand); }
+
+.rb-label { display: block; font: 500 14px var(--sans); color: var(--ink); }
+.rb-form label { display: grid; gap: 6px; font: 500 14px var(--sans); color: var(--ink); }
+.rb-form .opt { font: 400 12px var(--mono); color: var(--muted); margin-left: 4px; }
+.rb-help { margin: 0; font-size: 13px; color: var(--muted); }
+.rb-form label > .rb-help { font-weight: 400; }
+
+.rb-form textarea, .rb-form input:not([type="file"]), .rb-form select { font: 15px/1.45 var(--sans); color: var(--ink); background: var(--surface); border: 1px solid rgb(var(--ink-rgb) / .2); border-radius: var(--glass-r); padding: 9px 11px; width: 100%; box-sizing: border-box; min-height: 44px; }
+.rb-form textarea { resize: vertical; }
+.rb-form :is(textarea, input, select):focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
+.rb-form textarea, .rb-form input, .rb-form select { transition: border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease), background-color var(--t-fast) var(--ease); }
+.rb-form [aria-invalid="true"] { border-color: var(--warn); }
+.rb-err { display: block; margin-top: 2px; font-size: 13px; color: var(--warn); animation: n1-appear var(--t-base) var(--ease) both; }
+
+/* The dropdown: a native select (keyboard and screen readers unchanged). Safari and Firefox get a plain chevron; Chrome
+   and Edge (base-select) get the site's arrow, which turns as the list unrolls, as in the contact form */
+.rb-form select { appearance: none; padding-right: 44px;
+  background-image: linear-gradient(45deg, transparent 50%, var(--brand) 50%), linear-gradient(135deg, var(--brand) 50%, transparent 50%);
+  background-position: calc(100% - 23px) 50%, calc(100% - 18px) 50%; background-size: 5px 5px, 5px 5px; background-repeat: no-repeat; }
+@supports (appearance: base-select) {
+  .rb-form select, .rb-form select::picker(select) { appearance: base-select; }
+  .rb-form select { background-image: none; padding-right: 14px; display: inline-flex; align-items: center; gap: 12px; --arr-t: .09em; }
+  .rb-form select::picker-icon { content: ""; width: .95em; height: .75em; font: 15px var(--sans); background: var(--brand); clip-path: var(--arr-shape); align-self: center; margin-left: auto; margin-right: 2px; transition: rotate var(--t-base) var(--ease); }
+  .rb-form select:open::picker-icon { rotate: -90deg; }
+  .rb-form select[data-dir="up"]::picker(select) { position-area: block-start span-inline-end; margin: 0 0 4px; }
+  .rb-form select[data-dir="up"]:open::picker-icon { rotate: 90deg; }
+  .rb-form select::picker(select) { max-height: var(--picker-max, min(320px, 60vh)); position-try-fallbacks: none; border: 1px solid rgb(var(--ink-rgb) / .2); border-radius: var(--glass-r); background: var(--surface); box-shadow: 0 12px 32px rgba(0,0,0,.16); padding: 4px; margin-top: 4px; }
+  .rb-form select:open::picker(select) { animation: rb-unroll var(--t-base) var(--ease); }
+  .rb-form select[data-dir="up"]:open::picker(select) { animation-name: rb-unroll-up; }
+  .rb-form select option { padding: 8px 12px; border-radius: 6px; }
+  .rb-form select option::checkmark { display: none; }
+  .rb-form select option:checked { color: var(--brand); font-weight: 600; }
+  .rb-form select option:is(:hover, :focus-visible) { background: rgb(var(--brand-rgb) / .08); outline: none; }
+}
+@keyframes rb-unroll { from { opacity: 0; clip-path: inset(0 0 100% 0 round 8px); } to { opacity: 1; clip-path: inset(0 0 0 0 round 8px); } }
+@keyframes rb-unroll-up { from { opacity: 0; clip-path: inset(100% 0 0 0 round 8px); } to { opacity: 1; clip-path: inset(0 0 0 0 round 8px); } }
+
+/* Screenshots: the real file input stays in the page for keyboard and screen readers; its label is the visible button */
+.rb-shots { display: grid; gap: 8px; justify-items: start; }
+.rb-file { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.rb-add { cursor: pointer; }
+.rb-file:focus-visible + .rb-add { outline: 2px solid var(--brand); outline-offset: 2px; }
+.rb-shots[data-full] .rb-add { opacity: .5; pointer-events: none; }
+.rb-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; width: 100%; }
+.rb-list:empty { display: none; }
+.rb-list li { display: flex; align-items: center; gap: 12px; padding: 8px 10px; border: 1px solid rgb(var(--ink-rgb) / .18); border-radius: var(--glass-r); background: var(--surface); animation: n1-appear var(--t-base) var(--ease) both; }
+.rb-list img { width: 44px; height: 44px; object-fit: cover; border-radius: 4px; flex: none; background: var(--surface-2); }
+.rb-list .rb-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 14px var(--sans); color: var(--ink); }
+.rb-list .rb-size { font: 12px var(--mono); color: var(--muted); white-space: nowrap; }
+.rb-list button { min-height: 44px; min-width: 44px; padding: 0 10px; background: transparent; border: 0; color: var(--brand); font: 600 13px var(--mono); cursor: pointer; border-radius: 4px; }
+.rb-list button:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; }
+
+/* Hidden from people and screen readers; a bot that fills every field fills this one */
+.rb-hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+
+.rb-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+.rb-actions .btn:disabled { opacity: .6; cursor: default; }
+.rb-status { margin: 0; font-size: 14px; color: var(--brand); }
+.rb-status:not(:empty) { animation: n1-appear var(--t-base) var(--ease) both; }
+.rb-status.err { color: var(--warn); }
+
+.rb-done { padding: 20px; border: 1px solid rgb(var(--brand-rgb) / .3); border-radius: var(--glass-r); background: var(--surface); justify-items: start; }
+.rb-done p { margin: 0; font-size: 17px; color: var(--ink); }
+.rb-done .rb-help { font-size: 14px; color: var(--muted); }
+.rb-ref { font: 600 17px var(--mono); color: var(--brand); -webkit-user-select: all; user-select: all; }
+
+@media (max-width: 700px) { .rb-inner { padding: 24px 16px 72px; } }
