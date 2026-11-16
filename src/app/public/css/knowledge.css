@@ -18,7 +18,7 @@ body.kc { background: var(--page); }
 .kc-band { --band-text: #f1faf3; --band-soft: #cfe8d5; --band-line: rgba(255, 255, 255, .22); --band-eyebrow: #bff5cf;
   background: #035704; color: var(--band-text); border-bottom: 1px solid rgba(255, 255, 255, .18);
   background-image: radial-gradient(ellipse at 20% 0%, rgba(108, 255, 168, .22), transparent 60%); }
-:root[data-site-theme="matrix"] .kc-band { --band-soft: #a9c9b0; --band-eyebrow: var(--neon);
+:root[data-site-theme="matrix"] .kc-band { --band-soft: var(--m-muted); --band-eyebrow: var(--neon);
   background: #0F0A0D; border-bottom: 1px solid rgba(108, 255, 168, .55); box-shadow: 0 1px 18px -4px rgba(108, 255, 168, .35);
   background-image: linear-gradient(180deg, rgba(108, 255, 168, .13), rgba(108, 255, 168, .03)), radial-gradient(ellipse at 20% 0%, rgba(0, 143, 17, .28), transparent 60%); }
 /* The band's own space: the same above and below its words, and the same on the Knowledge Center and the blog; the Knowledge Center's
@@ -39,9 +39,9 @@ body.kc { background: var(--page); }
   background: #fff; color: #12241a; font: 16px var(--sans); }
 .kc-search input::placeholder { color: #5f7567; }
 .kc-search input:focus { outline: none; border-color: #fff; box-shadow: 0 0 0 3px rgba(255, 255, 255, .35); }
-:root[data-site-theme="matrix"] .kc-search input { border-color: rgba(108, 255, 168, .35); background: rgba(13, 2, 8, .6); color: #e9ffee; }
-:root[data-site-theme="matrix"] .kc-search input::placeholder { color: #6f8f77; }
-:root[data-site-theme="matrix"] .kc-search input:focus { border-color: var(--neon); box-shadow: 0 0 0 3px rgba(108, 255, 168, .2); }
+:root[data-site-theme="matrix"] .kc-search input { border-color: rgba(108, 255, 168, .55); background: rgba(13, 2, 8, .6); color: var(--m-ink); }
+:root[data-site-theme="matrix"] .kc-search input::placeholder { color: var(--m-faint); }
+:root[data-site-theme="matrix"] .kc-search input:focus { border-color: var(--neon); box-shadow: 0 0 0 3px rgba(108, 255, 168, .2); outline: 2px solid var(--neon); outline-offset: 2px; }
 .kc-results { min-height: 1.4em; margin: 8px 0 0; font: 13px var(--mono); color: var(--band-soft); }
 
 /* ---- Shelf links under the band ---- */

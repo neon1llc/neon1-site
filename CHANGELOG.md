@@ -10,6 +10,8 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 - Neo, the "ask neon1" window, is on every Knowledge Center and blog page, not only the home page. It follows the page's light or dark look, and holds the page still on a phone as it does on the home page.
 
+- Matrix theme: text is off-white with green kept for headings and links, links are underlined in running text, and form fields and focus rings are easier to see.
+
 ## v0.78.2
 
 - In the dark (matrix) theme, Neo's "ask Neo" button no longer glows over the landing's rain; below the rain it still does.

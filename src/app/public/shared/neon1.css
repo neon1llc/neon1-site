@@ -22,6 +22,9 @@
   --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --sans: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --glass-r: 8px;
+  /* Matrix (dark theme) text levels, derived in OKLCH from the landing green's hue (151, chroma <= .01). APCA targets 97 / 91 / 77 / 62
+     on #0F0A0D and #17110F. 1NEON reads the same names */
+  --m-ink: #EDF1ED; --m-ink-soft: #E3E7E4; --m-muted: #CBD1CC; --m-faint: #B1B8B2;
 }
 
 /* Motion: one curve, three lengths, and a longer open/close for folds (--t-open with --ease-open) for every state change on neon1.tech and 1NEON (shared/motion.js holds the same

@@ -24,9 +24,13 @@ h2::before { content: "> "; color: var(--mid); }
   border-bottom: 1px solid var(--line); color: inherit; text-decoration: none; }
 .row h3 { margin: 0; font-size: 17px; }
 .row .price, .row .state { margin: 0; font: 500 14px var(--mono); color: var(--glow); }
-.row .state.dim { color: var(--muted); }
+:root[data-site-theme="matrix"] .row .price, :root[data-site-theme="matrix"] .row .state { color: var(--ink-soft); }
+.row .state.dim, :root[data-site-theme="matrix"] .row .state.dim { color: var(--muted); }
 /* A public code row's license, quieter than its visibility and version */
 .row .state .lic { color: var(--muted); }
+/* Matrix: mono metadata and index labels are neutral; green stays on headings, links, row titles, and bold stats */
+:root[data-site-theme="matrix"] :is(.case .idx, .say .idx, .case-body .idx, .fit dt) { color: var(--muted-ink); }
+:root[data-site-theme="matrix"] .steps div::before { color: var(--muted-ink); }
 .row p:last-child { margin: 0; color: var(--muted); font-size: 15px; }
 a.row:hover h3 { color: var(--glow); }
 @media (max-width: 700px) { .row { grid-template-columns: 1fr auto; gap: 6px 16px; } .row p:last-child { grid-column: 1 / -1; } }
@@ -463,3 +467,17 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 
 /* Matrix (dark) theme: the launcher's dark ground and glow live in frame.css, shared with every page; hover lifts it a little */
 :root[data-site-theme="matrix"]:has(.n1-bar.light) .n1chat-launch:not(.n1chat-light):hover { background: rgb(18 34 24 / .96); }
+
+/* ---- Matrix readability: light text on dark ---- */
+/* A little more tracking for running text (not headings, mono, nav, or the landing) */
+:root[data-site-theme="matrix"] :is(.awake, .kc-text, .case-body) :is(p, li):not(.idx, .stat, .price, .state, .tag) { letter-spacing: .01em; }
+:root[data-site-theme="matrix"] :is(.foot, .legal, .cform, .n1-bar, .menu) :is(p, li) { letter-spacing: normal; }
+/* Inline links in running text carry an underline, so they do not rely on color alone */
+:root[data-site-theme="matrix"] :is(.awake :is(p, li), .kc-text, .case-body, .say) a:not(.btn, .btn-primary, .row, .card, .kc-card, .go) {
+  text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: rgb(var(--brand-rgb) / .55); }
+:root[data-site-theme="matrix"] :is(.awake :is(p, li), .kc-text, .case-body, .say) a:not(.btn, .btn-primary, .row, .card, .kc-card, .go):hover { text-decoration-color: var(--brand); }
+/* Fields: a visible edge (>= 3:1 on the surface), labels one step softer than typed text, placeholders at the faint level */
+:root[data-site-theme="matrix"] .cform :is(textarea, input, select), :root[data-site-theme="matrix"] .ctopic .pick { border-color: rgb(var(--ink-rgb) / .45); }
+:root[data-site-theme="matrix"] .cform [aria-invalid="true"] { border-color: var(--err); }
+:root[data-site-theme="matrix"] :is(.cform label, .ctopic legend) { color: var(--ink-soft); }
+:root[data-site-theme="matrix"] .cform :is(textarea, input)::placeholder { color: var(--m-faint); opacity: 1; }
