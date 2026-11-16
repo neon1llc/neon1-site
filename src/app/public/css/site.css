@@ -392,6 +392,9 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 .cform .opt { font: 400 12px var(--mono); color: var(--muted); }
 .cform textarea, .cform input, .cform select { font: 15px/1.45 var(--sans); color: var(--ink); background: var(--surface); border: 1px solid rgb(var(--ink-rgb) / .2); border-radius: var(--glass-r); padding: 9px 11px; width: 100%; box-sizing: border-box; min-height: 44px; }
 .cform :is(textarea, input, select):focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
+/* A dropdown takes the same ring as a text field from the click that opens it (a mouse click on a select is not :focus-visible) until focus leaves; a pointer over it shows it is clickable */
+.cform select:is(:focus, :open) { outline: 2px solid var(--brand); outline-offset: 1px; }
+.cform select, .cform select option { cursor: pointer; }
 .cform [aria-invalid="true"] { border-color: var(--err); }
 /* Fields, picks, and the send button ease between their states, and a status line eases in */
 .cform textarea, .cform input, .cform select, .ctopic .pick { transition: border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease), background-color var(--t-fast) var(--ease), opacity var(--t-fast) var(--ease); }
@@ -405,7 +408,7 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 @supports (appearance: base-select) {
   .cform select, .cform select::picker(select) { appearance: base-select; }
   .cform select { background-image: none; padding-right: 14px; display: inline-flex; align-items: center; gap: 12px; }
-  .cform select { --arr-t: .09em; } /* the select's text is regular weight, so its arrow's stroke is too */
+  .cform select { --arr-t: .156em; } /* the heavier stroke the fold arrows and 1NEON's dropdowns use, so every dropdown arrow matches */
   .cform select::picker-icon { content: ""; width: .95em; height: .75em; font: 15px var(--sans); background: var(--brand); clip-path: var(--arr-shape); align-self: center; margin-left: auto; margin-right: 2px; transition: rotate var(--t-base) var(--ease); }
   .cform select:open::picker-icon { rotate: -90deg; }
   /* The list opens above when there isn't room below (js/motion.js sets data-dir), and the arrow turns clockwise to point up */
