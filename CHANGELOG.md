@@ -4,6 +4,8 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+## v0.76.0
+
 - The free-account invitations now also show on the private dev site (its sign-up check was refused without the dev cookie). Nothing changes on neon1.tech.
 - Contact: the service area reads "remote across the US, or on site within about 30 miles of Queens, NY. Outside the US, ask", the same as the Knowledge Center.
 - Knowledge Center search no longer shows a percent match, which read like a chance the page answers the question. Results come in groups: best matches (your words in a title or heading), pages that mention them, and, when no page has every word, pages with only some of them, shown under the suggestions.
