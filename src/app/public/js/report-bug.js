@@ -66,6 +66,8 @@ if (form) {
   const where = guessWhere(referrer);
   if (where) form.elements.where.value = where;
   watchDirection(form.elements.where);
+  // Safari does not focus a dropdown when it is pressed, so the focus ring would wait until a choice; press focuses it, as in 1NEON
+  form.elements.where.addEventListener("pointerdown", (e) => { if (document.activeElement !== e.currentTarget) e.currentTarget.focus({ preventScroll: true }); });
 
   // ---- Fields and their messages ----
   // Each message sits under its field, linked by aria-describedby, and typing in the field clears it
