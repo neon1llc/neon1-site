@@ -10,6 +10,8 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 - Knowledge Center: "Start here" has a count, a one-line description, and the green rule under it, like the other headings.
 
+- Code and resources: each repository's line starts at its version ("v0.1.4 · MIT"); the "public" label is gone, since the description says it all is.
+
 - The about photo is one fixed size, lined up with the top of the first line and the foot of the last line of the text beside it, on a phone too.
 
 - Knowledge Center and blog headers are the brand's flat dark green in the light theme, with the bar's gray hairline and a soft shadow along their foot.
