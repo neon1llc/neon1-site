@@ -217,22 +217,15 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
   );
 
   // Bottom right: "report bug \\ feedback", each a form page in a new tab, so a bug seen or a thought had while talking to Neo is one
-  // click away (?from=neo picks "Neo chat" on the page). Each is left off its own page, where it would open the page you're on
+  // click away (?from=neo picks "Neo chat" on the page). Both always show, on the form pages too, so the pair never changes shape
   const bug = el("p", "n1chat-bug");
-  bug.append(el("span", "n1chat-lead", "report"));
-  if (!location.pathname.startsWith("/report-bug")) {
-    const link = el("a", "n1chat-plain n1chat-ext n1chat-buglink", "", { href: "/report-bug/?from=neo", target: "_blank", rel: "noopener", "aria-label": "report a bug" });
-    link.append(bugMark(), "bug");
-    bug.append(link);
-  }
-  if (!location.pathname.startsWith("/feedback")) {
-    if (bug.children.length > 1) bug.append(el("span", "n1chat-sep", "\\", { "aria-hidden": "true" }));
-    const link = el("a", "n1chat-plain n1chat-ext n1chat-buglink", "", { href: "/feedback/?from=neo", target: "_blank", rel: "noopener", "aria-label": "report feedback" });
-    link.append(feedbackMark(), "feedback");
-    bug.append(link);
-  }
+  const bugLink = el("a", "n1chat-plain n1chat-ext n1chat-buglink", "", { href: "/report-bug/?from=neo", target: "_blank", rel: "noopener", "aria-label": "report a bug" });
+  bugLink.append(bugMark(), "bug");
+  const feedbackLink = el("a", "n1chat-plain n1chat-ext n1chat-buglink", "", { href: "/feedback/?from=neo", target: "_blank", rel: "noopener", "aria-label": "report feedback" });
+  feedbackLink.append(feedbackMark(), "feedback");
+  bug.append(el("span", "n1chat-lead", "report"), bugLink, el("span", "n1chat-sep", "\\", { "aria-hidden": "true" }), feedbackLink);
 
-  panel.append(head, log, form, note, human, ...(bug.hasChildNodes() ? [bug] : []));
+  panel.append(head, log, form, note, human, bug);
   for (const cls of className.split(/\s+/).filter(Boolean)) for (const node of [launcher, panel]) node.classList.add(cls);
   root.append(launcher, panel);
 
