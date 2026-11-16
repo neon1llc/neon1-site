@@ -529,7 +529,37 @@
     if (settling) return;
     const [top, bottom] = range(indexAt(target));
     target = y = Math.max(top, Math.min(bottom, target));
+    rest();
   });
+
+  // ---- Never rest between two views ----
+  // Something other than the page's own steering can leave the scroll between views: iOS scrolling a focused
+  // field into sight above the keyboard, the toolbar growing back after the keyboard closes, or a restored
+  // position. The page waits until that is over (no finger down, no settle, no pull, and no keyboard open
+  // over the chat), then eases to the nearer edge: the bottom of the view above or the top of the one below
+  let fingers = 0, restTimer = 0;
+  addEventListener("touchstart", (e) => { fingers = e.touches.length; }, { passive: true, capture: true });
+  addEventListener("touchend", (e) => { fingers = e.touches.length; rest(); }, { passive: true, capture: true });
+  addEventListener("touchcancel", () => { fingers = 0; rest(); }, { passive: true, capture: true });
+  const typing = () => { const a = document.activeElement; return !!a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && !!a.closest(".n1chat"); };
+  function rest(wait = 160) {
+    clearTimeout(restTimer);
+    restTimer = setTimeout(function check() {
+      if (off || !menu.hidden || document.body.classList.contains("case-open") || document.body.classList.contains("white-rabbit-on")) return;
+      if (settling || pullDir || fingers || typing() || performance.now() - lastInput < IDLE) { restTimer = setTimeout(check, 200); return; }
+      const at = scrollY;
+      const i = indexAt(at), [, bottom] = range(i);
+      if (at <= bottom + 2 || i === views.length - 1) return; // inside a view
+      const nextTop = range(i + 1)[0];
+      goTo(at - bottom <= nextTop - at ? i : i + 1, { y: at - bottom <= nextTop - at ? bottom : nextTop });
+    }, wait);
+  }
+  addEventListener("scroll", () => rest(), { passive: true });
+  addEventListener("focusout", () => rest(400));
+  addEventListener("pageshow", () => rest());
+  if (window.visualViewport) visualViewport.addEventListener("resize", () => rest(300));
+  // Closing a window or menu leaves the page where it was: check once the close has played
+  document.addEventListener("click", () => rest(500), true);
 
   // Case links settle like section links, and Back eases to the remembered spot; once reduced motion
   // takes over mid-visit (off), the native moves above come back
@@ -567,6 +597,7 @@
 
   // Start in step with the current position; the render loop runs only while the page moves
   sync();
+  rest(600);
   } catch (err) {
     // Fail open: native scrolling, every view visible
     root.classList.remove("motion-ready", "glide");
