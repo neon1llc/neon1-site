@@ -4,6 +4,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+- Contact: the service area reads "remote across the US, or on site within about 30 miles of Queens, NY. Outside the US, ask", the same as the Knowledge Center.
 - Knowledge Center search no longer shows a percent match, which read like a chance the page answers the question. Results come in groups: best matches (your words in a title or heading), pages that mention them, and, when no page has every word, pages with only some of them, shown under the suggestions.
 - Switching themes flickers like a neon sign. The logo, wordmark, and Neo's launcher go dark in one flick, and light up with two quick flickers, a longer one, then a slow on. Below the rain they glow like a tube. Dark-green links, arrows, and headings take a softer version, and the mark glows in matrix. The wordmark glows green with the logo, and the slow on finishes without a jump.
 - Knowledge Center: the shelf bar is now one line, like "On this page" on a document: it names the shelf you are in and opens a list of every shelf by group, with counts. No more sideways scrolling.
