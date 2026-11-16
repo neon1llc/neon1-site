@@ -180,10 +180,11 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 .menu a { display: inline-flex; align-items: baseline; justify-content: center; }
 .menu .pr { display: inline-block; width: .7ex; height: 1ex; margin-right: .3em; overflow: visible; fill: none; stroke: currentColor; stroke-width: 2.4;
   stroke-linecap: round; stroke-linejoin: round; color: var(--mark); opacity: .9; }
-.menu .arr { margin-left: .35em; --arr-t: .092em; }
+.menu .arr { margin-left: .35em; --arr-t: .1em; }
 .menu .mp { width: .9em; height: .9em; margin-right: .4em; align-self: center; flex: none; }
-.menu .m-first { position: relative; margin-top: 14px; }
-.menu .m-first::before { content: ""; position: absolute; top: -16px; left: 50%; width: 48px; margin-left: -24px; border-top: 1px solid currentColor; opacity: .25; }
+.menu .m-first, .menu .m-split { position: relative; margin-top: 20px; }
+.menu .m-first::before, .menu .m-split::before { content: ""; position: absolute; top: -19px; left: 50%; width: 56px; margin-left: -28px; border-top: 1.5px solid rgba(108, 255, 168, .4); }
+.n1-bar.light ~ .menu .m-first::before, .n1-bar.light ~ .menu .m-split::before { border-top-color: rgb(var(--brand-rgb) / .45); } /* the rule takes the link color of its theme, not the list's */
 .menu a:hover, .menu a:focus-visible { color: #e9ffee; text-shadow: 0 0 14px rgba(108,255,168,.75); }
 /* Over the light page (and on light pages such as the Knowledge Center) the menu takes the light theme:
    paper behind, dark green links, and the bar keeps its own light look with the menu under it */

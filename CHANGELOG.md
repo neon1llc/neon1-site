@@ -4,6 +4,9 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+- The phone menu has three sets: the seven sections, then knowledge, blog, and 1NEON portal (the places on neon1), then book a call alone at the end. A hairline, in the theme's green and clearly visible in both, sits in a larger gap before each of the last two sets. The arrows beside knowledge, blog, and 1NEON portal match the weight of their text and of the > markers.
+- The drawn arrow's stroke now follows the weight set for its own text everywhere. Before, a place's `--arr-t` was ignored and every arrow used the bold default, so arrows beside regular or medium text (the questions, the Knowledge Center's folds, the dropdown, the menu) were heavier than their words. The shape is now declared where it is drawn instead of once on the root.
+
 - The phone menu says where each item goes. The sections of the home page come first in the order the page tells them, each with the same > as its heading (in the heading's own accent, so it follows the theme). A hairline then sets apart the other places: knowledge and blog take the shared right arrow, book a call keeps the outbound arrow, and "1NEON client portal" is now "1NEON portal" with 1NEON's mark to its left and the right arrow. The desktop bar is unchanged. I did not group the sections into dropdowns: no two or three groups tell the page's story in order, and a dropdown would hide the sections the menu exists to show.
 
 - A tab left open across a release reloads when it is looked at again, so an old page never runs with the newer release's scripts (the cause of a white rabbit that would not scroll back in a tab opened before a release). It asks `/version.json` what is live, and skips the reload while a form holds typed words, a case study is open, or the white rabbit is showing, then asks again the next time the tab is shown.

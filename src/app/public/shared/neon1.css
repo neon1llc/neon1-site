@@ -123,6 +123,11 @@
    head's arms are 45 degrees, and each is the same thickness as the shaft. */
 :root { --arr-t: .156em; --arr-shape: polygon(0 50%, .37em calc(50% - .37em), calc(.37em + .7071 * var(--arr-t)) calc(50% - .37em + .7071 * var(--arr-t)),
   calc(1.914 * var(--arr-t)) calc(50% - .5 * var(--arr-t)), 100% calc(50% - .5 * var(--arr-t)), 100% calc(50% + .5 * var(--arr-t)),
+  calc(1.914 * var(--arr-t)) calc(50% + .5 * var(--arr-t)), calc(.37em + .7071 * var(--arr-t)) calc(50% + .37em - .7071 * var(--arr-t)), .37em calc(50% + .37em)); } /* kept for places that read it unchanged (1NEON); the rule below is the one that follows a place's own --arr-t */
+/* The shape is declared on each element that draws it, not once on :root: a var() inside a custom property is filled in where
+   the property is declared, so a :root copy would keep :root's --arr-t and ignore the one a place sets for its own text weight */
+.arr, .n1-fold > summary::after, .cform select::picker-icon { --arr-shape: polygon(0 50%, .37em calc(50% - .37em), calc(.37em + .7071 * var(--arr-t)) calc(50% - .37em + .7071 * var(--arr-t)),
+  calc(1.914 * var(--arr-t)) calc(50% - .5 * var(--arr-t)), 100% calc(50% - .5 * var(--arr-t)), 100% calc(50% + .5 * var(--arr-t)),
   calc(1.914 * var(--arr-t)) calc(50% + .5 * var(--arr-t)), calc(.37em + .7071 * var(--arr-t)) calc(50% + .37em - .7071 * var(--arr-t)), .37em calc(50% + .37em)); }
 .arr { display: inline-block; position: relative; top: calc(.375em - var(--arr-xc)); }
 /* Sentence case or mixed case (a capital to line up with, such as a dropdown's "Choose one"): add .arr-mixed and the arrow

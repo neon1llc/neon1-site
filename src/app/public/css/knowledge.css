@@ -66,7 +66,7 @@ body.kc { background: var(--page); }
 .kc-group-head p { margin: 0; color: #a9c9b0; font-size: 15px; }
 .kc-nav-group { display: flex; align-items: center; }
 .kc-nav-group span { display: block; padding: 6px 4px 6px 10px; font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--mark); white-space: nowrap; }
-.kc-n, .kc-nav-group .kc-n { display: inline; padding: 0; font-weight: 400; letter-spacing: 0; opacity: .7; font-variant-numeric: tabular-nums; } /* a group's article count: quiet, beside its title */
+.kc-n, .kc-nav-group .kc-n { display: inline; padding: 0; font-weight: 400; letter-spacing: 0; opacity: .6; font-variant-numeric: tabular-nums; } /* a group's article count: quiet, beside its title */
 .kc-nav-group:not(:first-child) { margin-left: 10px; padding-left: 10px; border-left: 1px solid var(--line); }
 
 /* ---- Shelves and cards ---- */
