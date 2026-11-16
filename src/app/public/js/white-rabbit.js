@@ -32,6 +32,7 @@
 const PASS_TOUCH = 7;      // viewport heights of finger travel for the whole walk
 const PASS_WHEEL = 9;      // viewport heights of touchpad or smooth wheel scrolling
 const NOTCH = 1 / 45;      // one click of a notched mouse wheel
+const CARD_GAIN = 2.2;     // the still card needs about 45% of the scroll the scene does (Pradeep, 2026-11-16)
 const FLICK = 320;         // ms of a flick's speed carried on after the finger lifts
 const TOP = 0.45;          // the most of the walk shown per second, so a burst of input can't spin the view
 const STIFF = 90;          // spring stiffness, per second squared
@@ -320,7 +321,7 @@ export function whiteRabbit({ rain, root }) {
       if (mode === "card") cover(true, "card");
       else start();
     }
-    if (mode === "card") { card(d); return; }
+    if (mode === "card") { card(d * CARD_GAIN); return; }
     if (state === "done" && d > 0) { target = Math.min(1 + BAND, target + d * 0.3); band(); return; }
     set(d > 0 ? "playing" : "reversing");
     target = target + d > 1 ? Math.min(1 + BAND, 1 + (target + d - 1) * 0.3) : Math.max(0, target + d);
