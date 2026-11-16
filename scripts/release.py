@@ -8,6 +8,7 @@
 # A literal ?v=X.Y.Z written into a page, stylesheet, or script must name it too; the scene's loader
 # reads the meta at run time instead, so it has no copy to drift.
 
+import json
 import pathlib
 import re
 import sys
@@ -35,6 +36,7 @@ def main():
     if not footer:
         sys.exit("release: index.html's footer block has no vX.Y.Z link")
     found.append(("index.html footer", footer.group(1)))
+    found.append(("version.json", json.loads((root / "version.json").read_text())["version"]))
     top = TOP_ENTRY.search(changelog.read_text())
     if not top:
         sys.exit(f"release: {changelog.name} has no '## vX.Y.Z' entry")

@@ -8,6 +8,28 @@
   const header = document.querySelector(".n1-bar");
   const reduce = matchMedia("(prefers-reduced-motion: reduce)");
 
+  // ---- A tab left open across a deploy ----
+  // The page in an old tab is the old release's, but the scripts it loads later (the white rabbit's scene, a lazy import)
+  // come from the live one, so the two can disagree. When the tab is looked at again, it asks /version.json what is live and,
+  // if that is not its own release, reloads, unless that would lose something (words typed in a form, an open case study,
+  // the white rabbit); it asks again the next time the tab is shown.
+  {
+    const mine = document.querySelector('meta[name="version"]')?.content;
+    let asked = 0;
+    const busy = () => [...document.querySelectorAll("textarea, input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button])")].some((f) => f.value)
+      || document.querySelector(".case-layer:not([hidden])") || document.body.classList.contains("white-rabbit-on") || document.body.classList.contains("white-rabbit-cover");
+    const check = async () => {
+      if (!mine || document.hidden || Date.now() - asked < 30000) return;
+      asked = Date.now();
+      try {
+        const live = (await (await fetch("/version.json", { cache: "no-store" })).json()).version;
+        if (live && live !== mine && !busy()) location.reload();
+      } catch { /* offline, or no such file in a preview: stay as it is */ }
+    };
+    document.addEventListener("visibilitychange", check);
+    addEventListener("pageshow", (e) => { if (e.persisted) check(); });
+  }
+
   // Focus an in-page destination without scrolling (the caller or the browser does that), making a
   // section or heading focusable for the moment. Shared with js/views.js through window.n1focus
   function focusTarget(id) {
