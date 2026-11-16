@@ -16,7 +16,7 @@ body.kc { background: var(--page); }
 /* Awake: the brand's deep green, flat, with light type, so the band is plainly the light theme's own heading and not a dark patch; its foot takes
    the bar's gray hairline and a soft shadow, the light theme's version of matrix's green rule and glow. Matrix: the dark ground lifted by a
    green wash, with a neon rule along its foot, so it stays apart from the page under it */
-.kc-band { --band-text: #f1faf3; --band-soft: #cfe8d5; --band-line: rgba(255, 255, 255, .22); --band-eyebrow: #bff5cf;
+.kc-band { --band-text: #f1faf3; --band-soft: #cfe8d5; --band-eyebrow: #bff5cf;
   position: relative; background: #035704; color: var(--band-text);
   box-shadow: 0 1px 0 rgb(var(--ink-rgb) / .08), 0 10px 20px -10px rgb(var(--ink-rgb) / .35); }
 :root[data-site-theme="matrix"] .kc-band { --band-soft: var(--m-muted); --band-eyebrow: var(--neon);
@@ -121,7 +121,6 @@ body.kc { background: var(--page); }
 .kc-kicker { font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--mark); }
 .kc-tags { display: flex; gap: 6px; margin-top: auto; padding-top: 6px; }
 .kc-tags span { padding: 2px 8px; border-radius: 4px; background: rgb(var(--brand-rgb) / .1); font: 11px var(--mono); color: var(--brand); }
-.kc-empty { padding: 40px 0; color: var(--muted); }
 @media (prefers-reduced-motion: reduce) { .kc-card a, .kc-next a { transition: none; } .kc-card a:hover, .kc-next a:hover { transform: none; } }
 
 /* ---- A document ---- */

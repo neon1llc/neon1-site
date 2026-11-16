@@ -70,12 +70,6 @@
 /* The small marks drawn by pseudo-elements: the process timeline's numbers and dots, and the dropdown arrow on each summary */
 :root.flick-on .steps.timeline > *::before, :root.flick-on .steps.timeline > *::after, :root.flick-on .n1-fold > summary::after { animation: soft-on 2.23s linear both; }
 :root.flick-off .steps.timeline > *::before, :root.flick-off .steps.timeline > *::after, :root.flick-off .n1-fold > summary::after { animation: soft-off .5s ease-out both; }
-@keyframes neon-on {
-  0% { opacity: var(--lo); } 4% { opacity: 1; } 8% { opacity: var(--lo); } 13% { opacity: var(--lo); }
-  14.5% { opacity: 1; } 19% { opacity: 1; } 22% { opacity: var(--lo); } 28% { opacity: var(--lo); }
-  30% { opacity: 1; } 44% { opacity: 1; } 48% { opacity: var(--lo); } 52% { opacity: var(--lo); }
-  78% { opacity: .4; } 100% { opacity: 1; }
-}
 @keyframes glow-in { 0% { opacity: var(--lo); } 100% { opacity: 1; } }
 @keyframes neon-off { 0% { opacity: var(--lo); } 35% { opacity: var(--lo); } 100% { opacity: 1; } }
 @keyframes soft-on {
@@ -132,9 +126,6 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 .chip:hover, .chip[aria-pressed="true"] { color: var(--glow); border-color: rgba(0,230,118,.45); }
 /* A square arrow chip: the case-study rail's previous and next, and the tour's back-to-top */
 .chip.arrow { display: inline-grid; place-items: center; min-width: 44px; min-height: 44px; padding: 6px 14px; font-size: 15px; text-decoration: none; }
-
-/* N, E, O, N: the first letter of each stage in brand green, the rest of the word in the text color */
-.nl { color: var(--brand); font-weight: 700; }
 
 /* ---- Top bar: clear over the rain, frosted light once the page is light ---- */
 /* Position, height, and the logo's place come from .n1-bar, .n1-inner, and .n1-logo in /shared/neon1.css */
