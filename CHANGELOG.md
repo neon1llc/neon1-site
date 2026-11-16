@@ -4,6 +4,8 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+- The Knowledge Center shows how many documents each group holds, quietly beside its title in the shelf strip and in the group's header (32 for "For you", 34 for "About neon1" today). Not a total at the top. The counts are taken from the same lists that draw the cards, so they cannot drift from the page.
+
 - Every expandable is one component, `.n1-fold` in shared/neon1.css (1NEON can use it too): the home page's folds and questions, and the Knowledge Center's index ("On this page") and standards fold. Its arrow is the shared left arrow, turning counterclockwise to point down as the panel opens and back as it closes, finishing with the panel's own motion (0.6 s opening, 15% shorter closing, the shared curve). The "+" and "−" and "+" and "×" marks are gone. The Knowledge Center's panels now ease open and shut like the home page's (js/fold.js). Colors follow the text by default, in both themes, and a place changes them with `--fold-arrow` and `--arr-t`.
 - Knowledge Center shelf strip: every item, group titles and links alike, centers itself in the strip's height.
 

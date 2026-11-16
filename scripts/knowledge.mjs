@@ -92,11 +92,20 @@ const DEVELOPERS = "Developers"
 const cardList = (docs) => `<ul class="kc-cards">
 ${docs.map(card).join("\n")}
         </ul>`
-function shelfSection(s) {
+// The documents a shelf shows, in the three places it shows them: featured first, then the rest, then developers' fold.
+// The group counts in the nav strip and each group's header are taken from these same lists, so they match the cards
+function shelfDocs(s) {
   const lead = s.docs.filter((d) => d.data.featured)
   let rest = s.docs.filter((d) => !d.data.featured && d.data.audience !== DEVELOPERS)
   if (s.key === "case-studies") rest = [...rest, ...corpus.docs.filter((d) => d.section !== s.key && d.data.kind === "demonstration")].sort(byKind)
   const dev = s.docs.filter((d) => !d.data.featured && d.data.audience === DEVELOPERS)
+  return { lead, rest, dev }
+}
+const groupCount = (g) => new Set(g.shelves.flatMap((s) => Object.values(shelfDocs(s)).flat().map((d) => d.id))).size
+const countMark = (g) => `<span class="kc-n"> ${groupCount(g)}</span>`
+
+function shelfSection(s) {
+  const { lead, rest, dev } = shelfDocs(s)
   const fold = dev.length
     ? `
         <details class="n1-fold kc-fold">
@@ -117,14 +126,14 @@ function indexPage() {
   const groups = corpus.groups
     .map((g) => `    <section class="kc-group" id="${g.key}" aria-labelledby="${g.key}-h">
       <div class="kc-group-head">
-        <h2 id="${g.key}-h">${esc(g.label)}</h2>
+        <h2 id="${g.key}-h">${esc(g.label)}${countMark(g)}</h2>
         <p>${esc(g.description)}</p>
       </div>
 ${g.shelves.map(shelfSection).join("\n\n")}
     </section>`)
     .join("\n\n")
   const nav = corpus.groups
-    .map((g) => `        <li class="kc-nav-group"><span>${esc(g.label)}</span></li>
+    .map((g) => `        <li class="kc-nav-group"><span>${esc(g.label)}${countMark(g)}</span></li>
 ${g.shelves.map((s) => `        <li><a href="#${s.key}">${esc(s.label)}</a></li>`).join("\n")}`)
     .join("\n")
   const main = `${band({ id: "kc-title", eyebrow: "neon1 · knowledge center", title: "Everything neon1", lead: "Guides, policies, and answers.", after: `
