@@ -1,22 +1,20 @@
 // src/app/public/js/knowledge-groups.js - The Knowledge Center's two groups ("For you", "About neon1") keep their heading in sight
-// while you read through them, and the shelf bar says which shelf you are in.
+// while you read through them, and the "On this page" card says which section you are in.
 //
-// A group's heading sticks under the shelf bar. Once it sticks, its description eases away from the bottom up, leaving
-// only the title and count, so it costs little of a small screen. Near the group's end it fades: it starts when the
-// heading's bottom edge reaches the top of the group's last card, and is gone when it reaches that card's bottom, so the next group's
-// heading arrives on a clean page. The shelf bar's link for the shelf in view takes aria-current, and the bar scrolls to keep
-// that link in sight. Everything reads the page's own layout, so a search that hides groups or cards needs nothing here.
+// A group's heading sticks under the "On this page" card. Once it sticks, its description eases away from the bottom up, leaving
+// the title and count, and in the room beside them the title of the shelf being read fades in (the crumb), so one bar does the work
+// of two. Near the group's end the heading fades: it starts when its bottom edge reaches the top of the group's last card, and is gone
+// when it reaches that card's bottom, so the next group's heading arrives on a clean page. The card's link for the shelf in view takes
+// aria-current, and the list scrolls to keep that link in sight. Everything reads the page's own layout, so a search that hides
+// groups or cards needs nothing here.
 
 const heads = [...document.querySelectorAll(".kc-group")].map((group) => ({
   group,
   head: group.querySelector(".kc-group-head"),
   desc: group.querySelector(".kc-group-desc"),
+  crumb: group.querySelector(".kc-crumb"),
+  shelves: [...group.querySelectorAll(".kc-shelf")],
 })).filter((g) => g.head && g.desc);
-const subs = [...document.querySelectorAll(".kc-shelf")].map((shelf) => ({
-  shelf,
-  head: shelf.querySelector(".kc-shelf-head"),
-  desc: shelf.querySelector(".kc-shelf-desc"),
-})).filter((s) => s.head && s.desc);
 const bar = document.querySelector(".kc-shelves");
 
 if (heads.length && bar) {
@@ -34,35 +32,42 @@ if (heads.length && bar) {
   // The sticky headings sit just under it, wherever the shelf bar's height ends up
   const measure = () => {
     root.style.setProperty("--kc-stick", `${Math.round(stickAt())}px`);
-    // The room a heading gives up when it shrinks (its description, its gap, and the padding it tightens), handed to the shelf below
-    // as top padding, so the page under it never moves
-    for (const g of heads) g.group.style.setProperty("--kc-give", `${Math.round(g.desc.scrollHeight) + 6 + 14}px`);
-    // A shelf heading sticks right under a stuck group heading, whose stuck height is its title plus its tightened padding and borders
-    const first = heads[0], h2 = first.head.querySelector("h2");
-    root.style.setProperty("--kc-stick2", `${Math.round(stickAt() + h2.offsetHeight + 24)}px`);
-    for (const sh of subs) sh.shelf.style.setProperty("--kc-give2", `${Math.round(sh.desc.firstElementChild.scrollHeight) + 14}px`);
+    // The room a heading gives up when it shrinks (its description and the gap above it), handed to the shelf below as top padding,
+    // so the page under it never moves
+    for (const g of heads) g.group.style.setProperty("--kc-give", `${Math.round(g.desc.scrollHeight) + 6}px`);
+    // Where a landed shelf title sits: under a stuck group heading, whose stuck height is its one line (22px) and its 10px of padding above and below
+    root.style.setProperty("--kc-stick2", `${Math.round(stickAt() + 42)}px`);
   };
 
   const update = () => {
     queued = false;
     const stick = stickAt();
-    // Stuck heading and the fade at the end of its block (last visible card top to bottom); a group's heading and a shelf's work alike
-    const fadeHead = (block, head, at) => {
-      if (block.hidden) return;
-      head.classList.toggle("is-stuck", head.getBoundingClientRect().top <= at + 1);
-      const cards = [...block.querySelectorAll(".kc-card:not([hidden])")].filter((c) => c.offsetParent);
+    for (const { group, head, crumb, shelves: its } of heads) {
+      if (group.hidden) continue;
+      head.classList.toggle("is-stuck", head.getBoundingClientRect().top <= stick + 1);
+      const bottom = head.getBoundingClientRect().bottom, stuckBottom = stick + 42;
+      // The crumb names the last shelf whose title has gone under the heading, and the first one's name fades in as its title passes under
+      const seen = its.filter((sh) => !sh.hidden && sh.querySelector(".kc-shelf-head h3")?.getBoundingClientRect().top <= stuckBottom);
+      const sh = seen[seen.length - 1];
+      const title = sh && sh.querySelector(".kc-shelf-head h3");
+      if (crumb) {
+        const text = title ? title.innerHTML : "";
+        if (crumb.innerHTML !== text) crumb.innerHTML = text;
+        const t = title ? title.getBoundingClientRect() : null;
+        const k = t && head.classList.contains("is-stuck") ? Math.min(1, Math.max(0, (stuckBottom - t.top) / Math.max(1, t.height))) : 0;
+        crumb.style.opacity = seen.length > 1 ? "1" : String(k);
+      }
+      // The fade at the end of the group (its last visible card top to bottom)
+      const cards = [...group.querySelectorAll(".kc-card:not([hidden])")].filter((c) => c.offsetParent);
       const last = cards[cards.length - 1];
       let fade = 0;
       if (last) {
-        const r = last.getBoundingClientRect(), bottom = head.getBoundingClientRect().bottom;
+        const r = last.getBoundingClientRect();
         fade = Math.min(1, Math.max(0, (bottom - r.top) / Math.max(1, r.height)));
       }
       head.style.opacity = fade ? String(1 - fade) : "";
       head.style.pointerEvents = fade > 0.9 ? "none" : "";
-    };
-    for (const { group, head } of heads) fadeHead(group, head, stick);
-    const stick2 = parseFloat(getComputedStyle(root).getPropertyValue("--kc-stick2")) || stick;
-    for (const { shelf, head } of subs) fadeHead(shelf, head, stick2);
+    }
     // The shelf in view: the last whose top is above the line just under the stuck heading
     const line = stick + 80;
     let current = null;
@@ -74,7 +79,7 @@ if (heads.length && bar) {
     // The stuck bar names the shelf in view, as the document pages' index names its section
     if (label) label.textContent = current ? `${shelves.indexOf(current) + 1} of ${shelves.length} \u00b7 ${current.a.firstChild.textContent.trim()}` : resting;
   };
-  // A shelf link lands the shelf's title so the gap under the stuck group heading equals the gap between the title and its description
+  // A shelf link lands the shelf's title a title-to-description gap under the stuck group heading
   const land = (el, smooth) => {
     const title = el.querySelector(".kc-shelf-head h3");
     if (!title) return false;

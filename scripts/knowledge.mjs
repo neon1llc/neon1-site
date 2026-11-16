@@ -128,7 +128,7 @@ function indexPage() {
   const groups = corpus.groups
     .map((g) => `    <section class="kc-group" id="${g.key}" aria-labelledby="${g.key}-h">
       <div class="kc-group-head">
-        <h2 id="${g.key}-h">${esc(g.label)}${countMark(g)}</h2>
+        <div class="kc-group-row"><h2 id="${g.key}-h">${esc(g.label)}${countMark(g)}</h2><span class="kc-crumb" aria-hidden="true"></span></div>
         <div class="kc-group-desc"><p>${esc(g.description)}</p></div>
       </div>
 ${g.shelves.map(shelfSection).join("\n\n")}
@@ -164,13 +164,15 @@ ${g.shelves.map((s) => `        <li><a href="#${s.key}">${esc(s.label)}${shelfMa
     <div id="kc-browse">
 ${pathsSection()}
 
-    <nav class="kc-shelves" aria-label="Shelves">
+    <nav class="kc-shelves" aria-label="On this page">
+      <div class="kc-shelves-in">
       <details class="n1-fold kc-shelves-fold">
-        <summary>Shelves <span>${corpus.shelves.length} shelves</span></summary>
+        <summary>On this page <span>${corpus.shelves.length} sections</span></summary>
         <ul>
 ${nav}
         </ul>
       </details>
+      </div>
     </nav>
 
     <div class="kc-body">

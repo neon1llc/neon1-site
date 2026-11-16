@@ -13,11 +13,12 @@ body.kc { background: var(--page); }
 :root[data-site-theme="matrix"] .kc .kc-band :focus-visible { outline-color: var(--neon); }
 
 /* ---- The band at the top of an index page ---- */
-/* Awake: the brand's deep green with light type, so the band is plainly the light theme's own heading and not a dark patch. Matrix:
-   the dark ground lifted by a green wash, with a neon rule along its foot, so it stays apart from the page under it */
+/* Awake: the brand's deep green, flat, with light type, so the band is plainly the light theme's own heading and not a dark patch; its foot takes
+   the bar's gray hairline and a soft shadow, the light theme's version of matrix's green rule and glow. Matrix: the dark ground lifted by a
+   green wash, with a neon rule along its foot, so it stays apart from the page under it */
 .kc-band { --band-text: #f1faf3; --band-soft: #cfe8d5; --band-line: rgba(255, 255, 255, .22); --band-eyebrow: #bff5cf;
-  background: #035704; color: var(--band-text); border-bottom: 1px solid rgba(255, 255, 255, .18);
-  background-image: radial-gradient(ellipse at 20% 0%, rgba(108, 255, 168, .22), transparent 60%); }
+  position: relative; background: #035704; color: var(--band-text);
+  box-shadow: 0 1px 0 rgb(var(--ink-rgb) / .08), 0 10px 20px -10px rgb(var(--ink-rgb) / .35); }
 :root[data-site-theme="matrix"] .kc-band { --band-soft: var(--m-muted); --band-eyebrow: var(--neon);
   background: #0F0A0D; border-bottom: 1px solid rgba(108, 255, 168, .55); box-shadow: 0 1px 18px -4px rgba(108, 255, 168, .35);
   background-image: linear-gradient(180deg, rgba(108, 255, 168, .13), rgba(108, 255, 168, .03)), radial-gradient(ellipse at 20% 0%, rgba(0, 143, 17, .28), transparent 60%); }
@@ -45,19 +46,19 @@ body.kc { background: var(--page); }
 .kc-results { min-height: 1.4em; margin: 8px 0 0; font: 13px var(--mono); color: var(--band-soft); }
 
 /* ---- Shelf links under the band ---- */
-/* The shelf bar is "On this page" for the whole library: one stuck line under the site's bar naming the shelf in view, which opens a
- * list of every shelf by group, over the page, like the document pages' docked index (js/knowledge-groups.js names the shelf, closes it) */
-.kc-shelves { position: sticky; top: calc(64px + env(safe-area-inset-top)); z-index: 3; height: 48px; }
-.kc-shelves-fold { --fold-arrow: var(--brand); --arr-t: .13em; position: absolute; top: 0; left: 0; right: 0; background: rgb(var(--surface-rgb) / .98);
-  -webkit-backdrop-filter: saturate(1.8) blur(16px); backdrop-filter: saturate(1.8) blur(16px); border-bottom: 1px solid var(--line); }
+/* "On this page" for the whole library, in the document pages' own look: an inset card (the page's side padding, rounded, ruled) that holds
+ * under the site's bar naming the section in view, and opens a list of every section by group, over the page (js/knowledge-groups.js
+ * names it and closes it). Its strip is page-colored so cards scrolling under the gaps around it don't show through */
+.kc-shelves { position: sticky; top: calc(64px + env(safe-area-inset-top)); z-index: 3; height: 56px; margin-top: 36px; background: var(--page); }
+.kc-shelves-in { position: relative; max-width: 1040px; height: 100%; margin: 0 auto; padding: 0 24px; box-sizing: border-box; }
+.kc-shelves-fold { --fold-arrow: var(--brand); --arr-t: .13em; position: absolute; top: 6px; left: 24px; right: 24px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
 .kc-shelves-fold[open] { box-shadow: 0 8px 20px rgba(18,36,26,.07); }
-.kc-shelves-fold > summary { display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; height: 47px; max-width: 1040px; margin: 0 auto;
-  padding: 0 24px; cursor: pointer; list-style: none; font: 600 14px var(--sans); color: var(--brand); }
+.kc-shelves-fold > summary { display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; min-height: 44px; padding: 0 14px; cursor: pointer; list-style: none; font: 600 14px var(--sans); color: var(--brand); }
 .kc-shelves-fold > summary::-webkit-details-marker { display: none; }
 .kc-shelves-fold > summary span { flex: 1; min-width: 0; margin-left: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: right; font: 12px var(--mono); color: var(--muted); }
 .kc-shelves-fold > summary::after { margin-left: 10px; }
 .kc-shelves-fold > summary:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; }
-.kc-shelves ul { list-style: none; max-width: 1040px; margin: 0 auto; padding: 0 24px 12px; max-height: min(60vh, 460px); overflow-y: auto; overscroll-behavior: contain; }
+.kc-shelves ul { list-style: none; margin: 0; padding: 0 14px 10px; max-height: min(60vh, 460px); overflow-y: auto; overscroll-behavior: contain; }
 .kc-shelves li { display: flex; align-items: center; }
 .kc-shelves a { display: flex; flex: 1; align-items: baseline; justify-content: space-between; gap: 12px; padding: 7px 0; font: 14px/1.4 var(--sans); color: var(--muted); text-decoration: none; }
 .kc-shelves a:hover { color: var(--brand); }
@@ -65,24 +66,25 @@ body.kc { background: var(--page); }
 
 /* ---- Featured row and the two groups ---- */
 .kc-group { padding-top: 56px; scroll-margin-top: 120px; }
-.kc-group-head h2 { margin: 0 0 6px; font: 600 12px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--mark); transition: margin-bottom var(--t-open) var(--ease-open); }
+.kc-group-head h2 { font: 600 12px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--mark); }
 .kc-group[hidden] { display: none; }
-/* The group heading is a panel in the page's own theme (a wash of its brand color, a rule down its left edge), so it reads as a
- * heading in light and in matrix, and sticks under the shelf bar while its group is read. Stuck, the description eases away
- * from the bottom up and the padding tightens; --kc-give (on the group) hands the lost height to the first shelf's top padding, so the page
- * below never moves and the heading can sit right down to the group's last card before it ends (js/knowledge-groups.js sets it, --kc-stick,
- * and the fade near the group's end) */
-.kc-group-head { position: sticky; top: var(--kc-stick, calc(120px + env(safe-area-inset-top))); z-index: 2; padding: 18px 20px; border-radius: 10px;
-  background: var(--surface); background: color-mix(in srgb, rgb(var(--brand-rgb)) 9%, var(--page)); color: var(--ink);
-  border: 1px solid rgb(var(--brand-rgb) / .3); border-left: 4px solid var(--brand);
-  transition: padding var(--t-open) var(--ease-open), box-shadow var(--t-open) var(--ease-open); }
-.kc-group-head h2 { color: var(--brand); font-size: 13px; }
+/* A group's heading is a flat line in the page's own color, in line with the shelf headings below it, not a box. It sticks under the
+ * "On this page" card while its group is read; stuck, its description eases away and, in its empty space, the title of the shelf being read
+ * fades in after the group's name (the crumb), so one bar does the work of two. --kc-give (on the group) hands the lost height to the
+ * first shelf's top padding, so the page below never moves, and the heading can sit right down to the group's last card before it ends
+ * (js/knowledge-groups.js sets it, --kc-stick, the crumb, and the fade near the group's end) */
+.kc-group-head { position: sticky; top: var(--kc-stick, calc(120px + env(safe-area-inset-top))); z-index: 2; padding: 10px 0; background: var(--page); color: var(--ink);
+  transition: box-shadow var(--t-open) var(--ease-open); }
+.kc-group-row { display: flex; align-items: baseline; min-height: 22px; margin: 0 0 6px; transition: margin-bottom var(--t-open) var(--ease-open); }
+.kc-group-head h2 { margin: 0; flex: none; color: var(--brand); font-size: 13px; }
+.kc-crumb { min-width: 0; margin-left: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 16px var(--sans); color: var(--brand); opacity: 0; }
+.kc-crumb:not(:empty)::before { content: "/"; margin-right: 12px; font-weight: 400; color: var(--muted); }
 .kc-group-desc { display: grid; grid-template-rows: 1fr; transition: grid-template-rows var(--t-open) var(--ease-open), opacity var(--t-open) var(--ease-open); }
 .kc-group-desc p { min-height: 0; overflow: hidden; margin: 0; color: var(--muted-ink); font-size: 15px; }
-.kc-group-head.is-stuck { padding-top: 11px; padding-bottom: 11px; box-shadow: 0 6px 16px -10px rgb(var(--ink-rgb) / .4); }
-.kc-group-head.is-stuck h2 { margin-bottom: 0; }
+.kc-group-head.is-stuck { box-shadow: 0 1px 0 var(--line), 0 8px 14px -10px rgb(var(--ink-rgb) / .45); }
+.kc-group-head.is-stuck .kc-group-row { margin-bottom: 0; }
 .kc-group-head.is-stuck .kc-group-desc { grid-template-rows: 0fr; opacity: 0; }
-@media (prefers-reduced-motion: reduce) { .kc-group-head, .kc-group-desc { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .kc-group-head, .kc-group-row, .kc-group-desc { transition: none; } }
 .kc-nav-group { display: flex; align-items: center; }
 .kc-nav-group span { display: block; padding: 10px 0 4px; font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--mark); white-space: nowrap; }
 .kc-n, .kc-nav-group .kc-n, .kc-shelves a .kc-n { display: inline; padding: 0; font: 400 .85em var(--mono); letter-spacing: 0; opacity: 1; font-variant-numeric: tabular-nums;
@@ -107,18 +109,10 @@ body.kc { background: var(--page); }
 .kc-fold > summary span { color: var(--muted); }
 .kc-fold > summary:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 .kc-fold > .kc-cards { margin-top: 12px; }
-/* A shelf's heading sticks under the group's, like it: stuck, its description eases away and the cards below take up the room
- * (--kc-give2), and it fades as it meets the shelf's last card (js/knowledge-groups.js) */
-.kc-shelf-head { position: sticky; top: var(--kc-stick2, 160px); z-index: 1; margin-bottom: 16px; padding: 8px 0 10px; background: var(--page); border-bottom: 1.5px solid var(--brand);
-  }
-.kc-shelf-head h3 { margin: 0 0 14px; font: 700 20px var(--sans); color: var(--brand); transition: margin-bottom var(--t-open) var(--ease-open); }
-.kc-shelf-desc { display: grid; grid-template-rows: 1fr; transition: grid-template-rows var(--t-open) var(--ease-open), opacity var(--t-open) var(--ease-open); }
-.kc-shelf-desc p { min-height: 0; overflow: hidden; margin: 0; color: var(--muted); font-size: 15px; }
-.kc-shelf-head.is-stuck h3 { margin-bottom: 0; }
-.kc-shelf-head.is-stuck .kc-shelf-desc { grid-template-rows: 0fr; opacity: 0; }
-.kc-shelf-head + .kc-cards { transition: margin-top var(--t-open) var(--ease-open); }
-.kc-shelf-head.is-stuck + .kc-cards { margin-top: calc(var(--kc-give2, 0px) + 16px); }
-@media (prefers-reduced-motion: reduce) { .kc-shelf-head h3, .kc-shelf-desc, .kc-shelf-head + .kc-cards { transition: none; } }
+/* A shelf's heading is part of the page: the group's bar above names the shelf once this heading scrolls under it */
+.kc-shelf-head { margin-bottom: 16px; padding: 8px 0 10px; border-bottom: 1.5px solid var(--brand); }
+.kc-shelf-head h3 { margin: 0 0 14px; font: 700 20px var(--sans); color: var(--brand); }
+.kc-shelf-desc p { margin: 0; color: var(--muted); font-size: 15px; }
 .kc-cards { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
 .kc-card[hidden] { display: none; }
 .kc-card a, .kc-next a { display: flex; flex-direction: column; gap: 6px; height: 100%; padding: 18px 18px 16px; border-radius: 10px;
@@ -276,7 +270,7 @@ body.kc { background: var(--page); }
 @media (max-width: 600px) {
   .kc-band-inner { --band-y: 36px; padding-left: 16px; padding-right: 16px; }
   .kc-body, .kc-doc { padding-left: 16px; padding-right: 16px; }
-  .kc-shelves-fold > summary, .kc-shelves ul { padding-left: 16px; padding-right: 16px; }
+  .kc-shelves-in { padding: 0 16px; } .kc-shelves-fold { left: 16px; right: 16px; }
   .kc-text { font-size: 16px; }
   .kc-text .blank { min-width: 8em; }
   /* Phones list many cards, so each one is tighter: two lines of summary, the PDF tag beside the title */

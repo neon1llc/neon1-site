@@ -4,6 +4,14 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+- "report a bug" in the footer's bottom right opens a short form (what happened, an optional email for a reply) from every page; the page and theme go along automatically. It sends to hello@ and falls back to an email link without scripts.
+
+- Knowledge Center: "Shelves" is now "On this page", an inset card in the style of the documents' own, set apart from the "Not sure where you fit" line. The group headings ("For you", "About neon1") are flat lines in line with the shelf headings, and a single sticky bar shows the shelf you are reading, fading its name in beside the group's.
+
+- The about photo is one fixed size, lined up with the top of the first line and the foot of the last line of the text beside it, on a phone too.
+
+- Knowledge Center and blog headers are the brand's flat dark green in the light theme, with the bar's gray hairline and a soft shadow along their foot.
+
 - Opening "send me your use case" moves the page and the form together in one eased motion, and on shorter windows keeps the send button in view.
 
 - The bar and menu item reads "code", and the section heading reads "code and resources", lowercase like the other headings. "Public" is gone from both, since the line under the heading already says it's all on GitHub.

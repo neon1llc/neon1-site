@@ -223,16 +223,17 @@ html.case-lock { overflow: hidden; }
 @media (pointer: coarse) { .view { padding-bottom: calc(clamp(28px, 5vh, 56px) + 72px); } }
 
 /* Views set their own spacing; the about story reads as one column */
-.story { display: block; max-width: 720px; }
+.story { display: block; max-width: 760px; }
 .story p { font-size: 18px; line-height: 1.65; margin: 0 0 18px; }
 
-/* About: the photo beside the story, above it on a phone. The photo is one fixed size everywhere: 137px, the
-   height of the two paragraphs beside it on a desktop, so it matches them there and doesn't grow on a phone */
-.about { display: grid; grid-template-columns: 137px minmax(0, 720px); gap: clamp(24px, 4vw, 48px); align-items: center; }
-.portrait { margin: 0; }
-.portrait img { display: block; width: 137px; height: 137px; aspect-ratio: 1; object-fit: cover; border-radius: 12px; border: 1px solid var(--line); }
+/* About: the photo beside the story, above it on a phone. The photo is one fixed size everywhere (no scaling on a phone): 154px square,
+   so on a desktop its top lines up with the top of the first line's letters and its bottom with the foot of the last line's, over the two
+   paragraphs' five lines (18px type on a 1.65 line, with the 18px between paragraphs) */
+.about { --photo: 154px; display: grid; grid-template-columns: var(--photo) minmax(0, 760px); gap: clamp(24px, 4vw, 48px); align-items: start; }
+.portrait { margin: 7px 0 0; }
+.portrait img { display: block; width: var(--photo); height: var(--photo); aspect-ratio: 1; object-fit: cover; border-radius: 12px; border: 1px solid var(--line); }
 .about .story p:last-child { margin-bottom: 0; }
-@media (max-width: 760px) { .about { grid-template-columns: 1fr; } }
+@media (max-width: 760px) { .about { grid-template-columns: 1fr; } .portrait { margin-top: 0; } }
 /* "More" links: a line of its own under a section, in the site's usual bold link style (.ext) */
 .more { margin: 18px 0 0; }
 .row p b { color: var(--ink); font-weight: 600; }
