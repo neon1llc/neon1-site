@@ -31,11 +31,11 @@ const esc = (text) => String(text).replace(/[&<>"']/g, (c) => ESC[c])
 // The corpus writes plain HTML. The page wants links out marked and opened in a new tab (links to neon1.tech itself,
 // such as the free 1NEON account, become paths that open in the same tab, as in the Knowledge Center), and tables without
 // thead and tbody, as its case panel styles them
-// Links between corpus documents name their Markdown sources (../company/contact.md). On the home page the contact
+// Links between corpus documents name their Markdown sources (../engagement/contact.md). On the home page the contact
 // document is the contact section itself, and every other document is its Knowledge Center page (RC-C1)
 const forPage = (html) =>
   bindExtArrows(html
-    .replace(/<a href="(?:\.\.\/)+company\/contact\.md">/g, '<a href="#contact">')
+    .replace(/<a href="(?:\.\.\/)+(?:company|engagement)\/contact\.md">/g, '<a href="#contact">')
     .replace(/<a href="(?:\.\.\/)+([a-z0-9-]+)\/([a-z0-9-]+)\.md">/g, '<a href="/knowledge/$1/$2/">')
     .replace(/<a href="(https?:[^"]+)">/g, (tag) => classifyLinks(tag))
     .replace(/<\/?(thead|tbody)>/g, "")

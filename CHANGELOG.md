@@ -4,6 +4,8 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+- The home page's service-agreement link and the corpus's contact links use the Engagement addresses, so none goes through a redirect.
+
 - Knowledge Center: the Services shelf is now Engagement and holds Services, pricing, how a project runs, the capability statement, contact, publishing client work, and the service agreement (from the corpus branch refactor/engagement-shelf, shown on dev until it is released). Old addresses redirect.
 - Contact: the lead line reads "Tell me what's going on with an email, a call or text to (424) 32-neon1, or a free 15-minute call", with "How can I help?" above it and one gap between the lines. The facts table is now availability, where, size, and first call, each slash-separated, with weekday evenings as 6-9pm (Fri to 8pm); a few clients at a time. The home page's structured data lists opening hours.
 - Knowledge Center: group headers are a band edge to edge with a line above and below, in type larger and heavier than the shelf titles. One gap (the one above the "On this page" bar) separates the bar, bands, shelf titles, and the cards. The bar is as thin as the document pages' bar, the group names in its menu are links, counts sit beside names (the current one in the current style), and the menu stays open when the theme changes.
