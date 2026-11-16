@@ -549,7 +549,8 @@
   land();
   // The page may show itself now: viewport.js held it as blank paper while it waited to land on the section
   const arrived = () => document.documentElement.classList.remove("arriving");
-  if (start <= 0) arrived();
+  // Landing is a single scroll, so the page shows itself two frames after it; a later correction (fonts, the load event) moves it by a few pixels at most
+  if (start <= 0) arrived(); else requestAnimationFrame(() => requestAnimationFrame(arrived));
   // The browser's own jump to the #fragment can run after load and land 72px low, so land once more after it
   addEventListener("load", () => { land(); requestAnimationFrame(() => setTimeout(() => { land(); arrived(); }, 0)); });
   if (document.fonts) document.fonts.ready.then(land);

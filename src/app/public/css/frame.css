@@ -44,7 +44,7 @@ body.woke { background-color: var(--page); }
 /* Arriving at a section: blank paper until the page has landed on it (js/viewport.js sets this, js/views.js clears it) */
 html.arriving { background: var(--page); }
 html.arriving body { opacity: 0; }
-body { transition: background-color .4s, opacity var(--t-slow) var(--ease); }
+body { transition: background-color .4s; }
 a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3px; }
 :focus-visible { outline: 2px solid var(--glow); outline-offset: 3px; border-radius: 6px; }
 /* Focus rings take the color that reads on the surface they sit on: brand green on the light bar and the
@@ -192,9 +192,6 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 /* Ghost buttons on the light page take the brand green, not the dark-mode neon; hover keeps the light green wash */
 .awake .btn-ghost { color: var(--brand); border-color: var(--brand); }
 
-/* Leaving for 1NEON: the page fades out, so the portal can fade in */
-body.leaving header, body.leaving .top, body.leaving .awake, body.leaving .rainctl, body.leaving .menu { opacity: 0; transition: opacity .4s ease; }
-body.leaving .awake { pointer-events: none; }
 
 /* ---- Footer: the mark and slogan, contact, elsewhere, and the legal line ---- */
 footer { position: relative; z-index: 2; border-top: 1px solid var(--line); background: rgba(13,2,8,.92); }

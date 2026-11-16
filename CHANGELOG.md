@@ -4,6 +4,9 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+- Moving between pages is one short cross-fade, done only by the browser's own page transitions, and the bar holds still while the page under it changes. Before, three fades could stack: the browser's, one on the links that hand over to 1NEON, and one when a section loaded, which made a double fade going from the Knowledge Center or blog to a home section and left some moves without a clear fade. The home page now waits as blank paper until it has landed on a section, with reduced motion too, then shows without a second fade. Browsers without page transitions change pages at once.
+- The Knowledge Center's search box and its label are in the page itself, so they are there from the first paint instead of appearing after the page's script ran.
+
 - The neon1 logo's mark now sits on the content's left line, as 1NEON and the menu button sit on the right one, on every page and the rain landing, desktop and phone. Its hover pill hangs outside the page padding instead of pushing the mark in.
 - The footer's privacy, browser storage, and terms links go to the site's own policy pages in the Knowledge Center in place of the 1NEON portal's copies, and the footer's legal line underlines its internal links (state registration, privacy, browser storage, terms) so they read as links beside its plain text. Internal links still carry no arrow.
 - The site starts light for everyone. Dark is only by choice: the switch picks it and remembers it. Before, a device set to dark opened the site dark.

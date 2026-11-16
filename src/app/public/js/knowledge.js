@@ -1,6 +1,7 @@
 // src/app/public/js/knowledge.js - The knowledge center's search. It fetches one local index file on first use and
 // lists matching documents with a snippet and a link to the section. Nothing leaves the browser. Without JavaScript
-// the box stays hidden and the page lists every document.
+// the box does nothing and the page lists every document. The box is in the page's HTML, so it is there from the first
+// paint instead of appearing when this script has run.
 import { prepare, search } from "./knowledge-search-core.js";
 
 const box = document.querySelector(".kc-search");

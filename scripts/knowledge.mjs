@@ -128,7 +128,7 @@ ${g.shelves.map(shelfSection).join("\n\n")}
 ${g.shelves.map((s) => `        <li><a href="#${s.key}">${esc(s.label)}</a></li>`).join("\n")}`)
     .join("\n")
   const main = `${band({ id: "kc-title", eyebrow: "neon1 · knowledge center", title: "Everything neon1", lead: "Guides, policies, and answers.", after: `
-        <form class="kc-search" role="search" action="${BASE}" method="get" hidden>
+        <form class="kc-search" role="search" action="${BASE}" method="get">
           <label for="kc-q">Search the knowledge center</label>
           <input id="kc-q" name="q" type="search" placeholder="Try &quot;backup&quot;, &quot;passkey&quot;, or &quot;privacy&quot;" autocomplete="off" />
           <p class="kc-results" id="kc-results" role="status" aria-live="polite" aria-atomic="true"></p>

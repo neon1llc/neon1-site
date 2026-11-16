@@ -1,5 +1,4 @@
-// src/app/public/js/frame.js - What every page's frame does: the footer year, the fade on the way to
-// 1NEON, and the phone menu. Each page loads it as a module; pages react to the menu through the
+// src/app/public/js/frame.js - What every page's frame does: the footer year and the phone menu. Each page loads it as a module; pages react to the menu through the
 // "n1:menu" event instead of reaching into it.
 {
   // Footer year; without the script the line still reads "© neon1 LLC"
@@ -8,18 +7,6 @@
 
   const header = document.querySelector(".n1-bar");
   const reduce = matchMedia("(prefers-reduced-motion: reduce)");
-
-  // ---- 1NEON: the page fades out, then hands over to the portal, which fades itself in ----
-  document.querySelectorAll("a[data-handoff]").forEach((a) => a.addEventListener("click", (e) => {
-    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return; // new tab or window: a plain link
-    e.preventDefault();
-    try { sessionStorage.setItem("neon1.handoff", "1"); } catch { /* storage blocked: the portal just won't fade in */ }
-    if (reduce.matches) { location.href = a.href; return; }
-    document.body.classList.add("leaving");
-    setTimeout(() => (location.href = a.href), 450);
-  }));
-  // Coming back with the browser's Back button restores the page as it was left, faded out; undo the fade
-  addEventListener("pageshow", (e) => { if (e.persisted) document.body.classList.remove("leaving"); });
 
   // Focus an in-page destination without scrolling (the caller or the browser does that), making a
   // section or heading focusable for the moment. Shared with js/views.js through window.n1focus
