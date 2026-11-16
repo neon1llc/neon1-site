@@ -4,6 +4,9 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+- The home page questions are short: five questions, each showing the first paragraph of its answer, chosen by the FAQ's `home` list in neon1-corpus. "How do I pay?" leaves the home page; the Knowledge Center keeps every question in full.
+- Services: the networks row links to getting ready for a first call instead of costs, and the closing line says every proposal lays out its options and costs before you decide.
+
 ## v0.77.3
 
 - Everything that turns from dark green to matrix green takes the neon flicker: the case-study labels, numbers, and stats, the code-row states, required-field asterisks, the footer wordmark, the Knowledge Center's eyebrow, counts, and contents title, the share buttons, the process timeline's numbers and dots, the dropdown arrows, and the links, headings, and icons in the top bar and phone menu.
