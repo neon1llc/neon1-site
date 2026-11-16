@@ -4,7 +4,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
-- "report a bug" in the footer's bottom right opens a short form (what happened, an optional email for a reply) from every page; the page and theme go along automatically. It sends to hello@ and falls back to an email link without scripts.
+- "report a bug" in the footer's bottom right opens the report page in a new tab, from every page, with the page it came from passed along.
 
 - Knowledge Center: "Shelves" is now "On this page", an inset card in the style of the documents' own, set apart from the "Not sure where you fit" line. The group headings ("For you", "About neon1") are flat lines in line with the shelf headings, and a single sticky bar shows the shelf you are reading, fading its name in beside the group's.
 
