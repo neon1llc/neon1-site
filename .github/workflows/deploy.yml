@@ -18,6 +18,14 @@ on:
     - cron: "*/15 * * * *"
   workflow_dispatch:
     inputs:
+      force_full:
+        description: Run every browser check and print the PDFs, whatever changed
+        type: boolean
+        default: false
+      compare_to:
+        description: A commit to compare with, to see which checks a change would run (dry runs from a branch; empty runs everything)
+        type: string
+        default: ""
       force_invalidation:
         description: Also invalidate CloudFront (releases don't need it; for a font, media, or .well-known file changed in place)
         type: boolean
@@ -64,6 +72,35 @@ jobs:
           echo "releases_pin=$releases" >> "$GITHUB_OUTPUT"
           echo "go=$go" >> "$GITHUB_OUTPUT"
 
+  # Which checks this push needs, from the files it changed (scripts/change_map.py). It is sure or it runs everything:
+  # a shared file (css, scripts, templates, version), no list of files (a schedule or manual run, the corpus), or any
+  # error all mean the full browser checks, the chat checks, and the PDFs. The static checks always run
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      full: ${{ steps.map.outputs.full }}
+      behavior: ${{ steps.map.outputs.behavior }}
+      only: ${{ steps.map.outputs.only }}
+      shards: ${{ steps.map.outputs.shards }}
+      chat: ${{ steps.map.outputs.chat }}
+      pdf: ${{ steps.map.outputs.pdf }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: map
+        env:
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before || github.event.pull_request.base.sha }}
+          FORCE_FULL: ${{ inputs.force_full }}
+          COMPARE_TO: ${{ inputs.compare_to }}
+        run: |
+          if [ "$FORCE_FULL" = true ] || [ "$EVENT" = schedule ] || [ "$EVENT" = workflow_dispatch ]; then BEFORE="$COMPARE_TO"; fi
+          if [ "$FORCE_FULL" = true ]; then BEFORE=; fi
+          python3 scripts/change_map.py "$BEFORE" HEAD | tee -a "$GITHUB_OUTPUT"
+          grep '^reason=' "$GITHUB_OUTPUT" | sed 's/^reason=/### Checks: /' >> "$GITHUB_STEP_SUMMARY"
+
   # The site's generated parts, written once and packed. The browser checks run on these exact bytes and the
   # deploy job uploads them, so what shipped is what was tested. (The Knowledge Center's PDFs are printed beside it.)
   build:
@@ -93,8 +130,8 @@ jobs:
 
   # The Knowledge Center's PDFs, printed beside the pages from the same corpus release, in parallel with the checks
   pdf:
-    needs: plan
-    if: needs.plan.outputs.go == 'true' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: [plan, changes]
+    if: needs.plan.outputs.go == 'true' && needs.changes.outputs.pdf == 'true' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     env:
       CORPUS_TAG: ${{ needs.plan.outputs.corpus_tag }}
@@ -154,12 +191,13 @@ jobs:
   # loopback and stub every API, aborting anything that leaves it, so nothing reaches a live service. Playwright
   # comes from knowledge/package-lock.json, the same locked version the PDF printer uses
   behavior:
-    needs: [plan, build]
+    needs: [plan, build, changes]
+    if: needs.plan.outputs.go == 'true' && needs.changes.outputs.behavior == 'true'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        shard: [0, 1, 2]
+        shard: ${{ fromJSON(needs.changes.outputs.shards) }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -178,14 +216,37 @@ jobs:
         run: |
           npm ci --prefix knowledge
           npx --prefix knowledge playwright install --with-deps chromium
-      - name: make behavior (shard ${{ matrix.shard }} of 3)
+      - name: make behavior (shard ${{ matrix.shard }} of ${{ strategy.job-total }})
         env:
           NODE_PATH: ${{ github.workspace }}/knowledge/node_modules
-          SHARD: ${{ matrix.shard }}/3
+          SHARD: ${{ matrix.shard }}/${{ strategy.job-total }}
+          ONLY: ${{ needs.changes.outputs.only }}
         run: make behavior
-      # The chat window's checks ride with the lightest shard
+
+  # The chat window's checks, beside the shards, when the chat or anything shared changed
+  chat:
+    needs: [plan, build, changes]
+    if: needs.plan.outputs.go == 'true' && needs.changes.outputs.chat == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: knowledge/package-lock.json
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: site
+          path: ${{ runner.temp }}/site
+      - run: tar xzf "$RUNNER_TEMP/site/site.tgz" -C src/app/public
+      - name: Install Playwright and Chromium
+        run: |
+          npm ci --prefix knowledge
+          npx --prefix knowledge playwright install --with-deps chromium
       - name: Chat window checks
-        if: matrix.shard == 0
         env:
           NODE_PATH: ${{ github.workspace }}/knowledge/node_modules
         run: node scripts/chat_check.cjs
@@ -194,8 +255,8 @@ jobs:
   # schedule run that found a new corpus release comes here too, since dev must show the release production does.
   # The called workflows need contents to push dev and an OIDC token for the dev deploy role
   dev:
-    needs: [plan, check, behavior]
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.plan.outputs.go == 'true'
+    needs: [plan, changes, build, check, behavior, chat, pdf]
+    if: ${{ always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.plan.outputs.go == 'true' && needs.build.result == 'success' && needs.check.result == 'success' && contains('success skipped', needs.behavior.result) && contains('success skipped', needs.chat.result) && contains('success skipped', needs.pdf.result) }}
     uses: ./.github/workflows/dev-sync.yml
     with:
       corpus_tag: ${{ needs.plan.outputs.corpus_tag }}
@@ -205,9 +266,10 @@ jobs:
 
   # Deploys only from main, after the static checks and the browser contracts pass; nothing touches S3 or
   # CloudFront before then. It uploads the site the checks ran on, so it needs no Node, Playwright, or build
+  # A job skipped because nothing it covers changed counts as passed; one skipped because something before it failed does not (build and check must succeed)
   deploy:
-    needs: [plan, check, behavior, pdf]
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: [plan, changes, build, check, behavior, chat, pdf]
+    if: ${{ always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.plan.outputs.go == 'true' && needs.changes.result == 'success' && needs.build.result == 'success' && needs.check.result == 'success' && contains('success skipped', needs.behavior.result) && contains('success skipped', needs.chat.result) && contains('success skipped', needs.pdf.result) }}
     runs-on: ubuntu-latest
     env:
       CORPUS_TAG: ${{ needs.plan.outputs.corpus_tag }}
@@ -240,8 +302,20 @@ jobs:
       - name: Unpack the tested site
         run: |
           tar xzf "$RUNNER_TEMP/built/site/site.tgz" -C src/app/public
-          tar xzf "$RUNNER_TEMP/built/pdfs/pdfs.tgz" -C src/app/public
           test -f src/app/public/index.html
+
+      # PDFs printed in this run, or, when nothing the Knowledge Center prints from changed, the live ones (same
+      # content, so the same files). A document that isn't live yet stops the deploy: run it again with force_full
+      - name: PDFs
+        env:
+          PRINTED: ${{ needs.pdf.result }}
+        run: |
+          if [ "$PRINTED" = success ]; then
+            tar xzf "$RUNNER_TEMP/built/pdfs/pdfs.tgz" -C src/app/public
+          else
+            python3 scripts/dev_pdfs.py src/app/public | tee "$RUNNER_TEMP/pdfs.txt"
+            if grep -q "not live yet" "$RUNNER_TEMP/pdfs.txt"; then echo "::error::a PDF isn't live yet; run deploy again with force_full"; exit 1; fi
+          fi
 
       - run: make deploy
 

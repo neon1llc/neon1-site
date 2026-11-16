@@ -68,6 +68,7 @@ logic: ## Check the white rabbit's scene lifetime, and that the links check fail
 	@command -v node >/dev/null 2>&1 || { echo "logic: install Node.js"; exit 1; }
 	@node scripts/rabbit_lifecycle.cjs $(SITE_DIR)
 	@python3 scripts/test_check_page.py
+	@python3 scripts/test_change_map.py
 	@node --test scripts/knowledge.test.mjs scripts/releases.test.mjs
 
 # The bar and footer markup lives once, in index.html; other pages get copies
