@@ -28,6 +28,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - Matrix theme: text is off-white with green kept for headings and links, links are underlined in running text, and form fields and focus rings are easier to see.
 
 - Dark theme: dropdowns, menus, and other controls now follow the dark theme.
+- The contact form sends the visitor's time zone with the message, so the email to neon1 can show their local time.
 
 ## v0.78.2
 
