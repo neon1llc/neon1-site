@@ -42,9 +42,9 @@ const main = `${band({
 })}
     <section class="rb" aria-label="Report a bug form">
       <div class="rb-inner">
-        <!-- Shown until js/report-bug.js runs; without it the form can't send, so the email link does the job -->
-        <p class="rb-nojs" id="rb-nojs">This form needs JavaScript. Email <a class="ext" href="mailto:hello@neon1.tech?subject=Bug%20report"><span class="ext-end">hello@neon1.tech</span></a> instead.</p>
-        <form class="rb-form" id="rb-form" novalidate hidden>
+        <!-- The form shows at once; only without JavaScript (it can't send) is it swapped for the email link -->
+        <noscript><link rel="stylesheet" href="/css/rb-nojs.css"><p class="rb-nojs">This form needs JavaScript. Email <a class="ext" href="mailto:hello@neon1.tech?subject=Bug%20report"><span class="ext-end">hello@neon1.tech</span></a> instead.</p></noscript>
+        <form class="rb-form" id="rb-form" novalidate>
           <label><span>Where?<span class="req" aria-hidden="true">*</span></span><select name="where" required>
             <option value="">Pick one</option>
 ${WHERE.map(([v, t]) => `            <option value="${v}">${t}</option>`).join("\n")}

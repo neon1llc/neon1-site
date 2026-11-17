@@ -5,7 +5,7 @@
 .rb { background: var(--paper); }
 .rb-inner { max-width: 1040px; margin: 0 auto; padding: 32px 24px 96px; box-sizing: border-box; }
 .rb-form, .rb-done { display: grid; gap: 18px; max-width: 620px; }
-.rb-form[hidden], .rb-done[hidden], .rb-nojs[hidden] { display: none; }
+.rb-form[hidden], .rb-done[hidden] { display: none; }
 .rb-nojs { margin: 0; color: var(--muted); }
 .rb-form { --req-color: var(--brand); }
 

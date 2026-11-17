@@ -249,6 +249,4 @@ if (form) {
     swap(done, form).then(() => form.elements.what.focus());
   });
 
-  document.getElementById("rb-nojs").hidden = true;
-  form.hidden = false;
 }

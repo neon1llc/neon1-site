@@ -49,9 +49,9 @@ const main = `${band({
 })}
     <section class="rb" aria-label="Feedback form">
       <div class="rb-inner">
-        <!-- Shown until js/feedback.js runs; without it the form can't send, so the email link does the job -->
-        <p class="rb-nojs" id="rb-nojs">This form needs JavaScript. Email <a class="ext" href="mailto:hello@neon1.tech?subject=Feedback"><span class="ext-end">hello@neon1.tech</span></a> instead.</p>
-        <form class="rb-form" id="rb-form" novalidate hidden>
+        <!-- The form shows at once; only without JavaScript (it can't send) is it swapped for the email link -->
+        <noscript><link rel="stylesheet" href="/css/rb-nojs.css"><p class="rb-nojs">This form needs JavaScript. Email <a class="ext" href="mailto:hello@neon1.tech?subject=Feedback"><span class="ext-end">hello@neon1.tech</span></a> instead.</p></noscript>
+        <form class="rb-form" id="rb-form" novalidate>
           <label><span>What kind?<span class="req" aria-hidden="true">*</span></span><select name="kind" required>
             <option value="">Pick one</option>
 ${KIND.map(([v, t]) => `            <option value="${v}">${t}</option>`).join("\n")}
