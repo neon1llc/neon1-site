@@ -65,6 +65,13 @@
     fill var(--dawn) var(--dawn-ease), stroke var(--dawn) var(--dawn-ease), box-shadow var(--dawn) var(--dawn-ease), text-shadow var(--dawn) var(--dawn-ease),
     transform var(--t-base) var(--ease-open), opacity var(--t-base) var(--ease), visibility var(--t-base) !important;
 }
+/* The lit fixtures (the logo and wordmark, Neo's launcher) are their own layers in a dawn: the dark green fixture they rest as is already
+   there underneath, and the glow of the lit one dims slowly away over it, so they never vanish before the light comes up (Pradeep, 2026-11-17) */
+:root.dawn-vt .n1-bar .n1-logo { view-transition-name: n1-logo; }
+:root.dawn-vt .n1chat-launch { view-transition-name: n1-neo; }
+:root.dawn-vt::view-transition-new(n1-logo), :root.dawn-vt::view-transition-new(n1-neo) { animation: none !important; opacity: 1 !important; }
+:root.dawn-vt::view-transition-old(n1-logo), :root.dawn-vt::view-transition-old(n1-neo) { animation: dawn-glow-out var(--dawn) var(--dawn-ease) both !important; }
+@keyframes dawn-glow-out { from { opacity: 1; } 40% { opacity: .65; } to { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { :root.dawn-vt::view-transition-new(*) { animation: none !important; } }
 
 /* ---- Neon: the theme switch flickers like a sign ----
