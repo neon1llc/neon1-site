@@ -8,6 +8,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - Matrix has Awake (light) and Plugged (dark). Sentinel has Providence (light) and Desert of the Real (dark), with a leaf-green palette based on #39AB56 and still presentation.
 - Site and 1NEON public screens share the family and mode. The profile uses the same four names, and an unrelated profile save preserves the landing's family choice.
 - Sentinel form fields and topic choices use stronger boundaries in both modes, including the contact, bug, and feedback forms.
+- Bug and feedback forms describe the captured mode as light or dark.
 
 ## v0.81.0
 - Switching from dark to awake is slow, like eyes taking the light after the dark: the light page comes up over the dark one in a long ease-out, a little bright at first, then settling, with the glow fading gently. Going dark stays quick. Reduced motion changes at once.
