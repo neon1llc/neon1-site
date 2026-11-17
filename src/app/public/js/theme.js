@@ -99,9 +99,7 @@
 
   // ---- The switches in the bar ----
   // Mode: off is light (sun, left), on is dark (moon, right), independent of family.
-  // Style: on the landing's first screen only; its pick is kept under KEY_STYLE and wins everywhere. The landing runs the rain and the
-  // white rabbit only for the matrix look and starts them once, at load, so it reloads to change style (the choice is already stored,
-  // so the new page paints in the new look from its first frame)
+  // Style: on the landing's first screen only; its pick is kept under KEY_STYLE and wins everywhere
   function wire() {
     document.querySelectorAll(".theme-sw:not(.style-sw)").forEach((b) => {
       b.setAttribute("aria-checked", String(dark(wantedLook())));
@@ -116,23 +114,20 @@
       b.addEventListener("click", () => {
         const next = root.dataset.siteStyle === "sentinel" ? "matrix" : "sentinel";
         write(KEY_MODE, mode());
-        const kept = write(KEY_STYLE, next);
-        if (kept && document.getElementById("rain")) location.reload();
-        else change(lookFor(next, mode()));
+        write(KEY_STYLE, next);
+        change(lookFor(next, mode()));
       });
     });
   }
   if (document.readyState === "loading") addEventListener("DOMContentLoaded", wire); else wire();
 
   // ---- Staying in step: other tabs, and a page restored by Back ----
-  // A style change in another tab reloads the landing (its rain) and just re-applies elsewhere
+  // A family change re-applies in place; the landing starts its Matrix effects only when needed
   addEventListener("storage", (e) => {
-    if (e.key === KEY_STYLE) { if (document.getElementById("rain")) location.reload(); else change(wantedLook()); }
-    else if (e.key === KEY_MODE || e.key === null) change(wantedLook());
+    if (e.key === KEY_STYLE || e.key === KEY_MODE || e.key === null) change(wantedLook());
   });
   addEventListener("pageshow", (e) => {
     if (!e.persisted) return;
-    if (root.dataset.siteStyle !== style() && document.getElementById("rain")) { location.reload(); return; }
     if (root.dataset.siteLook !== wantedLook()) change(wantedLook());
   });
 })();
