@@ -110,8 +110,9 @@ body.kc { background: var(--page); }
 .kc-fold > .kc-cards { margin-top: 12px; }
 /* A shelf's heading is part of the page: the group's bar above names the shelf once this heading scrolls under it */
 .kc-shelf-head { margin-bottom: 16px; padding: 0 0 10px; border-bottom: 1.5px solid var(--brand); }
-.kc-shelf-head h3 { margin: 0 0 14px; font: 700 20px var(--sans); color: var(--brand); }
+.kc-shelf-head :is(h2, h3) { margin: 0 0 14px; font: 700 20px var(--sans); color: var(--brand); }
 .kc-shelf-desc p { margin: 0; color: var(--muted); font-size: 15px; }
+.kc-shelf-head > .kc-shelf-desc { margin: 0; color: var(--muted); font-size: 15px; }
 .kc-cards { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
 .kc-card[hidden] { display: none; }
 .kc-card a, .kc-next a { display: flex; flex-direction: column; gap: 6px; height: 100%; padding: 18px 18px 16px; border-radius: 10px;

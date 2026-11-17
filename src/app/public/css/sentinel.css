@@ -10,7 +10,7 @@
   --accent: #246F38; --accent-rgb: 36 111 56; --accent-wash: rgb(36 111 56 / .08);
   --paper: #F5F8F4; --page: #F5F8F4; --page-rgb: 245 248 244; --void: #F5F8F4;
   --ink: #18271D; --ink-rgb: 24 39 29; --ink-soft: #384D3F; --muted-ink: #526858;
-  --surface: #FFFFFF; --surface-rgb: 255 255 255; --surface-2: #E7EFE6;
+  --surface: #F2F4F2; --surface-rgb: 242 244 242; --surface-2: #E7EFE6;
   --err: #A12B1F; --warn: #8A5300;
   --m-ink: #18271D; --m-ink-soft: #384D3F; --m-muted: #526858; --m-faint: #5B705F;
   --band-bg: #204D2D;
@@ -105,3 +105,9 @@
 
 /* ---- No page transitions or fades of any kind ---- */
 :root[data-site-style="sentinel"]::view-transition-group(*), :root[data-site-style="sentinel"]::view-transition-old(*), :root[data-site-style="sentinel"]::view-transition-new(*) { animation-duration: 0s !important; }
+
+/* Sentinel's phone menu keeps the two in-site destinations plain, like the section links above them */
+@media (max-width: 700px) {
+  :root[data-site-style="sentinel"] .menu a[href="/knowledge/"] .arr,
+  :root[data-site-style="sentinel"] .menu a[href="/blog/"] .arr { display: none; }
+}
