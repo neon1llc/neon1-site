@@ -286,12 +286,14 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 .n1-bar.light ~ .menu a { color: var(--brand); text-shadow: none; }
 .n1-bar.light ~ .menu a:hover, .n1-bar.light ~ .menu a:focus-visible { color: var(--ink); text-shadow: none; text-decoration: underline; text-underline-offset: 6px; }
 .n1-bar.light.menu-open { background: transparent; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; border-color: transparent; }
-/* Short phone viewports tighten the list so its auto margins can center it below the fixed bar */
+/* The phone menu occupies only the visible space below the fixed bar, so its list centers between the real bounds */
 @media (max-width: 700px) {
-  .menu ul { gap: clamp(5px, 1.25dvh, 10px); }
-  .menu a { font-size: clamp(20px, 3.2dvh, 26px); }
-  .menu .m-first, .menu .m-split { margin-top: clamp(8px, 1.6dvh, 14px); }
-  .menu .m-first::before, .menu .m-split::before { top: calc(1px - clamp(8px, 1.6dvh, 14px)); }
+  .menu { inset-block: calc(64px + env(safe-area-inset-top)) 0; block-size: auto; padding-block: clamp(12px, 2.5dvh, 24px) calc(clamp(12px, 2.5dvh, 24px) + env(safe-area-inset-bottom));
+    background: var(--page); backdrop-filter: none; }
+  .menu ul { gap: clamp(8px, 1.5dvh, 16px); }
+  .menu a { font-size: clamp(24px, 4.4dvh, 38px); }
+  .menu .m-first, .menu .m-split { margin-top: clamp(12px, 2.2dvh, 22px); }
+  .menu .m-first::before, .menu .m-split::before { top: calc(1px - clamp(12px, 2.2dvh, 22px)); }
 }
 
 /* ---- Light surface: everything inside .awake reads dark green and ink on paper ---- */
