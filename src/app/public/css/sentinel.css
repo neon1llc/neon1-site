@@ -8,9 +8,9 @@
 :root[data-site-style="sentinel"][data-site-theme="awake"],
 :root[data-site-style="sentinel"][data-site-theme="awake"] :is(.awake, .n1-bar, .menu, .case-layer) {
   --accent: #246F38; --accent-rgb: 36 111 56; --accent-wash: rgb(36 111 56 / .08);
-  --paper: #F5F8F4; --page: #F5F8F4; --page-rgb: 245 248 244; --void: #F5F8F4;
+  --paper: #F2F4F2; --page: #F2F4F2; --page-rgb: 242 244 242; --void: #F2F4F2;
   --ink: #18271D; --ink-rgb: 24 39 29; --ink-soft: #384D3F; --muted-ink: #526858;
-  --surface: #F2F4F2; --surface-rgb: 242 244 242; --surface-2: #E7EFE6;
+  --surface: #F5F8F4; --surface-rgb: 245 248 244; --surface-2: #E7EFE6;
   --err: #A12B1F; --warn: #8A5300;
   --m-ink: #18271D; --m-ink-soft: #384D3F; --m-muted: #526858; --m-faint: #5B705F;
   --band-bg: #204D2D;
@@ -18,11 +18,11 @@
 :root[data-site-style="sentinel"][data-site-theme="matrix"],
 :root[data-site-style="sentinel"][data-site-theme="matrix"] :is(.awake, .n1-bar, .menu, .case-layer) {
   --accent: #79CF91; --accent-rgb: 121 207 145; --accent-wash: rgb(121 207 145 / .1);
-  --paper: #121A14; --page: #121A14; --page-rgb: 18 26 20; --void: #121A14;
-  --ink: #E6F0E7; --ink-rgb: 230 240 231; --ink-soft: #C8DACB; --muted-ink: #A6BFA9;
-  --surface: #1B2820; --surface-rgb: 27 40 32; --surface-2: #0D1510;
+  --paper: #0F0A0D; --page: #0F0A0D; --page-rgb: 15 10 13; --void: #0F0A0D;
+  --ink: #F2F4F2; --ink-rgb: 242 244 242; --ink-soft: #D3D9D4; --muted-ink: #B2BDB4;
+  --surface: #17110F; --surface-rgb: 23 17 15; --surface-2: #0A0608;
   --err: #FF9A8F; --warn: #E8B35A;
-  --m-ink: #E6F0E7; --m-ink-soft: #C8DACB; --m-muted: #A6BFA9; --m-faint: #91AC96;
+  --m-ink: #F2F4F2; --m-ink-soft: #D3D9D4; --m-muted: #B2BDB4; --m-faint: #9AA89C;
   --band-bg: #1B2820;
 }
 /* Both themes: the accent stands in for every green, in the tokens the rest of the CSS reads */
@@ -109,5 +109,6 @@
 /* Sentinel's phone menu keeps the two in-site destinations plain, like the section links above them */
 @media (max-width: 700px) {
   :root[data-site-style="sentinel"] .menu a[href="/knowledge/"] .arr,
-  :root[data-site-style="sentinel"] .menu a[href="/blog/"] .arr { display: none; }
+  :root[data-site-style="sentinel"] .menu a[href="/blog/"] .arr,
+  :root[data-site-style="sentinel"] .menu a[href="/1NEON/"] .arr { display: none; }
 }
