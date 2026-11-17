@@ -3,6 +3,7 @@
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
+- A style switch on the landing's first screen, in the place the theme switch takes once the page scrolls, turns the whole site from the stylized look (the rain, the white rabbit, the glow and flicker) to a plain business look. Business has two themes, alert (light) and lamp (dark), in a neutral palette with one steel-blue accent, plain type, the same logo mark recolored, and no motion when switching or moving between pages. The choice is kept, wins on every page, and the theme switch elsewhere toggles awake and matrix when stylized and alert and lamp when business. The first visit stays stylized and awake; the device's light or dark setting is followed only for the first visit to business.
 
 ## v0.81.0
 - Switching from dark to awake is slow, like eyes taking the light after the dark: the light page comes up over the dark one in a long ease-out, a little bright at first, then settling, with the glow fading gently. Going dark stays quick. Reduced motion changes at once.

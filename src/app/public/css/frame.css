@@ -207,6 +207,20 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 :root:not([data-site-theme]) .menu-btn { margin-left: auto; }
 @media (forced-colors: active) { .theme-knob { border: 1px solid ButtonText; } .theme-sw svg { color: ButtonText; opacity: 1; } }
 
+/* ---- Style switch: stylized (the rain, the neon) or business (plain), on the landing's first screen only ----
+   The same control as the theme switch (stripes for the rain on the left, a briefcase for business on the right), in the very place
+   the theme switch takes once the page scrolls: it overlays the theme switch's box (a negative margin of its width plus the bar's gap; the same
+   absolute spot in the wide margin), shows while the bar carries [data-top] (js/page.js), and the theme switch steps aside meanwhile.
+   Over the rain it is clear glass in the neon, like the bar's other items there. Its pick wins on every page (css/business.css) */
+.theme-sw.style-sw { margin-left: -72px; } /* its own width plus the bar's 20px gap */
+@media (min-width: 1320px) { .theme-sw.style-sw { margin: 0; } }
+.n1-bar:not([data-top]) .style-sw { display: none; }
+.n1-bar[data-top] .theme-sw:not(.style-sw) { opacity: 0; visibility: hidden; pointer-events: none; }
+.n1-bar:not(.light) .theme-sw.style-sw { opacity: 1; visibility: visible; pointer-events: auto; background: rgba(13,2,8,.4); color: #84a98c;
+  --brand: var(--neon); --brand-rgb: 108 255 168; --ctl-line: rgba(108,255,168,.4); }
+.style-sw .biz-case { fill: none; stroke: currentColor; stroke-width: 1.8; }
+.style-sw[aria-checked="false"] .theme-sun, .style-sw[aria-checked="true"] .theme-moon { color: var(--brand); }
+
 /* ---- Phone menu: below the width the links need, they fold into a full-screen menu ---- */
 .menu-btn { margin-left: auto; display: none; border-radius: var(--glass-r); }
 /* On the light bar the menu button, the theme switch, and 1NEON share one surface and one thin theme-green border */

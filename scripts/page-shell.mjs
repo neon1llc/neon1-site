@@ -65,6 +65,7 @@ export function page(frame, { title, description, path, main, kind, ld, current,
   <link rel="stylesheet" href="/shared/chat.css" />
   <link rel="stylesheet" href="/css/frame.css" />
 ${styles.map((s) => `  <link rel="stylesheet" href="${s}" />`).join("\n")}
+  <link rel="stylesheet" href="/css/business.css" />
 </head>
 <body class="kc">
   <a class="skip" href="#main">skip to content</a>

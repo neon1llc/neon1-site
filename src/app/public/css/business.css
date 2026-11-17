@@ -1,0 +1,108 @@
+/* src/app/public/css/business.css - The business style: the whole of neon1.tech without the stylized look's rain, glows, neon, or effects
+ * (Pradeep, 2026-11-17). Nothing here applies unless js/theme.js has set html[data-site-style="business"], which the landing's style
+ * switch chooses and every page follows.
+ *
+ * Two themes, as the stylized style has two: alert (light) and lamp (dark). They ride on the same html[data-site-theme] values the
+ * rest of the CSS already reads ("awake" is the light one, "matrix" the dark one), so every structural rule, layout, and dark-surface
+ * fix written for those still applies; this file only swaps the palette, takes out what is stylized, and keeps the type plain.
+ * It loads last, after the page's own stylesheets, so it wins at equal weight.
+ *
+ * Palette: neutral greys with one sober accent, a steel blue (navy on light, a softer blue on dark), each checked for text contrast
+ * (ink on page 15:1 and up, muted text 5.5:1 and up, the accent on its page 6:1 and up). The logo keeps its mark and wordmark and takes
+ * the accent as its one color; no green, no glow. */
+
+/* ---- Tokens ---- */
+:root[data-site-style="business"][data-site-theme="awake"],
+:root[data-site-style="business"][data-site-theme="awake"] :is(.awake, .n1-bar, .menu, .case-layer) {
+  --accent: #1F4E79; --accent-rgb: 31 78 121; --accent-wash: rgb(31 78 121 / .08);
+  --paper: #F7F8FA; --page: #F7F8FA; --page-rgb: 247 248 250; --void: #F7F8FA;
+  --ink: #1B2230; --ink-rgb: 27 34 48; --ink-soft: #3C4556; --muted-ink: #566074;
+  --surface: #FFFFFF; --surface-rgb: 255 255 255; --surface-2: #EDEFF3;
+  --err: #A12B1F; --warn: #8A5300;
+  --m-ink: #1B2230; --m-ink-soft: #3C4556; --m-muted: #566074; --m-faint: #6B7587;
+  --band-bg: #1F3A57;
+}
+:root[data-site-style="business"][data-site-theme="matrix"],
+:root[data-site-style="business"][data-site-theme="matrix"] :is(.awake, .n1-bar, .menu, .case-layer) {
+  --accent: #8FB4DE; --accent-rgb: 143 180 222; --accent-wash: rgb(143 180 222 / .1);
+  --paper: #14171C; --page: #14171C; --page-rgb: 20 23 28; --void: #14171C;
+  --ink: #E6E9EE; --ink-rgb: 230 233 238; --ink-soft: #CDD2DA; --muted-ink: #A3ABB8;
+  --surface: #1C2027; --surface-rgb: 28 32 39; --surface-2: #101318;
+  --err: #FF9A8F; --warn: #E8B35A;
+  --m-ink: #E6E9EE; --m-ink-soft: #CDD2DA; --m-muted: #A3ABB8; --m-faint: #8B93A0;
+  --band-bg: #1C2027;
+}
+/* Both themes: the accent stands in for every green, in the tokens the rest of the CSS reads */
+:root[data-site-style="business"], :root[data-site-style="business"] :is(.awake, .n1-bar, .menu, .case-layer) {
+  --brand: var(--accent); --brand-rgb: var(--accent-rgb); --mark: var(--accent); --deep: var(--accent); --neon: var(--accent);
+  --glow: var(--accent); --mid: var(--accent);
+  --text: var(--ink); --muted: var(--muted-ink); --panel: var(--surface); --line: rgb(var(--ink-rgb) / .14);
+  --ctl-line: rgb(var(--ink-rgb) / .28);
+}
+/* Typography: one plain sans for everything but code (the stylized style's mono labels, wordmark, and prompt chevrons are part of its look) */
+:root[data-site-style="business"] { --mono: var(--sans); }
+:root[data-site-style="business"] :is(code, pre, kbd, samp) { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+:root[data-site-style="business"] .pr { display: none; }
+
+/* ---- The landing: a still page, no rain, no rabbit, no decode ---- */
+:root[data-site-style="business"] :is(#rain, #lens, .veil, .rainctl, #whiteRabbit, .white-rabbit-in) { display: none !important; }
+:root[data-site-style="business"] body { background: var(--page); color: var(--ink); transition: none; }
+:root[data-site-style="business"] .hero-pane .brand { color: var(--accent); letter-spacing: -.01em; font-weight: 700; }
+:root[data-site-style="business"] .tagline { color: var(--muted-ink); opacity: 1; font-family: var(--sans); }
+:root[data-site-style="business"] .reveal { animation: none; opacity: 1; }
+:root[data-site-style="business"] .awake { background: none; }
+
+/* ---- Nothing glows, flickers, or eases between looks ---- */
+:root[data-site-style="business"] :is(*, *::before, *::after) { text-shadow: none !important; }
+:root[data-site-style="business"] :is(.n1-logo svg, .n1chat-launch svg, .n1chat-mark) { filter: none !important; }
+:root[data-site-style="business"] :is(.n1-logo, .n1chat-launch, .btn-primary:hover, .kc-band, .n1chat) { box-shadow: none; }
+:root[data-site-style="business"] .n1chat { box-shadow: 0 8px 24px rgb(0 0 0 / .18); }
+:root[data-site-style="business"] .glitch::before, :root[data-site-style="business"] .glitch::after { animation: none; opacity: 0; }
+:root[data-site-style="business"] :is(.card:hover, a.card:hover) { transform: none; }
+:root[data-site-style="business"] ::selection { background: rgb(var(--accent-rgb) / .28); color: var(--ink); }
+
+/* ---- The bar, the menu, buttons, links ---- */
+:root[data-site-style="business"] .n1-bar.light .n1-logo { color: var(--accent); }
+:root[data-site-style="business"] .n1-bar.light { background: rgb(var(--page-rgb) / .94); box-shadow: 0 1px 0 rgb(var(--ink-rgb) / .12); }
+:root[data-site-style="business"] .menu { background: rgb(var(--page-rgb) / .98); backdrop-filter: none; }
+:root[data-site-style="business"] .menu a { color: var(--ink); font-weight: 600; }
+:root[data-site-style="business"] .menu :is(.m-first, .m-split)::before { border-top-color: rgb(var(--ink-rgb) / .2); }
+:root[data-site-style="business"] :focus-visible, :root[data-site-style="business"] .menu :focus-visible { outline-color: var(--accent); }
+:root[data-site-style="business"] .btn-primary { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+:root[data-site-style="business"] .btn-primary:hover { box-shadow: none; filter: brightness(1.08); }
+:root[data-site-style="business"] .btn-ghost, :root[data-site-style="business"] .n1-bar .links .portal { color: var(--accent); border-color: var(--ctl-line); background: transparent; }
+:root[data-site-style="business"] :is(.btn-ghost, .links .portal):hover { background: var(--accent-wash); border-color: var(--accent); }
+:root[data-site-style="business"] .links a:not(.btn):hover { color: var(--accent); }
+/* The style switch over the landing's plain first screen is the quiet bar item it is everywhere else */
+:root[data-site-style="business"] .n1-bar .theme-sw { background: var(--surface); }
+
+/* ---- Knowledge Center and blog: the band is a plain slate (dark mode: the surface, ruled) instead of the green ---- */
+:root[data-site-style="business"] .kc-band { --band-text: #F4F6F9; --band-soft: #CBD5E1; --band-eyebrow: #B7C7DB; background: var(--band-bg); background-image: none; border-bottom: 0; }
+:root[data-site-style="business"][data-site-theme="matrix"] .kc-band { --band-text: var(--ink); --band-soft: var(--m-muted); --band-eyebrow: var(--accent); border-bottom: 1px solid rgb(var(--ink-rgb) / .14); }
+:root[data-site-style="business"] .kc-eyebrow { letter-spacing: .06em; }
+:root[data-site-style="business"] .kc-search input { border-color: rgb(var(--ink-rgb) / .3); background: var(--surface); color: var(--ink); }
+:root[data-site-style="business"] .kc-search input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgb(var(--accent-rgb) / .25); outline: 2px solid var(--accent); }
+:root[data-site-style="business"] .kc .kc-band :focus-visible { outline-color: #fff; }
+:root[data-site-style="business"][data-site-theme="matrix"] .kc .kc-band :focus-visible { outline-color: var(--accent); }
+
+/* ---- Neo: the same two palettes as the page ---- */
+/* The stylized dark look's tube glow on the launcher has high weight (css/frame.css, "Neon"); this one is a notch above it */
+:root[data-site-style="business"][data-site-theme="matrix"]:has(.n1-bar.light) .n1chat-launch:not(.n1chat-light) { border-color: var(--accent); color: var(--accent);
+  background: rgb(var(--page-rgb) / .96); box-shadow: none; }
+:root[data-site-style="business"][data-site-theme="matrix"]:has(.n1-bar.light) .n1chat-launch:not(.n1chat-light) svg { filter: none; }
+:root[data-site-style="business"][data-site-theme="matrix"] .n1-bar.light .n1-logo { color: var(--accent); }
+:root[data-site-style="business"] .n1chat-launch:not(.n1chat-light) { color: var(--accent); border-color: var(--accent); background: rgb(var(--page-rgb) / .96); }
+:root[data-site-style="business"] .n1chat-launch:not(.n1chat-light):hover { background: var(--accent-wash); }
+:root[data-site-style="business"] .n1chat-launch.n1chat-light { box-shadow: 0 2px 8px rgb(var(--ink-rgb) / .14); }
+:root[data-site-style="business"] .n1chat { --bg: var(--surface); --fg: var(--ink); --line: rgb(var(--ink-rgb) / .22); --soft: rgb(var(--ink-rgb) / .12);
+  --bot: var(--surface-2); --you: var(--accent-wash); --muted: var(--muted-ink); --accent-ink: var(--paper);
+  --field: var(--page); --link: var(--accent); }
+:root[data-site-style="business"] .n1chat-light { --bot: var(--surface-2); }
+:root[data-site-style="business"] .n1chat-send:disabled { opacity: .6; }
+
+/* ---- The 404 page and the other small standalone pages ---- */
+:root[data-site-style="business"] .nf h1 { color: var(--accent); }
+:root[data-site-style="business"] .nf a:hover { background: var(--accent-wash); }
+
+/* ---- No page transitions or fades of any kind ---- */
+:root[data-site-style="business"]::view-transition-group(*), :root[data-site-style="business"]::view-transition-old(*), :root[data-site-style="business"]::view-transition-new(*) { animation-duration: 0s !important; }

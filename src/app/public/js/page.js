@@ -1,17 +1,33 @@
 // src/app/public/js/page.js - Rain, wordmark, chat, and the white rabbit; the rain itself is shared with 1NEON,
 // and the menu, footer year, and 1NEON fade come from js/frame.js.
 
-import { rain, controls, TEXT } from "/shared/rain.js";
-import { whiteRabbit } from "/js/white-rabbit.js";
+// The rain, the white rabbit, and the wordmark's decode are the stylized look's; in the business style (html[data-site-style], js/theme.js)
+// none of them is loaded or started, the landing is a plain page, and Neo still loads. Changing style reloads the landing, so each load
+// runs one look from its first frame.
+const business = document.documentElement.dataset.siteStyle === "business";
+const header = document.querySelector("header");
+{
+  // ---- Business: a still page; the bar is the light bar from the first frame, and Neo follows the light or dark theme ----
+  if (business) {
+    document.body.classList.add("woke");
+    header.classList.add("light");
+    // The style switch shows on the first screen only (css/business.css, [data-top])
+    const top = () => header.toggleAttribute("data-top", scrollY < innerHeight * 0.6);
+    addEventListener("scroll", top, { passive: true }); top();
+  }
+}
+const stylized = business ? null : await Promise.all([import("/shared/rain.js"), import("/js/white-rabbit.js")]);
+const TEXT = stylized ? stylized[0].TEXT : "";
 {
   // ---- Matrix rain, with the hero pane, header, and controls as glass ----
   // A rabbit drops in now and then, only when the egg is ready, and never under the text or controls
   let egg = null;
   const canvas = document.getElementById("rain"), lens = document.getElementById("lens");
-  const header = document.querySelector("header");
   header.dataset.lensRadius = "0";
   const reduce = matchMedia("(prefers-reduced-motion: reduce)");
-  const r = rain({
+  const { rain, controls } = stylized ? stylized[0] : {};
+  const { whiteRabbit } = stylized ? stylized[1] : {};
+  const r = business ? null : rain({
     canvas,
     lens,
     // The top bar is one pane edge to edge, the size of the light bar it becomes, rather than a pane per item
@@ -27,12 +43,15 @@ import { whiteRabbit } from "/js/white-rabbit.js";
     },
   });
   const ctl = document.querySelector(".rainctl");
-  controls(ctl, r);
-  egg = whiteRabbit({ rain: r, root: document.getElementById("whiteRabbit") });
+  if (!business) {
+    controls(ctl, r);
+    egg = whiteRabbit({ rain: r, root: document.getElementById("whiteRabbit") });
+  }
 
   // Waking up: rain and its controls fade as the light content takes over
   const veil = document.querySelector(".veil");
   function onScroll() {
+    if (business) return;
     const t = Math.min(1, scrollY / (innerHeight * 0.9));
     canvas.style.opacity = lens.style.opacity = String(0.6 * (1 - t));
     veil.style.opacity = String(1 - t);
@@ -42,12 +61,13 @@ import { whiteRabbit } from "/js/white-rabbit.js";
     ctl.style.pointerEvents = gone ? "none" : "auto";
     ctl.inert = gone;
     header.classList.toggle("light", t > 0.95);
+    // The style switch (and not the theme switch) shows on the first screen (css/frame.css, [data-top])
+    header.toggleAttribute("data-top", t < 0.95);
     document.body.classList.toggle("woke", t >= 1);
     // A paused rain still needs the lens redrawn as panes move
     if (!r.running) r.refract();
   }
-  addEventListener("scroll", onScroll, { passive: true });
-  onScroll();
+  if (!business) { addEventListener("scroll", onScroll, { passive: true }); onScroll(); }
 
   // The menu (js/frame.js) made the rain controls inert while open; closing restores their own state
   document.addEventListener("n1:menu", (e) => { if (!e.detail.open) onScroll(); });
@@ -63,7 +83,7 @@ import { whiteRabbit } from "/js/white-rabbit.js";
   }).catch(() => { /* chat unavailable: contact links remain */ });
 
   // ---- Wordmark decode: each letter cycles glyphs, then locks in, left to right ----
-  if (!reduce.matches) {
+  if (!reduce.matches && !business) {
     const spans = [...document.querySelectorAll(".brand .dec")];
     const finals = spans.map((el) => el.textContent);
     const total = finals.join("").length;
