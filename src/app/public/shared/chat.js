@@ -61,12 +61,12 @@ function feedbackMark() {
   return svg;
 }
 
-// The neon1 mark (the same paths as the favicon), drawn in the current text color
+// The neon1 mark (the site logo's eight arcs), drawn in the current text color
 function mark() {
   const svg = document.createElementNS(SVG, "svg");
-  for (const [k, v] of Object.entries({ viewBox: "0 0 64 64", fill: "none", stroke: "currentColor", "stroke-width": "6", "stroke-linecap": "round", "aria-hidden": "true", class: "n1chat-mark" })) svg.setAttribute(k, v);
+  for (const [k, v] of Object.entries({ viewBox: "3 4 58 58", fill: "none", stroke: "currentColor", "stroke-width": "3.4", "stroke-linecap": "round", "aria-hidden": "true", class: "n1chat-mark" })) svg.setAttribute(k, v);
   const path = document.createElementNS(SVG, "path");
-  path.setAttribute("d", "M6 6a24 24 0 0 1 24 24v30M6 18a12 12 0 0 1 12 12v30M34 6a24 24 0 0 1 24 24v30M34 18a12 12 0 0 1 12 12v30");
+  path.setAttribute("d", "M6 6a24 24 0 0 1 24 24v30M6 12a18 18 0 0 1 18 18v30M6 18a12 12 0 0 1 12 12v30M6 24a6 6 0 0 1 6 6v30M34 6a24 24 0 0 1 24 24v30M34 12a18 18 0 0 1 18 18v30M34 18a12 12 0 0 1 12 12v30M34 24a6 6 0 0 1 6 6v30");
   svg.append(path);
   return svg;
 }

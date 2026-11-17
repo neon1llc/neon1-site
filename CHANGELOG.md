@@ -3,6 +3,7 @@
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
+- Neo's mark is the site logo's eight arcs, drawn finer so they stay distinct at its size.
 
 ## v0.80.0
 
