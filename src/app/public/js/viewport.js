@@ -22,7 +22,11 @@
   // hero and wordmark, and only then scroll to the section. Until js/views.js has landed there (it removes this class), the page
   // shows blank paper. It is hidden (opacity 0, with no transition so focus still works), not faded: the browser's page transition is the only fade on a move. A timer clears it if that script never does.
   // A remembered position (Back, Forward, reload) holds the page the same way
-  const memo = history.state && history.state.pos;
+  let memo = history.state && history.state.pos;
+  try {
+    const t = (performance.getEntriesByType("navigation")[0] || {}).type, m = JSON.parse(sessionStorage.getItem("n1.spots") || "{}")[location.pathname + location.search];
+    if ((t === "back_forward" || t === "reload") && m && m.v) memo = m;
+  } catch { /* storage off */ }
   if (/^#(services|projects|process|why|work|faq|contact|case-[\w-]+)$/.test(location.hash) || (memo && (memo.v || memo.dy > 2))) {
     root.classList.add("arriving");
     setTimeout(() => root.classList.remove("arriving"), 2500);
