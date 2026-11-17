@@ -49,6 +49,24 @@
     transform var(--t-base) var(--ease-open), opacity var(--t-base) var(--ease), visibility var(--t-base) !important;
 }
 
+/* ---- Dark to awake: eyes coming up into the light (Pradeep, 2026-11-17) ----
+   Going dark stays quick, as if closing the eyes. Going light is slow: the dark page stays and the light one comes up over it in a
+   long ease-out, a little too bright at first and settling, so the glow and the rain-green fade out gently together with the text and lines.
+   js/theme.js wraps the change in a view transition and sets html.dawn-vt for its length (browsers without one get html.theme-dawn:
+   the same colors on a slow transition). Reduced motion never sets either, so it is a plain change */
+:where(:root) { --dawn: 2.2s; --dawn-ease: cubic-bezier(.3, .05, .2, 1); }
+:root.dawn-vt::view-transition-group(*) { animation-duration: var(--dawn) !important; animation-timing-function: var(--dawn-ease) !important; }
+:root.dawn-vt::view-transition-old(*), :root.dawn-vt::view-transition-new(*) { mix-blend-mode: normal !important; animation-duration: var(--dawn) !important; animation-timing-function: var(--dawn-ease) !important; }
+:root.dawn-vt::view-transition-old(*) { animation: none !important; }
+:root.dawn-vt::view-transition-new(*) { animation-name: dawn-in !important; animation-fill-mode: both !important; }
+@keyframes dawn-in { from { opacity: 0; filter: brightness(1.16) saturate(.82); } 45% { opacity: .55; } to { opacity: 1; filter: brightness(1) saturate(1); } }
+:root.theme-dawn, :root.theme-dawn *, :root.theme-dawn *::before, :root.theme-dawn *::after {
+  transition: background-color var(--dawn) var(--dawn-ease), color var(--dawn) var(--dawn-ease), border-color var(--dawn) var(--dawn-ease),
+    fill var(--dawn) var(--dawn-ease), stroke var(--dawn) var(--dawn-ease), box-shadow var(--dawn) var(--dawn-ease), text-shadow var(--dawn) var(--dawn-ease),
+    transform var(--t-base) var(--ease-open), opacity var(--t-base) var(--ease), visibility var(--t-base) !important;
+}
+@media (prefers-reduced-motion: reduce) { :root.dawn-vt::view-transition-new(*) { animation: none !important; } }
+
 /* ---- Neon: the theme switch flickers like a sign ----
    The logo, its wordmark, and Neo's launcher are the neon: lighting up (matrix) they ease up smoothly once and hold;
    going dark is one quick flick. Dark-green links, arrows, and headings take the same run with a shallower dip, so they read as
