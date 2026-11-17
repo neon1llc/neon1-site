@@ -6,9 +6,12 @@
 // auto-retry). Without this script the form stays hidden and an email link shows instead.
 
 import { swap, watchDirection } from "/shared/motion.js";
+import { startGate } from "/js/form-gate.js";
 
 const form = document.getElementById("rb-form");
 if (form) {
+  // The bot gate's challenge is asked for now and solved while the form is filled (js/form-gate.js)
+  const gate = startGate("bug");
   const status = document.getElementById("rb-status");
   const done = document.getElementById("rb-done");
   const list = document.getElementById("rb-list");
@@ -168,6 +171,7 @@ if (form) {
     const f = form.elements;
     let answer;
     try {
+      const gateAnswer = await gate.take();
       const r = await post("/1NEON/api/bug", {
         headers: { "content-type": "application/json", "x-1neon": "1" },
         body: JSON.stringify({
@@ -177,6 +181,7 @@ if (form) {
           images: picked.length,
           page: referrer, theme, browser, viewport: viewport(),
           website: f.website.value,
+          ...(gateAnswer ? { gate: gateAnswer } : {}),
         }),
       }, WAIT);
       if (!r.ok) {
@@ -188,6 +193,9 @@ if (form) {
           for (const [n, m] of Object.entries(fields)) if (f[n]) { fieldError(f[n], String(m)); first ??= f[n]; }
           first?.focus();
           status.textContent = "A field above needs another look.";
+        } else if (j.error === "gate") {
+          // Nothing was sent, and a fresh check is already under way
+          status.textContent = "The page's check didn't pass. Try sending again.";
         } else {
           status.textContent = `${r.status === 429 || r.status === 503 ? j.message || NO_NET : NO_NET}`;
         }
@@ -249,6 +257,4 @@ if (form) {
     swap(done, form).then(() => form.elements.what.focus());
   });
 
-  document.getElementById("rb-nojs").hidden = true;
-  form.hidden = false;
 }

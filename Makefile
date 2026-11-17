@@ -36,12 +36,12 @@ GITLEAKS_IMAGE := ghcr.io/gitleaks/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79
 
 # Plain make shows the help
 .DEFAULT_GOAL := help
-.PHONY: help content corpus-tag static corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf releases-export blog blog-check blog-export report-bug report-bug-check check html js links logic frame frame-check release rollback manifest rehash models budget secrets behavior perf serve three icons deploy invalidate verify indexnow dev-build dev-check dev-push dev-drop dev-rollback dev-gate dev-signout dev-allow dev-deny
+.PHONY: help content corpus-tag static corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf releases-export blog blog-check blog-export report-bug report-bug-check feedback feedback-check check html js links logic frame frame-check release rollback manifest rehash models budget secrets behavior perf serve three icons deploy invalidate verify indexnow dev-build dev-check dev-push dev-drop dev-rollback dev-gate dev-signout dev-allow dev-deny
 
 
 ##@ Checks
 
-check: html js links logic frame-check corpus-check knowledge-check blog-check report-bug-check static release manifest models budget secrets ## Run every static check
+check: html js links logic frame-check corpus-check knowledge-check blog-check report-bug-check feedback-check static release manifest models budget secrets ## Run every static check
 
 # Every page served as HTML, so each check covers the tour as well as the home page
 PAGES := $(SITE_DIR)/index.html $(SITE_DIR)/tour.html
@@ -50,7 +50,7 @@ KNOWLEDGE_PAGES = $(shell find $(SITE_DIR)/knowledge -name index.html 2>/dev/nul
 # The blog's generated pages, checked the same way
 BLOG_PAGES = $(shell find $(SITE_DIR)/blog -name index.html 2>/dev/null | sort)
 # The report-a-bug page, checked the same way
-REPORT_PAGES = $(wildcard $(SITE_DIR)/report-bug/index.html)
+REPORT_PAGES = $(wildcard $(SITE_DIR)/report-bug/index.html $(SITE_DIR)/feedback/index.html)
 
 html: ## Validate every page against the HTML standard
 	@command -v npx >/dev/null 2>&1 || { echo "html: install Node.js to get npx"; exit 1; }
@@ -82,7 +82,7 @@ frame-check: ## Fail if any page's bar or footer differs from index.html
 
 # Everything the corpus writes into the site, in one step. The Knowledge Center and blog folders are built here,
 # never committed, so a fresh checkout runs this before make serve or make check
-content: corpus knowledge blog report-bug ## Write every corpus-made part of the site from the newest neon1-corpus release
+content: corpus knowledge blog report-bug feedback ## Write every corpus-made part of the site from the newest neon1-corpus release
 
 corpus-tag: ## Print the neon1-corpus tag this build reads
 	@echo $(CORPUS_TAG)
@@ -129,6 +129,12 @@ report-bug: ## Write the report-a-bug page (/report-bug/) from the shared page s
 
 report-bug-check: ## Fail if the report-a-bug page differs from what the shell writes
 	@node scripts/report-bug.mjs check $(SITE_DIR)
+
+feedback: ## Write the feedback page (/feedback/) from the shared page shell
+	@node scripts/feedback.mjs sync $(SITE_DIR)
+
+feedback-check: ## Fail if the feedback page differs from what the shell writes
+	@node scripts/feedback.mjs check $(SITE_DIR)
 
 blog-check: blog-export knowledge-export ## Fail if the blog differs from CORPUS_TAG
 	@node scripts/blog.mjs check $(SITE_DIR) .corpus/export/blog .corpus/export/knowledge

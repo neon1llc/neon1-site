@@ -38,7 +38,8 @@ const overrides = new Map(); // path -> async (body) => body | null (null answer
 const server = http.createServer(async (req, res) => {
   requests.push(req.url);
   const pathname = decodeURIComponent(new URL(req.url, "http://local").pathname);
-  const file = path.join(SITE, pathname === "/" ? "index.html" : pathname);
+  // A folder URL answers with its index.html, as the CDN does
+  const file = path.join(SITE, pathname === "/" ? "index.html" : pathname.endsWith("/") ? pathname + "index.html" : pathname);
   if (!file.startsWith(SITE + path.sep) || !fs.existsSync(file) || !fs.statSync(file).isFile()) { res.statusCode = 404; res.end(); return; }
   let body = fs.readFileSync(file);
   const hook = overrides.get(pathname);
@@ -372,6 +373,119 @@ for (const motion of ["reduce", "no-preference"]) {
       await page.goForward();
       expect(await landed(page, "migration"), "Forward did not return to case-migration");
       expect(!errors.length, "page errors", errors);
+    } finally { await context.close(); }
+  });
+}
+
+
+// ---- Back, Forward, and reload return to the exact spot ----
+// Every page remembers where each history entry was left (js/views.js on the home page, js/scroll-memory.js elsewhere). These
+// walk the paths that lost a spot before: a section reached from the menu, a page opened at a #fragment (the browser's smooth jump
+// to it beat the restored scroll), a phone whose toolbar shifts the layout as the next page starts, and reduced motion
+// Chromium reports a cross-document page transition that a quick Back cuts short as an uncaught error; it is the browser's, not the page's
+const realErrors = (errors) => errors.filter((e) => !/ViewTransition/.test(e));
+const spot = (page) => page.evaluate(() => ({ url: location.pathname + location.hash, y: Math.round(scrollY) }));
+const sameSpot = (a, b) => a.url === b.url && Math.abs(a.y - b.y) <= 3;
+const jump = async (page, y) => { await page.evaluate((y) => scrollTo({ top: y, behavior: "instant" }), y); await page.waitForTimeout(900); };
+// Leave through the bar's logo (a link to "/"), wait for the home page to show, then come Back
+const leaveAndBack = async (page) => {
+  await page.evaluate(() => document.querySelector('.n1-bar a[href="/"], header a[href="/"]').click());
+  await page.waitForLoadState("load");
+  await page.waitForTimeout(2200);
+  await page.goBack();
+  await page.waitForTimeout(2500);
+};
+const HAS_KC = fs.existsSync(path.join(SITE, "knowledge", "index.html"));
+const PHONE = { viewport: { width: 390, height: 780 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 };
+for (const [label, options] of [
+  ["motion, wide", { reducedMotion: "no-preference" }],
+  ["motion, phone", { reducedMotion: "no-preference", ...PHONE }],
+  ["reduced motion, wide", { reducedMotion: "reduce" }],
+  ["reduced motion, phone", { reducedMotion: "reduce", ...PHONE }],
+]) {
+  const phone = !!options.isMobile;
+  check("browser", `back: contact from the menu, scrolled, a link out, then Back returns to the same spot (${label})`, async () => {
+    const { page, context, errors } = await open(options);
+    try {
+      await page.waitForTimeout(1200);
+      if (phone) { await page.locator("#menuBtn").click(); await page.waitForTimeout(500); await page.locator('.menu a[href="#contact"], .menu a[href="/#contact"]').first().click(); }
+      else await page.locator('.links a[data-view="contact"]').click();
+      await page.waitForTimeout(2000);
+      await page.evaluate(() => scrollBy(0, 130));
+      await page.waitForTimeout(1200);
+      const link = page.locator('a[href^="/knowledge/engagement/services/"]').first();
+      await link.evaluate((a) => a.scrollIntoView({ block: "center", behavior: "instant" }));
+      await page.waitForTimeout(1200);
+      const box = await link.boundingBox(), before = await spot(page);
+      await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+      await page.waitForURL(/\/knowledge\//);
+      await page.waitForLoadState("load");
+      await page.waitForTimeout(1000);
+      await page.goBack();
+      await page.waitForTimeout(3000);
+      const after = await spot(page);
+      expect(sameSpot(before, after), "Back did not return to the spot the page was left at", { before, after });
+      expect(!realErrors(errors).length, "page errors", errors);
+    } finally { await context.close(); }
+  });
+}
+
+for (const [label, options] of [["wide", {}], ["phone", PHONE]]) {
+  if (!HAS_KC) break;
+  check("browser", `back: a Knowledge Center page opened at a #fragment, scrolled, left, then Back returns to the scroll (${label})`, async () => {
+    const { page, context, errors } = await open({ reducedMotion: "no-preference", ...options }, "/knowledge/engagement/services/#which-one-sounds-like-you");
+    try {
+      await page.waitForTimeout(1800);
+      await jump(page, 1100);
+      const before = await spot(page);
+      await leaveAndBack(page);
+      const after = await spot(page);
+      expect(sameSpot(before, after), "Back went to the #fragment instead of where the page was left", { before, after });
+      await page.reload({ waitUntil: "load" });
+      await page.waitForTimeout(2500);
+      expect(sameSpot(before, await spot(page)), "reload did not keep the spot", { before, now: await spot(page) });
+      expect(!realErrors(errors).length, "page errors", errors);
+    } finally { await context.close(); }
+  });
+
+  check("browser", `back: On this page's jump is its own entry; Back and Forward move between the two spots (${label})`, async () => {
+    const { page, context, errors } = await open({ reducedMotion: "no-preference", ...options }, "/knowledge/engagement/services/");
+    try {
+      await page.waitForTimeout(1800);
+      await jump(page, 700);
+      const first = await spot(page);
+      const sel = options.isMobile ? ".kc-toc-fold a[href^='#']" : ".kc-toc-side a[href^='#']";
+      if (options.isMobile) { await page.evaluate(() => { document.querySelector(".kc-toc-fold").open = true; }); await page.waitForTimeout(300); }
+      await page.evaluate((sel) => document.querySelectorAll(sel)[2].click(), sel);
+      await page.waitForTimeout(1800);
+      if (options.isMobile) await page.evaluate(() => { document.querySelector(".kc-toc-fold").open = false; });
+      await jump(page, (await spot(page)).y + 260);
+      const second = await spot(page);
+      expect(second.url !== first.url, "the jump did not start a history entry", { first, second });
+      await leaveAndBack(page);
+      expect(sameSpot(second, await spot(page)), "Back from the next page did not return to the jump's spot", { second, now: await spot(page) });
+      await page.goBack();
+      await page.waitForTimeout(2000);
+      expect(sameSpot(first, await spot(page)), "Back within the page did not return to the spot before the jump", { first, now: await spot(page) });
+      await page.goForward();
+      await page.waitForTimeout(2000);
+      expect(sameSpot(second, await spot(page)), "Forward did not return to the jump's spot", { second, now: await spot(page) });
+      expect(!realErrors(errors).length, "page errors", errors);
+    } finally { await context.close(); }
+  });
+
+  check("browser", `back: a blog post and the Knowledge Center index return to their scroll (${label})`, async () => {
+    const { page, context, errors } = await open({ reducedMotion: "no-preference", ...options }, "/blog/why-neon1/");
+    try {
+      for (const [url, y] of [["/blog/why-neon1/", 900], ["/knowledge/", 1500]]) {
+        await page.goto(origin + url, { waitUntil: "load" });
+        await page.waitForTimeout(1800);
+        await jump(page, y);
+        const before = await spot(page);
+        await leaveAndBack(page);
+        expect(sameSpot(before, await spot(page)), `Back did not return to the scroll on ${url}`, { before, now: await spot(page) });
+      }
+      expect(!realErrors(errors).length, "page errors", errors);
     } finally { await context.close(); }
   });
 }
