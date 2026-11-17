@@ -52,7 +52,7 @@ function serve() {
 const PORTAL = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>portal stand-in</title>
 <link rel="stylesheet" href="/shared/neon1.css"><link rel="stylesheet" href="/shared/chat.css">
 <style>:root{--glass-r:10px}body{margin:0;min-height:100vh;background:#f2f4f2}</style></head>
-<body><div id="root"><main><h1>Projects</h1></main></div>
+<body><div id="root"><main><h1>Projects</h1><button id="outside-action" type="button" style="position:fixed;top:10px;left:10px;z-index:20" onclick="window.actionClicks = (window.actionClicks || 0) + 1">Outside action</button></main></div>
 <script type="module">
 import { chat } from "/shared/chat.js";
 window.widget = chat({ className: "n1chat-portal n1chat-right", light: () => !document.querySelector(".signin"), watch: [document.getElementById("root")] });
@@ -153,6 +153,20 @@ let base;
       await page.locator(sel.close).click();
       await page.waitForTimeout(500);
     }
+    await ctx.close();
+  });
+
+  await check("an outside control closes Neo on phone and still receives its click", async () => {
+    const { ctx, page } = await portal(browser);
+    await page.setViewportSize({ width: 390, height: 800 });
+    await open(page);
+    await page.evaluate(() => {
+      const button = document.querySelector("#outside-action");
+      button.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, button: 0 }));
+      button.click();
+    });
+    assert.equal(await page.evaluate(() => window.actionClicks), 1, "the original control action should still run");
+    await page.waitForFunction(() => document.querySelector(".n1chat").hidden);
     await ctx.close();
   });
 
