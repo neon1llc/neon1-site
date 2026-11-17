@@ -75,7 +75,8 @@
 
 /* ---- The question box, send, and the route to a person ---- */
 .n1chat-form { display: flex; gap: 8px; padding: 10px 14px 6px; border-top: 1px solid var(--soft); }
-.n1chat-input { flex: 1; resize: none; font: 14px/1.4 var(--sans); color: var(--fg); background: var(--field);
+.n1chat-input { flex: 1 1 auto; min-width: 0; width: 100%; min-height: 40px; max-height: 160px; height: auto; field-sizing: content; overflow-y: hidden;
+  resize: none; font: 14px/1.4 var(--sans); color: var(--fg); background: var(--field);
   border: 1px solid var(--soft); border-radius: var(--glass-r); padding: 8px 10px; }
 .n1chat-input::placeholder { color: var(--muted); }
 /* Phones zoom the page in on any field under 16px when it takes focus; at 16px they only raise the

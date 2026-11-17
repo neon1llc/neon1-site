@@ -137,6 +137,25 @@ let base;
   base = `http://127.0.0.1:${server.address().port}`;
   const browser = await chromium.launch();
 
+  await check("the question field grows with wrapped text and shrinks when cleared on phone and desktop", async () => {
+    const { ctx, page } = await portal(browser);
+    for (const width of [320, 1280]) {
+      await page.setViewportSize({ width, height: 800 });
+      await open(page);
+      const field = page.locator(sel.input);
+      const oneLine = (await field.boundingBox()).height;
+      await field.fill("A question that wraps to several lines inside the chat bar. ".repeat(8));
+      const wrapped = (await field.boundingBox()).height;
+      assert.ok(wrapped > oneLine, `${width}px field stayed ${oneLine}px high after wrapping`);
+      await field.fill("Short");
+      const short = (await field.boundingBox()).height;
+      assert.ok(short < wrapped, `${width}px field stayed ${wrapped}px high after its text was cleared`);
+      await page.locator(sel.close).click();
+      await page.waitForTimeout(500);
+    }
+    await ctx.close();
+  });
+
   // ---- SITE-02: one request owner; "new" cancels it, and nothing stale lands afterwards ----
 
   for (const late of ["answer", "error", "network failure"]) {
