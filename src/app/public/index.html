@@ -85,7 +85,7 @@
   <!-- The frame every page shares, then this page's own layout -->
   <link rel="stylesheet" href="/css/frame.css" />
   <link rel="stylesheet" href="/css/site.css" />
-  <link rel="stylesheet" href="/css/business.css" />
+  <link rel="stylesheet" href="/css/sentinel.css" />
 </head>
 <body>
   <a class="skip" href="#main">skip to content</a>
@@ -126,19 +126,19 @@
         <!-- /frame:actions -->
       </ul>
       <!-- frame:theme -->
-      <!-- Light (awake) or dark (matrix): a switch with the sun on the left and the moon on the right, for every part
+      <!-- Light or dark mode: a switch with the sun on the left and the moon on the right, for every part
            of the site but the landing's rain, where it stays hidden. js/theme.js sets it and keeps the choice -->
-      <button class="theme-sw" type="button" role="switch" aria-checked="false" aria-label="Dark theme" title="awake or matrix">
+      <button class="theme-sw" type="button" role="switch" aria-checked="false" aria-label="Dark mode" title="light or dark">
         <svg class="theme-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" /><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6" /></svg>
         <svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.6A8.2 8.2 0 0 1 9.4 4a8.2 8.2 0 1 0 10.6 10.6Z" /></svg>
         <span class="theme-knob" aria-hidden="true"></span>
       </button>
       <!-- /frame:theme -->
-      <!-- Style: stylized (the rain and the neon) or business (plain). Only on the landing's first screen, where the theme switch would
-           sit, hidden once the page scrolls; its pick wins on every page (js/theme.js, css/business.css) -->
-      <button class="theme-sw style-sw" type="button" role="switch" aria-checked="false" aria-label="Style: stylized or business" title="Style: stylized or business">
+      <!-- Theme: matrix (the rain and the neon) or sentinel (plain). Only on the landing's first screen, where the theme switch would
+           sit, hidden once the page scrolls; its pick wins on every page (js/theme.js, css/sentinel.css) -->
+      <button class="theme-sw style-sw" type="button" role="switch" aria-checked="false" aria-label="matrix or sentinel" title="matrix or sentinel">
         <svg class="theme-sun" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.5v6M12 3.5v9M17 3.5v5M7 14v6.5M12 16.5v4M17 12v8.5" /></svg>
-        <svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path class="biz-case" d="M3.5 8h17v11.5h-17zM8.5 8V5.5h7V8M3.5 13h17" /></svg>
+        <svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path class="sentinel-case" d="M3.5 8h17v11.5h-17zM8.5 8V5.5h7V8M3.5 13h17" /></svg>
         <span class="theme-knob" aria-hidden="true"></span>
       </button>
       <!-- frame:menu-button -->
