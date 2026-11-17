@@ -57,7 +57,7 @@
 /* ---- The bar, the menu, buttons, links ---- */
 :root[data-site-style="sentinel"] .n1-bar.light .n1-logo { color: var(--accent); }
 :root[data-site-style="sentinel"] .n1-bar.light { background: rgb(var(--page-rgb) / .94); box-shadow: 0 1px 0 rgb(var(--ink-rgb) / .12); }
-:root[data-site-style="sentinel"] .menu { background: rgb(var(--page-rgb) / .98); backdrop-filter: none; }
+:root[data-site-style="sentinel"] .menu { background: var(--page); backdrop-filter: none; }
 :root[data-site-style="sentinel"] .menu a { color: var(--ink); font-weight: 600; }
 :root[data-site-style="sentinel"] .menu :is(.m-first, .m-split)::before { border-top-color: rgb(var(--ink-rgb) / .2); }
 :root[data-site-style="sentinel"] :focus-visible, :root[data-site-style="sentinel"] .menu :focus-visible { outline-color: var(--accent); }
