@@ -103,7 +103,10 @@
 
   // Native scrolling stays in charge without Motion or with reduced motion
   const M = window.Motion;
+  // Without steering (no Motion, or reduced motion) js/scroll-memory.js, loaded right after this script, remembers each history
+  // entry's spot and shows the page; with steering, the memory below does and tells that script to stand aside
   if (!M || reduce.matches) return;
+  window.__n1ScrollMemory = true;
   const { animate, stagger } = M;
 
   // Gesture feel and easing curves
@@ -132,6 +135,7 @@
   const visited = new Set([hero]);
   const menu = document.getElementById("menu");
   let off = false; // reduced motion turned on mid-visit
+  let forgetSaved = () => {}; // set where the position is remembered, further down
   const paused = () => off || !menu.hidden || document.body.classList.contains("case-open") || document.body.classList.contains("n1chat-open") || document.body.classList.contains("white-rabbit-on");
   // The ask neon1 window scrolls on its own; page steering never takes its wheel, touch, or keys
   const inChat = (node) => node instanceof Element && !!node.closest(".n1chat");
@@ -495,6 +499,7 @@
     // Every section link puts its #section in the address, so the view can be shared; only the logo goes home to "/".
     // The top bar's Contact link points at /#contact so it also works from other pages, which is why it carries data-view
     history.replaceState(null, "", a.dataset.view === "top" ? "/" : "#" + id);
+    forgetSaved(); // the entry's state was just cleared: save where it ends up, even if that is where the last save was
     goTo(i, { link: true });
     // Keyboard focus follows the view, so the next Tab continues inside it (AS-02); the logo keeps its own
     if (!a.dataset.view) window.n1focus?.(id);
@@ -601,7 +606,15 @@
   // Where this history entry was last scrolled, kept in the entry itself (history.state), so Back, Forward and
   // reload return to the exact spot however the visitor got there (menu link, wheel, keys, touch, scrollbar).
   // It is stored as a view plus the distance inside it, which survives font and layout shifts better than raw pixels.
-  const memo = history.state && history.state.pos;
+  // The site keeps one more record, in sessionStorage (this tab only, never sent anywhere): the spot of each page at the moment a link
+  // on it was pressed, by page address. Coming back by Back, Forward, or reload it wins over the entry's own state and the #section,
+  // because those can be reset or corrupted while a browser leaves the page (iOS), and a visitor who scrolled from the top has no #section at all
+  const SPOTS = "n1.spots", pageKey = location.pathname + location.search;
+  const savedSpot = () => { try { return JSON.parse(sessionStorage.getItem(SPOTS) || "{}")[pageKey] || null; } catch { return null; } };
+  const navType = (performance.getEntriesByType && performance.getEntriesByType("navigation")[0] || {}).type;
+  let backish = navType === "back_forward" || navType === "reload";
+  const spotNow = () => { const m = backish && savedSpot(); return m && m.v ? m : history.state && history.state.pos; };
+  const memo = spotNow();
   const memoAt = memo ? (memo.v ? views.findIndex((v) => v.id === memo.v) : memo.i) : -1;
   const aimAt = memo && memoAt >= 0 && (memoAt > 0 || memo.dy > 2) ? memoAt : -1;
   // The scroll position to land on: the remembered spot, else the top of the linked view
@@ -616,23 +629,76 @@
   const land = () => { if (wantsLanding && !lastInput && !touched && !settling) { scrollTo(0, aim()); sync(); } };
   land();
 
+  // ---- Coming back to the page: the remembered view, else the linked #section, is the truth ----
+  // Some browsers (DuckDuckGo and Safari on iOS among them) show the page from their cache, reset or restore the scroll after
+  // load, or shift the layout as the toolbar settles. For the first seconds after the page is shown, until the visitor touches it,
+  // a page resting on any other view than the remembered one (this entry's saved spot, else the section named in the address) is
+  // put back on that view's remembered spot
+  let hands = true, shownAt = performance.now();
+  for (const ev of ["wheel", "touchstart", "pointerdown", "keydown"]) addEventListener(ev, () => { hands = false; }, { capture: true, passive: true });
+  const expected = () => {
+    const m = spotNow(), i = m ? (m.v ? views.findIndex((v) => v.id === m.v) : m.i) : -1;
+    if (m && i >= 0 && (i > 0 || m.dy > 2)) return { i, y: Math.min(range(i)[0] + m.dy, maxY()) };
+    const el = location.hash.length > 1 && document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    const j = views.indexOf(el && el.closest ? el.closest(".view") : null);
+    return j > 0 ? { i: j, y: range(j)[0] } : null;
+  };
+  const settleBack = () => {
+    if (!hands || off || settling || pullDir || fingers || performance.now() - shownAt > 4000) return;
+    if (document.body.classList.contains("case-open") || document.body.classList.contains("n1chat-open")) return;
+    const e = expected();
+    if (e && indexAt(scrollY) !== e.i) { scrollTo(0, e.y); sync(); }
+  };
+  addEventListener("pageshow", (ev) => {
+    if (ev.persisted) backish = true; // shown again from the browser's cache: the same as coming back
+    hands = true; shownAt = performance.now();
+    requestAnimationFrame(() => requestAnimationFrame(settleBack));
+    for (const t of [200, 600, 1500, 3000]) setTimeout(settleBack, t);
+  });
+  addEventListener("resize", settleBack);
+  if (document.fonts) document.fonts.ready.then(settleBack);
+
   // Remember the position: once the page rests, when it is hidden or left, and just before a link is followed
-  let lastSaved = "";
-  function remember() {
+  // A page being left can change shape under the same scroll (a phone's toolbar and the visible height shift as the next page starts
+  // to load, which moves every view's top), so leaving only saves a scroll the rest save has not stored yet, taken from the last
+  // scroll seen; a position unchanged since the last save keeps that save, measured while the page stood still
+  // Safari already points history.state at the page being returned to when the page being left gets its pagehide, so a save made
+  // while leaving only counts when the entry in hand carries this visit's token; otherwise the page would write its own spot
+  // over the one it is going back to
+  const memToken = Math.random().toString(36).slice(2);
+  let lastSaved = "", lastSavedY = NaN, seenY = scrollY;
+  function remember(leaving) {
     // Until the visitor has moved, a restored or linked page is still landing: keep the older memory
     if (wantsLanding && !lastInput && !touched && performance.now() < 4000) return;
     if (document.body.classList.contains("case-open") || document.body.classList.contains("n1chat-open") || off) return;
-    const i = indexAt(scrollY), v = views[i];
-    const pos = { v: v.id || "", i, dy: Math.max(0, Math.round(scrollY - range(i)[0])) };
+    if (leaving && (Math.abs(seenY - lastSavedY) <= 2 || !(history.state && history.state.pos && history.state.pos.t === memToken))) return;
+    const at = leaving ? seenY : scrollY;
+    const i = indexAt(at), v = views[i];
+    const pos = { v: v.id || "", i, dy: Math.max(0, Math.round(at - range(i)[0])), t: memToken };
     const key = pos.v + "|" + pos.i + "|" + pos.dy;
     if (key === lastSaved) return;
-    try { history.replaceState({ ...history.state, pos }, ""); lastSaved = key; } catch { /* Safari limits how often the entry may change */ }
+    try { history.replaceState({ ...history.state, pos }, ""); lastSaved = key; lastSavedY = at; } catch { /* Safari limits how often the entry may change */ }
   }
   let rememberTimer = 0;
-  addEventListener("scroll", () => { clearTimeout(rememberTimer); rememberTimer = setTimeout(remember, 250); }, { passive: true });
-  addEventListener("pagehide", remember);
-  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") remember(); });
-  document.addEventListener("click", (e) => { if (e.target.closest && e.target.closest("a[href]")) remember(); }, true);
+  addEventListener("scroll", () => { seenY = scrollY; clearTimeout(rememberTimer); rememberTimer = setTimeout(remember, 250); }, { passive: true });
+  addEventListener("pagehide", () => remember(true));
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") remember(true); });
+  const keepSpot = () => {
+    if (document.body.classList.contains("case-open") || document.body.classList.contains("n1chat-open") || off) return;
+    const i = indexAt(scrollY), v = views[i];
+    try {
+      const all = JSON.parse(sessionStorage.getItem(SPOTS) || "{}");
+      all[pageKey] = { v: v.id || "", i, dy: Math.max(0, Math.round(scrollY - range(i)[0])), t: Date.now() };
+      const keys = Object.keys(all);
+      if (keys.length > 40) delete all[keys[0]];
+      sessionStorage.setItem(SPOTS, JSON.stringify(all));
+    } catch { /* storage off: the entry's own state still serves */ }
+  };
+  // Pressed, before the next page starts to load: the page still stands as the visitor saw it
+  for (const ev of ["pointerdown", "click"]) document.addEventListener(ev, (e) => { if (e.target.closest && e.target.closest("a[href]")) keepSpot(); }, true);
+  document.addEventListener("click", (e) => { if (e.target.closest && e.target.closest("a[href]")) { seenY = scrollY; remember(); } }, true);
+  // A section link clears the entry's memory (below), so the next rest saves again even at an unchanged spot
+  forgetSaved = () => { lastSaved = ""; lastSavedY = NaN; clearTimeout(rememberTimer); rememberTimer = setTimeout(remember, 700); };
 
   // The page may show itself now: viewport.js held it as blank paper while it waited to land on the section
   const arrived = () => document.documentElement.classList.remove("arriving");
