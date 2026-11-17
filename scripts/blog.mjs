@@ -135,7 +135,7 @@ ${posts.map(card).join("\n")}
       <section class="kc-shelf" aria-labelledby="blog-posts-h">
         <div class="kc-shelf-head">
           <h2 id="blog-posts-h">Posts</h2>
-          <p>Newest first. <a href="${FEED}">Follow with RSS</a>.</p>
+          <p class="kc-shelf-desc">Newest first. <a href="${FEED}">Follow with RSS</a>.</p>
         </div>
 ${list}
       </section>
