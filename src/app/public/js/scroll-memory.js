@@ -19,7 +19,13 @@
   // ---- Landing: hold the remembered spot until the reader takes over ----
   // spec is the spot being held (null: nothing remembered, the browser's own #fragment jump stands). It is held for the first
   // seconds of a visit, or of a Back/Forward within the page, until the reader scrolls, taps, or types
-  let spec = read(history.state), since = 0, moved = false;
+  // One more record, in sessionStorage (this tab only, never sent anywhere): the spot of each page when a link on it was pressed, by page
+  // address. Coming back by Back, Forward, or reload it wins over the entry's own state and the browser's own restoration, which a browser
+  // can reset or corrupt as it leaves a page (iOS); the entry's state still serves same-page entries and when storage is off
+  const SPOTS = "n1.spots", pageKey = location.pathname + location.search;
+  const stored = () => { try { const m = JSON.parse(sessionStorage.getItem(SPOTS) || "{}")[pageKey]; return m && typeof m.y === "number" ? m : null; } catch { return null; } };
+  const navType = (performance.getEntriesByType && performance.getEntriesByType("navigation")[0] || {}).type;
+  let spec = ((navType === "back_forward" || navType === "reload") && stored()) || read(history.state), since = 0, moved = false;
   const wants = () => (spec.w === innerWidth ? spec.y : Math.round(spec.f * room()));
   const landing = () => spec !== null && !moved && performance.now() - since < (since ? 1500 : 4000);
   // Instantly, whatever the page's smooth scrolling says, so a fragment jump already under way is cut short
@@ -62,6 +68,24 @@
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") save(true); });
   // The entry being left keeps its spot before a link moves on (a #fragment link starts a new entry)
   document.addEventListener("click", (e) => { if (e.target instanceof Element && e.target.closest("a[href]")) { moved = true; saved = ""; save(); } }, true);
+
+  const keep = () => {
+    try {
+      const all = JSON.parse(sessionStorage.getItem(SPOTS) || "{}"), y = Math.round(scrollY);
+      all[pageKey] = { y, f: y / room(), w: innerWidth, t: Date.now() };
+      const keys = Object.keys(all);
+      if (keys.length > 40) delete all[keys[0]];
+      sessionStorage.setItem(SPOTS, JSON.stringify(all));
+    } catch { /* storage off */ }
+  };
+  // Pressed, before the next page starts to load: the page still stands as the reader saw it
+  for (const ev of ["pointerdown", "click"]) document.addEventListener(ev, (e) => { if (e.target instanceof Element && e.target.closest("a[href]") && !landing()) keep(); }, true);
+  // Shown again from the browser's cache: the same as coming back
+  addEventListener("pageshow", (e) => {
+    if (!e.persisted) return;
+    const m = stored();
+    if (m) { spec = m; since = performance.now(); moved = false; land(); }
+  });
 
   // ---- Back and Forward between entries of this same page (#fragment links) ----
   // Manual restoration leaves the page where it was, so the entry's own spot is put back; an entry never scrolled takes its fragment, else the top

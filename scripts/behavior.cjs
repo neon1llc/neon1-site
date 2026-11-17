@@ -430,6 +430,39 @@ for (const [label, options] of [
   });
 }
 
+// A browser that resets or restores the scroll after the page is shown (iOS WebKit from its cache, a toolbar settling) must not leave the
+// home page on the first section while the address names another (some fire popstate on load, which must not stop the correction): the remembered view, else the linked #section, wins
+for (const [label, options] of [["wide", {}], ["phone", PHONE]]) {
+  check("browser", `back: Back puts the page on the spot saved when its link was pressed, whatever the browser did meanwhile (${label})`, async () => {
+    // As iOS can: the entry's own state is corrupted as the page is left, then the scroll is reset after the page shows, with a stray popstate
+    const reset = () => {
+      addEventListener("pagehide", () => { try { history.replaceState({ pos: { v: "services", i: 0, dy: 0 } }, ""); } catch {} });
+      addEventListener("pageshow", () => { if ((performance.getEntriesByType("navigation")[0] || {}).type === "back_forward") { setTimeout(() => dispatchEvent(new PopStateEvent("popstate", { state: null })), 50); for (const t of [400, 900]) setTimeout(() => scrollTo(0, 800), t); } });
+    };
+    const { page, context, errors } = await open({ reducedMotion: "no-preference", ...options, init: reset });
+    try {
+      await page.waitForTimeout(1200);
+      if (options.isMobile) { await page.locator("#menuBtn").click(); await page.waitForTimeout(500); await page.locator('.menu a[href="#contact"], .menu a[href="/#contact"]').first().click(); }
+      else await page.locator('.links a[data-view="contact"]').click();
+      await page.waitForTimeout(2000);
+      await page.evaluate(() => scrollBy(0, 130));
+      await page.waitForTimeout(1200);
+      const link = page.locator('a[href^="/knowledge/engagement/services/"]').first();
+      await link.evaluate((a) => a.scrollIntoView({ block: "center", behavior: "instant" }));
+      await page.waitForTimeout(1200);
+      const box = await link.boundingBox(), before = await spot(page);
+      await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+      await page.waitForURL(/\/knowledge\//);
+      await page.waitForTimeout(800);
+      await page.goBack();
+      await page.waitForTimeout(3500);
+      const after = await page.evaluate(() => { const c = document.getElementById("contact").getBoundingClientRect(); return { url: location.hash, inContact: c.top < innerHeight && c.bottom > 0, y: Math.round(scrollY) }; });
+      expect(after.inContact, "the page rests away from the contact view", { before, after });
+      expect(!realErrors(errors).length, "page errors", errors);
+    } finally { await context.close(); }
+  });
+}
+
 for (const [label, options] of [["wide", {}], ["phone", PHONE]]) {
   if (!HAS_KC) break;
   check("browser", `back: a Knowledge Center page opened at a #fragment, scrolled, left, then Back returns to the scroll (${label})`, async () => {
