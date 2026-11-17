@@ -66,6 +66,12 @@
 :root[data-site-style="sentinel"] .btn-ghost, :root[data-site-style="sentinel"] .n1-bar .links .portal { color: var(--accent); border-color: var(--ctl-line); background: transparent; }
 :root[data-site-style="sentinel"] :is(.btn-ghost, .links .portal):hover { background: var(--accent-wash); border-color: var(--accent); }
 :root[data-site-style="sentinel"] .links a:not(.btn):hover { color: var(--accent); }
+/* Form boundaries use the control token; invalid and selected fields retain their state colors */
+:root[data-site-style="sentinel"] :is(.cform, .rb-form) :is(input, textarea, select):not([aria-invalid="true"]),
+:root[data-site-style="sentinel"] .ctopic .pick { border-color: var(--ctl-line); }
+:root[data-site-style="sentinel"] .ctopic .pick:has(input:checked),
+:root[data-site-style="sentinel"] .ctopic .pick-other:has(input:not(:placeholder-shown)) { border-color: var(--accent); }
+:root[data-site-style="sentinel"] :is(.cform, .rb-form) select::picker(select) { border-color: var(--ctl-line); }
 /* The style switch over the landing's plain first screen is the quiet bar item it is everywhere else */
 :root[data-site-style="sentinel"] .n1-bar .theme-sw { background: var(--surface); }
 
