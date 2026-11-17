@@ -51,6 +51,30 @@
     flicker = setTimeout(() => root.classList.remove("flick-on", "flick-off"), 2400);
   }
 
+  // ---- Dark to awake is slow, as the eyes take the light after the dark (css/frame.css, "Dark to awake") ----
+  // The change runs inside a view transition (the light page comes up over the dark one); a browser without one eases the colors
+  // instead. Reduced motion or motion off: a plain change
+  function dawn(change) {
+    if (still.matches || root.dataset.motion === "off") { change(); return; }
+    root.classList.remove("flick-on", "flick-off", "theme-shift");
+    const done = () => root.classList.remove("dawn-vt", "theme-dawn");
+    if (typeof document.startViewTransition === "function") {
+      root.classList.add("dawn-vt");
+      try { document.startViewTransition(change).finished.then(done, done); } catch { done(); change(); }
+    } else {
+      const ms = parseFloat(getComputedStyle(root).getPropertyValue("--dawn")) * 1000 || 2200;
+      root.classList.add("theme-dawn");
+      change();
+      setTimeout(done, ms + 100);
+    }
+  }
+  // Every change of theme after the first load goes through here: leaving matrix is slow, entering it is the quick flick
+  function change(next) {
+    if (root.dataset.siteTheme === next) return;
+    if (root.dataset.siteTheme === "matrix") dawn(() => apply(next));
+    else { shift(next); apply(next); }
+  }
+
   apply(wanted());
 
   // ---- The switch in the bar: off is awake (sun, left), on is matrix (moon, right) ----
@@ -60,15 +84,14 @@
       b.addEventListener("click", () => {
         const next = root.dataset.siteTheme === "matrix" ? "awake" : "matrix";
         try { localStorage.setItem(KEY, next); } catch { /* not kept: this page still switches */ }
-        shift(next);
-        apply(next);
+        change(next);
       });
     });
   }
   if (document.readyState === "loading") addEventListener("DOMContentLoaded", wire); else wire();
 
   // ---- Staying in step: other tabs, and a page restored by Back ----
-  addEventListener("storage", (e) => { if (e.key === KEY) { shift(wanted()); apply(wanted()); } });
+  addEventListener("storage", (e) => { if (e.key === KEY) change(wanted()); });
   addEventListener("pageshow", (e) => { if (e.persisted && root.dataset.siteTheme !== wanted()) apply(wanted()); });
 })();
 

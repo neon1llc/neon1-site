@@ -4,6 +4,10 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+## v0.81.0
+- Switching from dark to awake is slow, like eyes taking the light after the dark: the light page comes up over the dark one in a long ease-out, a little bright at first, then settling, with the glow fading gently. Going dark stays quick. Reduced motion changes at once.
+- Neo's mark is the site logo's eight arcs, drawn finer so they stay distinct at its size.
+
 ## v0.80.0
 
 - "report a bug" in the footer becomes "report bug \ feedback": "report" is a plain muted word that leads both, the bug drawing sits before "bug" and the speech bubble before "feedback", each link ends in the outbound arrow, with the same .18em gap, the footer's backslash between them, and the pair's right edge and centering on Neo as before. Neo's panel has the same pair on its last row, with more room above it from the links over it.

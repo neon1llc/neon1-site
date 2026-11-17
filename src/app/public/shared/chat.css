@@ -9,7 +9,7 @@
   height: 48px; min-width: 48px; padding: 0 12px; border-radius: 24px; cursor: pointer;
   font: 500 13px var(--mono); letter-spacing: .02em; color: var(--neon); background: transparent;
   border: 1px solid var(--neon); transition: background-color .25s, color .25s, border-color .25s, box-shadow .25s; }
-.n1chat-launch:hover { background: rgba(0, 230, 118, .08); }
+.n1chat-launch:hover { background: rgba(108, 255, 168, .08); }
 .n1chat-launch .n1chat-mark { width: 22px; height: 22px; flex: none; }
 .n1chat-label { max-width: 0; opacity: 0; margin-left: 0; overflow: hidden; white-space: nowrap;
   transition: max-width .35s ease, opacity .25s ease, margin-left .35s ease; }
@@ -21,7 +21,7 @@
 .n1chat-hidden { display: none; }
 
 /* ---- The window: colors are variables, so the light look only swaps the palette ---- */
-.n1chat { --bg: rgba(13, 2, 8, .96); --fg: #d8f5e1; --line: rgba(0, 230, 118, .45); --soft: rgba(0, 230, 118, .2);
+.n1chat { --bg: rgba(13, 2, 8, .96); --fg: #d8f5e1; --line: rgba(108, 255, 168, .45); --soft: rgba(108, 255, 168, .2);
   --bot: rgba(0, 59, 0, .45); --you: rgba(108, 255, 168, .14); --muted: #84a98c; --accent: var(--neon);
   --accent-ink: var(--void); --field: rgba(255, 255, 255, .04); --link: var(--neon);
   position: fixed; left: max(16px, env(safe-area-inset-left)); bottom: var(--n1chat-bottom, max(16px, env(safe-area-inset-bottom))); z-index: 10; width: min(380px, calc(100vw - 32px));
