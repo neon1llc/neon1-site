@@ -8,6 +8,8 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - neon1.tech/feedback is a page of its own for a comment, a complaint, a concern, or a suggestion: what kind, what it is about (the report page's places, filled in from a `?from=` link or the page you came from), what you wrote, and an optional email for a reply. The page you came from, your theme, browser, and window size go with it, and the page says so. It sends to feedback@ through 1NEON's feedback route, and the confirmation shows a reference to quote.
 - The report and feedback pages show their form the moment they load. The "This form needs JavaScript" note no longer flashes first; it appears only when JavaScript is off.
 - The report and feedback forms ask 1NEON for a one-time bot-check challenge when they open and answer it in the background (js/form-gate.js), with no third-party script, so the page policy is unchanged. A send made a moment after the page opens waits a few seconds for the check before it goes.
+- Knowledge Center group headers ("For you", "About neon1") are set in the spaced uppercase monospace of the group names in the "On this page" menu, at the same size as before, so they stop reading as shouting.
+- Back, Forward, and reload return to the exact spot on every page: the home page, Knowledge Center documents and index, blog posts, and the report and feedback pages. Each history entry remembers its own scroll. Before, a page opened at a #section could come back at the section instead of where it was left, a phone's toolbar shifting as the next page started could save the wrong spot on the home page, and with reduced motion the home page came back a screen off and stayed blank for a moment.
 
 ## v0.79.0
 

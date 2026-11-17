@@ -97,6 +97,7 @@ ${main}
 
   <script type="module" src="/js/frame.js"></script>
   <script type="module" src="/js/neo.js"></script>
+  <script type="module" src="/js/scroll-memory.js"></script>
 ${scripts.map((s) => `  <script type="module" src="${s}"></script>`).join("\n")}
 </body>
 </html>
