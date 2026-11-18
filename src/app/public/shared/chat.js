@@ -350,10 +350,10 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
   });
   // aria-modal follows the same width rule, so assistive technology hears what the keyboard gets
   const narrow = matchMedia("(max-width: 600px)");
-  // On phones Neo can cover controls in the page beneath it. A tap on one of those controls
-  // closes Neo first, while the original pointer/click still reaches the control.
+  // When Neo is open, a click on any page control closes it first, while the original
+  // pointer/click still reaches that control. This also covers controls rendered in portals.
   const dismissFromControl = (event) => {
-    if (!narrow.matches || panel.hidden || !(event.target instanceof Element)) return;
+    if (panel.hidden || !(event.target instanceof Element)) return;
     if (panel.contains(event.target) || launcher.contains(event.target)) return;
     if (!event.target.closest("button, a[href], input, select, textarea, [role=button]")) return;
     open(false);
