@@ -285,13 +285,13 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 .n1-bar.light ~ .menu { background: var(--paper); }
 .n1-bar.light ~ .menu a { color: var(--brand); text-shadow: none; }
 .n1-bar.light ~ .menu a:hover, .n1-bar.light ~ .menu a:focus-visible { color: var(--ink); text-shadow: none; text-decoration: underline; text-underline-offset: 6px; }
-.n1-bar.light.menu-open { background: transparent; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; border-color: transparent; }
 /* The Matrix rain landing keeps its own dark surface in either mode, so its open menu follows the rain rather than the light bar */
 :root[data-site-style="matrix"][data-rain-screen] .n1-bar.light ~ .menu {
   --paper: #0F0A0D; --page: #0F0A0D; --page-rgb: 15 10 13;
   --ink: #E9FFEE; --ink-rgb: 237 241 237; --brand: #6CFFA8; --brand-rgb: 108 255 168; --mark: #00B84F; --neon: #6CFFA8;
   background: var(--page);
 }
+:root[data-site-style="matrix"][data-rain-screen] .n1-bar.light.menu-open { background: transparent; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; border-color: transparent; }
 :root[data-site-style="matrix"][data-rain-screen] .n1-bar.light ~ .menu a { color: var(--neon); text-shadow: 0 0 8px rgba(108,255,168,.3); }
 :root[data-site-style="matrix"][data-rain-screen] .n1-bar.light ~ .menu a:is(:hover, :focus-visible) { color: #e9ffee; text-shadow: 0 0 14px rgba(108,255,168,.75); text-decoration: none; }
 /* The phone menu occupies only the visible space below the fixed bar, so its list centers between the real bounds */
