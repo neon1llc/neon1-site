@@ -52,7 +52,7 @@ if (form) {
     try { const u = new URL(referrer); return u.origin === location.origin ? u.pathname : u.origin; } catch { return "no page"; }
   }
   const sentLine = document.getElementById("rb-sent");
-  const showSent = () => { sentLine.textContent = `Sent with it: the page you came from (${pageLabel()}), your ${theme} theme, ${browserName()}, and a ${innerWidth} by ${innerHeight} window.`; };
+  const showSent = () => { sentLine.textContent = `Sent with it: the page you came from (${pageLabel()}), your ${theme === "matrix" ? "dark" : "light"} mode, ${browserName()}, and a ${innerWidth} by ${innerHeight} window.`; };
   showSent();
   // The theme is read again at send time, and the line under the form follows a switch
   document.addEventListener("n1:theme", () => { theme = currentTheme(); showSent(); });

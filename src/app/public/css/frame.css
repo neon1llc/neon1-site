@@ -207,6 +207,20 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 :root:not([data-site-theme]) .menu-btn { margin-left: auto; }
 @media (forced-colors: active) { .theme-knob { border: 1px solid ButtonText; } .theme-sw svg { color: ButtonText; opacity: 1; } }
 
+/* ---- Style switch: matrix (the rain, the neon) or sentinel (plain), on the landing's first screen only ----
+   The same control as the theme switch (stripes for the rain on the left, a briefcase for sentinel on the right), in the very place
+   the theme switch takes once the page scrolls: it overlays the theme switch's box (a negative margin of its width plus the bar's gap; the same
+   absolute spot in the wide margin), shows while the bar carries [data-top] (js/page.js), and the theme switch steps aside meanwhile.
+   Over the rain it is clear glass in the neon, like the bar's other items there. Its pick wins on every page (css/sentinel.css) */
+.theme-sw.style-sw { margin-left: -72px; } /* its own width plus the bar's 20px gap */
+@media (min-width: 1320px) { .theme-sw.style-sw { margin: 0; } }
+.n1-bar:not([data-top]) .style-sw { display: none; }
+.n1-bar[data-top] .theme-sw:not(.style-sw) { opacity: 0; visibility: hidden; pointer-events: none; }
+.n1-bar:not(.light) .theme-sw.style-sw { opacity: 1; visibility: visible; pointer-events: auto; background: rgba(13,2,8,.4); color: #84a98c;
+  --brand: var(--neon); --brand-rgb: 108 255 168; --ctl-line: rgba(108,255,168,.4); }
+.style-sw .sentinel-case { fill: none; stroke: currentColor; stroke-width: 1.8; }
+.style-sw[aria-checked="false"] .theme-sun, .style-sw[aria-checked="true"] .theme-moon { color: var(--brand); }
+
 /* ---- Phone menu: below the width the links need, they fold into a full-screen menu ---- */
 .menu-btn { margin-left: auto; display: none; border-radius: var(--glass-r); }
 /* On the light bar the menu button, the theme switch, and 1NEON share one surface and one thin theme-green border */
@@ -235,8 +249,8 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
  * it fits and let it start at the top when it doesn't, so no height breakpoint decides (1024x600, zoom).
  * The top padding is set so the links read centered between the logo row and the screen's bottom edge:
  * the first link is lowercase with no tall letters and the last has descenders, so equal boxes look low */
-.menu { position: fixed; inset: 0; z-index: 7; display: grid; overflow-y: auto; overscroll-behavior: contain;
-  padding: calc(68px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom)); background: rgba(13,2,8,.94); backdrop-filter: blur(6px); }
+.menu { position: fixed; inset: 0 auto auto 0; z-index: 7; display: grid; box-sizing: border-box; block-size: 100dvh; inline-size: 100%; overflow-y: auto; overscroll-behavior: contain;
+  padding: calc(64px + env(safe-area-inset-top)) 16px calc(clamp(16px, 5dvh, 48px) + env(safe-area-inset-bottom)); background: rgba(13,2,8,.94); backdrop-filter: blur(6px); }
 .menu[hidden] { display: none; }
 /* Opening fades the overlay in and lifts the links a little; closing fades it out (js/frame.js waits) */
 .menu:not([hidden]) { animation: menu-in .28s cubic-bezier(.28,.11,.32,1) both; }
@@ -271,7 +285,24 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 .n1-bar.light ~ .menu { background: var(--paper); }
 .n1-bar.light ~ .menu a { color: var(--brand); text-shadow: none; }
 .n1-bar.light ~ .menu a:hover, .n1-bar.light ~ .menu a:focus-visible { color: var(--ink); text-shadow: none; text-decoration: underline; text-underline-offset: 6px; }
-.n1-bar.light.menu-open { background: transparent; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; border-color: transparent; }
+/* The Matrix rain landing keeps its own dark surface in either mode, so its open menu follows the rain rather than the light bar */
+:root[data-site-style="matrix"][data-rain-screen] .menu {
+  --paper: #0F0A0D; --page: #0F0A0D; --page-rgb: 15 10 13;
+  --ink: #E9FFEE; --ink-rgb: 237 241 237; --brand: #6CFFA8; --brand-rgb: 108 255 168; --mark: #00B84F; --neon: #6CFFA8;
+  background: var(--page);
+}
+:root[data-site-style="matrix"][data-rain-screen] .n1-bar.light.menu-open { background: transparent; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; border-color: transparent; }
+:root[data-site-style="matrix"][data-rain-screen] .menu a { color: var(--neon); text-shadow: 0 0 8px rgba(108,255,168,.3); }
+:root[data-site-style="matrix"][data-rain-screen] .menu a:is(:hover, :focus-visible) { color: #e9ffee; text-shadow: 0 0 14px rgba(108,255,168,.75); text-decoration: none; }
+/* The phone menu occupies only the visible space below the fixed bar, so its list centers between the real bounds */
+@media (max-width: 700px) {
+  .menu { inset-block: calc(64px + env(safe-area-inset-top)) 0; block-size: auto; padding-block: clamp(12px, 2.5dvh, 24px) calc(clamp(12px, 2.5dvh, 24px) + env(safe-area-inset-bottom));
+    background: var(--page); backdrop-filter: none; }
+  .menu ul { gap: clamp(8px, 1.5dvh, 16px); }
+  .menu a { font-size: clamp(24px, 4.4dvh, 38px); }
+  .menu .m-first, .menu .m-split { margin-top: clamp(12px, 2.2dvh, 22px); }
+  .menu .m-first::before, .menu .m-split::before { top: calc(1px - clamp(12px, 2.2dvh, 22px)); }
+}
 
 /* ---- Light surface: everything inside .awake reads dark green and ink on paper ---- */
 .awake { position: relative; z-index: 2; color: var(--text);
