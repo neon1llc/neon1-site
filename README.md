@@ -40,7 +40,7 @@ Everything is static HTML written at build time, so search engines, link preview
 
 ## Theme family and mode
 
-The site stores family (Matrix or Sentinel) and mode (light or dark) separately in `neon1.style` and `neon1.mode`. `js/theme.js` applies the chosen look before paint. Switching family on the landing updates the page in place; Matrix effects load only when chosen. Pages use the tokens in `css/frame.css` and `css/sentinel.css` so colors follow both axes. 1NEON keeps its own account and browser theme settings.
+The site stores family (Matrix or Sentinel) and mode (light or dark) separately in `neon1.style` and `neon1.mode`. Sentinel and light are the defaults. `js/theme.js` applies the chosen look before paint and shares explicit choices with 1NEON on the same origin. Switching family on the landing updates the page in place; Matrix effects load only when chosen. Pages use the tokens in `css/frame.css` and `css/sentinel.css` so colors follow both axes.
 
 ## Content Security Policy
 

@@ -5,6 +5,7 @@
 (() => {
   const KEY_MODE = "neon1.mode";
   const KEY_STYLE = "neon1.style";
+  const KEY_SHARED = "neon1.theme.shared";
   const root = document.documentElement;
   const still = matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -12,7 +13,7 @@
   const memory = new Map();
   const read = (key) => { if (memory.has(key)) return memory.get(key); try { return localStorage.getItem(key); } catch { return null; } };
   const write = (key, value) => { try { localStorage.setItem(key, value); memory.delete(key); return true; } catch { memory.set(key, value); return false; } };
-  const style = () => ["sentinel", "business"].includes(read(KEY_STYLE)) ? "sentinel" : "matrix";
+  const style = () => ["matrix", "stylized"].includes(read(KEY_STYLE)) ? "matrix" : "sentinel";
   const dark = (look) => ["plugged", "desert-of-the-real", "matrix", "lamp"].includes(look);
   const mode = () => {
     const saved = read(KEY_MODE);
@@ -106,6 +107,7 @@
       b.title = "light or dark";
       b.addEventListener("click", () => {
         write(KEY_MODE, mode() === "dark" ? "light" : "dark");
+        write(KEY_SHARED, "1");
         change(wantedLook());
       });
     });
@@ -115,6 +117,7 @@
         const next = root.dataset.siteStyle === "sentinel" ? "matrix" : "sentinel";
         write(KEY_MODE, mode());
         write(KEY_STYLE, next);
+        write(KEY_SHARED, "1");
         change(lookFor(next, mode()));
       });
     });
