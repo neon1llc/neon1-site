@@ -59,6 +59,18 @@
   // bar inert too, so the menu can't open over them, and the menu makes their openers unreachable.
   // Looked up each time, because the chat window arrives after the page starts; missing parts are skipped
   const menu = document.getElementById("menu"), menuBtn = document.getElementById("menuBtn");
+  // The Matrix landing menu is dark only while its rain hero is the active screen
+  const rain = document.getElementById("rain"), nextView = rain && document.querySelector(".view");
+  if (nextView) {
+    const syncRainScreen = () => {
+      const nextTop = nextView.getBoundingClientRect().top + scrollY - 64;
+      document.documentElement.toggleAttribute("data-rain-screen", scrollY < nextTop - 2);
+    };
+    syncRainScreen();
+    addEventListener("scroll", syncRainScreen, { passive: true });
+    addEventListener("resize", syncRainScreen, { passive: true });
+    addEventListener("pageshow", syncRainScreen);
+  }
   const behind = () => document.querySelectorAll(".top, .awake, .rainctl, .n1chat-launch, .n1chat");
   // Closing by Escape, the button, or a click outside gives focus back to the button. Choosing a link
   // doesn't: the page focuses where the link went (js/views.js), or the browser follows it (AS-02)
