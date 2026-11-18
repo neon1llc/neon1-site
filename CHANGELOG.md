@@ -4,6 +4,12 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+## v0.82.0
+
+### Changed
+- Matrix and Sentinel are independent of light and dark mode. The four named looks, saved preferences, and transition behavior carry through the site and portal.
+- Sentinel uses softened black and white grounds, plain mobile links, and a still presentation. Site menus scale and center within the visible phone viewport.
+- The Knowledge Center and blog share card spacing and typography. Neo's mobile input grows with wrapped text, and outside controls close its window.
 - The landing theme switch chooses Matrix or Sentinel without changing light or dark mode. Mode switches say “light or dark.” Existing saved preferences remain readable.
 - Matrix has Awake (light) and Plugged (dark). Sentinel has Providence (light) and Desert of the Real (dark), with a leaf-green palette based on #39AB56 and still presentation.
 - Site and 1NEON public screens share the family and mode. The profile uses the same four names, and an unrelated profile save preserves the landing's family choice.

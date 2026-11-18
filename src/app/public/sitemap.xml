@@ -5,7 +5,7 @@
   <!-- /1NEON/example is left out until it is pre-rendered with its own content; the canonical 1NEON help is /knowledge/faq/1neon-help/, listed below -->
   <!-- knowledge -->
   <url><loc>https://neon1.tech/knowledge/</loc><lastmod>2026-11-17</lastmod></url>
-  <url><loc>https://neon1.tech/knowledge/company/releases/</loc><lastmod>2026-11-17</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/company/releases/</loc><lastmod>2026-11-18</lastmod></url>
   <url><loc>https://neon1.tech/knowledge/company/about/</loc><lastmod>2026-11-15</lastmod></url>
   <url><loc>https://neon1.tech/knowledge/company/architecture/</loc><lastmod>2026-11-15</lastmod></url>
   <url><loc>https://neon1.tech/knowledge/company/glossary/</loc><lastmod>2026-11-15</lastmod></url>
@@ -67,7 +67,7 @@
   <url><loc>https://neon1.tech/knowledge/examples/release-and-handover/</loc><lastmod>2026-11-15</lastmod></url>
   <url><loc>https://neon1.tech/knowledge/policies/accessibility/</loc><lastmod>2026-11-15</lastmod></url>
   <url><loc>https://neon1.tech/knowledge/policies/ai-use/</loc><lastmod>2026-11-15</lastmod></url>
-  <url><loc>https://neon1.tech/knowledge/policies/cookies/</loc><lastmod>2026-11-16</lastmod></url>
+  <url><loc>https://neon1.tech/knowledge/policies/cookies/</loc><lastmod>2026-11-17</lastmod></url>
   <url><loc>https://neon1.tech/knowledge/policies/privacy/</loc><lastmod>2026-11-16</lastmod></url>
   <url><loc>https://neon1.tech/knowledge/policies/security/</loc><lastmod>2026-11-15</lastmod></url>
   <url><loc>https://neon1.tech/knowledge/policies/terms/</loc><lastmod>2026-11-16</lastmod></url>
