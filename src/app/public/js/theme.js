@@ -1,35 +1,51 @@
-// src/app/public/js/theme.js - The light ("awake") or dark ("matrix") look of every part of neon1.tech outside the
-// landing's rain: the home page's sections, the Knowledge Center, and the blog. The rain itself always stays dark.
-//
-// A plain blocking script in <head>, before the stylesheets, so the first paint already has the right theme and a
-// dark page never flashes white. It sets html[data-site-theme] (not data-theme, which 1NEON uses for its own setting
-// and which the shared stylesheets must never confuse with this). A visitor's pick is kept in localStorage under
-// "neon1.theme"; until they pick, the site is awake (light), whatever the device's own setting (Pradeep, 2026-11-15).
+// src/app/public/js/theme.js - Matrix or sentinel, with one independent light/dark preference across the site.
+// A blocking head script sets the look before paint. data-site-theme retains the CSS compatibility values
+// awake/matrix; data-site-look names awake, plugged, providence, or desert-of-the-real.
 
 (() => {
-  const KEY = "neon1.theme";
+  const KEY_MODE = "neon1.mode";
+  const KEY_STYLE = "neon1.style";
   const root = document.documentElement;
   const still = matchMedia("(prefers-reduced-motion: reduce)");
 
-  // ---- The theme: the visitor's pick, else awake ----
-  // Storage can be blocked (private windows, strict settings); then each page starts awake
-  const saved = () => {
-    try { const v = localStorage.getItem(KEY); return v === "matrix" || v === "awake" ? v : null; } catch { return null; }
+  // Keep the selected family and mode independent; old preferences migrate without losing their mode
+  const memory = new Map();
+  const read = (key) => { if (memory.has(key)) return memory.get(key); try { return localStorage.getItem(key); } catch { return null; } };
+  const write = (key, value) => { try { localStorage.setItem(key, value); memory.delete(key); return true; } catch { memory.set(key, value); return false; } };
+  const style = () => ["sentinel", "business"].includes(read(KEY_STYLE)) ? "sentinel" : "matrix";
+  const dark = (look) => ["plugged", "desert-of-the-real", "matrix", "lamp"].includes(look);
+  const mode = () => {
+    const saved = read(KEY_MODE);
+    if (saved === "light" || saved === "dark") return saved;
+    const legacy = read(style() === "sentinel" ? "neon1.theme.business" : "neon1.theme");
+    return dark(legacy) ? "dark" : "light";
   };
-  const wanted = () => saved() || "awake";
+  const lookFor = (family, mode) => family === "sentinel" ? (mode === "dark" ? "desert-of-the-real" : "providence") : (mode === "dark" ? "plugged" : "awake");
+  const wantedLook = () => lookFor(style(), mode());
+  write(KEY_MODE, mode());
 
-  // ---- Applying it: the attribute the CSS keys on, the switch's state, the browser bar's color ----
-  function apply(theme) {
-    root.dataset.siteTheme = theme;
-    document.querySelectorAll(".theme-sw").forEach((b) => b.setAttribute("aria-checked", String(theme === "matrix")));
-    // Light pages (the Knowledge Center, the blog) tint the browser's bar paper; in matrix it takes the dark ground.
-    // The home page's bar color is the landing's black in both themes, so it is left alone
+  // ---- Applying it: the attributes the CSS keys on, the switch's state, the browser bar's color ----
+  const BAR = { providence: "#F5F8F4", "desert-of-the-real": "#121A14" };
+  function apply(look) {
+    const biz = look === "providence" || look === "desert-of-the-real";
+    root.dataset.siteStyle = biz ? "sentinel" : "matrix";
+    root.dataset.siteLook = look;
+    root.dataset.siteTheme = dark(look) ? "matrix" : "awake";
+    document.querySelectorAll(".theme-sw:not(.style-sw)").forEach((b) => {
+      b.setAttribute("aria-checked", String(dark(look)));
+      b.title = "light or dark";
+    });
+    document.querySelectorAll(".style-sw").forEach((b) => b.setAttribute("aria-checked", String(biz)));
+    // Light pages (the Knowledge Center, the blog) tint the browser's bar paper; in plugged it takes the dark ground; sentinel takes its own
+    // plain grounds on every page, the landing included (its black belongs to the rain). The home page's bar color is otherwise left alone
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) {
       meta.dataset.awake ||= meta.content;
-      if (meta.dataset.awake.toUpperCase() === "#F2F4F2") meta.content = theme === "matrix" ? "#0F0A0D" : meta.dataset.awake;
+      if (biz) meta.content = BAR[look];
+      else if (meta.dataset.awake.toUpperCase() === "#F2F4F2") meta.content = dark(look) ? "#0F0A0D" : meta.dataset.awake;
+      else meta.content = meta.dataset.awake;
     }
-    document.dispatchEvent(new CustomEvent("n1:theme", { detail: { theme } }));
+    document.dispatchEvent(new CustomEvent("n1:theme", { detail: { theme: root.dataset.siteTheme, look, style: root.dataset.siteStyle } }));
   }
 
   // ---- A change eases, on the shared motion length; reduced motion makes it a plain change ----
@@ -46,7 +62,7 @@
     easing = setTimeout(() => root.classList.remove("theme-shift"), ms + 80);
     root.classList.remove("flick-on", "flick-off");
     void root.offsetWidth; // restart the animation if it was still running
-    root.classList.add(next === "matrix" ? "flick-on" : "flick-off");
+    root.classList.add(dark(next) ? "flick-on" : "flick-off");
     clearTimeout(flicker);
     flicker = setTimeout(() => root.classList.remove("flick-on", "flick-off"), 2400);
   }
@@ -68,31 +84,52 @@
       setTimeout(done, ms + 100);
     }
   }
-  // Every change of theme after the first load goes through here: leaving matrix is slow, entering it is the quick flick
+  // Every change of theme after the first load goes through here. Matrix: leaving matrix is slow, entering it is the quick flick.
+  // Sentinel: always one plain, instant change, with no flicker, fade, or easing at all (the effects belong to the matrix look)
+  let revision = 0;
   function change(next) {
-    if (root.dataset.siteTheme === next) return;
-    if (root.dataset.siteTheme === "matrix") dawn(() => apply(next));
+    const current = ++revision;
+    if (root.dataset.siteLook === next) return;
+    if (next === "providence" || next === "desert-of-the-real" || root.dataset.siteStyle === "sentinel") { apply(next); return; }
+    if (root.dataset.siteTheme === "matrix") dawn(() => { if (current === revision) apply(next); });
     else { shift(next); apply(next); }
   }
 
-  apply(wanted());
+  apply(wantedLook());
 
-  // ---- The switch in the bar: off is awake (sun, left), on is matrix (moon, right) ----
+  // ---- The switches in the bar ----
+  // Mode: off is light (sun, left), on is dark (moon, right), independent of family.
+  // Style: on the landing's first screen only; its pick is kept under KEY_STYLE and wins everywhere
   function wire() {
-    document.querySelectorAll(".theme-sw").forEach((b) => {
-      b.setAttribute("aria-checked", String(root.dataset.siteTheme === "matrix"));
+    document.querySelectorAll(".theme-sw:not(.style-sw)").forEach((b) => {
+      b.setAttribute("aria-checked", String(dark(wantedLook())));
+      b.title = "light or dark";
       b.addEventListener("click", () => {
-        const next = root.dataset.siteTheme === "matrix" ? "awake" : "matrix";
-        try { localStorage.setItem(KEY, next); } catch { /* not kept: this page still switches */ }
-        change(next);
+        write(KEY_MODE, mode() === "dark" ? "light" : "dark");
+        change(wantedLook());
+      });
+    });
+    document.querySelectorAll(".style-sw").forEach((b) => {
+      b.setAttribute("aria-checked", String(style() === "sentinel"));
+      b.addEventListener("click", () => {
+        const next = root.dataset.siteStyle === "sentinel" ? "matrix" : "sentinel";
+        write(KEY_MODE, mode());
+        write(KEY_STYLE, next);
+        change(lookFor(next, mode()));
       });
     });
   }
   if (document.readyState === "loading") addEventListener("DOMContentLoaded", wire); else wire();
 
   // ---- Staying in step: other tabs, and a page restored by Back ----
-  addEventListener("storage", (e) => { if (e.key === KEY) change(wanted()); });
-  addEventListener("pageshow", (e) => { if (e.persisted && root.dataset.siteTheme !== wanted()) apply(wanted()); });
+  // A family change re-applies in place; the landing starts its Matrix effects only when needed
+  addEventListener("storage", (e) => {
+    if (e.key === KEY_STYLE || e.key === KEY_MODE || e.key === null) change(wantedLook());
+  });
+  addEventListener("pageshow", (e) => {
+    if (!e.persisted) return;
+    if (root.dataset.siteLook !== wantedLook()) change(wantedLook());
+  });
 })();
 
 // ---- The cross-fade between pages: only for a move from one neon1 page to the next ----
@@ -105,6 +142,8 @@
 // Script-built stylesheets are not inline styles, so the strict CSP allows them. Reduced motion never fades.
 (() => {
   if (!("adoptedStyleSheets" in document) || typeof CSSStyleSheet !== "function") return;
+  // The sentinel theme has no page effects at all, so pages simply change
+  if (document.documentElement.dataset.siteStyle === "sentinel") return;
   const optIn = () => {
     try {
       const sheet = new CSSStyleSheet();

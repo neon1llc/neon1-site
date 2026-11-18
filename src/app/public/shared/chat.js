@@ -195,7 +195,17 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
   log.append(hello, chips);
 
   const form = el("form", "n1chat-form");
-  const input = el("textarea", "n1chat-input", null, { rows: "2", maxlength: String(LIMITS.chars), "aria-label": "Your question", "aria-describedby": "n1chat-note", placeholder: "Ask Neo" });
+  const input = el("textarea", "n1chat-input", null, { rows: "1", maxlength: String(LIMITS.chars), "aria-label": "Your question", "aria-describedby": "n1chat-note", placeholder: "Ask Neo" });
+  // Keep the box one line until wrapping needs more room, then scroll inside it past the limit
+  const fitInput = () => {
+    input.style.height = "auto";
+    const max = 160;
+    input.style.height = `${Math.min(input.scrollHeight, max)}px`;
+    input.style.overflowY = input.scrollHeight > max ? "auto" : "hidden";
+  };
+  input.addEventListener("input", fitInput);
+  addEventListener("resize", fitInput);
+  window.visualViewport?.addEventListener("resize", fitInput);
   const send = el("button", "n1chat-send", "send", { type: "submit" });
   form.append(input, send);
 
@@ -303,6 +313,7 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
     if (show) {
       launcher.classList.add("n1chat-hidden");
       panel.hidden = false;
+      requestAnimationFrame(fitInput);
       if (!reduce()) animate("n1chat-grow", GROW_MS, () => {});
       // Focus lands on the window, not the box, so phones don't raise the keyboard until someone taps in
       if (!panel.hasAttribute("tabindex")) panel.tabIndex = -1;
@@ -339,6 +350,16 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
   });
   // aria-modal follows the same width rule, so assistive technology hears what the keyboard gets
   const narrow = matchMedia("(max-width: 600px)");
+  // When Neo is open, a click on any page control closes it first, while the original
+  // pointer/click still reaches that control. This also covers controls rendered in portals.
+  const dismissFromControl = (event) => {
+    if (panel.hidden || !(event.target instanceof Element)) return;
+    if (panel.contains(event.target) || launcher.contains(event.target)) return;
+    if (!event.target.closest("button, a[href], input, select, textarea, [role=button]")) return;
+    open(false);
+  };
+  document.addEventListener("pointerdown", dismissFromControl, true);
+  document.addEventListener("click", dismissFromControl, true);
   const modality = () => panel.setAttribute("aria-modal", String(narrow.matches));
   modality();
   narrow.addEventListener?.("change", modality);

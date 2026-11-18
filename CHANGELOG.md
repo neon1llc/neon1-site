@@ -4,6 +4,13 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+## v0.82.0
+
+### Changed
+- Matrix and Sentinel are independent of light and dark mode. The four named looks, saved preferences, and transition behavior carry through the site and portal.
+- Sentinel uses softened black and white grounds, plain mobile links, and a still presentation. Site menus scale and center within the visible phone viewport.
+- The Knowledge Center and blog share card spacing and typography. Neo's mobile input grows with wrapped text, and outside controls close its window.
+
 ## v0.81.0
 - Switching from dark to awake is slow, like eyes taking the light after the dark: the light page comes up over the dark one in a long ease-out, a little bright at first, then settling, with the glow fading gently. Going dark stays quick. Reduced motion changes at once.
 - Neo's mark is the site logo's eight arcs, drawn finer so they stay distinct at its size.
