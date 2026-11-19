@@ -12,10 +12,12 @@ function page(values = {}, options = {}) {
   const storage = new Map(Object.entries(options.fresh || options.blocked ? values : { 'neon1.style': 'matrix', ...values })), listeners = {}, pending = [];
   const button = () => ({ attrs: {}, setAttribute(k, v) { this.attrs[k] = v; }, addEventListener(k, fn) { this[k] = fn; } });
   const mode = button(), family = button();
-  const root = { dataset: {}, classList: { add() {}, remove() {} } };
+  const links = [];
+  const root = { dataset: { ...options.dataset }, classList: { add() {}, remove() {} } };
   const document = { documentElement: root, readyState: 'complete', querySelector: () => null,
     querySelectorAll: (s) => s.includes(':not') ? [mode] : s === '.style-sw' ? [family] : [],
-    getElementById: () => null, dispatchEvent() {} };
+    getElementById: () => null, dispatchEvent() {}, createElement: () => ({}),
+    head: options.dataset ? { appendChild: (link) => links.push(link) } : undefined };
   if (options.transition) document.startViewTransition = (fn) => { pending.push(fn); return { finished: Promise.resolve() }; };
   vm.runInNewContext(source, { document, localStorage: {
     getItem(k) { if (options.blocked) throw Error('blocked'); return storage.get(k) ?? null; },
@@ -24,7 +26,7 @@ function page(values = {}, options = {}) {
     addEventListener: (k, fn) => { listeners[k] = fn; }, CustomEvent: function () {},
     setTimeout: () => 0, clearTimeout() {}, getComputedStyle: () => ({ getPropertyValue: () => '' }),
   });
-  return { root, storage, mode, family, listeners, pending };
+  return { root, storage, mode, family, listeners, pending, links };
 }
 
 // Each family switch preserves the mode, even when the old per-family choices disagree
@@ -82,4 +84,13 @@ test('readable storage with rejected writes retains the current page choice', ()
   assert.equal(p.root.dataset.siteLook, 'desert-of-the-real');
   p.mode.click();
   assert.equal(p.root.dataset.siteLook, 'providence');
+});
+
+// The landing's Matrix-only hints (rain and rabbit modules, the Matrix font) are added only for a Matrix visitor
+const hints = { matrixPreload: '/shared/rain.js /js/white-rabbit.js', matrixFont: '/fonts/mono.woff2' };
+test('Sentinel adds no preload hints, and Matrix adds the module and font hints', () => {
+  assert.equal(page({}, { fresh: true, dataset: hints }).links.length, 0);
+  const matrix = page({ 'neon1.style': 'matrix' }, { dataset: hints }).links;
+  assert.deepEqual(matrix.map((l) => [l.rel, l.href]), [['modulepreload', '/shared/rain.js'], ['modulepreload', '/js/white-rabbit.js'], ['preload', '/fonts/mono.woff2']]);
+  assert.equal(matrix[2].as, 'font');
 });

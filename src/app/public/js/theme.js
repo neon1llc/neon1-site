@@ -98,6 +98,17 @@
 
   apply(wantedLook());
 
+  // The landing names the modules and the font its Matrix look uses. Only a Matrix visitor preloads them, so Sentinel downloads none
+  if (root.dataset.siteStyle === "matrix" && document.head) {
+    const hint = (rel, href, extra = {}) => {
+      const link = document.createElement("link");
+      Object.assign(link, { rel, href }, extra);
+      document.head.appendChild(link);
+    };
+    for (const href of (root.dataset.matrixPreload || "").split(" ").filter(Boolean)) hint("modulepreload", href);
+    if (root.dataset.matrixFont) hint("preload", root.dataset.matrixFont, { as: "font", type: "font/woff2", crossOrigin: "anonymous" });
+  }
+
   // ---- The switches in the bar ----
   // Mode: off is light (sun, left), on is dark (moon, right), independent of family.
   // Style: on the landing's first screen only; its pick is kept under KEY_STYLE and wins everywhere
