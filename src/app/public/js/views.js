@@ -495,7 +495,8 @@
     const i = views.indexOf(v);
     if (i < 0) return;
     e.preventDefault();
-    if (!menu.hidden) document.getElementById("menuBtn").click();
+    // The menu's own click handler starts its fade before this document handler runs; don't restart that close
+    if (!menu.hidden && !menu.classList.contains("closing")) document.getElementById("menuBtn").click();
     // Every section link puts its #section in the address, so the view can be shared; only the logo goes home to "/".
     // The top bar's Contact link points at /#contact so it also works from other pages, which is why it carries data-view
     history.replaceState(null, "", a.dataset.view === "top" ? "/" : "#" + id);

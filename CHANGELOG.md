@@ -4,6 +4,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 - Sentinel is the default theme family, while light mode stays the default. Explicit theme choices are shared with the 1NEON menu switches. Email and phone links keep their outbound arrow and open their handler directly.
+- Choosing an in-page destination from the mobile menu no longer restarts the menu's close animation.
 
 ## v0.82.0
 
