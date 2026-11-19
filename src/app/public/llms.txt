@@ -35,7 +35,7 @@ neon1 is the independent engineering and technology consulting practice of neon1
 - [Before you buy a new tool](https://neon1.tech/knowledge/guides/before-you-buy/): Ten questions to ask before adding software to your business, so it fits, lasts, and lets you leave.
 - [Do you need a business associate agreement?](https://neon1.tech/knowledge/guides/do-you-need-a-baa/): A plain guide for health practices on when a vendor needs a BAA, and what to check before signing one.
 - [Getting ready for a first call](https://neon1.tech/knowledge/guides/first-call/): What to bring to a free 15-minute call with neon1.
-- [Free 1NEON accounts](https://neon1.tech/knowledge/guides/free-accounts/): Start without a call: make a free 1NEON account, write down what your project needs, then ask for an assessment or a call from your account.
+- [Free 1NEON accounts](https://neon1.tech/knowledge/guides/free-accounts/): Start before we talk: make a free 1NEON account, write down what your project needs, then ask for a free assessment and book the 15-minute call.
 - [A password manager for your family](https://neon1.tech/knowledge/guides/password-manager-for-family/): How to move a household onto a password manager, step by step, without locking anyone out.
 - [Cloud and AI engineering](https://neon1.tech/knowledge/guides/use-case-cloud/): Cloud architecture, infrastructure as code, delivery, migrations, and AI applications: when an independent engineer is worth bringing in, what I deliver, and how ownership stays with your team.
 - [Networks and connected systems](https://neon1.tech/knowledge/guides/use-case-networks/): Designing and integrating networks, devices, and connected environments: when it's worth doing, what I deliver, and which work belongs to licensed trades.
