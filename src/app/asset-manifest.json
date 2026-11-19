@@ -309,7 +309,7 @@
     "portrait": {
       "title": "Pradeep's photo on About",
       "origin": "first-party",
-      "made": "Pradeep's own photo, cropped square and resized to 480 and 960 pixels with no camera or location data. The NASA insignia behind him belongs to NASA and implies no endorsement.",
+      "made": "Pradeep's own photo, cropped square and resized to 380 pixels with no camera or location data.",
       "consumers": [
         "index.html"
       ]
@@ -380,20 +380,12 @@
       "sha256": "7a06a3a04aecf5533a9fe7ecf72b76fda7f37e5f0b8423230db9a60dfbddd06f",
       "asset": "og-card"
     },
-    "media/pradeep-480.jpg": {
-      "sha256": "b79a0dfef03897b564e7cf7c43136524c73350a3967d2737fee6278001f6f8dc",
+    "media/pradeep-380.jpg": {
+      "sha256": "f90cebd2c2972ee77678874efe142881eaf459bedb4a6a5a14baa6c0e39d9eb1",
       "asset": "portrait"
     },
-    "media/pradeep-480.webp": {
-      "sha256": "e6dfffe7d65cffe7aeac79a20b5e72091d54bfc26144f67ce457fca152361626",
-      "asset": "portrait"
-    },
-    "media/pradeep-960.jpg": {
-      "sha256": "b61da0aa0cf8498522ab271f0e74614604197dd190272c50fc520d60136226ed",
-      "asset": "portrait"
-    },
-    "media/pradeep-960.webp": {
-      "sha256": "be1c815298f00af69d9691e0736c98852c232b9751c362f56b169248258b1de3",
+    "media/pradeep-380.webp": {
+      "sha256": "f2ace41b87bf4846025c9ba8b2ea46ea32106a9cc1702475f33cc0d72fa341b6",
       "asset": "portrait"
     },
     "media/white-rabbit-v8.m4a": {
