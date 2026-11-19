@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- src/app/public/index.html - The neon1.tech home page. Its styles and scripts are files under css/, js/, and shared/, since the CSP blocks inline scripts and styles. -->
-<html lang="en">
+<html lang="en" data-matrix-preload="/shared/rain.js /js/white-rabbit.js" data-matrix-font="/fonts/jetbrains-mono-latin-wght-normal.woff2">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -74,12 +74,10 @@
   <link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <!-- /frame:icons -->
-  <link rel="preload" href="/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
   <!-- Shared with 1NEON: fonts, brand tokens, rain layers, glass, and rain controls -->
   <link rel="stylesheet" href="/shared/neon1.css" />
   <link rel="stylesheet" href="/shared/chat.css" />
-  <link rel="modulepreload" href="/shared/rain.js" />
-  <link rel="modulepreload" href="/js/white-rabbit.js" />
+  <!-- The rain and rabbit modules and the Matrix font are preloaded by js/theme.js, and only for the Matrix look (data-matrix-* on html) -->
   <!-- The visible height, set before the first paint -->
   <script src="/js/viewport.js"></script>
   <!-- The frame every page shares, then this page's own layout -->

@@ -3,6 +3,7 @@
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
+- The Sentinel landing no longer downloads the rain, the white rabbit's entry module, or the Matrix monospace font; they are preloaded only when the Matrix look is chosen. Sentinel's first load is about 58 KB smaller on the wire and its largest contentful paint is faster, and Matrix is unchanged.
 - The Sentinel landing says what neon1 is: independent engineering and technology consulting, who it serves, the four services, selected work, and the next step (Discuss a project, email, or a free 15-minute call, with no account needed). The slogan stays. Matrix, when chosen, keeps the wordmark and slogan on the rain and shows none of this; the rain, the white rabbit, the theme switches and their saved choices are unchanged.
 - Services are four equal blocks, each with its buying situations and a fold for deliverables, what else fits better, limits, related work, and a next step: workflow automation, cloud and AI engineering, networks and connected systems, and security readiness. No service is defined by a single small example, and SOC 2 appears as one context within security readiness.
 - Client work opens with how its figures are measured and a key to the six kinds of evidence: neon1 engagements, subcontracted engagements, previous employment, independent projects, reconstructed demonstrations, and fictional examples. About, process, and contact use the corpus wording, and the sections run services, client work, about, process.
