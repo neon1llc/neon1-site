@@ -5,6 +5,7 @@
 (() => {
   const KEY_MODE = "neon1.mode";
   const KEY_STYLE = "neon1.style";
+  const KEY_SHARED = "neon1.theme.shared";
   const root = document.documentElement;
   const still = matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -12,7 +13,7 @@
   const memory = new Map();
   const read = (key) => { if (memory.has(key)) return memory.get(key); try { return localStorage.getItem(key); } catch { return null; } };
   const write = (key, value) => { try { localStorage.setItem(key, value); memory.delete(key); return true; } catch { memory.set(key, value); return false; } };
-  const style = () => ["sentinel", "business"].includes(read(KEY_STYLE)) ? "sentinel" : "matrix";
+  const style = () => ["matrix", "stylized"].includes(read(KEY_STYLE)) ? "matrix" : "sentinel";
   const dark = (look) => ["plugged", "desert-of-the-real", "matrix", "lamp"].includes(look);
   const mode = () => {
     const saved = read(KEY_MODE);
@@ -97,6 +98,17 @@
 
   apply(wantedLook());
 
+  // The landing names the modules and the font its Matrix look uses. Only a Matrix visitor preloads them, so Sentinel downloads none
+  if (root.dataset.siteStyle === "matrix" && document.head) {
+    const hint = (rel, href, extra = {}) => {
+      const link = document.createElement("link");
+      Object.assign(link, { rel, href }, extra);
+      document.head.appendChild(link);
+    };
+    for (const href of (root.dataset.matrixPreload || "").split(" ").filter(Boolean)) hint("modulepreload", href);
+    if (root.dataset.matrixFont) hint("preload", root.dataset.matrixFont, { as: "font", type: "font/woff2", crossOrigin: "anonymous" });
+  }
+
   // ---- The switches in the bar ----
   // Mode: off is light (sun, left), on is dark (moon, right), independent of family.
   // Style: on the landing's first screen only; its pick is kept under KEY_STYLE and wins everywhere
@@ -106,6 +118,7 @@
       b.title = "light or dark";
       b.addEventListener("click", () => {
         write(KEY_MODE, mode() === "dark" ? "light" : "dark");
+        write(KEY_SHARED, "1");
         change(wantedLook());
       });
     });
@@ -115,6 +128,7 @@
         const next = root.dataset.siteStyle === "sentinel" ? "matrix" : "sentinel";
         write(KEY_MODE, mode());
         write(KEY_STYLE, next);
+        write(KEY_SHARED, "1");
         change(lookFor(next, mode()));
       });
     });

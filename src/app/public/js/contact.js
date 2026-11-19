@@ -1,4 +1,4 @@
-// src/app/public/js/contact.js - The contact form, folded under "send me your use case": pick any of the
+// src/app/public/js/contact.js - The contact form, folded under "send a message": pick any of the
 // four services (or none), add your own words in "something else", say what's going on, and send.
 // Messages go to 1NEON's contact route, which mails neon1's inbox and no one else. Nothing is stored in
 // the browser or put in the URL. Without this script the fold stays hidden and the email and phone links

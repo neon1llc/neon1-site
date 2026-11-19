@@ -1,20 +1,20 @@
 # neon1
 
-> I connect the orders, intake, and invoices an owner-run business types in more than once, in two to four weeks. Also cloud and AI engineering, office networks, and security training. Queens, NY, and remote.
+> Independent engineering and technology consulting: workflow automation, cloud and AI engineering, networks and connected systems, and security readiness. Remote across the US, or on site near Queens, NY.
 
-neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site within about 30 miles of Queens, NY, or over a secure temporary connection. Contact: hello@neon1.tech, +1 424-326-3661, or the form at https://neon1.tech/#contact.
+neon1 is the independent engineering and technology consulting practice of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site within about 30 miles of Queens, NY, or over a secure temporary connection. Contact: hello@neon1.tech, +1 424-326-3661, or the form at https://neon1.tech/#contact.
 
-- [Home page](https://neon1.tech/): services, client work, process, code and resources, and questions
+- [Home page](https://neon1.tech/): services, client work, about, process, code and resources, and questions
 - [Knowledge center](https://neon1.tech/knowledge/): every public document below, most with a PDF to download
 - [Blog](https://neon1.tech/blog/): posts on local businesses' questions, the whats and whys of neon1, and lessons from its public repositories ([RSS](https://neon1.tech/blog/feed.xml))
 - Source for these documents: https://github.com/neon1llc/neon1-corpus (CC BY-ND 4.0)
 
 ## Company
 
-- [About neon1](https://neon1.tech/knowledge/company/about/): Who does the work, a few case studies, and how the practice is set up.
+- [About neon1](https://neon1.tech/knowledge/company/about/): Who does the work, the experience behind it, and how the practice is set up.
 - [How neon1 is built](https://neon1.tech/knowledge/company/architecture/): Diagrams of the website, the Knowledge Center, the 1NEON portal, Neo, and the infrastructure: how each runs in production and on the private dev copy, what data each keeps and why, and how a change reaches them.
 - [Glossary](https://neon1.tech/knowledge/company/glossary/): The names and technical terms used across neon1's documents, each in a sentence or two.
-- [Mission and promise](https://neon1.tech/knowledge/company/mission/): Why neon1 exists and the five things every client can count on.
+- [Mission and promise](https://neon1.tech/knowledge/company/mission/): What neon1 is for and the five things every client can count on.
 - [The names](https://neon1.tech/knowledge/company/names/): Where neon1, its slogan and its products get their names.
 - [State registration](https://neon1.tech/knowledge/company/registration/): neon1 LLC's public record with the New York Department of State: its ID, status, filings, registered agent, and assumed name, and how to check the live record yourself.
 - [Where I learn from](https://neon1.tech/knowledge/company/sources/): The standards bodies, government guides, and practitioners whose published work shapes how neon1 works, grouped by topic, with what each one is for.
@@ -23,7 +23,7 @@ neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site
 
 - [Capability statement](https://neon1.tech/knowledge/engagement/capabilities/): neon1 on one page for a buyer, partner, or procurement office: what it does, how it differs, work it has delivered, and the company's details.
 - [Contact](https://neon1.tech/knowledge/engagement/contact/): How to reach neon1, when, and what the first call covers.
-- [Services](https://neon1.tech/knowledge/engagement/services/): Mostly workflow projects for owner-run businesses, plus cloud engineering, office networks, and security training.
+- [Services](https://neon1.tech/knowledge/engagement/services/): Workflow automation, cloud and AI engineering, networks and connected systems, and security readiness, from a focused assessment to a complete implementation.
 - [How I price my work](https://neon1.tech/knowledge/engagement/pricing/): How a neon1 project is priced: a fixed price or a capped estimate, rough ranges, what the price includes, when it can change, and how paying works.
 - [How a project runs](https://neon1.tech/knowledge/engagement/process/): Listen, propose, decide, build and hand over.
 - [Publishing client work](https://neon1.tech/knowledge/engagement/publishing-client-work/): When and how a client's work appears as a case study: permission, anonymity, quotes, and figures.
@@ -34,12 +34,14 @@ neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site
 - [Backups you can trust](https://neon1.tech/knowledge/guides/backups-you-can-trust/): How a small office or household checks that its backups would restore what it needs.
 - [Before you buy a new tool](https://neon1.tech/knowledge/guides/before-you-buy/): Ten questions to ask before adding software to your business, so it fits, lasts, and lets you leave.
 - [Do you need a business associate agreement?](https://neon1.tech/knowledge/guides/do-you-need-a-baa/): A plain guide for health practices on when a vendor needs a BAA, and what to check before signing one.
-- [Getting ready for a first call](https://neon1.tech/knowledge/guides/first-call/): What to bring to a free 15-minute call with neon1.
-- [Free 1NEON accounts](https://neon1.tech/knowledge/guides/free-accounts/): Start without a call: make a free 1NEON account, write down what your project needs, then ask for an assessment or a call from your account.
+- [Getting ready for a first call](https://neon1.tech/knowledge/guides/first-call/): What to bring to a free 30-minute call with neon1.
+- [Free 1NEON accounts](https://neon1.tech/knowledge/guides/free-accounts/): Start before we talk: make a free 1NEON account, write down what your project needs, then ask for a free assessment and book the 30-minute call.
 - [A password manager for your family](https://neon1.tech/knowledge/guides/password-manager-for-family/): How to move a household onto a password manager, step by step, without locking anyone out.
-- [Use case: a cloud account you can trust](https://neon1.tech/knowledge/guides/use-case-cloud/): How a typical cloud engineering engagement goes for a small technical team: inventory, infrastructure as code, deploys, and tested recovery.
-- [Use case: security awareness for a team or family](https://neon1.tech/knowledge/guides/use-case-security-awareness/): How a typical plain-language security session goes, and what people leave able to do.
-- [Use case: one workflow, no more retyping](https://neon1.tech/knowledge/guides/use-case-workflows/): How a typical business workflow engagement goes, from the first call to a handover the staff can run.
+- [Cloud and AI engineering](https://neon1.tech/knowledge/guides/use-case-cloud/): Cloud architecture, infrastructure as code, delivery, migrations, and AI applications: when an independent engineer is worth bringing in, what I deliver, and how ownership stays with your team.
+- [Networks and connected systems](https://neon1.tech/knowledge/guides/use-case-networks/): Designing and integrating networks, devices, and connected environments: when it's worth doing, what I deliver, and which work belongs to licensed trades.
+- [Security awareness sessions](https://neon1.tech/knowledge/guides/use-case-security-awareness/): How an informational security awareness session for a team or group runs, and what people leave able to do.
+- [Security readiness](https://neon1.tech/knowledge/guides/use-case-security-readiness/): Assessing technical risk, strengthening controls, and preparing systems for a security review or audit: what I deliver, and where an auditor or specialist takes over.
+- [Workflow automation](https://neon1.tech/knowledge/guides/use-case-workflows/): Integrating business systems, automating processes, and building the software in between: when it's worth doing, what I deliver, and when something else fits better.
 
 ## Questions
 
@@ -48,12 +50,12 @@ neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site
 
 ## Case studies
 
-- [Answers in seconds, with sources](https://neon1.tech/knowledge/case-studies/answers-in-seconds/): Staff spent minutes searching Microsoft 365, or asked a senior colleague.
-- [Intake, out of the shared inbox](https://neon1.tech/knowledge/case-studies/intake-out-of-the-inbox/): Intake ran through one inbox, with staff chasing and retyping documents.
-- [One view of the business](https://neon1.tech/knowledge/case-studies/one-view-of-the-shop/): A small business's point-of-sale, order tracking, and cameras each had their own screen, and none showed the business as a whole.
-- [Two offices off local servers](https://neon1.tech/knowledge/case-studies/two-offices-off-local-servers/): The app, database, and files lived on two local servers both offices used.
-- [Security for non-security people](https://neon1.tech/knowledge/case-studies/security-for-non-security-people/): People knew they were exposed online, but not where to start.
-- [From cameras to Grandma's email](https://neon1.tech/knowledge/case-studies/cameras-to-grandmas-email/): A house with no cameras, and passwords reused everywhere.
+- [Permission-aware document assistant](https://neon1.tech/knowledge/case-studies/answers-in-seconds/): Staff spent minutes searching Microsoft 365, or asked a senior colleague.
+- [Patient intake portal](https://neon1.tech/knowledge/case-studies/intake-out-of-the-inbox/): Patient intake ran through a shared inbox and a slow EHR, with staff chasing documents by email.
+- [Operations integration and monitoring](https://neon1.tech/knowledge/case-studies/one-view-of-the-shop/): A small business's point-of-sale, order tracking, and cameras each had their own screen, and none showed the business as a whole.
+- [Two-site server migration](https://neon1.tech/knowledge/case-studies/two-offices-off-local-servers/): The app, database, and files lived on two local servers both offices used.
+- [Security awareness sessions](https://neon1.tech/knowledge/case-studies/security-for-non-security-people/): People knew they were exposed online, but not where to start.
+- [Home cameras and family accounts](https://neon1.tech/knowledge/case-studies/cameras-to-grandmas-email/): A house with no cameras, and passwords reused everywhere.
 - [Where neon1 started](https://neon1.tech/knowledge/case-studies/where-neon1-started/): A grade school wanted real STEM tools on a small budget.
 
 ## Products
@@ -66,7 +68,7 @@ neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site
 ## Alternatives
 
 - [Open-source tools on my shortlist](https://neon1.tech/knowledge/landscape/open-source-shortlist/): The open-source projects I'd look at first for common small-business needs, what each is for, and what to check before relying on one.
-- [Where else to get help](https://neon1.tech/knowledge/landscape/where-else-to-get-help/): The other places a small business or household can get technology help, who each one suits, and when they'd serve you better than neon1.
+- [Where else to get help](https://neon1.tech/knowledge/landscape/where-else-to-get-help/): The other ways a business, technical team, or household can get technology work done, who each suits, and when they'd serve you better than neon1.
 
 ## Templates
 
@@ -94,7 +96,7 @@ neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site
 
 - [Business associate agreement request, filled in](https://neon1.tech/knowledge/examples/baa-request/): The BAA questionnaire completed for a fictional physical therapy practice, showing how the decision gets made. (fictional example)
 - [Intake, filled in](https://neon1.tech/knowledge/examples/intake/): The intake form completed for a fictional physical therapy practice after a first call. (fictional example)
-- [Proposal with options, filled in](https://neon1.tech/knowledge/examples/proposal-options/): A complete neon1 proposal with three options for a fictional bakery's order list: discovery, goals, what's in and out, the hours behind each price, when the client pays, what each side will do, and the agreement. (fictional example)
+- [Proposal with options, filled in](https://neon1.tech/knowledge/examples/proposal-options/): A complete neon1 proposal with three options for a fictional retailer whose stock counts disagree: discovery, goals, what's in and out, the hours behind each price, when the client pays, what each side will do, and the agreement. (fictional example)
 - [Proposal, filled in](https://neon1.tech/knowledge/examples/proposal/): A complete neon1 proposal for a fictional physical therapy practice's intake project. (fictional example)
 - [Release and handover record, filled in](https://neon1.tech/knowledge/examples/release-and-handover/): The handover record that closed a fictional physical therapy practice's intake project. (fictional example)
 

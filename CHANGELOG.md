@@ -4,12 +4,34 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+## v0.83.0
+
+### Changed
+- The free first call is 30 minutes, and the home page says it is about your needs, with options afterward in writing.
+- The About line and the structured data give my role at neon1 as Lead Engineer, and the About line no longer names a city.
+- The Sentinel landing no longer downloads the rain, the white rabbit's entry module, or the Matrix monospace font; they are preloaded only when the Matrix look is chosen. Sentinel's first load is about 58 KB smaller on the wire and its largest contentful paint is faster, and Matrix is unchanged.
+- The Sentinel landing says what neon1 is: independent engineering and technology consulting, who it serves, the four services, selected work, and the next step (Discuss a project, email, or a free 15-minute call, with no account needed). The slogan stays. Matrix, when chosen, keeps the wordmark and slogan on the rain and shows none of this; the rain, the white rabbit, the theme switches and their saved choices are unchanged.
+- Services are four equal blocks, each with its buying situations and a fold for deliverables, what else fits better, limits, related work, and a next step: workflow automation, cloud and AI engineering, networks and connected systems, and security readiness. No service is defined by a single small example, and SOC 2 appears as one context within security readiness.
+- Client work opens with how its figures are measured and a key to the six kinds of evidence: neon1 engagements, subcontracted engagements, previous employment, independent projects, reconstructed demonstrations, and fictional examples. About, process, and contact use the corpus wording, and the sections run services, client work, about, process.
+- Contact: no account is needed, topics follow the services, the form's placeholder and the line about the truth are gone, and "any need, any size" is replaced by what the first call covers.
+- Page title, description, link previews, structured data, and the portrait's alt text no longer describe a small-business workflow shop.
+- Code and resources version rows follow the newest release of each repository (scripts/versions.mjs, run by make knowledge and checked by make knowledge-check), so they no longer go stale. AWS CLIP is described as a safety prompt, and DeployOps as a developer preview.
+- In Matrix, "follow the white rabbit" joins the tab order once the rabbit is ready, so Enter on it always catches one.
+- The About portrait is a plain head-and-shoulders photo, with no employer insignia behind it, and a smaller file.
+- Sentinel is the default theme family, while light mode stays the default. Explicit theme choices are shared with the 1NEON menu switches. Email and phone links keep their outbound arrow and open their handler directly.
+- Choosing an in-page destination from the mobile menu no longer restarts the menu's close animation.
+
 ## v0.82.0
 
 ### Changed
 - Matrix and Sentinel are independent of light and dark mode. The four named looks, saved preferences, and transition behavior carry through the site and portal.
 - Sentinel uses softened black and white grounds, plain mobile links, and a still presentation. Site menus scale and center within the visible phone viewport.
 - The Knowledge Center and blog share card spacing and typography. Neo's mobile input grows with wrapped text, and outside controls close its window.
+- The landing theme switch chooses Matrix or Sentinel without changing light or dark mode. Mode switches say “light or dark.” Existing saved preferences remain readable.
+- Matrix has Awake (light) and Plugged (dark). Sentinel has Providence (light) and Desert of the Real (dark), with a leaf-green palette based on #39AB56 and still presentation.
+- Site and 1NEON public screens share the family and mode. The profile uses the same four names, and an unrelated profile save preserves the landing's family choice.
+- Sentinel form fields and topic choices use stronger boundaries in both modes, including the contact, bug, and feedback forms.
+- Bug and feedback forms describe the captured mode as light or dark.
 
 ## v0.81.0
 - Switching from dark to awake is slow, like eyes taking the light after the dark: the light page comes up over the dark one in a long ease-out, a little bright at first, then settling, with the glow fading gently. Going dark stays quick. Reduced motion changes at once.

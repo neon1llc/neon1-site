@@ -7,14 +7,17 @@ const vm = require('node:vm');
 const source = readFileSync(process.env.THEME_SCRIPT || 'src/app/public/js/theme.js', 'utf8');
 
 // The minimal DOM exposes the switches and pending transitions, while storage survives a simulated reload
+// A page with nothing stored opens in Sentinel; the checks that follow the Matrix family start from a stored Matrix choice
 function page(values = {}, options = {}) {
-  const storage = new Map(Object.entries(values)), listeners = {}, pending = [];
+  const storage = new Map(Object.entries(options.fresh || options.blocked ? values : { 'neon1.style': 'matrix', ...values })), listeners = {}, pending = [];
   const button = () => ({ attrs: {}, setAttribute(k, v) { this.attrs[k] = v; }, addEventListener(k, fn) { this[k] = fn; } });
   const mode = button(), family = button();
-  const root = { dataset: {}, classList: { add() {}, remove() {} } };
+  const links = [];
+  const root = { dataset: { ...options.dataset }, classList: { add() {}, remove() {} } };
   const document = { documentElement: root, readyState: 'complete', querySelector: () => null,
     querySelectorAll: (s) => s.includes(':not') ? [mode] : s === '.style-sw' ? [family] : [],
-    getElementById: () => null, dispatchEvent() {} };
+    getElementById: () => null, dispatchEvent() {}, createElement: () => ({}),
+    head: options.dataset ? { appendChild: (link) => links.push(link) } : undefined };
   if (options.transition) document.startViewTransition = (fn) => { pending.push(fn); return { finished: Promise.resolve() }; };
   vm.runInNewContext(source, { document, localStorage: {
     getItem(k) { if (options.blocked) throw Error('blocked'); return storage.get(k) ?? null; },
@@ -23,7 +26,7 @@ function page(values = {}, options = {}) {
     addEventListener: (k, fn) => { listeners[k] = fn; }, CustomEvent: function () {},
     setTimeout: () => 0, clearTimeout() {}, getComputedStyle: () => ({ getPropertyValue: () => '' }),
   });
-  return { root, storage, mode, family, listeners, pending };
+  return { root, storage, mode, family, listeners, pending, links };
 }
 
 // Each family switch preserves the mode, even when the old per-family choices disagree
@@ -46,12 +49,18 @@ test('legacy sentinel choice migrates and both mode tooltips stay literal', () =
   assert.equal(p.root.dataset.siteLook, 'providence');
 });
 
+test('a first visit opens in Sentinel, light', () => {
+  const p = page({}, { fresh: true });
+  assert.equal(p.root.dataset.siteLook, 'providence');
+  assert.equal(p.root.dataset.siteStyle, 'sentinel');
+});
+
 test('blocked storage still permits both switches on this page', () => {
   const p = page({}, { blocked: true });
   p.mode.click(); p.family.click();
-  assert.equal(p.root.dataset.siteLook, 'desert-of-the-real');
+  assert.equal(p.root.dataset.siteLook, 'plugged');
   p.mode.click();
-  assert.equal(p.root.dataset.siteLook, 'providence');
+  assert.equal(p.root.dataset.siteLook, 'awake');
 });
 
 test('a stale dawn callback cannot reverse a rapid second mode toggle', () => {
@@ -75,4 +84,13 @@ test('readable storage with rejected writes retains the current page choice', ()
   assert.equal(p.root.dataset.siteLook, 'desert-of-the-real');
   p.mode.click();
   assert.equal(p.root.dataset.siteLook, 'providence');
+});
+
+// The landing's Matrix-only hints (rain and rabbit modules, the Matrix font) are added only for a Matrix visitor
+const hints = { matrixPreload: '/shared/rain.js /js/white-rabbit.js', matrixFont: '/fonts/mono.woff2' };
+test('Sentinel adds no preload hints, and Matrix adds the module and font hints', () => {
+  assert.equal(page({}, { fresh: true, dataset: hints }).links.length, 0);
+  const matrix = page({ 'neon1.style': 'matrix' }, { dataset: hints }).links;
+  assert.deepEqual(matrix.map((l) => [l.rel, l.href]), [['modulepreload', '/shared/rain.js'], ['modulepreload', '/js/white-rabbit.js'], ['preload', '/fonts/mono.woff2']]);
+  assert.equal(matrix[2].as, 'font');
 });
