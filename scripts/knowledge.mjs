@@ -365,9 +365,9 @@ const llmsWant = `# neon1
 
 > ${homeDesc}
 
-neon1 is the DBA of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site within about 30 miles of Queens, NY, or over a secure temporary connection. Contact: hello@neon1.tech, +1 424-326-3661, or the form at ${SITE}/#contact.
+neon1 is the independent engineering and technology consulting practice of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site within about 30 miles of Queens, NY, or over a secure temporary connection. Contact: hello@neon1.tech, +1 424-326-3661, or the form at ${SITE}/#contact.
 
-- [Home page](${SITE}/): services, client work, process, code and resources, and questions
+- [Home page](${SITE}/): services, client work, about, process, code and resources, and questions
 - [Knowledge center](${SITE}${BASE}): every public document below, most with a PDF to download
 ${blogPosts.length ? `- [Blog](${SITE}/blog/): posts on local businesses' questions, the whats and whys of neon1, and lessons from its public repositories ([RSS](${SITE}/blog/feed.xml))\n` : ""}- Source for these documents: https://github.com/neon1llc/neon1-corpus (CC BY-ND 4.0)
 ${llmsShelves}${llmsBlog}`

@@ -80,7 +80,11 @@ async function open(options = {}, url = "/") {
 }
 
 // Rabbit's animation-frame callbacks by name, so a check can see whether the scene loop still runs
+// The white rabbit lives in Matrix, which a visitor picks on purpose (Sentinel is the default and has no rain), so its checks choose it first
+const MATRIX_STYLE = () => { try { localStorage.setItem("neon1.style", "matrix"); } catch {} };
+// Init scripts are serialized into the page, so this one repeats the style line instead of calling MATRIX_STYLE
 const COUNT_FRAMES = () => {
+  try { localStorage.setItem("neon1.style", "matrix"); } catch {}
   const raf = window.requestAnimationFrame.bind(window), caf = window.cancelAnimationFrame.bind(window);
   const pending = (window.__frames = new Map());
   window.requestAnimationFrame = (cb) => { const id = raf((t) => { pending.delete(id); cb(t); }); pending.set(id, cb.name); return id; };
@@ -191,6 +195,35 @@ check("browser", "home: the first screen has no offer block, and the bar's conta
     expect((await page.evaluate(() => location.pathname + location.hash)) === "/", "the logo returns the address to /");
     expect(!errors.length, "page errors", errors);
   } finally { await context.close(); }
+});
+
+// The Sentinel landing is the default and says what neon1 is, what it does, for whom, and the next step; Matrix, chosen on purpose,
+// keeps the wordmark and slogan on the rain and shows none of the pitch
+check("browser", "home: Sentinel's first screen states the offer and the next step, with no account and no rain; Matrix shows only the wordmark and slogan", async () => {
+  const sentinel = await open({ reducedMotion: "reduce" });
+  try {
+    await sentinel.page.waitForLoadState("load");
+    const p = sentinel.page;
+    expect((await p.evaluate(() => document.documentElement.dataset.siteStyle)) === "sentinel", "a fresh visitor does not get Sentinel");
+    const text = await p.locator(".pitch").innerText();
+    expect(/independent engineering and technology consulting/i.test(text), "the first screen doesn't say what neon1 is", text);
+    expect((await p.locator(".pitch-services a").count()) === 4, "the first screen doesn't name the four services");
+    expect((await p.locator('.pitch a[href^="mailto:hello@"]').count()) === 1, "the first screen has no email link");
+    expect(/no account needed/i.test(text), "the first screen doesn't say no account is needed");
+    expect(/1 is glad to be of service/.test(await p.locator(".hero").innerText()), "the slogan is gone");
+    expect(!(await p.locator("#rain").isVisible()), "Sentinel's first screen shows the rain");
+    expect(!sentinel.errors.length, "page errors", sentinel.errors);
+  } finally { await sentinel.context.close(); }
+  const matrix = await open({ reducedMotion: "reduce", init: MATRIX_STYLE });
+  try {
+    await matrix.page.waitForLoadState("load");
+    const p = matrix.page;
+    expect((await p.evaluate(() => document.documentElement.dataset.siteStyle)) === "matrix", "a chosen Matrix did not stay");
+    expect(!(await p.locator(".pitch").isVisible()), "Matrix's first screen shows the pitch");
+    expect(await p.locator("#rain").isVisible(), "Matrix's first screen has no rain");
+    expect(/1 is glad to be of service/.test(await p.locator(".hero").innerText()), "Matrix lost the slogan");
+    expect(!matrix.errors.length, "page errors", matrix.errors);
+  } finally { await matrix.context.close(); }
 });
 
 check("browser", "home: one wheel gesture from the first screen settles on services (motion, wide)", async () => {
@@ -369,7 +402,7 @@ for (const motion of ["reduce", "no-preference"]) {
       expect(await landed(page, "migration"), "the link did not land on case-migration");
       await page.goBack();
       const back = await page.waitForFunction((at) => location.hash !== "#case-migration" && Math.abs(scrollY + innerHeight / 2 - at) < innerHeight / 2, at, { timeout: 5000 }).then(() => true, () => false);
-      expect(back, "Back did not return to the form", await page.evaluate(() => [location.hash, scrollY]));
+      expect(back, "Back did not return to the form", { at, now: await page.evaluate(() => [location.hash, scrollY, innerHeight]) });
       await page.goForward();
       expect(await landed(page, "migration"), "Forward did not return to case-migration");
       expect(!errors.length, "page errors", errors);
@@ -545,6 +578,8 @@ const SMALL = { viewport: { width: 480, height: 320 }, reducedMotion: "no-prefer
 
 // Tab from the top of the page to the way in; it is off screen until focused, then in view
 async function tabToRabbit(page) {
+  // The way in joins the tab order once the rabbit is wired
+  await page.waitForSelector("#whiteRabbitIn:not([hidden])", { state: "attached", timeout: 15000 });
   for (let i = 0; i < 40; i++) {
     await page.keyboard.press("Tab");
     if (await page.evaluate(() => document.activeElement.id === "whiteRabbitIn")) {
@@ -591,7 +626,7 @@ check("browser", "rabbit: keyboard entry, no controls on screen, Tab, Esc, and f
 });
 
 check("browser", "rabbit: the keyboard way in shows only with keyboard focus, never after a touch entry", async () => {
-  const { page, context } = await open({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }, "/?rabbit=p0.5");
+  const { page, context } = await open({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, init: MATRIX_STYLE }, "/?rabbit=p0.5");
   try {
     const seen = () => page.evaluate(() => { const c = getComputedStyle(document.getElementById("whiteRabbitIn")); return c.opacity !== "0" && c.clipPath === "none"; });
     expect(!(await seen()), "the way in shows before anyone tabs to it");
@@ -605,7 +640,7 @@ check("browser", "rabbit: the keyboard way in shows only with keyboard focus, ne
 });
 
 check("browser", "rabbit: a touch screen leaves the card by swiping back up", async () => {
-  const { page, context } = await open({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }, "/?rabbit=p0.5");
+  const { page, context } = await open({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, init: MATRIX_STYLE }, "/?rabbit=p0.5");
   try {
     expect(await isState(page, "playing"), "the test flag did not catch a rabbit", await rabbit(page));
     expect((await rabbit(page)).controls === 0, "a control showed over the card", await rabbit(page));
@@ -654,6 +689,7 @@ check("browser", "rabbit: at the end of the card, \"go back\" is the one control
   try {
     await tabToRabbit(page);
     await page.keyboard.press("Enter");
+    expect(await isState(page, "caught"), "Enter did not catch the rabbit", await rabbit(page));
     await page.keyboard.press("End");
     expect(await isState(page, "done"), "End did not finish the card", await rabbit(page));
     let r = await rabbit(page);

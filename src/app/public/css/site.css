@@ -447,7 +447,6 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 .cnote { margin: 0; font-size: 13px; color: var(--muted); }
 /* Morpheus's line, in the site's dark green and not bold */
-.cnote .truth { color: var(--brand); font-weight: 400; }
 .cactions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
 .cactions .btn:disabled { opacity: .6; cursor: default; }
 .cstatus { margin: 0; font-size: 14px; color: var(--brand); }
@@ -486,3 +485,27 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 :root[data-site-theme="matrix"] .cform [aria-invalid="true"] { border-color: var(--err); }
 :root[data-site-theme="matrix"] :is(.cform label, .ctopic legend) { color: var(--ink-soft); }
 :root[data-site-theme="matrix"] .cform :is(textarea, input)::placeholder { color: var(--m-faint); opacity: 1; }
+
+
+/* ---- Services: four equal blocks, each opening to its deliverables, limits, and next step ---- */
+.svc-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: clamp(28px, 4vw, 56px); border-top: 1px solid rgb(var(--ink-rgb) / .12); }
+.svc { display: flex; flex-direction: column; padding: 20px 0 16px; border-bottom: 1px solid rgb(var(--ink-rgb) / .12); }
+.svc h3 { font: 600 clamp(19px, 1.8vw, 22px)/1.25 var(--sans); letter-spacing: -.015em; margin: 0 0 8px; color: var(--ink); }
+.svc-line { margin: 0 0 10px; color: var(--ink-soft); font-size: 15.5px; line-height: 1.5; }
+.svc-when { margin: 0 0 4px; padding-left: 18px; color: var(--muted-ink); font-size: 14.5px; line-height: 1.5; }
+.svc-when li { margin: 0 0 4px; }
+.svc-more { margin-top: auto; }
+.svc-more > summary { font-size: 15px; }
+.svc-facts { margin: 4px 0 8px; }
+.svc-facts dt { font: 700 12px/1.4 var(--mono); color: var(--brand); margin: 12px 0 2px; }
+.svc-facts dd { margin: 0; color: var(--ink-soft); font-size: 14.5px; line-height: 1.55; }
+.svc-next { margin: 8px 0 4px; font-size: 14.5px; }
+.svc-foot { margin-top: 24px; max-width: 760px; }
+@media (max-width: 860px) { .svc-grid { grid-template-columns: 1fr; } }
+
+/* ---- Evidence key: the six kinds of work, so none is mistaken for another ---- */
+.kinds { margin: 4px 0 14px; display: grid; grid-template-columns: minmax(150px, max-content) 1fr; gap: 8px 22px; max-width: 900px; }
+.kinds dt { font: 700 13px/1.5 var(--mono); color: var(--brand); }
+.kinds dd { margin: 0; color: var(--ink-soft); font-size: 15px; line-height: 1.5; }
+@media (max-width: 640px) { .kinds { grid-template-columns: 1fr; gap: 2px; } .kinds dd { margin-bottom: 10px; } }
+.evidence-key { margin-top: 18px; }

@@ -7,8 +7,9 @@ const vm = require('node:vm');
 const source = readFileSync(process.env.THEME_SCRIPT || 'src/app/public/js/theme.js', 'utf8');
 
 // The minimal DOM exposes the switches and pending transitions, while storage survives a simulated reload
+// A page with nothing stored opens in Sentinel; the checks that follow the Matrix family start from a stored Matrix choice
 function page(values = {}, options = {}) {
-  const storage = new Map(Object.entries(values)), listeners = {}, pending = [];
+  const storage = new Map(Object.entries(options.fresh || options.blocked ? values : { 'neon1.style': 'matrix', ...values })), listeners = {}, pending = [];
   const button = () => ({ attrs: {}, setAttribute(k, v) { this.attrs[k] = v; }, addEventListener(k, fn) { this[k] = fn; } });
   const mode = button(), family = button();
   const root = { dataset: {}, classList: { add() {}, remove() {} } };
@@ -46,12 +47,18 @@ test('legacy sentinel choice migrates and both mode tooltips stay literal', () =
   assert.equal(p.root.dataset.siteLook, 'providence');
 });
 
+test('a first visit opens in Sentinel, light', () => {
+  const p = page({}, { fresh: true });
+  assert.equal(p.root.dataset.siteLook, 'providence');
+  assert.equal(p.root.dataset.siteStyle, 'sentinel');
+});
+
 test('blocked storage still permits both switches on this page', () => {
   const p = page({}, { blocked: true });
   p.mode.click(); p.family.click();
-  assert.equal(p.root.dataset.siteLook, 'desert-of-the-real');
+  assert.equal(p.root.dataset.siteLook, 'plugged');
   p.mode.click();
-  assert.equal(p.root.dataset.siteLook, 'providence');
+  assert.equal(p.root.dataset.siteLook, 'awake');
 });
 
 test('a stale dawn callback cannot reverse a rapid second mode toggle', () => {
