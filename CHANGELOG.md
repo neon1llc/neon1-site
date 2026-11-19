@@ -7,6 +7,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 ## v0.83.0
 
 ### Changed
+- The free first call is 30 minutes, and the home page says it is about your needs, with options afterward in writing.
 - The About line and the structured data give my role at neon1 as Lead Engineer, and the About line no longer names a city.
 - The Sentinel landing no longer downloads the rain, the white rabbit's entry module, or the Matrix monospace font; they are preloaded only when the Matrix look is chosen. Sentinel's first load is about 58 KB smaller on the wire and its largest contentful paint is faster, and Matrix is unchanged.
 - The Sentinel landing says what neon1 is: independent engineering and technology consulting, who it serves, the four services, selected work, and the next step (Discuss a project, email, or a free 15-minute call, with no account needed). The slogan stays. Matrix, when chosen, keeps the wordmark and slogan on the rain and shows none of this; the rain, the white rabbit, the theme switches and their saved choices are unchanged.
