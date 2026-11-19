@@ -96,7 +96,7 @@ neon1 is the independent engineering and technology consulting practice of neon1
 
 - [Business associate agreement request, filled in](https://neon1.tech/knowledge/examples/baa-request/): The BAA questionnaire completed for a fictional physical therapy practice, showing how the decision gets made. (fictional example)
 - [Intake, filled in](https://neon1.tech/knowledge/examples/intake/): The intake form completed for a fictional physical therapy practice after a first call. (fictional example)
-- [Proposal with options, filled in](https://neon1.tech/knowledge/examples/proposal-options/): A complete neon1 proposal with three options for a fictional bakery's order list: discovery, goals, what's in and out, the hours behind each price, when the client pays, what each side will do, and the agreement. (fictional example)
+- [Proposal with options, filled in](https://neon1.tech/knowledge/examples/proposal-options/): A complete neon1 proposal with three options for a fictional retailer whose stock counts disagree: discovery, goals, what's in and out, the hours behind each price, when the client pays, what each side will do, and the agreement. (fictional example)
 - [Proposal, filled in](https://neon1.tech/knowledge/examples/proposal/): A complete neon1 proposal for a fictional physical therapy practice's intake project. (fictional example)
 - [Release and handover record, filled in](https://neon1.tech/knowledge/examples/release-and-handover/): The handover record that closed a fictional physical therapy practice's intake project. (fictional example)
 
