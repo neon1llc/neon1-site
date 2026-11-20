@@ -4,6 +4,9 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+### Changed
+- Services are four cards like the client work cards. Each card shows the summary and when it fits, and opens a panel with what you get, what else fits better, limits, related work, and the next step, in place of the dropdown.
+
 ## v0.83.0
 
 ### Changed

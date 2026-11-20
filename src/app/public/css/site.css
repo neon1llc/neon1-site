@@ -488,18 +488,26 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 
 
 /* ---- Services: four equal blocks, each opening to its deliverables, limits, and next step ---- */
-.svc-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: clamp(28px, 4vw, 56px); border-top: 1px solid rgb(var(--ink-rgb) / .12); }
-.svc { display: flex; flex-direction: column; padding: 20px 0 16px; border-bottom: 1px solid rgb(var(--ink-rgb) / .12); }
-.svc h3 { font: 600 clamp(19px, 1.8vw, 22px)/1.25 var(--sans); letter-spacing: -.015em; margin: 0 0 8px; color: var(--ink); }
+/* Services: four cards like the client work cards. The whole card opens a panel with what you get, limits, and the next step
+   (js/cases.js); the card keeps the summary and when it fits */
+.svc-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.svc { position: relative; display: flex; flex-direction: column; padding: clamp(20px, 2.6vh, 26px); background: var(--surface); border: 1px solid rgb(var(--ink-rgb) / .1);
+  border-radius: 6px; cursor: pointer; transition: box-shadow .2s, border-color .2s; }
+.svc:hover { border-color: rgb(var(--brand-rgb) / .35); box-shadow: 0 8px 24px rgba(18,36,26,.08); }
+.svc:hover .open svg { transform: translate(2px, -2px); }
+.svc h3 { font: 600 clamp(19px, 1.8vw, 22px)/1.25 var(--sans); letter-spacing: -.015em; margin: 0 0 8px; padding-right: 36px; color: var(--ink); }
 .svc-line { margin: 0 0 10px; color: var(--ink-soft); font-size: 15.5px; line-height: 1.5; }
-.svc-when { margin: 0 0 4px; padding-left: 18px; color: var(--muted-ink); font-size: 14.5px; line-height: 1.5; }
+.svc-when { margin: 0 0 14px; padding-left: 18px; color: var(--muted-ink); font-size: 14.5px; line-height: 1.5; }
 .svc-when li { margin: 0 0 4px; }
-.svc-more { margin-top: auto; }
-.svc-more > summary { font-size: 15px; }
+.svc-cue { margin: auto 0 0; padding-top: 12px; border-top: 1px solid rgb(var(--ink-rgb) / .1); font: 13px var(--mono); color: var(--brand); }
 .svc-facts { margin: 4px 0 8px; }
 .svc-facts dt { font: 700 12px/1.4 var(--mono); color: var(--brand); margin: 12px 0 2px; }
 .svc-facts dd { margin: 0; color: var(--ink-soft); font-size: 14.5px; line-height: 1.55; }
+.case-body .svc-facts dt { font-size: 13px; margin-top: 22px; }
+.case-body .svc-facts dd { font-size: 16px; line-height: 1.6; }
+.case-body .svc-line { font-size: 18px; color: var(--ink); margin-top: 10px; }
 .svc-next { margin: 8px 0 4px; font-size: 14.5px; }
+.case-body .svc-next { margin-top: 24px; font-size: 16px; }
 .svc-foot { margin-top: 24px; max-width: 760px; }
 @media (max-width: 860px) { .svc-grid { grid-template-columns: 1fr; } }
 

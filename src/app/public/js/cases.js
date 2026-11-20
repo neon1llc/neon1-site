@@ -1,4 +1,4 @@
-// src/app/public/js/cases.js - Opens each case study as a full panel over the page.
+// src/app/public/js/cases.js - Opens each case study, and each service, as a full panel over the page.
 //
 // "Read the case study" grows the card into the panel, and closing shrinks it
 // back into the card. The scroll position never changes, so you return exactly
@@ -54,15 +54,17 @@
   // Fills the panel from the card's label, title, stat, and template, then grows it out of the card
   // Focus moves to the panel itself (so a screen reader starts at its title) and returns to the button on close
   function open(id, button) {
-    const next = document.getElementById("case-" + id);
+    const next = document.getElementById("case-" + id) || document.getElementById(id); // a case, or a service card (#service-...)
     if (!next) return;
     if (state === "closing") settle(false); // a close still shrinking finishes now, leaving focus to this open
     card = next; opener = button;
+    // A case brings its label and figures; a service brings its summary and when it fits
     const tpl = card.querySelector("template.deep");
-    body.replaceChildren(card.querySelector(".idx").cloneNode(true));
+    const idx = card.querySelector(".idx");
+    body.replaceChildren(...(idx ? [idx.cloneNode(true)] : []));
     const h = document.createElement("h3");
     h.id = "casePanelTitle"; h.textContent = card.querySelector("h3").textContent;
-    body.append(h, card.querySelector(".stat").cloneNode(true), tpl.content.cloneNode(true));
+    body.append(h, ...[...card.querySelectorAll(":scope > :is(.stat, .svc-line, .svc-when)")].map((el) => el.cloneNode(true)), tpl.content.cloneNode(true));
     layer.hidden = false;
     document.body.classList.add("case-open");
     document.documentElement.classList.add("case-lock");
@@ -125,7 +127,7 @@
     if (b) { e.preventDefault(); open(b.dataset.case, b); return; }
 
     // Anywhere else on a card opens it too
-    const c = state === "closed" && e.target.closest(".case");
+    const c = state === "closed" && e.target.closest(".case, .svc");
     if (c) { const o = c.querySelector("[data-case]"); open(o.dataset.case, o); return; }
     if (e.target.closest("[data-close]")) close();
   });
