@@ -4,6 +4,9 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+### Fixed
+- The phone menu opens and closes without stutter. Making the page behind inert, which restyled all of it in the frame the menu moved, now waits until the menu has finished moving; the menu is opaque with no backdrop blur; and the Matrix rain holds still while the menu is up.
+
 ## v0.83.0
 
 ### Changed
