@@ -39,13 +39,19 @@
     // The mirror never takes the field's indent: the placeholder's own shift would move the caret off the field's start
     mirror.style.textIndent = "0";
     mirror.style.boxSizing = "border-box";
-    mirror.style.width = field.clientWidth + "px";
+    mirror.style.width = boxWidth(field, cs) + "px";
     mirror.style.whiteSpace = multi ? "pre-wrap" : "pre";
     mirror.textContent = field.value;
     const end = document.createElement("span");
     end.textContent = "​";
     mirror.appendChild(end);
     return { x: end.offsetLeft, y: end.offsetTop, h: end.offsetHeight };
+  }
+
+  // The padding box's width, left of the scrollbar. An input's clientWidth leaves its padding out, so this is worked from the box instead
+  function boxWidth(field, cs) {
+    if (field instanceof HTMLTextAreaElement) return field.clientWidth;
+    return field.getBoundingClientRect().width - parseFloat(cs.borderLeftWidth) - parseFloat(cs.borderRightWidth);
   }
 
   // Whether a field can show a caret at all: in the page, shown, enabled, and editable
@@ -65,16 +71,15 @@
     const cs = getComputedStyle(field);
     const m = measure(field, cs);
     const multi = field instanceof HTMLTextAreaElement;
-    const left = r.left + field.clientLeft + m.x;
-    const room = r.left + field.clientLeft + field.clientWidth - parseFloat(cs.paddingRight);
+    const edgeL = r.left + parseFloat(cs.borderLeftWidth), edgeT = r.top + parseFloat(cs.borderTopWidth);
+    const left = edgeL + m.x;
+    const room = edgeL + boxWidth(field, cs) - parseFloat(cs.paddingRight);
     // A line of text longer than the field is shown scrolled to its start, so the end of it is out of sight
     if (!multi && left > room) return hide();
     const padTop = parseFloat(cs.paddingTop), padBottom = parseFloat(cs.paddingBottom);
-    const top = multi
-      ? r.top + field.clientTop + m.y - field.scrollTop
-      : r.top + field.clientTop + padTop + (field.clientHeight - padTop - padBottom - m.h) / 2;
-    const bottom = r.top + field.clientTop + field.clientHeight;
-    if (multi && (top < r.top + field.clientTop || top + m.h > bottom + 1)) return hide();
+    const inner = r.height - parseFloat(cs.borderTopWidth) - parseFloat(cs.borderBottomWidth);
+    const top = multi ? edgeT + m.y - field.scrollTop : edgeT + padTop + (inner - padTop - padBottom - m.h) / 2;
+    if (multi && (top < edgeT || top + m.h > edgeT + field.clientHeight + 1)) return hide();
     // Something laid over the field's text (a header, a panel) covers the caret too
     const hit = document.elementFromPoint(left + 1, top + m.h / 2);
     if (hit !== field && !(hit && field.contains(hit))) return hide();
