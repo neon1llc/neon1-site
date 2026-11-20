@@ -55,7 +55,7 @@ if (box && input && status && found && list && none && browse) {
 
   // Results in three groups, each best first: pages about the search (its words in a title or heading), pages
   // that only mention it, and, when no page holds every word, pages with some of them (search-core's strength)
-  const GROUPS = [["strong", "Best matches"], ["partial", "Also mentioned in"], ["weak", "Pages with only some of your words"]];
+  const GROUPS = [["strong", "Best matches"], ["partial", "Also mentioned in"], ["weak", "Partial matches"]];
   function groups(results) {
     return GROUPS.map(([key, label]) => [label, results.filter((r) => r.strength === key)])
       .filter(([, rs]) => rs.length)

@@ -128,7 +128,7 @@ function indexPage() {
     ? `      <ul class="kc-cards">
 ${posts.map(card).join("\n")}
       </ul>`
-    : "      <p>The first post is on its way.</p>"
+    : "      <p>No posts yet.</p>"
   const main = `${band({ id: "blog-title", eyebrow: "neon1 · blog", title: "Blog", lead: "Answers for local businesses in plain words, how neon1 works, and lessons from its public repositories." })}
 
     <div class="kc-body">
@@ -250,7 +250,7 @@ function feed() {
     <title>neon1 blog</title>
     <link>${SITE}${BLOG}</link>
     <atom:link href="${SITE}${FEED}" rel="self" type="application/rss+xml" />
-    <description>Questions from local businesses answered in plain words, the whats and whys of neon1, and lessons from its public repositories.</description>
+    <description>Answers for local businesses in plain words, how neon1 works, and lessons from neon1's public repositories.</description>
     <language>en-us</language>
     <copyright>© neon1 LLC. CC BY-ND 4.0.</copyright>${latest ? `
     <lastBuildDate>${rfc822(latest)}</lastBuildDate>` : ""}

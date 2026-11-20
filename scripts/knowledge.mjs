@@ -73,7 +73,7 @@ function pathsSection() {
   return `    <section class="kc-paths" aria-labelledby="kc-paths-h">
       <div class="kc-shelf-head">
         <h2 id="kc-paths-h">Start here<span class="kc-n"> ${new Set(PATHS.flatMap((p) => p.ids)).size}</span></h2>
-        <div class="kc-shelf-desc"><p>Four ways in, by what you need.</p></div>
+        <div class="kc-shelf-desc"><p>Four ways in, by need.</p></div>
       </div>
       <ul class="kc-path-list">
 ${PATHS.map((p) => `        <li class="kc-path">
@@ -84,7 +84,7 @@ ${p.ids.map((id) => `            <li><a href="${corpus.byId.get(id).url}">${esc(
           </ul>
         </li>`).join("\n")}
       </ul>
-      <p class="kc-paths-more">Not sure where you fit? <a href="/#services">See what I offer</a> or <a href="/#contact">get in touch</a>.${releasesDir ? ` <a href="${RELEASES_URL}">Releases</a> lists what changed in each product.` : ""}</p>
+      <p class="kc-paths-more">Not sure where you fit? <a href="/#services">See services</a> or <a href="/#contact">get in touch</a>.${releasesDir ? ` <a href="${RELEASES_URL}">Releases</a> lists what changed in each product.` : ""}</p>
     </section>`
 }
 
@@ -149,15 +149,15 @@ ${g.shelves.map((s) => `        <li><a href="#${s.key}">${esc(s.label)}${shelfMa
         </form>` })}
 
     <section class="kc-none" id="kc-none" aria-label="No results" hidden>
-      <h2>I don't have a page for that yet</h2>
-      <p>Try one of these, or ask me directly.</p>
+      <h2>No page for that yet</h2>
+      <p>Try one of these.</p>
       <ul>
         <li><a href="${BASE}?q=backups" data-term="backups">backups</a></li>
         <li><a href="${BASE}?q=phishing" data-term="phishing">phishing</a></li>
         <li><a href="${BASE}?q=proposal" data-term="proposal">proposal</a></li>
         <li><a href="${BASE}?q=privacy" data-term="privacy">privacy</a></li>
       </ul>
-      <p><a href="${BASE}faq/1neon-help/">1NEON help</a> answers portal questions, and <a href="/#contact">contact</a> reaches me.</p>
+      <p><a href="${BASE}faq/1neon-help/">1NEON help</a> covers portal questions. <a href="/#contact">Contact</a> reaches me.</p>
     </section>
 
     <section class="kc-found" id="kc-found" aria-label="Search results" hidden>

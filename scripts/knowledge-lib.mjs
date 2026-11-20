@@ -181,13 +181,13 @@ export function searchIndex(corpus) {
 
 // Four ways in for someone who doesn't know the library's shelves yet, with documents chosen by id
 export const TASK_PATHS = [
-  { key: "considering", title: "Considering a project", blurb: "Before the first call, or before you spend anything.",
+  { key: "considering", title: "Considering a project", blurb: "Before a first call or a purchase.",
     ids: ["guides-first-call", "guides-before-you-buy", "case-security-for-non-security-people"] },
-  { key: "recurring", title: "Fixing a recurring problem", blurb: "The same thing keeps going wrong, and you want it to stop.",
+  { key: "recurring", title: "Fixing a recurring problem", blurb: "The same thing keeps going wrong.",
     ids: ["guides-backups-you-can-trust", "guides-use-case-workflows"] },
-  { key: "using", title: "Using 1NEON", blurb: "Answers for the client portal, and what it is.",
+  { key: "using", title: "Using 1NEON", blurb: "Portal answers, and what it is.",
     ids: ["faq-1neon-help", "product-1neon"] },
-  { key: "diligence", title: "Technical due diligence", blurb: "How the systems are built, how data is handled, and how security problems are reported.",
+  { key: "diligence", title: "Technical due diligence", blurb: "How systems are built, how data is handled, and how security issues are reported.",
     ids: ["company-architecture", "policy-privacy", "policy-security"] },
 ]
 
