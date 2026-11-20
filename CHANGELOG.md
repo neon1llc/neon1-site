@@ -11,6 +11,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - Matrix text fields have a green caret, dark green in light mode and Matrix green in dark. A field without focus shows one after its text, and an empty one sits just before its placeholder. Only one blinks at a time, the focused field or else the first empty field in view, and the rest hold steady and dim; reduced motion keeps every caret steady. Sentinel is unchanged. 1NEON inherits it from shared/caret.js.
 
 ### Changed
+- The process steps' sign-up line invites anyone, ready or just curious, to start on their own by signing up in 1NEON, outlining up to three projects, and requesting an assessment.
 - About says a project that needs a specialty gets "a vetted specialist" with a defined role in the proposal, not "the partner".
 - About says the earlier work was for "government, financial services, media, and security organizations", not "employers".
 - On a phone, the Start here cards no longer space their links 44px apart. The tap area reaches halfway to the next line, as the footer's links do, so the lists read as lists.
