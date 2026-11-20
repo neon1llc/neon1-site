@@ -217,6 +217,9 @@ body.kc { background: var(--page); }
 .kc-text ul, .kc-text ol { margin: 0 0 16px; padding-left: 24px; }
 .kc-text li { margin: 4px 0; }
 .kc-text code { padding: 1px 5px; border-radius: 4px; background: rgb(var(--brand-rgb) / .1); font: 14px var(--mono); }
+/* Code blocks scroll inside themselves, so a long command never widens a phone's page */
+.kc-text pre { margin: 12px 0 20px; padding: 12px 14px; overflow-x: auto; border-radius: 8px; background: rgb(var(--brand-rgb) / .06); font: 13px/1.5 var(--mono); }
+.kc-text pre code { padding: 0; background: none; font: inherit; }
 .kc-text blockquote { margin: 16px 0; padding: 4px 0 4px 16px; border-left: 3px solid var(--glow); color: var(--muted); }
 .kc-text hr { border: 0; border-top: 1px solid var(--line); margin: 28px 0; }
 /* Tables scroll sideways on phones; from tablet width up they span the column like any table */

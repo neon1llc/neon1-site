@@ -14,6 +14,7 @@ import re
 import sys
 
 META = re.compile(r'<meta name="version" content="([^"]*)"')
+SITE_ROW = re.compile(r'github\.com/neon1llc/neon1-site"[^\n]*?<p class="state">v(\d+\.\d+\.\d+)')
 FOOTER = re.compile(r"<!-- frame:footer -->.*?>v(\d+\.\d+\.\d+)(?:</span>)?</a>.*?<!-- /frame:footer -->", re.S)
 TOP_ENTRY = re.compile(r"^## v(\S+)\s*$", re.M)
 LITERAL_V = re.compile(r"[?&]v=(\d+\.\d+\.\d+)")
@@ -37,6 +38,11 @@ def main():
         sys.exit("release: index.html's footer block has no vX.Y.Z link")
     found.append(("index.html footer", footer.group(1)))
     found.append(("version.json", json.loads((root / "version.json").read_text())["version"]))
+    # The code-and-resources row for this repository names the release being built, like the footer
+    row = SITE_ROW.search((root / "index.html").read_text())
+    if not row:
+        sys.exit("release: index.html has no neon1-site row in code and resources")
+    found.append(("index.html neon1-site row", row.group(1)))
     top = TOP_ENTRY.search(changelog.read_text())
     if not top:
         sys.exit(f"release: {changelog.name} has no '## vX.Y.Z' entry")
