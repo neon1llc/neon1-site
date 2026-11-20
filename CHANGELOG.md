@@ -20,6 +20,9 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - The theme script paints from the saved choice when a change runs, flips the family from the saved family rather than the painted one, and catches up when a tab is brought forward, so quick switches and changes made in another tab always end on the newest choice. Tests cover every run of up to four quick switches with the paints arriving in any order.
 
 
+### Fixed
+- Opening a fold (how to read the evidence, the questions, the code and resources groups) keeps the page where it is, instead of scrolling back to the top of its section.
+
 ## v0.83.0
 
 ### Changed
