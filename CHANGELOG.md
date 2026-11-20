@@ -11,6 +11,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - Services, process, and contact say to outline up to three projects in a free 1NEON account, then ask for a free assessment, with the free 30-minute call as the other way in. The account lines show only while sign-up is open.
 
 ### Fixed
+- Back, Forward, and reload return every page to where that history entry was left, however many steps back, even when the same page is in the history twice. Each entry gets its own id, and its scroll is kept under that id for this tab only; a new link opens at its top or its #section, and a new tab starts with nothing remembered. This replaces the record kept by page address, which put a page visited twice at its latest spot.
 - The phone menu opens and closes without stutter. Making the page behind inert, which restyled all of it in the frame the menu moved, now waits until the menu has finished moving; the menu is opaque with no backdrop blur; and the Matrix rain holds still while the menu is up.
 - The dermatology case study's table gives the intake time in days, matching its card.
 - On the Sentinel landing the top bar is light from the first paint. It used to start as Matrix glass and fade to light on every visit, and the style switch's knob slid across as if the look had just changed. The light/dark switch on other pages no longer slides on load in dark mode either.

@@ -173,6 +173,48 @@
   });
 })();
 
+// ---- Where each page was left: one record per history entry ----
+// Every history entry carries its own id in history.state ("eid"): a page opened by a link, a #fragment entry, and a page that
+// appears twice in the tab's history each get their own. Where an entry was scrolled is kept under its id in sessionStorage, which
+// belongs to this tab only and starts empty in a new tab. js/scroll-memory.js and the home page's js/views.js save and restore
+// through window.n1Entry; a new link has no record, so it opens at its top or its #fragment, and Back, Forward, and reload find theirs.
+// Scripts that replace or push a state keep or get an id without knowing about it: both calls are wrapped here, before any other
+// script runs
+(() => {
+  const KEY = "n1.entries";
+  const fresh = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  const withId = (state, id) => (state && typeof state === "object" ? (state.eid ? state : { ...state, eid: id }) : { eid: id });
+  const push = history.pushState.bind(history), replace = history.replaceState.bind(history);
+  // A pushed entry is announced, so the scripts keeping its spot follow it (popstate and hashchange don't fire for a push)
+  history.pushState = (state, title, url) => { push(withId(state, fresh()), title, url); dispatchEvent(new Event("n1:entry")); };
+  history.replaceState = (state, title, url) => replace(withId(state, (history.state && history.state.eid) || fresh()), title, url);
+  // A #fragment link followed natively makes an entry with no state; it gets its id the moment it arrives
+  const id = () => {
+    if (!(history.state && history.state.eid)) { try { replace(withId(history.state, fresh()), ""); } catch { return null; } }
+    return history.state.eid;
+  };
+  id();
+  addEventListener("hashchange", id);
+  addEventListener("popstate", id);
+  const all = () => { try { return JSON.parse(sessionStorage.getItem(KEY) || "{}"); } catch { return {}; } };
+  try { sessionStorage.removeItem("n1.spots"); } catch { /* the old record, kept by page address */ }
+  window.n1Entry = {
+    id,
+    get: (eid) => (eid && all()[eid]) || null,
+    set: (eid, spot) => {
+      if (!eid) return;
+      try {
+        const m = all();
+        delete m[eid]; // the newest goes last, so the oldest is the one let go
+        m[eid] = spot;
+        const keys = Object.keys(m);
+        if (keys.length > 100) delete m[keys[0]];
+        sessionStorage.setItem(KEY, JSON.stringify(m));
+      } catch { /* storage off: pages open at their top */ }
+    },
+  };
+})();
+
 // ---- The cross-fade between pages: only for a move from one neon1 page to the next ----
 // The browser's own page transition (@view-transition) runs only when both pages opt in. Opting in from the stylesheet
 // left a page blank on first open in some iPhone browsers built on WebKit (DuckDuckGo: a link from Gmail, or a typed
