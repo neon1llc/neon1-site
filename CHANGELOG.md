@@ -4,6 +4,9 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+### Fixed
+- The dermatology case study's table gives the intake time in days, matching its card.
+
 ## v0.83.0
 
 ### Changed
