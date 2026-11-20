@@ -154,6 +154,7 @@
 // Scripts that replace or push a state keep or get an id without knowing about it: both calls are wrapped here, before any other
 // script runs
 (() => {
+  if (typeof history === "undefined" || !history.pushState) return; // not a browser page (the preference tests)
   const KEY = "n1.entries";
   const fresh = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
   const withId = (state, id) => (state && typeof state === "object" ? (state.eid ? state : { ...state, eid: id }) : { eid: id });
