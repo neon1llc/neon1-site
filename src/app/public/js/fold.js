@@ -9,7 +9,8 @@ const running = new WeakMap();
 
 function ease(d, opening) {
   running.get(d)?.cancel();
-  const time = (parseFloat(token("--t-open")) || 0.6) * 1000 * (opening ? 1 : 0.85);
+  const own = parseFloat(getComputedStyle(d).getPropertyValue("--t-open"));
+  const time = (Number.isNaN(own) ? parseFloat(token("--t-open")) || 0.6 : own) * 1000 * (opening ? 1 : 0.85);
   const curve = `cubic-bezier(${(token("--ease-open").match(/[\d.]+/g) || [0.25, 0.8, 0.25, 1]).join(",")})`;
   const s = d.querySelector(":scope > summary");
   const h0 = d.getBoundingClientRect().height;
