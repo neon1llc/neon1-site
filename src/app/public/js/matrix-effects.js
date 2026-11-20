@@ -17,7 +17,8 @@ export async function start() {
     lens,
     panes: () => document.querySelectorAll(".hero-pane, header.n1-bar, .rainctl button"),
     lensOff: () => header.classList.contains("light"),
-    idle: () => document.documentElement.dataset.siteStyle === "sentinel" || document.body.classList.contains("woke"),
+    // Still while the phone menu covers it, so drawing doesn't compete with the menu's entrance
+    idle: () => document.documentElement.dataset.siteStyle === "sentinel" || document.body.classList.contains("woke") || header.classList.contains("menu-open"),
     rabbit: {
       every: [7000, 10000],
       ok: () => !!egg && egg.ready(),

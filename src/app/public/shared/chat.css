@@ -148,4 +148,4 @@
 }
 
 /* The menu, a case study, or the white rabbit owns the screen; the chat steps aside until it closes */
-body.menu-open .n1chat, body.menu-open .n1chat-launch, body.case-open .n1chat, body.case-open .n1chat-launch, body.white-rabbit-on .n1chat, body.white-rabbit-on .n1chat-launch { display: none; }
+.n1chat.under-menu, .n1chat-launch.under-menu, body.menu-open .n1chat, body.menu-open .n1chat-launch, body.case-open .n1chat, body.case-open .n1chat-launch, body.white-rabbit-on .n1chat, body.white-rabbit-on .n1chat-launch { display: none; }
