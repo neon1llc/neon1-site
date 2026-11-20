@@ -287,7 +287,7 @@ check("browser", "case: Shift+Tab from the panel, full Tab cycle, Escape, and fo
     await page.keyboard.press("Enter");
     let s = await caseState(page);
     expect(s.open && s.onPanel, "focus did not move to the open panel", s);
-    expect(s.inert.every(Boolean), "the page behind the panel is not inert", s.inert);
+    expect(s.inert[1] && s.inert[3] && !s.inert[0] && !s.inert[2], "the page behind the panel is not inert, or the top bar is", s.inert);
     await page.keyboard.press("Shift+Tab");
     s = await caseState(page);
     expect(s.inPanel && s.last, "Shift+Tab from the panel left it or missed its last control", s);
@@ -337,18 +337,20 @@ for (const [label, options] of [["wide", {}], ["phone", { viewport: { width: 390
   });
 }
 
-check("browser", "case: on a phone, the menu can't open over an open case study", async () => {
+check("browser", "case: on a phone, the menu button closes an open case study and then opens the menu", async () => {
   const { page, context } = await open({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
   try {
     await page.locator("[data-case=migration]").click();
     const box = await page.locator("#menuBtn").boundingBox();
     await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+    await page.waitForTimeout(400);
     const menuHidden = await page.locator("#menu").evaluate((m) => m.hidden);
     const s = await caseState(page);
-    expect(menuHidden && s.open, "the menu opened over the case study", { menuHidden, s });
-    await page.locator(".case-close").click();
+    expect(!menuHidden && !s.open && !s.locked, "the menu button did not close the case study and open the menu", { menuHidden, s });
     await page.locator("#menuBtn").click();
-    expect(!(await page.locator("#menu").evaluate((m) => m.hidden)), "the menu no longer opens after the case study closed");
+    await page.waitForTimeout(400);
+    await page.locator("[data-case=migration]").click();
+    expect((await caseState(page)).open, "a case study no longer opens after the menu closed");
   } finally { await context.close(); }
 });
 
@@ -1168,7 +1170,7 @@ check("browser", "case: an address or link naming #case-... opens that panel wit
       expect(!s.open && (await page.evaluate(() => location.pathname + location.hash)) === "/" && (await page.evaluate(() => history.length)) === length, "Esc did not close in place", s);
       expect(s.focused === "dermatology", "focus did not return to the case open button", s);
       // A link in the page's own words opens the same way
-      await page.evaluate(() => document.querySelector('a[href="#case-migration"]').click()); await page.waitForTimeout(1500);
+      await page.evaluate(() => document.querySelector('a[href="#case-migration"]').click()); await page.waitForTimeout(3200); // the page reaches the client work first, then the card opens
       s = await caseState(page);
       expect(s.open && (await page.evaluate(() => location.hash)) === "#case-migration", "a case link did not open its panel");
       await page.goBack(); await page.waitForTimeout(700);
