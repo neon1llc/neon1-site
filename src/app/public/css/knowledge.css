@@ -310,6 +310,9 @@ body.kc { background: var(--page); }
 .kc-path ul { margin: 0; padding-left: var(--sp-4); font-size: var(--fs-md); line-height: 1.5; }
 .kc-path li + li { margin-top: var(--sp-1); }
 .kc-path a { color: var(--brand); }
+/* The Start here cards list links on their own, so the bullets mark them and no underline runs between them */
+.kc-paths .kc-path li a { text-decoration: none; }
+.kc-paths .kc-path li a:hover, .kc-paths .kc-path li a:focus-visible { text-decoration: underline; }
 .kc-paths-more { margin: var(--sp-4) 0 0; font-size: var(--fs-md); color: var(--muted); }
 
 /* ---- Search results and the empty state ---- */

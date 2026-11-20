@@ -5,6 +5,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 ## Unreleased
 
 ### Changed
+- The Start here cards in the Knowledge Center list their links without underlines, which return on hover and focus. "I do the work myself" is gone from the first screen and About.
 - Shorter copy on the landing page: the Services intro is one line pointing to the first call or a 1NEON account, its closing is the pricing link, the four service cards and their detail panels are rewritten for a quick read, and the process, contact, form, Neo, Knowledge Center, and blog wording is cut to what a visitor needs. The site now builds from neon1-corpus v0.51.8.
 - On a phone the four services are one swipeable row, like the client work cards, with previous and next buttons; the "reach by" links on the first screen slide the row to their service and mark it for a moment. Wide screens keep the 2 by 2 grid.
 - On a wide screen (1540px and up) the Knowledge Center index keeps its sections open at the right of the page, as a document's index does, and its "On this page" bar steps aside; narrower, the bar works as before.
