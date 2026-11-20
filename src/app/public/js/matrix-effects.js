@@ -9,6 +9,7 @@ export async function start() {
   started = true;
   const header = document.querySelector("header");
   const canvas = document.getElementById("rain"), lens = document.getElementById("lens"), ctl = document.querySelector(".rainctl");
+  const menu = document.getElementById("menu");
   const veil = document.querySelector(".veil"), reduce = matchMedia("(prefers-reduced-motion: reduce)");
   let egg = null;
   header.dataset.lensRadius = "0";
@@ -17,8 +18,8 @@ export async function start() {
     lens,
     panes: () => document.querySelectorAll(".hero-pane, header.n1-bar, .rainctl button"),
     lensOff: () => header.classList.contains("light"),
-    // Still while the phone menu covers it, so drawing doesn't compete with the menu's entrance
-    idle: () => document.documentElement.dataset.siteStyle === "sentinel" || document.body.classList.contains("woke") || header.classList.contains("menu-open"),
+    // Still while the phone menu is up, from its entrance to the end of its fade out, so drawing doesn't compete with either
+    idle: () => document.documentElement.dataset.siteStyle === "sentinel" || document.body.classList.contains("woke") || menu?.hidden === false,
     rabbit: {
       every: [7000, 10000],
       ok: () => !!egg && egg.ready(),
