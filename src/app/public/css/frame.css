@@ -125,7 +125,7 @@
 /* ---- Base: box model, anchor scrolling clear of the bar, links, and focus rings ---- */
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 72px; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
-body { margin: 0; background: var(--void); color: var(--text); font: 16px/1.65 var(--sans); }
+body { margin: 0; background: var(--void); color: var(--text); font: var(--fs-base)/1.65 var(--sans); }
 body.woke { background-color: var(--page); }
 /* Arriving at a section: blank paper until the page has landed on it (js/viewport.js sets this, js/views.js clears it) */
 html.arriving { background: var(--page); }
@@ -143,21 +143,21 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 
 /* Skip link: hidden above the bar until it gets keyboard focus */
 .skip { position: fixed; left: 12px; top: -64px; z-index: 30; padding: 10px 16px; border-radius: 4px;
-  font: 500 14px var(--mono); color: var(--void); background: var(--neon); text-decoration: none; }
+  font: 500 var(--fs-ui) var(--mono); color: var(--void); background: var(--neon); text-decoration: none; }
 .skip:focus { top: 12px; }
 
 /* ---- Buttons: one system, 44px tall with small corners (primary, ghost, and the round chip) ---- */
 .btn { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 20px; border: 1px solid var(--glow); border-radius: 4px;
-  font: 500 14px var(--mono); letter-spacing: .02em; text-decoration: none; cursor: pointer; transition: box-shadow .25s, background .25s, color .25s; }
+  font: 500 var(--fs-ui) var(--mono); letter-spacing: .02em; text-decoration: none; cursor: pointer; transition: box-shadow .25s, background .25s, color .25s; }
 .btn-primary { background: var(--deep); border-color: var(--deep); color: #00FF41; }
 .btn-primary:hover { box-shadow: 0 0 30px rgba(0,230,118,.5); }
 .btn-ghost { background: transparent; color: var(--neon); border-color: var(--neon); }
 .btn-ghost:hover { background: rgba(0,230,118,.08); }
-.chip { font: 12px var(--mono); color: var(--muted); background: var(--panel); border: 1px solid var(--line);
+.chip { font: var(--fs-xs) var(--mono); color: var(--muted); background: var(--panel); border: 1px solid var(--line);
   border-radius: 99px; padding: 6px 12px; cursor: pointer; }
 .chip:hover, .chip[aria-pressed="true"] { color: var(--glow); border-color: rgba(0,230,118,.45); }
 /* A square arrow chip: the case-study rail's previous and next, and the tour's back-to-top */
-.chip.arrow { display: inline-grid; place-items: center; min-width: 44px; min-height: 44px; padding: 6px 14px; font-size: 15px; text-decoration: none; }
+.chip.arrow { display: inline-grid; place-items: center; min-width: 44px; min-height: 44px; padding: 6px 14px; font-size: var(--fs-md); text-decoration: none; }
 
 /* ---- Top bar: clear over the rain, frosted light once the page is light ---- */
 /* Position, height, and the logo's place come from .n1-bar, .n1-inner, and .n1-logo in /shared/neon1.css */
@@ -169,9 +169,9 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 /* The middle and right of the bar: section links, then book a call and 1NEON at the far right */
 .links { list-style: none; display: flex; align-items: center; gap: 4px; margin: 0 0 0 auto; padding: 0; }
 .links a { white-space: nowrap; justify-content: center; text-align: center; }
-.links a:not(.btn), .links .note { padding: 7px 12px; color: var(--muted); font: 13px var(--mono); text-decoration: none; }
+.links a:not(.btn), .links .note { padding: 7px 12px; color: var(--muted); font: var(--fs-sm) var(--mono); text-decoration: none; }
 .links a:not(.btn):hover { color: var(--neon); }
-.links .btn { min-height: 36px; padding: 7px 14px; margin-left: 6px; font-size: 13px; border-radius: var(--glass-r); }
+.links .btn { min-height: 36px; padding: 7px 14px; margin-left: 6px; font-size: var(--fs-sm); border-radius: var(--glass-r); }
 /* 1NEON: quieter than book a call, with the portal's rings */
 .links .portal { color: var(--neon); border-color: var(--line); background: transparent; }
 .links .portal:hover { border-color: var(--neon); background: rgba(0,230,118,.08); }
@@ -345,31 +345,31 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 /* ---- Footer: the mark and slogan, contact, elsewhere, and the legal line ---- */
 footer { position: relative; z-index: 2; border-top: 1px solid var(--line); background: rgba(13,2,8,.92); }
 .awake footer { background: var(--surface-2); }
-.foot { max-width: 1200px; margin: 0 auto; display: grid; gap: 28px; grid-template-columns: 2fr 1fr 1fr; font-size: 14px; color: var(--muted);
+.foot { max-width: 1200px; margin: 0 auto; display: grid; gap: 28px; grid-template-columns: 2fr 1fr 1fr; font-size: var(--fs-ui); color: var(--muted);
   padding: 40px max(24px, env(safe-area-inset-right)) 28px max(24px, env(safe-area-inset-left)); }
 /* Footer headings are h2: the page's own h1 and sections come before, so an h3 here skipped a level (the page-wide h2 rules lose to the extra element in this selector) */
-footer .foot h2 { font: 600 13px var(--mono); letter-spacing: .01em; color: var(--text); margin: 0 0 10px; }
+footer .foot h2 { font: 600 var(--fs-sm) var(--mono); letter-spacing: .01em; color: var(--text); margin: 0 0 10px; }
 .foot ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
 .foot a { color: var(--muted); text-decoration: none; } .foot a:hover { color: var(--glow); }
 .foot .slogan { margin: 0; }
 /* The look picker: two plain text buttons for the same choice as the bar's style switch, which only the landing's first screen shows */
 /* The theme choice: the legal strip's first line, ending where the report line ends */
 /* 32px under it, the room between the copyright lines and the report line (the strip's bottom padding less half the launcher row), the strip's 8px gap included */
-.legal .look-pick { flex: 0 0 100%; display: flex; justify-content: flex-end; align-items: baseline; gap: 6px; margin: 0 0 24px; font: 12px var(--mono); }
+.legal .look-pick { flex: 0 0 100%; display: flex; justify-content: flex-end; align-items: baseline; gap: 6px; margin: 0 0 24px; font: var(--fs-xs) var(--mono); }
 @media (min-width: 1320px) { .legal .look-pick { margin-right: calc(-1 * ((100vw - var(--sbw, 0px) - 1200px) / 4 + 38px)); } }
 .legal .look-lead { margin-right: .4em; }
 .legal .look-opt { padding: 0; border: 0; background: none; color: var(--muted); font: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; cursor: pointer; }
 .legal .look-opt:hover { color: var(--glow); }
 .legal .look-opt[aria-pressed="true"] { color: var(--text); text-decoration: none; font-weight: 600; cursor: default; }
 :root:not([data-site-style]) .look-pick { display: none; }
-.mark-light { font: 700 17px var(--mono); letter-spacing: .06em; color: var(--brand); margin: 0 0 10px; }
+.mark-light { font: 700 var(--fs-lg) var(--mono); letter-spacing: .06em; color: var(--brand); margin: 0 0 10px; }
 @media (max-width: 700px) { .foot { grid-template-columns: 1fr 1fr; } .foot > div:first-child { grid-column: 1 / -1; } }
 /* Legal line. Its bottom padding is a resting place for Neo's launcher (fixed, bottom left, 48px tall, 16px from the bottom edge): the
    launcher's own distance from the edge is also its distance above the line's last row, so at the end of any page it never covers text.
    "report bug \\ feedback" sits in the same strip at the right, centered on the launcher (see its rule below) */
 :root { --foot-gap: max(16px, env(safe-area-inset-bottom)); --foot-neo: 48px; }
 .legal { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; gap: 8px 12px; flex-wrap: wrap; /* 8px between wrapped lines, whether the line wrapped inside a group or between groups */
-  font: 12px var(--mono); color: var(--muted); border-top: 1px solid var(--line);
+  font: var(--fs-xs) var(--mono); color: var(--muted); border-top: 1px solid var(--line);
   padding: 16px max(24px, env(safe-area-inset-right)) calc(var(--foot-gap) * 2 + var(--foot-neo)) max(24px, env(safe-area-inset-left)); }
 .legal a { color: inherit; text-decoration: none; } .legal a:hover { color: var(--glow); }
 .legal .policies { display: flex; gap: 8px; flex-wrap: wrap; align-items: baseline; }
@@ -413,7 +413,7 @@ a.ext:hover { color: var(--brand); }
 /* "report" leads both links, as a plain muted word, so the pair reads "report bug" or "report feedback", the drawings sitting alike before each name */
 .legal .report-links .report-lead { color: var(--muted); margin-right: .7em; }
 .legal a.report-bug, .legal a.report-bug.ext, .legal a.report-feedback, .legal a.report-feedback.ext { display: inline-flex; align-items: center; gap: .18em;
-  font: 600 12px var(--mono); color: var(--glow); text-decoration: none; }
+  font: 600 var(--fs-xs) var(--mono); color: var(--glow); text-decoration: none; }
 .legal :is(a.report-bug, a.report-feedback) svg { width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 @media (min-width: 1200px) and (max-width: 1319px) { .legal .report-links { right: calc((100% - 1200px) / 2 + 24px); } }
 @media (min-width: 1320px) { .legal .report-links { right: calc((100% - 1200px) / 4 - 14px); } }
@@ -435,7 +435,7 @@ a.ext:hover { color: var(--brand); }
 :root[data-site-theme="matrix"] .foot a:not(.ext):is(:hover, :focus-visible) { text-decoration-color: currentColor; }
 
 /* Text fields at 16px on touch screens: iPhone browsers zoom the page in when a field under 16px takes focus */
-@media (pointer: coarse) { :root:root :is(input:not([type=checkbox], [type=radio], [type=file], [type=range], [type=color]), textarea, select) { font-size: 16px; } }
+@media (pointer: coarse) { :root:root :is(input:not([type=checkbox], [type=radio], [type=file], [type=range], [type=color]), textarea, select) { font-size: var(--fs-base); } }
 
 /* ---- Touch: 44px hit areas without changing how anything looks ----
    On a phone or tablet (a coarse pointer), the small controls get an invisible area around them that takes the tap, so the bar's

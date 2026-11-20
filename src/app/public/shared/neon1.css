@@ -27,6 +27,30 @@
   --m-ink: #EDF1ED; --m-ink-soft: #E3E7E4; --m-muted: #CBD1CC; --m-faint: #B1B8B2;
 }
 
+/* Design tokens, the parent of every neon1 surface (neon1.tech, the Knowledge Center, the blog, 1NEON): one type scale and one
+   spacing scale. A component names a step and never writes its own size; a size written as a number is a rare exception with a
+   comment saying why (scripts/scale.test.cjs fails on one that has none). Sizes are rem, so a person's own text-size setting scales
+   everything; the px beside each is at the default 16px root.
+   Type: captions and meta 12, labels and buttons 13, interface text 14, compact body and card titles 15, reading text 16, lead 18,
+   then headings. Helper, caption, and meta text never exceed 13, and a title is never below 15.
+   Spacing: 2 4 8 12 16 24 32 48 on a 4px grid. Page-level fluid sizes (the hero's clamp()) are the only sizes outside the scale */
+:root {
+  --fs-xs: .75rem;      /* 12  captions, meta, badges, mono labels */
+  --fs-sm: .8125rem;    /* 13  buttons, field labels, helper text */
+  --fs-ui: .875rem;     /* 14  menu rows, table rows, secondary body */
+  --fs-md: .9375rem;    /* 15  compact body, inputs, card and section titles */
+  --fs-base: 1rem;      /* 16  reading text */
+  --fs-lg: 1.125rem;    /* 18  lead paragraphs */
+  --fs-xl: 1.25rem;     /* 20  small headings, large numbers */
+  --fs-2xl: 1.5rem;     /* 24  headings */
+  --fs-3xl: 2rem;       /* 32  display */
+  --sp-0: .125rem; --sp-1: .25rem; --sp-2: .5rem; --sp-3: .75rem; --sp-4: 1rem; --sp-5: 1.5rem; --sp-6: 2rem; --sp-7: 3rem;
+}
+/* Helper text: one style for every hint, caption, and status line under a control or inside a card. It is never larger than a
+   card title, and a problem is the same line in red, not different text in the same place */
+.helper { margin: 0; font-size: var(--fs-sm); color: var(--muted, inherit); }
+.helper.warn { color: var(--red, #B3261E); }
+
 /* Motion: one curve, three lengths, and a longer open/close for folds (--t-open with --ease-open) for every state change on neon1.tech and 1NEON (shared/motion.js holds the same
    numbers). Reduced motion, or html[data-motion="off"] (1NEON's own switch), sets the lengths to nothing, so every
    transition and animation that uses them becomes a plain change. A browser without the features simply changes at once. */
@@ -75,7 +99,7 @@
 .n1-inner { max-width: 1200px; height: 64px; margin: 0 auto; display: flex; align-items: center; gap: 20px;
   padding: 0 max(24px, env(safe-area-inset-right)) 0 max(24px, env(safe-area-inset-left)); }
 .n1-logo { display: inline-flex; align-items: center; gap: 10px; padding: 7px 12px; border-radius: var(--glass-r); color: var(--neon);
-  text-decoration: none; font: 700 13px var(--mono); letter-spacing: .06em; text-shadow: 0 0 8px rgba(108, 255, 168, .45); }
+  text-decoration: none; font: 700 var(--fs-sm) var(--mono); letter-spacing: .06em; text-shadow: 0 0 8px rgba(108, 255, 168, .45); }
 /* The logo's padding is its hover pill, so the pill hangs outside the page padding and the mark itself sits on the content's left line, as the menu button and 1NEON sit on the right one */
 .n1-logo { margin-left: -12px; }
 .n1-logo svg { width: 26px; height: 26px; }
@@ -84,7 +108,7 @@
    launcher and shares its bottom edge, so both corners sit on one line, clear of the home indicator */
 .rainctl { position: fixed; right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); z-index: 6;
   height: 48px; display: flex; align-items: center; gap: 8px; transition: opacity .3s; }
-.rainctl button { font: 12px var(--mono); color: #84a98c; background: transparent; border: 1px solid rgba(0, 255, 65, .16);
+.rainctl button { font: var(--fs-xs) var(--mono); color: #84a98c; background: transparent; border: 1px solid rgba(0, 255, 65, .16);
   border-radius: var(--glass-r); padding: 6px 12px; cursor: pointer; }
 .rainctl button:hover, .rainctl button[aria-pressed="true"] { color: var(--glow); border-color: rgba(108, 255, 168, .45); }
 /* The narrowest phones: tighter chips, so they stay clear of "ask Neo" while it shows its label */
