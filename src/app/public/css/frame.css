@@ -198,9 +198,13 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 .theme-moon path { fill: currentColor; stroke: none; }
 .theme-knob { position: absolute; top: 2px; left: 2px; width: 22px; height: 22px; border-radius: 50%; background: rgb(var(--brand-rgb) / .12);
   transition: transform var(--t-base) var(--ease-open); }
-.theme-sw[aria-checked="true"] .theme-knob { transform: translateX(24px); }
-.theme-sw[aria-checked="false"] .theme-sun, .theme-sw[aria-checked="true"] .theme-moon { color: var(--brand); }
-.theme-sw[aria-checked="false"] .theme-moon, .theme-sw[aria-checked="true"] .theme-sun { opacity: .6; }
+/* The knob and icons follow the root's look, which the head script sets before the first paint, so a switch never slides on load.
+   aria-checked (js/theme.js) says the same thing to assistive tech. On: dark mode, or sentinel for the style switch */
+:is(:root[data-site-theme="matrix"] .theme-sw:not(.style-sw), :root[data-site-style="sentinel"] .style-sw) .theme-knob { transform: translateX(24px); }
+:is(:root[data-site-theme="awake"] .theme-sw:not(.style-sw), :root[data-site-style="matrix"] .style-sw) .theme-sun,
+:is(:root[data-site-theme="matrix"] .theme-sw:not(.style-sw), :root[data-site-style="sentinel"] .style-sw) .theme-moon { color: var(--brand); }
+:is(:root[data-site-theme="awake"] .theme-sw:not(.style-sw), :root[data-site-style="matrix"] .style-sw) .theme-moon,
+:is(:root[data-site-theme="matrix"] .theme-sw:not(.style-sw), :root[data-site-style="sentinel"] .style-sw) .theme-sun { opacity: .6; }
 .n1-bar.light .theme-sw:focus-visible { outline-color: var(--brand); }
 .n1-bar:not(.light) .theme-sw { opacity: 0; visibility: hidden; pointer-events: none; }
 :root:not([data-site-theme]) .theme-sw { display: none; }
@@ -219,7 +223,6 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 .n1-bar:not(.light) .theme-sw.style-sw { opacity: 1; visibility: visible; pointer-events: auto; background: rgba(13,2,8,.4); color: #84a98c;
   --brand: var(--neon); --brand-rgb: 108 255 168; --ctl-line: rgba(108,255,168,.4); }
 .style-sw .sentinel-case { fill: none; stroke: currentColor; stroke-width: 1.8; }
-.style-sw[aria-checked="false"] .theme-sun, .style-sw[aria-checked="true"] .theme-moon { color: var(--brand); }
 
 /* ---- Phone menu: below the width the links need, they fold into a full-screen menu ---- */
 .menu-btn { margin-left: auto; display: none; border-radius: var(--glass-r); }

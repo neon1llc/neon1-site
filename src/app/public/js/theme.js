@@ -98,6 +98,24 @@
 
   apply(wantedLook());
 
+  // Sentinel's bar is plain and light from the first paint. js/page.js sets the same classes, but as a module it runs after the
+  // page has shown, so the landing's bar used to start as Matrix glass and fade to light on every visit. The observer catches the
+  // header as the parser adds it; its callback runs before the browser can paint that header
+  if (root.dataset.siteStyle === "sentinel") {
+    const settle = () => {
+      const bar = document.querySelector("header.n1-bar");
+      if (!bar) return false;
+      bar.classList.add("light");
+      document.body?.classList.add("woke");
+      return true;
+    };
+    if (!settle()) {
+      const watch = new MutationObserver(() => { if (settle()) watch.disconnect(); });
+      watch.observe(root, { childList: true, subtree: true });
+      addEventListener("DOMContentLoaded", () => watch.disconnect(), { once: true });
+    }
+  }
+
   // The landing names the modules and the font its Matrix look uses. Only a Matrix visitor preloads them, so Sentinel downloads none
   if (root.dataset.siteStyle === "matrix" && document.head) {
     const hint = (rel, href, extra = {}) => {
