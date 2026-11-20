@@ -305,7 +305,7 @@ let base;
     await force(page, "z".repeat(1201));
     await page.waitForTimeout(50);
     assert.equal(api.requests.length, 0, "nothing sent");
-    assert.match(await logText(page), /keep your question under 1,200 characters/);
+    assert.match(await logText(page), /Keep your question under 1,200 characters/);
     assert.equal(await page.inputValue(sel.input), "z".repeat(1201), "the text stays to be shortened");
     await force(page, "\u{1F600}".repeat(600));
     const emoji = await api.next(1);
@@ -335,7 +335,7 @@ let base;
     await api.reply(retry, { error: "Please keep your question under 1,200 characters.", code: "question_too_long" }, 400);
     await page.waitForFunction(() => document.querySelector(".n1chat-log").textContent.includes("Keep your question under"));
     const text = await logText(page);
-    assert.ok(text.indexOf("start fresh") < text.indexOf("keep your question under"));
+    assert.ok(text.indexOf("start fresh") < text.indexOf("Keep your question under"));
     await ctx.close();
   });
 
