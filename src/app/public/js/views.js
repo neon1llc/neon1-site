@@ -176,7 +176,7 @@
   // Trailing momentum after a settle is swallowed until input goes idle
   let y = scrollY, target = scrollY; // rendered and wanted scroll positions
   let pull = 0, pullDir = 0, pullIndex = 0, pullBase = 0;
-  let settling = null;
+  let settling = null, detenting = false; // detenting: the settle is a detent after a native scroll, which a touch cuts short
   let lastInput = 0, gestureFromEdge = false, blockUntilIdle = false, idleTimer = 0;
   // Momentum fades, a person scrolling doesn't: two steps in a row that don't shrink count as a push
   let prevAbs = 0, steady = 0, lastDirect = false;
@@ -208,10 +208,11 @@
     const fromView = views[from], toView = views[i];
     pull = 0; pullDir = 0;
     const distance = Math.abs(dest - y);
-    const duration = Math.min(1.25, 0.7 + distance / 4000);
+    const duration = opts.detent ? Math.min(0.55, 0.28 + distance / 2400) : Math.min(1.25, 0.7 + distance / 4000);
     if (fromView !== toView && fromView !== hero && visited.has(fromView)) animate(fromView, { opacity: 0 }, { duration: duration * 0.6 });
     let entered = false;
     blockUntilIdle = true;
+    detenting = !!opts.detent;
     settling = animate(y, dest, {
       duration, ease: settleEase,
       onUpdate: (v) => {
@@ -219,7 +220,7 @@
         if (!entered && Math.abs(v - dest) < distance * 0.4) { entered = true; enter(toView); }
       },
       onComplete: () => {
-        settling = null; y = target = dest;
+        settling = null; detenting = false; y = target = dest;
         if (!entered) enter(toView);
         if (performance.now() - lastInput > IDLE) blockUntilIdle = false; // nothing left to swallow
       },
@@ -392,44 +393,10 @@
   }, { passive: false });
 
   // ---- Touch ----
-  // The last touch point, the locked axis, and vertical velocity in px per ms
-  let tY = 0, tX = 0, axis = null, vel = 0, tLast = 0;
-  let chatTouch = false, touchAt = null;
-  addEventListener("touchstart", (e) => {
-    chatTouch = inChat(e.target); touchAt = e.target;
-    if (e.touches.length !== 1) return;
-    tY = e.touches[0].clientY; tX = e.touches[0].clientX; axis = null; vel = 0; tLast = performance.now();
-  }, { passive: true });
-
-  // The first 6px pick the axis; vertical drags drive the views
-  addEventListener("touchmove", (e) => {
-    if (e.touches.length !== 1 || paused() || chatTouch) return;
-    const cy = e.touches[0].clientY, cx = e.touches[0].clientX;
-    const dy = tY - cy, dx = tX - cx;
-    if (!axis) {
-      if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
-      axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
-    }
-    if (axis === "x") return; // sideways, e.g. the work cards
-    if (innerScrolls(touchAt, dy)) { tY = cy; tX = cx; return; } // the box scrolls itself
-    e.preventDefault();
-    const now = performance.now();
-    vel = dy / Math.max(1, now - tLast);
-    tLast = now; tY = cy; tX = cx;
-    input(dy, true);
-  }, { passive: false });
-
-  // Lifting the finger springs back a pull, or lets a flick glide
-  addEventListener("touchend", () => {
-    if (axis !== "y" || settling || chatTouch) return;
-    if (pullDir) { release(); return; }
-    // A flick inside a tall view keeps gliding, and stops at the view's edge
-    if (Math.abs(vel) > 0.3) {
-      wake();
-      const [top, bottom] = range(indexAt(target));
-      target = Math.max(top, Math.min(bottom, target + vel * 260));
-    }
-  });
+  // A finger and its flick belong to the browser: the page scrolls natively, with the platform's own momentum (iOS's included),
+  // rubber band, and stop-on-touch, as any page does. Steering the finger (preventDefault on touchmove) lost all of that. What stays
+  // is the detent: once the scroll has come to rest, rest() below settles on the nearest view edge, so a flick can carry across several
+  // views and still never rest between two. Touching again during the settle takes the page back (see rest())
 
   // ---- Keyboard and links ----
   // Arrows and paging scroll inside a tall view, then move on at its edge
@@ -510,7 +477,19 @@
     if (!visited.has(v)) enter(v);
     else v.style.opacity = "1";
   }
+  // Views on screen during a native scroll show themselves as they arrive: a first visit plays its entrance, and one faded out by an
+  // earlier settle comes back, so a flick across several views never passes a blank one
+  function showVisible() {
+    for (const v of views) {
+      if (v === hero) continue;
+      const r = v.getBoundingClientRect();
+      if (r.bottom <= 0 || r.top >= vh()) continue;
+      if (!visited.has(v)) enter(v);
+      else if (v.style.opacity !== "1") v.style.opacity = "1";
+    }
+  }
   addEventListener("scroll", () => {
+    if (!settling && !pullDir && !landing()) showVisible();
     // Opened at a #section: the browser's own jump to it, which can come late, is put back on the view's top
     if (landing()) { land(); return; }
     if (!settling && !pullDir && Math.abs(scrollY - y) > 2) sync();
@@ -541,7 +520,11 @@
   // position. The page waits until that is over (no finger down, no settle, no pull, and no keyboard open
   // over the chat), then eases to the nearer edge: the bottom of the view above or the top of the one below
   let fingers = 0, restTimer = 0;
-  addEventListener("touchstart", (e) => { fingers = e.touches.length; }, { passive: true, capture: true });
+  addEventListener("touchstart", (e) => {
+    fingers = e.touches.length;
+    // A finger down in the middle of a detent takes the page back, so a pull back or a new flick starts from where it is
+    if (settling && detenting) { settling.stop(); settling = null; detenting = false; blockUntilIdle = false; sync(); }
+  }, { passive: true, capture: true });
   addEventListener("touchend", (e) => { fingers = e.touches.length; rest(); }, { passive: true, capture: true });
   addEventListener("touchcancel", () => { fingers = 0; rest(); }, { passive: true, capture: true });
   const typing = () => { const a = document.activeElement; return !!a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && !!a.closest(".n1chat"); };
@@ -554,7 +537,7 @@
       const i = indexAt(at), [, bottom] = range(i);
       if (at <= bottom + 2 || i === views.length - 1) return; // inside a view
       const nextTop = range(i + 1)[0];
-      goTo(at - bottom <= nextTop - at ? i : i + 1, { y: at - bottom <= nextTop - at ? bottom : nextTop });
+      goTo(at - bottom <= nextTop - at ? i : i + 1, { y: at - bottom <= nextTop - at ? bottom : nextTop, detent: true });
     }, wait);
   }
   addEventListener("scroll", () => rest(), { passive: true });
