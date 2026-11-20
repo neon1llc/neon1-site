@@ -34,3 +34,22 @@ import("/shared/chat.js").then(({ chat }) => {
   chat({ light: lightPage, watch: [header] });
   document.addEventListener("n1:theme", () => dispatchEvent(new Event("scroll")));
 }).catch(() => { /* chat unavailable; contact links remain */ });
+
+// The section in view is marked in the bar and the menu: the view crossing the screen's middle line. The first screen marks none
+const sectionLinks = [...document.querySelectorAll('.links a[href^="#"], .menu a[href^="#"]')];
+const sections = [...new Set(sectionLinks.map((a) => document.getElementById(a.getAttribute("href").slice(1))).filter(Boolean))];
+if (sections.length && "IntersectionObserver" in window) {
+  const inView = new Set();
+  const mark = () => {
+    const current = sections.find((s) => inView.has(s));
+    for (const a of sectionLinks) {
+      if (current && a.getAttribute("href") === "#" + current.id) a.setAttribute("aria-current", "location");
+      else a.removeAttribute("aria-current");
+    }
+  };
+  const watch = new IntersectionObserver((entries) => {
+    for (const e of entries) e.isIntersecting ? inView.add(e.target) : inView.delete(e.target);
+    mark();
+  }, { rootMargin: "-50% 0px -50% 0px" });
+  sections.forEach((s) => watch.observe(s));
+}

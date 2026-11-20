@@ -4,9 +4,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="version" content="0.83.0" />
+  <meta name="version" content="0.84.0" />
   <title>neon1 · independent engineering and technology consulting</title>
-  <meta name="description" content="Independent engineering and technology consulting: workflow automation, cloud and AI engineering, networks and connected systems, and security readiness. Remote across the US, or on site near Queens, NY." />
+  <meta name="description" content="Independent engineering and technology consulting: workflow automation, cloud and AI, networks, and security readiness. Remote across the US or near Queens, NY." />
   <meta name="theme-color" content="#0D0208" />
   <!-- Light or dark for everything below the rain, set before the first paint so nothing flashes -->
   <script src="/js/theme.js"></script>
@@ -16,7 +16,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="neon1" />
   <meta property="og:title" content="neon1 · independent engineering and technology consulting" />
-  <meta property="og:description" content="Independent engineering and technology consulting: workflow automation, cloud and AI engineering, networks and connected systems, and security readiness. Remote across the US, or on site near Queens, NY." />
+  <meta property="og:description" content="Independent engineering and technology consulting: workflow automation, cloud and AI, networks, and security readiness. Remote across the US or near Queens, NY." />
   <meta property="og:url" content="https://neon1.tech/" />
   <meta property="og:image" content="https://neon1.tech/media/og-card-1.png" />
   <meta property="og:image:width" content="1200" />
@@ -24,7 +24,7 @@
   <meta property="og:image:alt" content="The neon1 mark and name in glowing green on a dark card, with cloud, AI, IT, New York, and 1 is glad to be of service" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="neon1 · independent engineering and technology consulting" />
-  <meta name="twitter:description" content="Independent engineering and technology consulting: workflow automation, cloud and AI engineering, networks and connected systems, and security readiness. Remote across the US, or on site near Queens, NY." />
+  <meta name="twitter:description" content="Independent engineering and technology consulting: workflow automation, cloud and AI, networks, and security readiness. Remote across the US or near Queens, NY." />
   <!-- Who runs the practice, as shown on the page, and the site's name for search results. Only facts
        the page itself states; the @id values are stable names other pages can point at -->
   <script type="application/ld+json">
@@ -74,6 +74,10 @@
   <link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <!-- /frame:icons -->
+  <!-- frame:fonts -->
+  <!-- Figtree sets the body text on every page, so the browser fetches it with the first stylesheet. Left to the font-face rule it arrived after the first layout, swapped in, and moved the landing's text (layout shift 0.33 at 1440px) -->
+  <link rel="preload" href="/fonts/figtree-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <!-- /frame:fonts -->
   <!-- Shared with 1NEON: fonts, brand tokens, rain layers, glass, and rain controls -->
   <link rel="stylesheet" href="/shared/neon1.css" />
   <link rel="stylesheet" href="/shared/chat.css" />
@@ -132,9 +136,10 @@
         <span class="theme-knob" aria-hidden="true"></span>
       </button>
       <!-- /frame:theme -->
-      <!-- Theme: matrix (the rain and the neon) or sentinel (plain). Only on the landing's first screen, where the theme switch would
-           sit, hidden once the page scrolls; its pick wins on every page (js/theme.js, css/sentinel.css) -->
-      <button class="theme-sw style-sw" type="button" role="switch" aria-checked="false" aria-label="matrix or sentinel" title="matrix or sentinel">
+      <!-- Look: matrix (the rain and the neon) or sentinel (plain), on when Sentinel. Only on the landing's first screen, hidden once the page scrolls:
+           in Matrix it takes the light/dark switch's place, in Sentinel it sits after the logo (css/frame.css). The footer offers the same choice on every page.
+           Its pick wins on every page (js/theme.js, css/sentinel.css) -->
+      <button class="theme-sw style-sw" type="button" role="switch" aria-checked="false" aria-label="Sentinel look" title="sentinel or matrix look">
         <svg class="theme-sun" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.5v6M12 3.5v9M17 3.5v5M7 14v6.5M12 16.5v4M17 12v8.5" /></svg>
         <svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path class="sentinel-case" d="M3.5 8h17v11.5h-17zM8.5 8V5.5h7V8M3.5 13h17" /></svg>
         <span class="theme-knob" aria-hidden="true"></span>
@@ -184,6 +189,8 @@
           <p class="pitch-work">Selected work: <a href="#case-accounting">permission-aware document assistant</a>, <a href="#case-dermatology">patient intake portal</a>, <a href="#case-migration">two-site server migration</a>, <a href="#case-business">operations integration and monitoring</a>.</p>
         </div>
         <p class="tagline reveal d1">1 is glad to be of service.</p>
+        <!-- Matrix's one quiet line of offer and the way in, since the rest of the pitch stays off the rain (css/sentinel.css shows the pitch for Sentinel instead) -->
+        <p class="landing-line reveal d2"><span>Independent engineering and technology consulting.</span><a href="/#contact" data-view="contact">Discuss a project</a></p>
       </div>
       <!-- The white rabbit's way in from the keyboard: off screen until focused, like the skip link,
            and shown only once js/white-rabbit.js runs -->
@@ -195,7 +202,7 @@
   <main id="main" tabindex="-1">
     <section id="services" class="view" aria-labelledby="services-h">
       <h2 id="services-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>services</h2>
-      <p class="lead intro reveal-on">Four services, each from a focused assessment to a complete implementation. Open one for what you get, what it needs from you, and where something else fits better.</p>
+      <p class="lead intro reveal-on">Four services, each from a focused assessment to a complete implementation. Open one for what you get, what it needs from you, and where something else fits better.<span data-signup hidden> To start, <a href="/1NEON/?signup=1">outline up to three projects</a> in a free 1NEON account, then ask for a free assessment. The free 30-minute call is the other way in.</span></p>
       <div class="svc-grid">
         <article class="svc reveal-on" id="service-workflow" aria-labelledby="service-workflow-h">
           <h3 id="service-workflow-h">Workflow automation</h3>
@@ -206,8 +213,9 @@
             <li>Reporting needs data from systems that don't export cleanly.</li>
             <li>Documents arrive in volume and need structured extraction with human review.</li>
           </ul>
-          <details class="n1-fold fold svc-more">
-            <summary>deliverables, limits, next step</summary>
+          <p class="svc-cue">what you get, limits, next step</p>
+          <button class="open" type="button" data-case="service-workflow" aria-haspopup="dialog" aria-label="Open service: Workflow automation"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></button>
+          <template class="deep">
             <dl class="svc-facts">
               <dt>You get</dt><dd>An integration map and data ownership rules, a working implementation in your accounts, tests against agreed acceptance criteria including failure cases, monitoring, and a runbook for each integration.</dd>
               <dt>Something else fits better</dt><dd>When a native integration or a platform such as n8n, Zapier, or Make covers it, I recommend that and can set it up. The same goes for low volume, where a documented manual step costs less than software, and for a managed integration service with round-the-clock support.</dd>
@@ -215,7 +223,7 @@
               <dt>Related work</dt><dd><a href="#case-dermatology">Patient intake portal</a> and <a href="#case-business">operations integration and monitoring</a>.</dd>
             </dl>
             <p class="svc-next"><a href="/knowledge/guides/use-case-workflows/">Full description</a><span class="sep" aria-hidden="true">\</span><a href="/#contact" data-view="contact">Discuss a workflow project</a></p>
-          </details>
+          </template>
         </article>
         <article class="svc reveal-on" id="service-cloud" aria-labelledby="service-cloud-h">
           <h3 id="service-cloud-h">Cloud and AI engineering</h3>
@@ -226,8 +234,9 @@
             <li>Infrastructure built by hand should move to infrastructure as code.</li>
             <li>An AI feature must answer from your data, respect who may see what, cite sources, and be evaluated before people rely on it.</li>
           </ul>
-          <details class="n1-fold fold svc-more">
-            <summary>deliverables, limits, next step</summary>
+          <p class="svc-cue">what you get, limits, next step</p>
+          <button class="open" type="button" data-case="service-cloud" aria-haspopup="dialog" aria-label="Open service: Cloud and AI engineering"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></button>
+          <template class="deep">
             <dl class="svc-facts">
               <dt>You get</dt><dd>Written findings and options, reviewed changes in your repositories, test and evaluation results, rollback and recovery procedures, and a handover to the engineers who will run it.</dd>
               <dt>How it fits your team</dt><dd>I work in your repositories, follow your conventions and change process, and agree up front how the team will review and accept the work. The team keeps ownership and on-call.</dd>
@@ -236,7 +245,7 @@
               <dt>Related work</dt><dd><a href="#case-accounting">Permission-aware document assistant</a> and <a href="#case-migration">two-site server migration</a>.</dd>
             </dl>
             <p class="svc-next"><a href="/knowledge/guides/use-case-cloud/">Full description</a><span class="sep" aria-hidden="true">\</span><a href="/#contact" data-view="contact">Discuss a cloud or AI project</a></p>
-          </details>
+          </template>
         </article>
         <article class="svc reveal-on" id="service-networks" aria-labelledby="service-networks-h">
           <h3 id="service-networks-h">Networks and connected systems</h3>
@@ -247,16 +256,17 @@
             <li>Cameras, sensors, or building systems must be integrated with each other or with business systems, and monitored.</li>
             <li>A home network or lab is to be built to a higher standard, with local storage and private recording.</li>
           </ul>
-          <details class="n1-fold fold svc-more">
-            <summary>deliverables, limits, next step</summary>
+          <p class="svc-cue">what you get, limits, next step</p>
+          <button class="open" type="button" data-case="service-networks" aria-haspopup="dialog" aria-label="Open service: Networks and connected systems"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></button>
+          <template class="deep">
             <dl class="svc-facts">
               <dt>You get</dt><dd>A network diagram, an asset inventory, the configuration with its ownership and admin access recorded, access boundaries, recovery steps, and a maintenance schedule.</dd>
-              <dt>Something else fits better</dt><dd>A managed service provider, for a help desk, device management, or someone on call. A licensed installer, for cabling, licensed electrical work, or alarm systems; I can work from their side on design and configuration. The manufacturer or a repair shop, for one broken device.</dd>
+              <dt>Something else fits better</dt><dd>A managed service provider, for a help desk, device management, or someone on call. A licensed installer, for cabling, licensed electrical work, or alarm systems. I can work from their side on design and configuration. The manufacturer or a repair shop, for one broken device.</dd>
               <dt>Limits</dt><dd>I design and configure. Physical installation is arranged per project with a qualified installer. No licensed electrical or alarm-system work, safety-critical systems, or electronics repair.</dd>
               <dt>Related work</dt><dd>The separate device network in <a href="#case-business">operations integration and monitoring</a>, and the site-to-site VPN in the <a href="#case-migration">two-site server migration</a>.</dd>
             </dl>
             <p class="svc-next"><a href="/knowledge/guides/use-case-networks/">Full description</a><span class="sep" aria-hidden="true">\</span><a href="/#contact" data-view="contact">Discuss a network project</a></p>
-          </details>
+          </template>
         </article>
         <article class="svc reveal-on" id="service-security" aria-labelledby="service-security-h">
           <h3 id="service-security-h">Security readiness</h3>
@@ -267,16 +277,17 @@
             <li>Access has grown loose: shared accounts, missing MFA, unreviewed admin rights, slow offboarding.</li>
             <li>Backups exist, but a restore has never been tested.</li>
           </ul>
-          <details class="n1-fold fold svc-more">
-            <summary>deliverables, limits, next step</summary>
+          <p class="svc-cue">what you get, limits, next step</p>
+          <button class="open" type="button" data-case="service-security" aria-haspopup="dialog" aria-label="Open service: Security readiness"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></button>
+          <template class="deep">
             <dl class="svc-facts">
               <dt>You get</dt><dd>Prioritized findings, a remediation plan, the changes made and verified, and evidence of the checks performed.</dd>
-              <dt>Something else fits better</dt><dd>An independent auditor, for an audit opinion. A compliance platform such as Vanta, Drata, or Secureframe, for ongoing evidence collection; I can help set one up. A specialist or managed security provider, for a penetration test, 24/7 monitoring, or an incident in progress. A lawyer, for legal advice on an obligation.</dd>
-              <dt>Limits</dt><dd>No audit opinions, certifications, penetration tests, or legal advice, and no guarantee of passing a review. Work with health information starts only after a business associate agreement is signed. I also run informational security awareness sessions for groups; they are practical, not certified training.</dd>
+              <dt>Something else fits better</dt><dd>An independent auditor, for an audit opinion. A compliance platform such as Vanta, Drata, or Secureframe, for ongoing evidence collection. I can help set one up. A specialist or managed security provider, for a penetration test, 24/7 monitoring, or an incident in progress. A lawyer, for legal advice on an obligation.</dd>
+              <dt>Limits</dt><dd>No audit opinions, certifications, penetration tests, or legal advice, and no guarantee of passing a review. Work with health information starts only after a business associate agreement is signed. I also run informational security awareness sessions for groups. They are practical, not certified training.</dd>
               <dt>Related work</dt><dd>Access, encryption, and audit logging in the <a href="#case-dermatology">patient intake portal</a>, and <a href="#case-security">security awareness sessions</a>.</dd>
             </dl>
             <p class="svc-next"><a href="/knowledge/guides/use-case-security-readiness/">Full description</a><span class="sep" aria-hidden="true">\</span><a href="/#contact" data-view="contact">Discuss a security review</a></p>
-          </details>
+          </template>
         </article>
       </div>
       <p class="lead svc-foot reveal-on">Each proposal makes one recommendation, or sets out options when there's a real choice, with scope, acceptance criteria, and cost to build and run. <a href="/knowledge/engagement/pricing/">How engagements are priced</a>.</p>
@@ -304,7 +315,7 @@
           <dl class="glance"><dt>problem</dt><dd>Intake ran through a shared inbox, with staff chasing documents by email.</dd><dt>work</dt><dd>An AWS portal where patients upload once and staff see what&#x27;s complete.</dd><dt>results</dt><dd>Compared four weeks before and after.</dd><dt>after</dt><dd>Maintained with Xenoss, and an EHR interface when the vendor allows it.</dd></dl>
           <p class="stat"><b>2.6 days → 3.4 hours</b> · 24 → 8 min staff time</p>
           <button class="open" type="button" data-case="dermatology" aria-haspopup="dialog" aria-label="Open case study: Patient intake portal"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></button>
-          <template class="deep"><h4>The problem</h4><p>A new practice and its sister location ran intake through a shared Microsoft 365 inbox. Patients sent forms, insurance cards, referrals, and phone photos. Staff downloaded, renamed, and tracked them in Outlook flags and a spreadsheet, then uploaded each into a slow EHR. Anything missing started another round of emails.</p><h4>The work</h4><p>I mapped the process with staff, separating patient waiting time from staff handling time, then built a Terraform-managed serverless portal. <a class="ext" href="https://xenoss.io" target="_blank" rel="noopener"><span class="ext-end">Xenoss</span></a> held the contract, brought me in as a subcontractor, and helped on design and maintenance.</p><ul><li>CloudFront, WAF, and a private S3 site serve the portal. API Gateway, Cognito, and Python Lambda run the workflow.</li><li>Each intake has one state in DynamoDB. Documents upload to an encrypted S3 vault, locked until a malware scan passes.</li><li>Staff see one queue of what's complete and missing, and link each intake to the patient's EHR record by ID and MRN. The EHR vendor's interface wasn't available, so the portal was built not to depend on it.</li><li>Emails never include patient details, and access, encryption, and audit logging were set up front.</li></ul><h4>The results</h4><table><tr><th>Measure</th><th>Before</th><th>After</th></tr><tr><td>Median time to a complete intake</td><td>~2.6 business days</td><td>~3.4 hours</td></tr><tr><td>Staff time per intake</td><td>~24 min</td><td>~8 min</td></tr><tr><td>Finding and opening a document</td><td>~2 min 18 s</td><td>~12 s</td></tr><tr><td>Intakes needing a missing-document follow-up</td><td>~34%</td><td>~10%</td></tr></table><p>Four weeks before and after, same definitions. At about 250 intakes a month, that's roughly 67 staff hours saved. Time to a complete intake was timed from record timestamps, before and after launch: from the patient's most recent call, email, or other contact with the practice to when their appointment was scheduled. The portal records when each intake starts and when it's complete, as metrics only, with no patient details. The practice keeps them for its own dashboards and emails, and can turn them off. Before launch, staff time per intake was worked out by hand from the old records, from first call or email to the appointment being set, and checked against a short staff survey.</p><h4>After handover</h4><p>The EHR stays the clinical record. Xenoss and I maintain the portal, watch the measures, and tune it as both locations grow. Next is a direct EHR interface, once the vendor enables one and the volume justifies it.</p></template>
+          <template class="deep"><h4>The problem</h4><p>A new practice and its sister location ran intake through a shared Microsoft 365 inbox. Patients sent forms, insurance cards, referrals, and phone photos. Staff downloaded, renamed, and tracked them in Outlook flags and a spreadsheet, then uploaded each into a slow EHR. Anything missing started another round of emails.</p><h4>The work</h4><p>I mapped the process with staff, separating patient waiting time from staff handling time, then built a Terraform-managed serverless portal. <a class="ext" href="https://xenoss.io" target="_blank" rel="noopener"><span class="ext-end">Xenoss</span></a> held the contract, brought me in as a subcontractor, and helped on design and maintenance.</p><ul><li>CloudFront, WAF, and a private S3 site serve the portal. API Gateway, Cognito, and Python Lambda run the workflow.</li><li>Each intake has one state in DynamoDB. Documents upload to an encrypted S3 vault, locked until a malware scan passes.</li><li>Staff see one queue of what's complete and missing, and link each intake to the patient's EHR record by ID and MRN. The EHR vendor's interface wasn't available, so the portal was built not to depend on it.</li><li>Emails never include patient details, and access, encryption, and audit logging were set up front.</li></ul><h4>The results</h4><table><tr><th>Measure</th><th>Before</th><th>After</th></tr><tr><td>Median time to a complete intake</td><td>~2.6 days</td><td>~3.4 hours</td></tr><tr><td>Staff time per intake</td><td>~24 min</td><td>~8 min</td></tr><tr><td>Finding and opening a document</td><td>~2 min 18 s</td><td>~12 s</td></tr><tr><td>Intakes needing a missing-document follow-up</td><td>~34%</td><td>~10%</td></tr></table><p>Four weeks before and after, same definitions. At about 250 intakes a month, that's roughly 67 staff hours saved. Time to a complete intake was timed from record timestamps, before and after launch: from the patient's most recent call, email, or other contact with the practice to when their appointment was scheduled. The portal records when each intake starts and when it's complete, as metrics only, with no patient details. The practice keeps them for its own dashboards and emails, and can turn them off. Before launch, staff time per intake was worked out by hand from the old records, from first call or email to the appointment being set, and checked against a short staff survey.</p><h4>After handover</h4><p>The EHR stays the clinical record. Xenoss and I maintain the portal, watch the measures, and tune it as both locations grow. Next is a direct EHR interface, once the vendor enables one and the volume justifies it.</p></template>
         </article>
         <article class="case reveal-on" id="case-business">
           <p class="idx">small local business · workflows</p>
@@ -379,7 +390,7 @@
         <div class="reveal-on"><h3>Build</h3><p>Reviewable changes, tested against the acceptance criteria, including failure and rollback. Scope changes need your approval.</p></div>
         <div class="reveal-on"><h3>Hand over</h3><p>Evidence that it meets the criteria, documentation, and a walkthrough for whoever runs it. Ongoing care is optional.</p></div>
       </div>
-      <p class="tour-link reveal-on">Clients follow proposals, approvals, and handover in 1NEON; no account is needed to start a conversation. <a class="ext" href="/1NEON/live">See a guided <span class="ext-end">walkthrough</span></a> with fictional data.</p>
+      <p class="tour-link reveal-on">Clients follow proposals, approvals, and handover in 1NEON. No account is needed to start a conversation.<span data-signup hidden> A free account walks you through outlining up to three projects before you ask for an assessment.</span> <a href="/1NEON/live">See a guided walkthrough</a> with fictional data.</p>
     </section>
 
     <section id="work" class="view" aria-labelledby="work-h">
@@ -410,10 +421,10 @@
       <details class="n1-fold fold group reveal-on">
         <summary>this site</summary>
         <div class="rows repos">
-          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-corpus" target="_blank" rel="noopener"><span class="ext-end">neon1-corpus</span></a></h3><p class="state">v0.50.2 · <span class="lic">CC BY-ND 4.0 text, FSL-1.1 tools</span></p><p>neon1's public writing, in Markdown, shared by the site, 1NEON, and Neo.</p></div>
+          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-corpus" target="_blank" rel="noopener"><span class="ext-end">neon1-corpus</span></a></h3><p class="state">v0.51.0 · <span class="lic">CC BY-ND 4.0 text, FSL-1.1 tools</span></p><p>neon1's public writing, in Markdown, shared by the site, 1NEON, and Neo.</p></div>
           <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-aws-infrastructure" target="_blank" rel="noopener"><span class="ext-end">neon1-aws-infrastructure</span></a></h3><p class="state">v0.13.0 · <span class="lic">FSL-1.1 code, CC BY-ND 4.0 text</span></p><p>Terraform for neon1.tech on AWS.</p></div>
-          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener"><span class="ext-end">neon1-site</span></a></h3><p class="state">v0.82.0 · <span class="lic">FSL-1.1 code, CC BY-ND 4.0 text</span></p><p>The neon1.tech website, its Knowledge Center, and its blog.</p></div>
-          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-1NEON" target="_blank" rel="noopener"><span class="ext-end">neon1-1NEON</span></a></h3><p class="state">v0.22.1 · <span class="lic">MIT</span></p><p>1NEON, the client portal.</p></div>
+          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener"><span class="ext-end">neon1-site</span></a></h3><p class="state">v0.84.0 · <span class="lic">FSL-1.1 code, CC BY-ND 4.0 text</span></p><p>The neon1.tech website, its Knowledge Center, and its blog.</p></div>
+          <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-1NEON" target="_blank" rel="noopener"><span class="ext-end">neon1-1NEON</span></a></h3><p class="state">v0.23.0 · <span class="lic">MIT</span></p><p>1NEON, the client portal.</p></div>
           <div class="row repo"><h3><a class="ext" href="https://github.com/neon1llc/neon1-chat" target="_blank" rel="noopener"><span class="ext-end">neon1-chat</span></a></h3><p class="state">v0.3.1 · <span class="lic">FSL-1.1 code, CC BY-ND 4.0 text</span></p><p>Neo, the site's assistant, answering from neon1's public pages.</p></div>
         </div>
       </details>
@@ -423,7 +434,7 @@
       <h2 id="faq-h"><svg class="pr" viewBox="0 0 10 10" aria-hidden="true"><path d="M1.6 .9 8.4 5 1.6 9.1"/></svg>questions</h2>
       <div class="faq">
         <!-- corpus:questions generated by scripts/corpus.mjs from neon1-corpus. Edit there, then run make corpus -->
-        <details class="n1-fold reveal-on"><summary>Can I start without a call?</summary><p>Yes. <a href="/1NEON/?signup=1">Start a free 1NEON account</a> and write down what you need, on your own time. When it's ready, ask for a free assessment and book the 30-minute call. I read your project before we talk.</p></details>
+        <details class="n1-fold reveal-on"><summary>Can I start without a call?</summary><p>Yes. <a href="/1NEON/?signup=1">Start a free 1NEON account</a>, outline up to three projects on your own time, then ask for a free assessment of any or all of them. I read them and reply by email.</p></details>
         <details class="n1-fold reveal-on"><summary>How do you treat our data and accounts?</summary><p>I use only the access the job needs, keep your information confidential, and remove my access when we're done. We sign a short <a href="/knowledge/engagement/service-agreement/">service agreement</a> once, before any paid work.</p></details>
         <details class="n1-fold reveal-on"><summary>What if something urgent comes up?</summary><p>I work in planned appointments, with no 24/7 or emergency response. An incident in progress or an outage needs a provider with emergency coverage first.</p></details>
         <details class="n1-fold reveal-on"><summary>How is the cost worked out?</summary><p>After we talk, I send a short proposal: one recommendation, or options when there's a real choice, each with what it covers, its upkeep, and its cost. You approve it, and the cost changes only if you approve a change.</p></details>
@@ -438,10 +449,10 @@
       <p class="lead reveal-on">Tell me what you're working on, or ask for an opinion on a design, a system, or a decision. <a class="ext" href="mailto:hello@neon1.tech"><span class="ext-end">Email</span></a>, call or text <a class="ext" href="tel:+14243263661" title="(424) 326-3661">(424) <span class="ext-end">32-neon1</span></a>, or book a <a class="ext" href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener">free 30-minute <span class="ext-end">call</span></a>. No account is needed.</p>
       <!-- Self sign-up: a free, limited 1NEON account where a visitor can write down their needs first, if they prefer.
            Hidden until js/signup.js hears that 1NEON's sign-up is open -->
-      <p class="lead reveal-on" data-signup hidden>Prefer to write it down first? A free <a href="/1NEON/?signup=1">1NEON account</a> holds up to 3 projects and is kept 30 days after your last change. It's optional. <a href="/knowledge/guides/free-accounts/">How free accounts work</a>.</p>
+      <p class="lead reveal-on" data-signup hidden>Prefer to write it down first? Outline up to three projects in a free <a href="/1NEON/?signup=1">1NEON account</a>, then ask for a free assessment. You don't need a call first. Accounts are kept 30 days after your last change, and an account is optional. <a href="/knowledge/guides/free-accounts/">How free accounts work</a>.</p>
       <!-- Engagement fit: where, when, what size, and the first call, in one glance -->
       <dl class="fit reveal-on">
-        <div><dt>availability</dt><dd>Weekday evenings (6&ndash;9pm, Fri to 8pm) <span class="sep" aria-hidden="true">\</span> Weekends (8am&ndash;8pm) <span class="sep" aria-hidden="true">\</span> Eastern time <span class="sep" aria-hidden="true">\</span> Planned appointments, no 24/7 or emergency response</dd></div>
+        <div><dt>availability</dt><dd>Weekday evenings (6pm to 9pm, Friday to 8pm) <span class="sep" aria-hidden="true">\</span> Weekends (8am to 8pm) <span class="sep" aria-hidden="true">\</span> Eastern time <span class="sep" aria-hidden="true">\</span> Planned appointments, no 24/7 or emergency response</dd></div>
         <div><dt>where</dt><dd>Remote across the US <span class="sep" aria-hidden="true">\</span> On site within 30 miles of Queens, NY <span class="sep" aria-hidden="true">\</span> Outside the US (ask)</dd></div>
         <div><dt>size</dt><dd><a href="/knowledge/engagement/services/">A week or two up to six weeks</a> <span class="sep" aria-hidden="true">\</span> A few clients at a time, so each gets my full attention</dd></div>
         <div><dt>first call</dt><dd>Free, 30 minutes <span class="sep" aria-hidden="true">\</span> Your needs, and whether I'm the right fit</dd></div>
@@ -505,9 +516,11 @@
       <div>
         <p class="mark-light"><span class="ne">neon</span><span class="one">1</span></p>
         <p class="slogan">1 is glad to be of service.</p>
+        <!-- The look (sentinel or matrix) from any page, since the bar's switch shows only on the landing's first screen; js/theme.js -->
+        <p class="look-pick" role="group" aria-label="Look"><span class="look-lead" aria-hidden="true">look</span><button class="look-opt" type="button" data-look="sentinel" aria-pressed="false">sentinel</button><span class="sep" aria-hidden="true">\</span><button class="look-opt" type="button" data-look="matrix" aria-pressed="false">matrix</button></p>
       </div>
       <div>
-        <h3>contact</h3>
+        <h2>contact</h2>
         <ul>
           <li><a class="ext" href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener"><span class="ext-end">book a call</span></a></li>
           <li><a class="ext" href="mailto:hello@neon1.tech"><span class="ext-end">email</span></a></li>
@@ -516,7 +529,7 @@
         </ul>
       </div>
       <div>
-        <h3>elsewhere</h3>
+        <h2>elsewhere</h2>
         <ul>
           <li><a href="/knowledge/">knowledge center</a></li>
           <li><a href="/blog/">blog</a></li>
@@ -532,7 +545,7 @@
         <a href="/knowledge/policies/cookies/">browser storage</a><span class="sep" aria-hidden="true">\</span>
         <a href="/knowledge/policies/terms/">terms</a><span class="sep" aria-hidden="true">\</span>
         <span>no ads or trackers</span><span class="sep" aria-hidden="true">\</span>
-        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener"><span class="ext-end">v0.83.0</span></a>
+        <a class="ext" href="https://github.com/neon1llc/neon1-site" target="_blank" rel="noopener"><span class="ext-end">v0.84.0</span></a>
       </span>
       <span class="report-links">
         <span class="report-lead">report</span><a class="report-bug ext" href="/report-bug/?from=site" target="_blank" rel="noopener" aria-label="report a bug"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5.5 5.2V4a2.5 2.5 0 0 1 5 0v1.2M4.4 6.2h7.2v3.6a3.6 3.6 0 0 1-7.2 0zM8 6.4v7M1.8 7.6l2.6.9M14.2 7.6l-2.6.9M2.2 12.2l2.5-1.2M13.8 12.2 11.3 11"/></svg><span class="ext-end">bug</span></a><span class="sep" aria-hidden="true">\</span><a class="report-feedback ext" href="/feedback/?from=site" target="_blank" rel="noopener" aria-label="report feedback"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 3h11v7.2H8.4L5.2 13v-2.8H2.5zM5.4 5.8h5.2M5.4 7.6h3.2"/></svg><span class="ext-end">feedback</span></a>
@@ -546,7 +559,7 @@
   <div class="case-layer" id="caseLayer" hidden>
     <div class="case-scrim" data-close></div>
     <div class="case-panel" role="dialog" aria-modal="true" aria-labelledby="casePanelTitle" tabindex="-1">
-      <button class="case-close" type="button" data-close aria-label="Close case study"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 7 7 17M15 17H7V9"/></svg></button>
+      <button class="case-close" type="button" data-close aria-label="Close"><span aria-hidden="true">close</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 7 7 17M15 17H7V9"/></svg></button>
       <div class="case-body" id="caseBody"></div>
     </div>
   </div>

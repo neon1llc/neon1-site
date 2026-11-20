@@ -18,10 +18,14 @@
 /* On light pages the launcher floats over text of the same paper color, so a soft shadow lifts it off */
 .n1chat-launch.n1chat-light { color: var(--brand); background: var(--paper); border-color: var(--brand); box-shadow: 0 4px 14px rgba(18, 36, 26, .16); }
 .n1chat-launch.n1chat-light:hover { background: #fff; }
+/* On a phone the launcher stays the round mark: its label opening to "ask Neo" covered page text such as a download link */
+@media (max-width: 700px), (hover: none) {
+  .n1chat-launch:hover .n1chat-label, .n1chat-launch:focus-visible .n1chat-label, .n1chat-launch.n1chat-peek .n1chat-label { max-width: 0; opacity: 0; margin-left: 0; }
+}
 .n1chat-hidden { display: none; }
 
 /* ---- The window: colors are variables, so the light look only swaps the palette ---- */
-.n1chat { --bg: rgba(13, 2, 8, .96); --fg: #d8f5e1; --line: rgba(108, 255, 168, .45); --soft: rgba(108, 255, 168, .2);
+.n1chat { --bg: rgb(13, 2, 8); --fg: #d8f5e1; --line: rgba(108, 255, 168, .45); --soft: rgba(108, 255, 168, .2);
   --bot: rgba(0, 59, 0, .45); --you: rgba(108, 255, 168, .14); --muted: #84a98c; --accent: var(--neon);
   --accent-ink: var(--void); --field: rgba(255, 255, 255, .04); --link: var(--neon);
   position: fixed; left: max(16px, env(safe-area-inset-left)); bottom: var(--n1chat-bottom, max(16px, env(safe-area-inset-bottom))); z-index: 10; width: min(380px, calc(100vw - 32px));
@@ -148,4 +152,4 @@
 }
 
 /* The menu, a case study, or the white rabbit owns the screen; the chat steps aside until it closes */
-body.menu-open .n1chat, body.menu-open .n1chat-launch, body.case-open .n1chat, body.case-open .n1chat-launch, body.white-rabbit-on .n1chat, body.white-rabbit-on .n1chat-launch { display: none; }
+.n1chat.under-menu, .n1chat-launch.under-menu, body.menu-open .n1chat, body.menu-open .n1chat-launch, body.case-open .n1chat, body.case-open .n1chat-launch, body.white-rabbit-on .n1chat, body.white-rabbit-on .n1chat-launch { display: none; }

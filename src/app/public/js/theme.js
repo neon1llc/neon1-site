@@ -37,6 +37,7 @@
       b.title = "light or dark";
     });
     document.querySelectorAll(".style-sw").forEach((b) => b.setAttribute("aria-checked", String(biz)));
+    document.querySelectorAll("[data-look]").forEach((b) => b.setAttribute("aria-pressed", String((b.dataset.look === "sentinel") === biz)));
     // Light pages (the Knowledge Center, the blog) tint the browser's bar paper; in plugged it takes the dark ground; sentinel takes its own
     // plain grounds on every page, the landing included (its black belongs to the rain). The home page's bar color is otherwise left alone
     const meta = document.querySelector('meta[name="theme-color"]');
@@ -87,16 +88,38 @@
   }
   // Every change of theme after the first load goes through here. Matrix: leaving matrix is slow, entering it is the quick flick.
   // Sentinel: always one plain, instant change, with no flicker, fade, or easing at all (the effects belong to the matrix look)
+  // Painting always reads the saved choice (storage) when it runs, never a value captured earlier: a dawn paints a frame or more
+  // after it starts, and the choice may have moved on (another switch, another tab). `revision` also retires a dawn that a newer
+  // change has replaced, so the page can only end on the newest saved choice, however quickly the switches are pressed
   let revision = 0;
-  function change(next) {
+  function change() {
     const current = ++revision;
+    const next = wantedLook();
     if (root.dataset.siteLook === next) return;
     if (next === "providence" || next === "desert-of-the-real" || root.dataset.siteStyle === "sentinel") { apply(next); return; }
-    if (root.dataset.siteTheme === "matrix") dawn(() => { if (current === revision) apply(next); });
+    if (root.dataset.siteTheme === "matrix") dawn(() => { if (current === revision) apply(wantedLook()); });
     else { shift(next); apply(next); }
   }
 
   apply(wantedLook());
+
+  // Sentinel's bar is plain and light from the first paint. js/page.js sets the same classes, but as a module it runs after the
+  // page has shown, so the landing's bar used to start as Matrix glass and fade to light on every visit. The observer catches the
+  // header as the parser adds it; its callback runs before the browser can paint that header
+  if (root.dataset.siteStyle === "sentinel") {
+    const settle = () => {
+      const bar = document.querySelector("header.n1-bar");
+      if (!bar) return false;
+      bar.classList.add("light");
+      document.body?.classList.add("woke");
+      return true;
+    };
+    if (!settle()) {
+      const watch = new MutationObserver(() => { if (settle()) watch.disconnect(); });
+      watch.observe(root, { childList: true, subtree: true });
+      addEventListener("DOMContentLoaded", () => watch.disconnect(), { once: true });
+    }
+  }
 
   // The landing names the modules and the font its Matrix look uses. Only a Matrix visitor preloads them, so Sentinel downloads none
   if (root.dataset.siteStyle === "matrix" && document.head) {
@@ -119,31 +142,93 @@
       b.addEventListener("click", () => {
         write(KEY_MODE, mode() === "dark" ? "light" : "dark");
         write(KEY_SHARED, "1");
-        change(wantedLook());
+        change();
       });
     });
     document.querySelectorAll(".style-sw").forEach((b) => {
       b.setAttribute("aria-checked", String(style() === "sentinel"));
       b.addEventListener("click", () => {
-        const next = root.dataset.siteStyle === "sentinel" ? "matrix" : "sentinel";
+        // From the saved family, not from what is painted (a dawn may still be waiting to paint)
+        const next = style() === "sentinel" ? "matrix" : "sentinel";
         write(KEY_MODE, mode());
         write(KEY_STYLE, next);
         write(KEY_SHARED, "1");
-        change(lookFor(next, mode()));
+        change();
       });
     });
   }
-  if (document.readyState === "loading") addEventListener("DOMContentLoaded", wire); else wire();
+  // The footer's two buttons set the same family from any page, without moving the mode
+  function wireLook() {
+    document.querySelectorAll("[data-look]").forEach((b) => {
+      b.setAttribute("aria-pressed", String((b.dataset.look === "sentinel") === (style() === "sentinel")));
+      b.addEventListener("click", () => {
+        if (style() === b.dataset.look) return;
+        write(KEY_MODE, mode());
+        write(KEY_STYLE, b.dataset.look);
+        write(KEY_SHARED, "1");
+        change();
+      });
+    });
+  }
+  const start = () => { wire(); wireLook(); };
+  if (document.readyState === "loading") addEventListener("DOMContentLoaded", start); else start();
 
   // ---- Staying in step: other tabs, and a page restored by Back ----
   // A family change re-applies in place; the landing starts its Matrix effects only when needed
   addEventListener("storage", (e) => {
-    if (e.key === KEY_STYLE || e.key === KEY_MODE || e.key === null) change(wantedLook());
+    if (e.key === KEY_STYLE || e.key === KEY_MODE || e.key === null) change();
   });
   addEventListener("pageshow", (e) => {
     if (!e.persisted) return;
-    if (root.dataset.siteLook !== wantedLook()) change(wantedLook());
+    if (root.dataset.siteLook !== wantedLook()) change();
   });
+  // A tab brought forward may have slept through a change made elsewhere
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && root.dataset.siteLook !== wantedLook()) change();
+  });
+})();
+
+// ---- Where each page was left: one record per history entry ----
+// Every history entry carries its own id in history.state ("eid"): a page opened by a link, a #fragment entry, and a page that
+// appears twice in the tab's history each get their own. Where an entry was scrolled is kept under its id in sessionStorage, which
+// belongs to this tab only and starts empty in a new tab. js/scroll-memory.js and the home page's js/views.js save and restore
+// through window.n1Entry; a new link has no record, so it opens at its top or its #fragment, and Back, Forward, and reload find theirs.
+// Scripts that replace or push a state keep or get an id without knowing about it: both calls are wrapped here, before any other
+// script runs
+(() => {
+  if (typeof history === "undefined" || !history.pushState) return; // not a browser page (the preference tests)
+  const KEY = "n1.entries";
+  const fresh = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  const withId = (state, id) => (state && typeof state === "object" ? (state.eid ? state : { ...state, eid: id }) : { eid: id });
+  const push = history.pushState.bind(history), replace = history.replaceState.bind(history);
+  // A pushed entry is announced, so the scripts keeping its spot follow it (popstate and hashchange don't fire for a push)
+  history.pushState = (state, title, url) => { push(withId(state, fresh()), title, url); dispatchEvent(new Event("n1:entry")); };
+  history.replaceState = (state, title, url) => replace(withId(state, (history.state && history.state.eid) || fresh()), title, url);
+  // A #fragment link followed natively makes an entry with no state; it gets its id the moment it arrives
+  const id = () => {
+    if (!(history.state && history.state.eid)) { try { replace(withId(history.state, fresh()), ""); } catch { return null; } }
+    return history.state.eid;
+  };
+  id();
+  addEventListener("hashchange", id);
+  addEventListener("popstate", id);
+  const all = () => { try { return JSON.parse(sessionStorage.getItem(KEY) || "{}"); } catch { return {}; } };
+  try { sessionStorage.removeItem("n1.spots"); } catch { /* the old record, kept by page address */ }
+  window.n1Entry = {
+    id,
+    get: (eid) => (eid && all()[eid]) || null,
+    set: (eid, spot) => {
+      if (!eid) return;
+      try {
+        const m = all();
+        delete m[eid]; // the newest goes last, so the oldest is the one let go
+        m[eid] = spot;
+        const keys = Object.keys(m);
+        if (keys.length > 100) delete m[keys[0]];
+        sessionStorage.setItem(KEY, JSON.stringify(m));
+      } catch { /* storage off: pages open at their top */ }
+    },
+  };
 })();
 
 // ---- The cross-fade between pages: only for a move from one neon1 page to the next ----
@@ -156,15 +241,26 @@
 // Script-built stylesheets are not inline styles, so the strict CSP allows them. Reduced motion never fades.
 (() => {
   if (!("adoptedStyleSheets" in document) || typeof CSSStyleSheet !== "function") return;
-  // The sentinel theme has no page effects at all, so pages simply change
-  if (document.documentElement.dataset.siteStyle === "sentinel") return;
+  // The opt-in is one stylesheet, added or removed as the look changes in this page: a visitor who switches to Matrix here gets the
+  // fade on the next move, and one who switches to Sentinel loses it, though the page loaded the other way
+  let sheet = null;
   const optIn = () => {
+    if (sheet || document.documentElement.dataset.siteStyle === "sentinel") return;
     try {
-      const sheet = new CSSStyleSheet();
-      sheet.replaceSync("@media (prefers-reduced-motion: no-preference) { @view-transition { navigation: auto; } }");
-      document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
+      const next = new CSSStyleSheet();
+      next.replaceSync("@media (prefers-reduced-motion: no-preference) { @view-transition { navigation: auto; } }");
+      document.adoptedStyleSheets = [...document.adoptedStyleSheets, next];
+      sheet = next;
     } catch { /* no fade: pages simply change */ }
   };
+  const optOut = () => {
+    if (!sheet) return;
+    document.adoptedStyleSheets = document.adoptedStyleSheets.filter((s) => s !== sheet);
+    sheet = null;
+  };
+  document.addEventListener("n1:theme", (e) => { if (e.detail.style === "sentinel") optOut(); else optIn(); });
+  // The sentinel theme has no page effects at all, so pages simply change
+  if (document.documentElement.dataset.siteStyle === "sentinel") return;
   let inside = false;
   try { inside = !!document.referrer && new URL(document.referrer).origin === location.origin; } catch { /* treat as outside */ }
   if (inside) optIn();

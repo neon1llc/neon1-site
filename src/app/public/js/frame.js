@@ -76,21 +76,33 @@
   // doesn't: the page focuses where the link went (js/views.js), or the browser follows it (AS-02)
   // Opening and closing ease (css/frame.css); a close keeps the overlay up while it fades, then hides it
   const still = matchMedia("(prefers-reduced-motion: reduce)");
-  let fading = 0;
+  // Making the page behind inert restyles all of it, which took tens of milliseconds on a phone. Done in the frame the menu
+  // opened or closed, it held back the first frame of the fade, so the menu stuttered. Now the menu moves first: the page goes
+  // inert once the entrance has played, and comes back once the fade out is over. The chat steps aside at once (a class on
+  // its own two elements, which costs nothing), since it sits above the menu
+  let fading = 0, settling = 0;
+  const chatAway = (away) => document.querySelectorAll(".n1chat, .n1chat-launch").forEach((el) => el.classList.toggle("under-menu", away));
   function setMenu(open, restore = true) {
-    clearTimeout(fading);
+    clearTimeout(fading); clearTimeout(settling);
+    const moving = !still.matches;
     menu.classList.remove("shown"); // the entrance plays again on the next open
-    menu.classList.toggle("closing", !open && !menu.hidden && !still.matches);
-    if (open || !menu.classList.contains("closing")) menu.hidden = !open;
-    else fading = setTimeout(() => { menu.hidden = true; menu.classList.remove("closing"); }, 220);
-    behind().forEach((el) => (el.inert = open));
+    menu.classList.toggle("closing", !open && !menu.hidden && moving);
+    const closing = menu.classList.contains("closing");
+    if (open || !closing) menu.hidden = !open;
     menuBtn.setAttribute("aria-expanded", String(open));
     menuBtn.textContent = open ? "close" : "menu";
     header.classList.toggle("menu-open", open);
-    document.body.classList.toggle("menu-open", open); // the chat window steps aside under the menu
     document.body.style.overflow = open ? "hidden" : "";
-    // The home page restores its rain controls' own inert state when the menu closes
-    document.dispatchEvent(new CustomEvent("n1:menu", { detail: { open } }));
+    if (open) chatAway(true);
+    // The home page restores its rain controls' own inert state when the menu closes, so the event follows the page's own restore
+    const settle = () => {
+      behind().forEach((el) => (el.inert = open));
+      if (!open) { menu.hidden = true; menu.classList.remove("closing"); chatAway(false); }
+      document.dispatchEvent(new CustomEvent("n1:menu", { detail: { open } }));
+    };
+    if (open && moving) settling = setTimeout(settle, 380); // the links' rise (.36s) is over
+    else if (closing) fading = setTimeout(settle, 220); // the fade out (.22s) is over
+    else settle();
     if (open) menu.querySelector("a").focus(); else if (restore) menuBtn.focus();
   }
   if (menu && menuBtn) {

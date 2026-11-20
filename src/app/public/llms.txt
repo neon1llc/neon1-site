@@ -1,6 +1,6 @@
 # neon1
 
-> Independent engineering and technology consulting: workflow automation, cloud and AI engineering, networks and connected systems, and security readiness. Remote across the US, or on site near Queens, NY.
+> Independent engineering and technology consulting: workflow automation, cloud and AI, networks, and security readiness. Remote across the US or near Queens, NY.
 
 neon1 is the independent engineering and technology consulting practice of neon1 LLC, run by Pradeep Tathineni. Work is remote, on site within about 30 miles of Queens, NY, or over a secure temporary connection. Contact: hello@neon1.tech, +1 424-326-3661, or the form at https://neon1.tech/#contact.
 
@@ -35,7 +35,8 @@ neon1 is the independent engineering and technology consulting practice of neon1
 - [Before you buy a new tool](https://neon1.tech/knowledge/guides/before-you-buy/): Ten questions to ask before adding software to your business, so it fits, lasts, and lets you leave.
 - [Do you need a business associate agreement?](https://neon1.tech/knowledge/guides/do-you-need-a-baa/): A plain guide for health practices on when a vendor needs a BAA, and what to check before signing one.
 - [Getting ready for a first call](https://neon1.tech/knowledge/guides/first-call/): What to bring to a free 30-minute call with neon1.
-- [Free 1NEON accounts](https://neon1.tech/knowledge/guides/free-accounts/): Start before we talk: make a free 1NEON account, write down what your project needs, then ask for a free assessment and book the 30-minute call.
+- [Free 1NEON accounts](https://neon1.tech/knowledge/guides/free-accounts/): Start before we talk: make a free 1NEON account, outline up to three projects, then ask for a free assessment. The 30-minute call is the other way in.
+- [Outlining a project in 1NEON](https://neon1.tech/knowledge/guides/outline-a-project/): The six parts of a project outline, what a good answer looks like, where each part goes once work starts, and how Ready for Execute adds it up.
 - [A password manager for your family](https://neon1.tech/knowledge/guides/password-manager-for-family/): How to move a household onto a password manager, step by step, without locking anyone out.
 - [Cloud and AI engineering](https://neon1.tech/knowledge/guides/use-case-cloud/): Cloud architecture, infrastructure as code, delivery, migrations, and AI applications: when an independent engineer is worth bringing in, what I deliver, and how ownership stays with your team.
 - [Networks and connected systems](https://neon1.tech/knowledge/guides/use-case-networks/): Designing and integrating networks, devices, and connected environments: when it's worth doing, what I deliver, and which work belongs to licensed trades.

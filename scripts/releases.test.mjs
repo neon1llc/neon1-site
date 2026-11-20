@@ -38,7 +38,7 @@ test("gather dates and orders releases across products", () => {
     ["neon1-1NEON", "v0.3.0", "2026-11-15", false], ["neon1-site", "v0.2.0", "2026-11-14", true], ["neon1-site", "v0.1.1", "2026-11-14", false]])
   assert.deepEqual(r.current.map((c) => c.version), ["v0.2.0", "v0.3.0"])
   const body = releasesBody(r)
-  // Version links carry no outbound arrow; an untagged version points at the changelog instead of a release
-  assert.match(body, /class="kc-plain" href="https:\/\/github.com\/neon1llc\/neon1-site\/releases\/tag\/v0.2.0"/)
+  // Version links are outbound links like the rest; an untagged version points at the changelog instead of a release
+  assert.match(body, /class="ext kc-ver" href="https:\/\/github.com\/neon1llc\/neon1-site\/releases\/tag\/v0.2.0"/)
   assert.match(body, /neon1-site\/blob\/main\/CHANGELOG.md/)
 })

@@ -178,6 +178,10 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 .n1-bar.light .n1-logo { color: var(--brand); text-shadow: none; }
 .n1-bar.light .links a:not(.btn), .n1-bar.light .links .note { color: var(--muted-ink); }
 .n1-bar.light .links a:not(.btn):hover { color: var(--brand); }
+/* The section in view: its link in the bar and in the menu is marked (js/page.js sets aria-current) */
+.links a:not(.btn)[aria-current] { color: var(--neon); text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 6px; }
+.n1-bar.light .links a:not(.btn)[aria-current] { color: var(--brand); }
+.menu a[aria-current] { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 8px; }
 .n1-bar.light .btn-ghost { color: var(--brand); border-color: var(--brand); }
 .n1-bar.light .links .portal { color: var(--brand); border-color: var(--ctl-line); }
 
@@ -198,9 +202,13 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 .theme-moon path { fill: currentColor; stroke: none; }
 .theme-knob { position: absolute; top: 2px; left: 2px; width: 22px; height: 22px; border-radius: 50%; background: rgb(var(--brand-rgb) / .12);
   transition: transform var(--t-base) var(--ease-open); }
-.theme-sw[aria-checked="true"] .theme-knob { transform: translateX(24px); }
-.theme-sw[aria-checked="false"] .theme-sun, .theme-sw[aria-checked="true"] .theme-moon { color: var(--brand); }
-.theme-sw[aria-checked="false"] .theme-moon, .theme-sw[aria-checked="true"] .theme-sun { opacity: .6; }
+/* The knob and icons follow the root's look, which the head script sets before the first paint, so a switch never slides on load.
+   aria-checked (js/theme.js) says the same thing to assistive tech. On: dark mode, or sentinel for the style switch */
+:is(:root[data-site-theme="matrix"] .theme-sw:not(.style-sw), :root[data-site-style="sentinel"] .style-sw) .theme-knob { transform: translateX(24px); }
+:is(:root[data-site-theme="awake"] .theme-sw:not(.style-sw), :root[data-site-style="matrix"] .style-sw) .theme-sun,
+:is(:root[data-site-theme="matrix"] .theme-sw:not(.style-sw), :root[data-site-style="sentinel"] .style-sw) .theme-moon { color: var(--brand); }
+:is(:root[data-site-theme="awake"] .theme-sw:not(.style-sw), :root[data-site-style="matrix"] .style-sw) .theme-moon,
+:is(:root[data-site-theme="matrix"] .theme-sw:not(.style-sw), :root[data-site-style="sentinel"] .style-sw) .theme-sun { opacity: .78; }
 .n1-bar.light .theme-sw:focus-visible { outline-color: var(--brand); }
 .n1-bar:not(.light) .theme-sw { opacity: 0; visibility: hidden; pointer-events: none; }
 :root:not([data-site-theme]) .theme-sw { display: none; }
@@ -219,7 +227,21 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 .n1-bar:not(.light) .theme-sw.style-sw { opacity: 1; visibility: visible; pointer-events: auto; background: rgba(13,2,8,.4); color: #84a98c;
   --brand: var(--neon); --brand-rgb: 108 255 168; --ctl-line: rgba(108,255,168,.4); }
 .style-sw .sentinel-case { fill: none; stroke: currentColor; stroke-width: 1.8; }
-.style-sw[aria-checked="false"] .theme-sun, .style-sw[aria-checked="true"] .theme-moon { color: var(--brand); }
+/* Sentinel: the landing's first screen offers both switches, so a visitor can pick dark mode before scrolling. Neither one moves
+   anything else: the logo, links, contact, 1NEON, light/dark switch, and menu button sit where they sit on every other page.
+   Wide (from 1320px) the style switch takes the left page margin, mirroring the light/dark switch in the right one. Narrower, it
+   sits in the row right after the logo, where the bar always has room (the links and the light/dark switch are pinned right);
+   on a phone it keeps that place, and below 370px, where the row has no room for it, it leaves the bar (the footer has the same
+   choice). It keeps its place once it hides on scroll, so nothing in the bar moves then either */
+:root[data-site-style="sentinel"] .n1-bar :is(.theme-sw:not(.style-sw), .menu-btn) { order: 1; }
+:root[data-site-style="sentinel"] .n1-bar[data-top] .theme-sw:not(.style-sw) { opacity: 1; visibility: visible; pointer-events: auto; }
+:root[data-site-style="sentinel"] .n1-bar:has(.style-sw) .n1-logo { order: -2; }
+:root[data-site-style="sentinel"] .n1-bar .theme-sw.style-sw { order: -1; margin: 0; }
+:root[data-site-style="sentinel"] .n1-bar:not([data-top]) .style-sw { display: inline-block; visibility: hidden; pointer-events: none; }
+@media (max-width: 369.98px) { :root[data-site-style="sentinel"] .n1-bar .theme-sw.style-sw { display: none; } }
+@media (min-width: 1320px) {
+  :root[data-site-style="sentinel"] .n1-bar .theme-sw.style-sw { right: auto; left: calc((100% - 1200px) / 4 + 12px); transform: translate(-50%, -50%); }
+}
 
 /* ---- Phone menu: below the width the links need, they fold into a full-screen menu ---- */
 .menu-btn { margin-left: auto; display: none; border-radius: var(--glass-r); }
@@ -250,7 +272,7 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
  * The top padding is set so the links read centered between the logo row and the screen's bottom edge:
  * the first link is lowercase with no tall letters and the last has descenders, so equal boxes look low */
 .menu { position: fixed; inset: 0 auto auto 0; z-index: 7; display: grid; box-sizing: border-box; block-size: 100dvh; inline-size: 100%; overflow-y: auto; overscroll-behavior: contain;
-  padding: calc(64px + env(safe-area-inset-top)) 16px calc(clamp(16px, 5dvh, 48px) + env(safe-area-inset-bottom)); background: rgba(13,2,8,.94); backdrop-filter: blur(6px); }
+  padding: calc(64px + env(safe-area-inset-top)) 16px calc(clamp(16px, 5dvh, 48px) + env(safe-area-inset-bottom)); background: rgb(13,2,8); } /* opaque, with no backdrop blur to redraw under every frame of the fade */
 .menu[hidden] { display: none; }
 /* Opening fades the overlay in and lifts the links a little; closing fades it out (js/frame.js waits) */
 .menu:not([hidden]) { animation: menu-in .28s cubic-bezier(.28,.11,.32,1) both; }
@@ -319,10 +341,18 @@ footer { position: relative; z-index: 2; border-top: 1px solid var(--line); back
 .awake footer { background: var(--surface-2); }
 .foot { max-width: 1200px; margin: 0 auto; display: grid; gap: 28px; grid-template-columns: 2fr 1fr 1fr; font-size: 14px; color: var(--muted);
   padding: 40px max(24px, env(safe-area-inset-right)) 28px max(24px, env(safe-area-inset-left)); }
-.foot h3 { font: 600 13px var(--mono); color: var(--text); margin: 0 0 10px; }
+/* Footer headings are h2: the page's own h1 and sections come before, so an h3 here skipped a level (the page-wide h2 rules lose to the extra element in this selector) */
+footer .foot h2 { font: 600 13px var(--mono); letter-spacing: .01em; color: var(--text); margin: 0 0 10px; }
 .foot ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
 .foot a { color: var(--muted); text-decoration: none; } .foot a:hover { color: var(--glow); }
 .foot .slogan { margin: 0; }
+/* The look picker: two plain text buttons for the same choice as the bar's style switch, which only the landing's first screen shows */
+.foot .look-pick { display: flex; align-items: baseline; gap: 6px; margin: 10px 0 0; font: 13px var(--mono); }
+.foot .look-lead { margin-right: .4em; }
+.foot .look-opt { padding: 0; border: 0; background: none; color: var(--muted); font: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; cursor: pointer; }
+.foot .look-opt:hover { color: var(--glow); }
+.foot .look-opt[aria-pressed="true"] { color: var(--text); text-decoration: none; font-weight: 600; cursor: default; }
+:root:not([data-site-style]) .look-pick { display: none; }
 .mark-light { font: 700 17px var(--mono); letter-spacing: .06em; color: var(--brand); margin: 0 0 10px; }
 @media (max-width: 700px) { .foot { grid-template-columns: 1fr 1fr; } .foot > div:first-child { grid-column: 1 / -1; } }
 /* Legal line. Its bottom padding is a resting place for Neo's launcher (fixed, bottom left, 48px tall, 16px from the bottom edge): the
@@ -394,3 +424,35 @@ a.ext:hover { color: var(--brand); }
 :root[data-site-theme="matrix"] :is(main, footer, .n1chat) a.ext:not([class*="btn"], .card):is(:hover, :focus-visible) { text-decoration-color: currentColor; }
 :root[data-site-theme="matrix"] .foot a:not(.ext) { text-decoration-color: color-mix(in srgb, currentColor 55%, transparent); }
 :root[data-site-theme="matrix"] .foot a:not(.ext):is(:hover, :focus-visible) { text-decoration-color: currentColor; }
+
+/* Text fields at 16px on touch screens: iPhone browsers zoom the page in when a field under 16px takes focus */
+@media (pointer: coarse) { :root:root :is(input:not([type=checkbox], [type=radio], [type=file], [type=range], [type=color]), textarea, select) { font-size: 16px; } }
+
+/* ---- Touch: 44px hit areas without changing how anything looks ----
+   On a phone or tablet (a coarse pointer), the small controls get an invisible area around them that takes the tap, so the bar's
+   switches, menu button, and logo, the case study buttons, Neo's header buttons, and the menu's rows are 44px to hit. The folds
+   and the footer's lists take real room instead, since their neighbors sit close. The legal row's links keep their layout and
+   get a hit area that reaches halfway to the next line */
+@media (pointer: coarse) {
+  .n1-logo, .menu-btn, .menu a, .n1chat-tool { position: relative; }
+  /* A pseudo-element's box starts inside the 1px border, so each side reaches one pixel further than the number says */
+  .theme-sw::after, .menu-btn::after { content: ""; position: absolute; inset: -9px 0; }
+  .n1-logo::after { content: ""; position: absolute; inset: -2px 0; }
+  .open::after { content: ""; position: absolute; inset: -4px; }
+  .case-close::after { content: ""; position: absolute; inset: -5px; }
+  .n1chat-tool::after { content: ""; position: absolute; inset: -11px 0; }
+  .menu a::after { content: ""; position: absolute; inset: -6px -8px; }
+  main .fold > summary { padding-block: 12px; }
+  .foot li a { display: inline-flex; align-items: center; min-height: 44px; }
+  .foot ul { gap: 0; }
+  .kc-crumbs a { display: inline-flex; align-items: center; min-height: 44px; margin-block: -14px; }
+  .legal :is(a.report-bug, a.report-feedback) { position: relative; }
+  .legal :is(a.report-bug, a.report-feedback)::after { content: ""; position: absolute; inset: -15px -4px; }
+  .foot .look-opt { position: relative; }
+  .foot .look-opt::after { content: ""; position: absolute; inset: -14px -6px; }
+  .kc-path li > a, .repo h3 > a { display: inline-flex; align-items: center; min-height: 44px; }
+  .kc-shelf-desc a { display: inline-block; padding-block: 12px; margin-block: -12px; }
+  .legal :is(.policies, .owner) a { position: relative; }
+  .legal :is(.policies, .owner) a::after { content: ""; position: absolute; inset: -13px -4px; }
+}
+

@@ -4,6 +4,45 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+## v0.84.0
+
+### Changed
+- The "send a message" fold opens and closes at half its old speed, and its arrow turns on the same time.
+- Services are four cards like the client work cards. Each card shows the summary and when it fits, and opens a panel with what you get, what else fits better, limits, related work, and the next step, in place of the dropdown.
+- The landing marks the section in view in the top bar and the phone menu, and every section link lands its heading the same distance below the bar: each view now starts at its top instead of centering its content.
+- On the Sentinel landing's first screen, the style switch and the light/dark switch are both in the bar, so dark mode is one tap away before scrolling, on a phone too. Once the page scrolls the style switch hides in place, so nothing in the bar moves. Matrix keeps its one switch over the rain.
+- Services, process, and contact say to outline up to three projects in a free 1NEON account, then ask for a free assessment, with the free 30-minute call as the other way in. The account lines show only while sign-up is open.
+- The bar has the same boxes on every page. On the Sentinel landing the style switch no longer takes room in the row: wide screens put it in the left page margin, mirroring the light/dark switch in the right one, and narrower ones put it after the logo. The links, 1NEON, the light/dark switch, and the menu button sit where they sit on the Knowledge Center and the blog, at 1280, 1366, 1440, 1536, and 1920px. Below 370px the switch leaves the bar.
+- The footer has a "look" choice, sentinel or matrix, so the family can be changed from any page. The bar's style switch is named "Sentinel look".
+- An open case study or service panel is a history entry. Back closes it and Forward reopens it, a `#case-...` link or address opens its panel with focus inside, and Esc closes a panel that was opened from the address in place. The close button says "close".
+- On a phone or tablet the bar's switches and menu button, the case buttons, Neo's header buttons, the menu's rows, and the footer's lists have 44px hit areas.
+- The Matrix landing shows one quiet line under the slogan, with a "Discuss a project" link. The rest of the pitch stays on the Sentinel landing.
+- Document pages start their words at one left edge on the Knowledge Center and the blog, and a line of text holds about 75 characters. Wide figures beside the "On this page" index use the page margin, so the largest drawings are about a quarter larger.
+- Release versions and email addresses in documents are marked as outbound links like the others. Footer headings are h2, so headings no longer skip a level. Labels set in capitals keep "neon1" in lowercase, and 11px labels are 12px.
+- Neo's launcher stays the round mark on a phone, instead of opening to a pill that covered page text.
+- The inactive icon on the light/dark and style switches meets 3:1. The home page, feedback, and report-a-bug descriptions are the length search results show. The hours use "to" instead of a dash, and four semicolons in the home page's prose are periods.
+
+### Fixed
+- On the bug report form, a screenshot that is too large, too many screenshots, or a file that isn't an image now says so under the Add screenshots button, naming the file and, for a large one, its size and the 3 MB limit. The message used to be removed the moment it appeared.
+- Text fields are 16px on touch screens, so focusing one on an iPhone no longer zooms the page in.
+- Back, Forward, and reload return every page to where that history entry was left, however many steps back, even when the same page is in the history twice. Each entry gets its own id, and its scroll is kept under that id for this tab only; a new link opens at its top or its #section, and a new tab starts with nothing remembered. This replaces the record kept by page address, which put a page visited twice at its latest spot.
+- The home page no longer shifts as Figtree loads: the font is fetched with the first stylesheet on every page (layout shift 0.33 to 0 at 1440px, 0.61 to 0 at 1024px).
+- On a 320 to 360px phone the Sentinel landing's menu button is no longer cut off at the screen's edge.
+- A fold on the home page that is pressed while it opens or closes turns round from where it is, as the Knowledge Center's folds do, instead of ignoring the press.
+- After the family is switched in a page, the next move to another neon1 page fades (Matrix) or doesn't (Sentinel), as if the page had loaded that way.
+- A dropdown's arrow sits as far from the right edge as its text from the left. Without JavaScript the landing's buttons are apart and each service's name sits above its line.
+- The blog's "What's and why's" label has its apostrophes.
+- The phone menu opens and closes without stutter. Making the page behind inert, which restyled all of it in the frame the menu moved, now waits until the menu has finished moving; the menu is opaque with no backdrop blur; and the Matrix rain holds still while the menu is up.
+- The dermatology case study's table gives the intake time in days, matching its card.
+- On the Sentinel landing the top bar is light from the first paint. It used to start as Matrix glass and fade to light on every visit, and the style switch's knob slid across as if the look had just changed. The light/dark switch on other pages no longer slides on load in dark mode either.
+- Neo's chat window is fully opaque in Matrix, so the page no longer shows through it.
+- The code-and-resources row for this site names the current release; make check now compares it with the footer and version.json.
+- Code blocks in the Knowledge Center scroll inside themselves, so a long command no longer widens a phone's page (DeployOps).
+- The guided walkthrough link in process has no outbound arrow, since 1NEON is part of neon1.
+- The theme script paints from the saved choice when a change runs, flips the family from the saved family rather than the painted one, and catches up when a tab is brought forward, so quick switches and changes made in another tab always end on the newest choice. Tests cover every run of up to four quick switches with the paints arriving in any order.
+- Opening a fold (how to read the evidence, the questions, the code and resources groups) keeps the page where it is, instead of scrolling back to the top of its section.
+- A link inside a service card or a client work card closes the card on the way, so the page it goes to, contact or another page, is never left behind the open card.
+
 ## v0.83.0
 
 ### Changed

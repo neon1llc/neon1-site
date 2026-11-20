@@ -27,35 +27,15 @@
   }
 
   // ---- Folds open in place ----
-  // Views center their content, so a fold opening in the middle of one pushed everything above it up by
-  // half its height, and the browser scrolled to make up for it, leaving the page outside the view it
-  // was in; the next scroll then jumped. Before the first fold in a view opens, its content is pinned
-  // where it already sits and grows downward instead. Clicks, Enter, and Space all arrive as a click
-  function pin(v) {
-    if (v.dataset.pinned) return;
-    const first = v.firstElementChild;
-    if (!first) return;
-    const top = first.getBoundingClientRect().top - v.getBoundingClientRect().top - (parseFloat(getComputedStyle(first).marginTop) || 0);
-    v.style.paddingTop = `${Math.max(0, top)}px`;
-    v.style.justifyContent = "flex-start";
-    v.style.alignContent = "start";
-    v.dataset.pinned = "1";
-  }
-  const unpin = (v) => { v.style.paddingTop = v.style.justifyContent = v.style.alignContent = ""; delete v.dataset.pinned; delete v.dataset.top; };
-  document.addEventListener("click", (e) => {
-    const s = e.target instanceof Element && e.target.closest("summary");
-    const v = s && s.closest(".view");
-    if (v) pin(v);
-  }, true);
-  // A new screen size centers again any view whose folds are all closed
-  addEventListener("resize", () => document.querySelectorAll(".view[data-pinned]").forEach((v) => { if (!v.querySelector("details[open]")) unpin(v); }));
+  // Views start at their top (css/site.css), so a fold grows downward and nothing above it moves. The page stays where the
+  // visitor is: opening a fold never scrolls back to the top of its view (it used to, when views centered their content)
 
   // ---- Case links: a link to one card lands on that card ----
   // Case links, such as the contact form's "a similar project", point at single cards (#case-home). Its
   // section comes into view, the row slides sideways to the card, the card is marked, and focus goes
-  // to its open button, so keyboard and screen reader users arrive where the link said. Each case link
-  // is a history entry: Back returns to where the link was, and Forward comes back to the card. Opening
-  // the page at #case-... takes the same route. Wired before the Motion check, like the arrows; when
+  // to its open button, and its panel opens over it (js/cases.js). Each case link is a history entry: Back
+  // closes the panel and returns to where the link was, and Forward comes back to the card. Opening the
+  // page at #case-... takes the same route. Wired before the Motion check, like the arrows; when
   // Motion steers the page it swaps in its own eased moves for toView and toY below
   const native = () => (reduce.matches ? "auto" : "smooth");
   let toView = (view) => view.scrollIntoView({ block: "start", behavior: native() });
@@ -66,13 +46,13 @@
   };
 
   // Sideways to the card, to the same place a snap would put it, then mark and focus it
-  function slide(card) {
+  function slide(card, focus = true) {
     const pad = parseFloat(getComputedStyle(rail).scrollPaddingInlineStart) || 0;
     const left = rail.scrollLeft + card.getBoundingClientRect().left - rail.getBoundingClientRect().left - pad;
     rail.scrollTo({ left, behavior: native() });
     rail.querySelectorAll(".case.is-target").forEach((c) => c.classList.remove("is-target"));
     card.classList.add("is-target");
-    card.querySelector("[data-case]").focus({ preventScroll: true });
+    if (focus) card.querySelector("[data-case]").focus({ preventScroll: true });
   }
   const reveal = (card) => { toView(card.closest(".view")); slide(card); };
 
@@ -82,23 +62,23 @@
       const a = e.target.closest('a[href^="#case-"]'), card = a && caseCard(a.getAttribute("href"));
       if (!card) return;
       e.preventDefault();
-      // The entry being left remembers where the page was, for Back
-      history.replaceState({ ...history.state, y: scrollY }, "");
+      // The entry being left has already saved its spot (js/scroll-memory.js, or the memory below), for Back
       history.pushState({ card: card.id }, "", "#" + card.id);
       reveal(card);
+      // js/cases.js opens the card's panel on top of it
+      document.dispatchEvent(new CustomEvent("n1:case", { detail: { id: card.id } }));
     });
-    // A frame later, so the browser's own scroll restoration for the entry has already run
-    addEventListener("popstate", (e) => requestAnimationFrame(() => {
+    // Back or Forward to a card's entry shows the card; any other entry is put back by the scroll memory
+    addEventListener("popstate", () => requestAnimationFrame(() => {
       const card = caseCard(location.hash);
       if (card) reveal(card);
-      else if (e.state && typeof e.state.y === "number") toY(e.state.y);
     }));
   }
 
   // Opened at #case-...: the slide and focus wait for load, because the browser's own jump to the
   // fragment, which also scrolls the row, clears focus as the page finishes loading
   const first = rail && caseCard(location.hash);
-  const arrive = () => slide(first);
+  const arrive = () => slide(first, !document.body.classList.contains("case-open")); // js/cases.js opens the panel for the address
   if (first) { if (document.readyState === "complete") arrive(); else addEventListener("load", arrive, { once: true }); }
 
   // Native scrolling stays in charge without Motion or with reduced motion
@@ -324,54 +304,52 @@
   const foldEase = (token("--ease-open").match(/[\d.]+/g) || [0.25, 0.8, 0.25, 1]).map(Number);
   const TOP_GAP = 28; // the view's spacing above its heading once it sits at the top
   const viewOf = (d) => d.closest(".view");
-  const centeredPad = (v) => {
-    // Where the content sits when centered: measured with the pin lifted, then put straight back
-    const keep = v.style.cssText;
-    unpin(v);
-    const first = v.firstElementChild;
-    const pad = first.getBoundingClientRect().top - v.getBoundingClientRect().top - (parseFloat(getComputedStyle(first).marginTop) || 0);
-    v.style.cssText = keep; v.dataset.pinned = "1";
-    return Math.max(0, pad);
-  };
+  // A fold in motion is turned round by the next press, from the height it has reached, so no press is dropped: its panel and arrow
+  // head back together, as the Knowledge Center's folds do (js/fold.js). `moving` holds each fold's runs, direction, and the entry
+  // that retires the runs a later press has replaced (a cancelled run still reports finished)
+  const moving = new Map();
   function toggleFold(d) {
     const v = viewOf(d), i = views.indexOf(v);
-    const opening = !d.open;
+    const was = moving.get(d);
+    const opening = was ? !was.opening : !d.open;
+    // A fold may set its own length (the contact form's, which is tall, moves slower); the stylesheet times its arrow on the same value
+    const own = parseFloat(getComputedStyle(d).getPropertyValue("--t-open")), T = Number.isNaN(own) ? FOLD_TIME : own;
     const s = d.querySelector(":scope > summary");
-    folding++;
-    const done = () => { folding = Math.max(0, folding - 1); y = target = scrollY; };
-    const h0 = d.getBoundingClientRect().height;
+    const h0 = d.getBoundingClientRect().height; // where it is now, partway if it was moving
+    if (was) was.runs.forEach((r) => r.cancel()); // before or after measuring h0 matters: a cancelled run restores its first value
+    const entry = { opening, runs: [] };
+    moving.set(d, entry);
+    folding = moving.size;
+    const done = () => {
+      if (moving.get(d) !== entry) return;
+      moving.delete(d);
+      folding = moving.size;
+      y = target = scrollY;
+    };
     d.style.overflow = "hidden";
     if (opening) {
+      d.classList.remove("closing"); // a turn back from closing: the arrow heads for open again at once
+      d.style.height = "";
       d.open = true;
       const h1 = d.getBoundingClientRect().height;
       d.style.height = `${h0}px`;
-      const runs = [animate(d, { height: [`${h0}px`, `${h1}px`] }, { duration: FOLD_TIME, ease: foldEase })];
-      const wasTop = !(v && v.dataset.pinned && !v.dataset.top), padFrom = v ? parseFloat(v.style.paddingTop) || 0 : 0;
-      // The first fold opened in a centered view: the view glides to its top while the fold opens
-      if (v && v.dataset.pinned && !v.dataset.top) {
-        v.dataset.top = "1";
-        const from = parseFloat(v.style.paddingTop) || 0;
-        runs.push(animate(v, { paddingTop: [`${from}px`, `${TOP_GAP}px`] }, { duration: FOLD_TIME, ease: foldEase }));
-        // The page lines up with the view's top in the same move, if it wasn't already there
-        // A fold that wants its label at the top (the contact form) scrolls there below instead of to the view's top
-        const top = range(i)[0];
-        if (!d.hasAttribute("data-focus-label") && Math.abs(scrollY - top) > 2) runs.push(animate(scrollY, top, { duration: FOLD_TIME, ease: foldEase, onUpdate: (p) => scrollTo(0, p) }));
-      }
+      entry.runs.push(animate(d, { height: [`${h0}px`, `${h1}px`] }, { duration: T, ease: foldEase }));
       // data-focus-label: the page glides, in the fold's own time and curve, until the label sits under the bar with the
       // usual spacing and the form runs down from it, from wherever the visitor was, even at the bottom of the view
       if (d.hasAttribute("data-focus-label")) {
-        // Where the label will be once the fold is open and the view has settled at its top
-        const labelY = s.getBoundingClientRect().top + scrollY - (wasTop ? 0 : Math.max(0, padFrom - TOP_GAP));
-        const finalMax = maxY() + (h1 - h0) - (wasTop ? 0 : Math.max(0, padFrom - TOP_GAP));
+        // Where the label will be once the fold is open
+        const labelY = s.getBoundingClientRect().top + scrollY;
+        const finalMax = maxY() + (h1 - h0);
         // The space above the label (under the bar) equals the space between the label and the form's first field
         const first = s.nextElementSibling, below = first ? first.getBoundingClientRect().top - s.getBoundingClientRect().bottom : TOP_GAP;
         // On a short window the space shrinks (down to 12px) so the form's send button stays in view with the label under the bar
         const room = innerHeight - HEADER - h1 - 12;
         const gap = Math.max(12, Math.min(96, Math.round(below), Math.floor(room)));
         const dest = Math.max(range(i)[0], Math.min(finalMax, Math.round(labelY - HEADER - gap)));
-        if (Math.abs(scrollY - dest) > 2) runs.push(animate(scrollY, dest, { duration: FOLD_TIME, ease: foldEase, onUpdate: (p) => scrollTo(0, p) }));
+        if (Math.abs(scrollY - dest) > 2) entry.runs.push(animate(scrollY, dest, { duration: T, ease: foldEase, onUpdate: (p) => scrollTo(0, p) }));
       }
-      Promise.all(runs.map((r) => r.finished ?? r)).then(() => {
+      Promise.all(entry.runs.map((r) => r.finished ?? r)).then(() => {
+        if (moving.get(d) !== entry) return;
         d.style.height = d.style.overflow = "";
         // An opened fold's label stays in view: if it sits under the bar, the page eases to it
         const r = s.getBoundingClientRect();
@@ -380,33 +358,25 @@
       }, done);
     } else {
       d.classList.add("closing"); // the arrow turns back now, not when the fold has finished shrinking
+      d.style.height = `${h0}px`;
       const h1 = s.getBoundingClientRect().height + (parseFloat(getComputedStyle(d).paddingTop) || 0) + (parseFloat(getComputedStyle(d).paddingBottom) || 0);
-      const last = v && v.querySelectorAll("details[open]").length === 1;
-      const runs = [animate(d, { height: [`${h0}px`, `${h1}px`] }, { duration: FOLD_TIME * 0.85, ease: foldEase })];
-      Promise.all(runs.map((r) => r.finished ?? r)).then(() => {
+      entry.runs.push(animate(d, { height: [`${h0}px`, `${h1}px`] }, { duration: T * 0.85, ease: foldEase }));
+      Promise.all(entry.runs.map((r) => r.finished ?? r)).then(() => {
+        if (moving.get(d) !== entry) return;
         d.open = false;
         d.classList.remove("closing");
         d.style.height = d.style.overflow = "";
-        if (last && v.dataset.top) {
-          // Back to centered: the page returns to the view's top while the content glides down to center
-          delete v.dataset.top;
-          const to = centeredPad(v), from = parseFloat(v.style.paddingTop) || 0;
-          const moves = [animate(v, { paddingTop: [`${from}px`, `${to}px`] }, { duration: FOLD_TIME, ease: foldEase })];
-          const top = range(i)[0];
-          if (Math.abs(scrollY - top) > 2) moves.push(animate(scrollY, top, { duration: FOLD_TIME, ease: foldEase, onUpdate: (p) => scrollTo(0, p) }));
-          Promise.all(moves.map((r) => r.finished ?? r)).then(() => { unpin(v); done(); }, done);
-        } else done();
+        done();
       }, done);
     }
   }
   // Clicks, Enter, and Space all arrive as a click on the summary; the browser's own instant toggle is
-  // replaced by the eased one. The pin listener above has already fixed where the content sits
+  // replaced by the eased one
   document.addEventListener("click", (e) => {
     const s = e.target instanceof Element && e.target.closest("summary");
     const d = s && s.parentElement;
     if (!d || d.tagName !== "DETAILS" || !viewOf(d) || off || e.defaultPrevented) return;
     e.preventDefault();
-    if (folding && d.style.height) return; // this fold is already moving
     toggleFold(d);
   });
 
@@ -604,17 +574,13 @@
   const start = views.indexOf(first ? first.closest(".view") : document.getElementById(location.hash.slice(1)));
   history.scrollRestoration = "manual";
 
-  // Where this history entry was last scrolled, kept in the entry itself (history.state), so Back, Forward and
-  // reload return to the exact spot however the visitor got there (menu link, wheel, keys, touch, scrollbar).
-  // It is stored as a view plus the distance inside it, which survives font and layout shifts better than raw pixels.
-  // The site keeps one more record, in sessionStorage (this tab only, never sent anywhere): the spot of each page at the moment a link
-  // on it was pressed, by page address. Coming back by Back, Forward, or reload it wins over the entry's own state and the #section,
-  // because those can be reset or corrupted while a browser leaves the page (iOS), and a visitor who scrolled from the top has no #section at all
-  const SPOTS = "n1.spots", pageKey = location.pathname + location.search;
-  const savedSpot = () => { try { return JSON.parse(sessionStorage.getItem(SPOTS) || "{}")[pageKey] || null; } catch { return null; } };
-  const navType = (performance.getEntriesByType && performance.getEntriesByType("navigation")[0] || {}).type;
-  let backish = navType === "back_forward" || navType === "reload";
-  const spotNow = () => { const m = backish && savedSpot(); return m && m.v ? m : history.state && history.state.pos; };
+  // Where this history entry was last scrolled, kept under the entry's id (window.n1Entry, js/theme.js), so Back, Forward and
+  // reload return to the exact spot however the visitor got there (menu link, wheel, keys, touch, scrollbar), and a new link opens
+  // at its top or its #section. It is stored as a view plus the distance inside it, which survives font and layout shifts better
+  // than raw pixels. The entry in hand is kept here: Safari already points history.state at the page being returned to when the
+  // page being left gets its pagehide
+  let here = window.n1Entry ? n1Entry.id() : null;
+  const spotNow = () => { const m = window.n1Entry && n1Entry.get(here); return m && typeof m.i === "number" ? m : null; };
   const memo = spotNow();
   const memoAt = memo ? (memo.v ? views.findIndex((v) => v.id === memo.v) : memo.i) : -1;
   const aimAt = memo && memoAt >= 0 && (memoAt > 0 || memo.dy > 2) ? memoAt : -1;
@@ -651,7 +617,7 @@
     if (e && indexAt(scrollY) !== e.i) { scrollTo(0, e.y); sync(); }
   };
   addEventListener("pageshow", (ev) => {
-    if (ev.persisted) backish = true; // shown again from the browser's cache: the same as coming back
+    if (ev.persisted && window.n1Entry) here = n1Entry.id(); // shown again from the browser's cache: the same as coming back
     hands = true; shownAt = performance.now();
     requestAnimationFrame(() => requestAnimationFrame(settleBack));
     for (const t of [200, 600, 1500, 3000]) setTimeout(settleBack, t);
@@ -663,41 +629,44 @@
   // A page being left can change shape under the same scroll (a phone's toolbar and the visible height shift as the next page starts
   // to load, which moves every view's top), so leaving only saves a scroll the rest save has not stored yet, taken from the last
   // scroll seen; a position unchanged since the last save keeps that save, measured while the page stood still
-  // Safari already points history.state at the page being returned to when the page being left gets its pagehide, so a save made
-  // while leaving only counts when the entry in hand carries this visit's token; otherwise the page would write its own spot
-  // over the one it is going back to
-  const memToken = Math.random().toString(36).slice(2);
   let lastSaved = "", lastSavedY = NaN, seenY = scrollY;
+  const spotAt = (at) => { const i = indexAt(at), v = views[i]; return { v: v.id || "", i, dy: Math.max(0, Math.round(at - range(i)[0])) }; };
   function remember(leaving) {
-    // Until the visitor has moved, a restored or linked page is still landing: keep the older memory
+    // Until the visitor has moved, a restored or linked page is still landing: keep the older memory. Only the visitor's own input
+    // ends that, not a scroll or popstate the browser makes while showing the page (iOS can do both)
     if (wantsLanding && !lastInput && !touched && performance.now() < 4000) return;
-    if (document.body.classList.contains("case-open") || document.body.classList.contains("n1chat-open") || off) return;
-    if (leaving && (Math.abs(seenY - lastSavedY) <= 2 || !(history.state && history.state.pos && history.state.pos.t === memToken))) return;
-    const at = leaving ? seenY : scrollY;
-    const i = indexAt(at), v = views[i];
-    const pos = { v: v.id || "", i, dy: Math.max(0, Math.round(at - range(i)[0])), t: memToken };
-    const key = pos.v + "|" + pos.i + "|" + pos.dy;
+    if (hands && performance.now() - shownAt < 4000 && expected()) return;
+    if (!window.n1Entry || document.body.classList.contains("case-open") || document.body.classList.contains("n1chat-open") || off) return;
+    if (leaving && Math.abs(seenY - lastSavedY) <= 2) return;
+    const at = leaving ? seenY : scrollY, pos = spotAt(at);
+    const key = here + "|" + pos.v + "|" + pos.i + "|" + pos.dy;
     if (key === lastSaved) return;
-    try { history.replaceState({ ...history.state, pos }, ""); lastSaved = key; lastSavedY = at; } catch { /* Safari limits how often the entry may change */ }
+    n1Entry.set(here, pos);
+    lastSaved = key; lastSavedY = at;
   }
   let rememberTimer = 0;
   addEventListener("scroll", () => { seenY = scrollY; clearTimeout(rememberTimer); rememberTimer = setTimeout(remember, 250); }, { passive: true });
   addEventListener("pagehide", () => remember(true));
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") remember(true); });
-  const keepSpot = () => {
-    if (document.body.classList.contains("case-open") || document.body.classList.contains("n1chat-open") || off) return;
-    const i = indexAt(scrollY), v = views[i];
-    try {
-      const all = JSON.parse(sessionStorage.getItem(SPOTS) || "{}");
-      all[pageKey] = { v: v.id || "", i, dy: Math.max(0, Math.round(scrollY - range(i)[0])), t: Date.now() };
-      const keys = Object.keys(all);
-      if (keys.length > 40) delete all[keys[0]];
-      sessionStorage.setItem(SPOTS, JSON.stringify(all));
-    } catch { /* storage off: the entry's own state still serves */ }
-  };
   // Pressed, before the next page starts to load: the page still stands as the visitor saw it
+  const keepSpot = () => {
+    if (!window.n1Entry || document.body.classList.contains("case-open") || document.body.classList.contains("n1chat-open") || off) return;
+    n1Entry.set(here, spotAt(scrollY));
+  };
   for (const ev of ["pointerdown", "click"]) document.addEventListener(ev, (e) => { if (e.target.closest && e.target.closest("a[href]")) keepSpot(); }, true);
-  document.addEventListener("click", (e) => { if (e.target.closest && e.target.closest("a[href]")) { seenY = scrollY; remember(); } }, true);
+  document.addEventListener("click", (e) => { if (e.target.closest && e.target.closest("a[href]")) { seenY = scrollY; lastSaved = ""; } }, true);
+  // Another entry of this page (a case link's card, pushed above): follow it, and coming back to one with a spot puts that spot back
+  const follow = () => { clearTimeout(rememberTimer); lastSaved = ""; lastSavedY = NaN; if (window.n1Entry) here = n1Entry.id(); };
+  addEventListener("n1:entry", follow);
+  addEventListener("popstate", () => {
+    follow();
+    if (caseCard(location.hash)) return; // the card's own entry: the rail shows it
+    const m = spotNow(), i = m ? (m.v ? views.findIndex((v) => v.id === m.v) : m.i) : -1;
+    if (i < 0) return;
+    // Already there (a browser that restored it, or a stray popstate): a settle of no distance would never finish
+    const to = Math.min(range(i)[0] + m.dy, maxY());
+    if (Math.abs(scrollY - to) > 2) goTo(i, { y: to });
+  });
   // A section link clears the entry's memory (below), so the next rest saves again even at an unchanged spot
   forgetSaved = () => { lastSaved = ""; lastSavedY = NaN; clearTimeout(rememberTimer); rememberTimer = setTimeout(remember, 700); };
 
