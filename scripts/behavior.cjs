@@ -199,7 +199,7 @@ check("browser", "home: the first screen has no offer block, and the bar's conta
 
 // The Sentinel landing is the default and says what neon1 is, what it does, for whom, and the next step; Matrix, chosen on purpose,
 // keeps the wordmark and slogan on the rain and shows none of the pitch
-check("browser", "home: Sentinel's first screen states the offer and the next step, with no account and no rain; Matrix shows the wordmark, slogan, and one quiet line", async () => {
+check("browser", "home: Sentinel's first screen states the offer and the next step, with no rain; Matrix shows the wordmark, slogan, and one quiet line", async () => {
   const sentinel = await open({ reducedMotion: "reduce" });
   try {
     await sentinel.page.waitForLoadState("load");
@@ -209,7 +209,7 @@ check("browser", "home: Sentinel's first screen states the offer and the next st
     expect(/independent engineering and technology consulting/i.test(text), "the first screen doesn't say what neon1 is", text);
     expect((await p.locator(".pitch-services a").count()) === 4, "the first screen doesn't name the four services");
     expect((await p.locator('.pitch a[href^="mailto:hello@"]').count()) === 1, "the first screen has no email link");
-    expect(/no account needed/i.test(text), "the first screen doesn't say no account is needed");
+    expect(/book a call/i.test(text) && !/no account/i.test(text), "the first screen offers a call, or still says no account is needed", text);
     expect(/1 is glad to be of service/.test(await p.locator(".hero").innerText()), "the slogan is gone");
     expect(!(await p.locator("#rain").isVisible()), "Sentinel's first screen shows the rain");
     expect(!(await p.locator(".landing-line").isVisible()), "Sentinel's pitch is doubled by Matrix's quiet line");
