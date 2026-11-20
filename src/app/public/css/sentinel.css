@@ -117,6 +117,14 @@
 /* ---- The landing says what neon1 is, does, and for whom, with the next step. Matrix keeps the wordmark and slogan on the rain,
  *      so only Sentinel shows the pitch (the hero is the first screen, and the only place Matrix lives) ---- */
 :root[data-site-style="matrix"] .pitch { display: none; }
+:root[data-site-style="sentinel"] .landing-line { display: none; }
+/* Without JavaScript the page carries no look (js/theme.js sets it), so the pitch is laid out plainly: the buttons apart, and each service's name above its line */
+:root:not([data-site-style]) .pitch-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 0 0 14px; }
+:root:not([data-site-style]) .pitch-actions .btn { margin: 0; text-decoration: none; }
+:root:not([data-site-style]) .pitch-services { list-style: none; max-width: 760px; margin: 20px auto; padding: 0; display: grid; gap: 14px; }
+:root:not([data-site-style]) .pitch-services a { display: block; text-decoration: none; }
+:root:not([data-site-style]) .pitch-services :is(b, span) { display: block; }
+:root:not([data-site-style]) .landing-line { display: none; }
 :root[data-site-style="sentinel"] .hero { display: flex; align-items: center; justify-content: center; text-align: left; padding: 88px max(24px, env(safe-area-inset-left)) 40px; }
 :root[data-site-style="sentinel"] .hero-pane { width: 100%; max-width: 1152px; padding: 0; display: flex; flex-direction: column; align-items: flex-start; }
 :root[data-site-style="sentinel"] .hero-pane .brand { margin: 0 0 18px; font-size: 30px; }
