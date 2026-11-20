@@ -199,7 +199,7 @@ check("browser", "home: the first screen has no offer block, and the bar's conta
 
 // The Sentinel landing is the default and says what neon1 is, what it does, for whom, and the next step; Matrix, chosen on purpose,
 // keeps the wordmark and slogan on the rain and shows none of the pitch
-check("browser", "home: Sentinel's first screen states the offer and the next step, with no account and no rain; Matrix shows only the wordmark and slogan", async () => {
+check("browser", "home: Sentinel's first screen states the offer and the next step, with no account and no rain; Matrix shows the wordmark, slogan, and one quiet line", async () => {
   const sentinel = await open({ reducedMotion: "reduce" });
   try {
     await sentinel.page.waitForLoadState("load");
@@ -212,6 +212,7 @@ check("browser", "home: Sentinel's first screen states the offer and the next st
     expect(/no account needed/i.test(text), "the first screen doesn't say no account is needed");
     expect(/1 is glad to be of service/.test(await p.locator(".hero").innerText()), "the slogan is gone");
     expect(!(await p.locator("#rain").isVisible()), "Sentinel's first screen shows the rain");
+    expect(!(await p.locator(".landing-line").isVisible()), "Sentinel's pitch is doubled by Matrix's quiet line");
     expect(!sentinel.errors.length, "page errors", sentinel.errors);
   } finally { await sentinel.context.close(); }
   const matrix = await open({ reducedMotion: "reduce", init: MATRIX_STYLE });
@@ -220,6 +221,10 @@ check("browser", "home: Sentinel's first screen states the offer and the next st
     const p = matrix.page;
     expect((await p.evaluate(() => document.documentElement.dataset.siteStyle)) === "matrix", "a chosen Matrix did not stay");
     expect(!(await p.locator(".pitch").isVisible()), "Matrix's first screen shows the pitch");
+    // One quiet line of offer and the way in, not the pitch
+    const line = p.locator(".landing-line");
+    expect(await line.isVisible() && /independent engineering and technology consulting/i.test(await line.innerText()), "Matrix's first screen lost its one line of offer");
+    expect((await line.locator('a[data-view="contact"]').innerText()) === "Discuss a project", "Matrix's first screen has no way in");
     expect(await p.locator("#rain").isVisible(), "Matrix's first screen has no rain");
     expect(/1 is glad to be of service/.test(await p.locator(".hero").innerText()), "Matrix lost the slogan");
     expect(!matrix.errors.length, "page errors", matrix.errors);
@@ -401,16 +406,20 @@ check("browser", "case: closing settles after repeated input, cancelled animatio
 });
 
 
-// ---- SITE-09: case links land on their exact card ----
-// A link to a single card, from anywhere on the page, must land on that card. The test puts the links in
+// ---- SITE-09: case links land on their exact card, with its panel open ----
+// A link to a single card, from anywhere on the page, must land on that card and open it. The test puts the links in
 // the contact view, the farthest view from the cards
 
-// Resolves once the card is in view vertically, inside the row sideways, focused, and named in the URL
+// Resolves once the card is in view vertically and inside the row sideways, marked, named in the URL, and its panel is open over it
+// with focus inside (a #case-... link or address opens the case study, and the card is where closing it leaves the visitor)
 const landed = (page, id) => page.waitForFunction((id) => {
   const card = document.getElementById("case-" + id), rail = document.getElementById("cases");
   const c = card.getBoundingClientRect(), r = rail.getBoundingClientRect();
+  const panel = document.querySelector(".case-panel");
   return c.top >= 0 && c.top < innerHeight && c.left >= r.left - 2 && c.right <= r.right + 2 &&
-    document.activeElement === card.querySelector("[data-case]") && location.hash === "#case-" + id && card.classList.contains("is-target");
+    !document.getElementById("caseLayer").hidden && panel.contains(document.activeElement) &&
+    document.getElementById("casePanelTitle").textContent === card.querySelector("h3").textContent &&
+    location.hash === "#case-" + id && card.classList.contains("is-target");
 }, id, { timeout: 5000 }).then(() => true, () => false);
 
 // The cards a link is tried on, and a link to one placed in the contact view
@@ -1041,6 +1050,158 @@ check("browser", "AS-09: an empty send marks each required field with its own de
   } finally { await context.close(); }
 });
 
+
+// ---- AUDIT-03: the bar sits in the same place on every page ----
+// The Sentinel landing's style switch used to take room in the row, moving the links and the light/dark switch from where every other page
+// has them. Every box in the bar, measured on the home page and on pages of each kind, must match at the widths a desktop uses
+const BAR_BOXES = () => {
+  const bar = document.querySelector("header.n1-bar"), R = (e) => { const r = e.getBoundingClientRect(); return [r.left, r.right, r.top, r.bottom].map((n) => Math.round(n * 10) / 10); };
+  return { logo: R(bar.querySelector(".n1-logo")), links: [...bar.querySelectorAll("ul.links > li > a")].map(R), mode: R(bar.querySelector(".theme-sw:not(.style-sw)")), menu: R(bar.querySelector("#menuBtn")) };
+};
+for (const [family, look] of [["sentinel", { "neon1.style": "sentinel" }], ["matrix", { "neon1.style": "matrix" }]]) {
+  check("browser", `bar: the ${family} bar has the same boxes on the home page, the Knowledge Center, the blog, and a form page at 1280, 1366, 1440, 1536, and 1920px`, async () => {
+    for (const width of [1280, 1366, 1440, 1536, 1920]) {
+      const init = `try { for (const [k, v] of Object.entries(${JSON.stringify(look)})) localStorage.setItem(k, v); localStorage.setItem("neon1.mode", "light"); } catch {}`;
+      const boxes = {};
+      for (const url of ["/", "/knowledge/", "/blog/", "/report-bug/"]) {
+        const { page, context } = await open({ viewport: { width, height: 800 }, init: new Function(init) }, url);
+        try { await page.waitForLoadState("load"); boxes[url] = await page.evaluate(BAR_BOXES); } finally { await context.close(); }
+      }
+      for (const url of ["/", "/blog/", "/report-bug/"]) expect(JSON.stringify(boxes[url]) === JSON.stringify(boxes["/knowledge/"]), `the bar differs between ${url} and /knowledge/ at ${width}px`, [boxes[url], boxes["/knowledge/"]]);
+    }
+  });
+}
+
+check("browser", "bar: on a 320px phone the Sentinel landing's menu button stays inside the screen, and the style switch is in the footer instead", async () => {
+  for (const width of [320, 340, 360, 390]) {
+    const { page, context } = await open({ viewport: { width, height: 700 }, hasTouch: true, isMobile: true }, "/");
+    try {
+      await page.waitForLoadState("load");
+      const r = await page.evaluate(() => { const m = document.getElementById("menuBtn").getBoundingClientRect(), s = document.querySelector(".style-sw"), sr = s.getBoundingClientRect(); return { menuRight: m.right, switchShown: getComputedStyle(s).display !== "none" && sr.width > 0, overflow: document.documentElement.scrollWidth > innerWidth }; });
+      expect(r.menuRight <= width - 12 && !r.overflow, `the menu button reaches ${r.menuRight}px of ${width}`, r);
+      if (width < 370) expect(!r.switchShown, `the style switch is still in the bar at ${width}px`);
+      else expect(r.switchShown, `the style switch is missing at ${width}px`);
+      expect(await page.locator('.foot [data-look="matrix"]').count() === 1, "the footer lacks the look choice");
+    } finally { await context.close(); }
+  }
+});
+
+check("browser", "look: the footer buttons switch Sentinel and Matrix on any page, keep light or dark, and say which is on", async () => {
+  const { page, context, errors } = await open({}, "/knowledge/");
+  try {
+    await page.waitForLoadState("load");
+    const state = () => page.evaluate(() => ({ style: document.documentElement.dataset.siteStyle, theme: document.documentElement.dataset.siteTheme, pressed: [...document.querySelectorAll("[data-look]")].map((b) => b.getAttribute("aria-pressed")) }));
+    expect(JSON.stringify(await state()) === JSON.stringify({ style: "sentinel", theme: "awake", pressed: ["true", "false"] }), "the footer does not show Sentinel on", await state());
+    await page.locator("header .theme-sw:not(.style-sw)").click();   // dark
+    await page.locator('[data-look="matrix"]').click();
+    const s = await state();
+    expect(s.style === "matrix" && s.theme === "matrix" && s.pressed.join() === "false,true", "Matrix did not take, or dark was lost", s);
+    expect((await page.evaluate(() => localStorage.getItem("neon1.theme.shared"))) === "1", "the choice was not shared with 1NEON");
+    await page.reload(); await page.waitForLoadState("load");
+    expect((await state()).style === "matrix", "the choice did not survive a reload");
+    expect(!errors.length, "page errors", errors);
+  } finally { await context.close(); }
+});
+
+// ---- AUDIT-07: a fold pressed while it moves turns round from where it is ----
+check("browser", "folds: pressing a home fold while it opens or closes reverses it, and an odd or even run of presses ends open or shut with the arrow to match (motion)", async () => {
+  const { page, context, errors } = await open({ reducedMotion: "no-preference" });
+  try {
+    await page.waitForLoadState("load");
+    for (const sel of ["#faq details.n1-fold", "#work details.fold.group"]) {
+      await page.evaluate((s) => document.querySelector(s).closest(".view").scrollIntoView({ behavior: "instant" }), sel);
+      await page.waitForTimeout(1200); // the view's entrance
+      for (const gaps of [[0, 120], [0, 120, 120], [0, 300, 300, 300], [0, 80, 80, 80, 80]]) {
+        const r = await page.evaluate(async ([s, gaps]) => {
+          const d = document.querySelector(s), sum = d.querySelector(":scope > summary"), sleep = (ms) => new Promise((x) => setTimeout(x, ms));
+          const startOpen = d.open;
+          for (const g of gaps) { await sleep(g); sum.click(); }
+          await sleep(1100);
+          return { open: d.open, want: gaps.length % 2 ? !startOpen : startOpen, closing: d.classList.contains("closing"), height: d.style.height, arrow: getComputedStyle(sum, "::after").transform };
+        }, [sel, gaps]);
+        expect(r.open === r.want, `${sel}: ${gaps.length} presses ended ${r.open ? "open" : "shut"}`, r);
+        expect(!r.closing && !r.height, `${sel}: a press left the fold half done`, r);
+        expect((r.arrow !== "none") === r.open, `${sel}: the arrow does not match the fold`, r);
+      }
+    }
+    expect(!errors.length, "page errors", errors);
+  } finally { await context.close(); }
+});
+
+// ---- AUDIT-10: an open panel is a history entry; #case-... opens it ----
+check("browser", "case: opening a panel adds a history entry, Back closes it and Forward reopens it, and the close button steps back out", async () => {
+  for (const reducedMotion of ["reduce", "no-preference"]) {
+    const { page, context, errors } = await open({ reducedMotion });
+    try {
+      await page.waitForLoadState("load");
+      const state = () => page.evaluate(() => ({ open: !document.getElementById("caseLayer").hidden, url: location.pathname + location.hash, length: history.length }));
+      const before = await state();
+      await page.locator('[data-case="dermatology"]').evaluate((b) => b.scrollIntoView({ block: "center", inline: "center", behavior: "instant" }));
+      await page.locator('[data-case="dermatology"]').click();
+      await page.waitForTimeout(700);
+      let s = await state();
+      expect(s.open && s.url === "/#case-dermatology" && s.length === before.length + 1, "opening did not add an entry for the case", [before, s]);
+      await page.goBack(); await page.waitForTimeout(700);
+      s = await state();
+      expect(!s.open && s.url === "/", "Back did not close the panel and stay on the page", s);
+      await page.goForward(); await page.waitForTimeout(700);
+      expect((await state()).open, "Forward did not reopen the panel");
+      await page.locator(".case-close").click(); await page.waitForTimeout(900);
+      s = await state();
+      expect(!s.open && s.url === "/" && s.length === before.length + 1, "the close button did not step back out of the entry it added", s);
+      expect(!errors.length, "page errors", errors);
+    } finally { await context.close(); }
+  }
+});
+
+check("browser", "case: an address or link naming #case-... opens that panel with focus in it, and Esc closes it in place without leaving the page", async () => {
+  for (const reducedMotion of ["reduce", "no-preference"]) {
+    const { page, context, errors } = await open({ reducedMotion }, "/#case-dermatology");
+    try {
+      await page.waitForLoadState("load"); await page.waitForTimeout(500);
+      let s = await caseState(page);
+      expect(s.open && s.onPanel, "the address did not open the case with focus on the panel", s);
+      expect(/patient intake portal/i.test(await page.locator("#casePanelTitle").innerText()), "the wrong case opened");
+      const length = await page.evaluate(() => history.length);
+      await page.keyboard.press("Escape"); await page.waitForTimeout(900);
+      s = await caseState(page);
+      expect(!s.open && (await page.evaluate(() => location.pathname + location.hash)) === "/" && (await page.evaluate(() => history.length)) === length, "Esc did not close in place", s);
+      expect(s.focused === "dermatology", "focus did not return to the case open button", s);
+      // A link in the page's own words opens the same way
+      await page.evaluate(() => document.querySelector('a[href="#case-migration"]').click()); await page.waitForTimeout(1500);
+      s = await caseState(page);
+      expect(s.open && (await page.evaluate(() => location.hash)) === "#case-migration", "a case link did not open its panel");
+      await page.goBack(); await page.waitForTimeout(700);
+      expect(!(await caseState(page)).open, "Back from a case link left the panel open");
+      expect(!errors.length, "page errors", errors);
+    } finally { await context.close(); }
+  }
+});
+
+check("browser", "touch: the bar's switches and menu button, the case open and close buttons, and Neo's header buttons are 44px to hit on a phone", async () => {
+  const { page, context } = await open({ viewport: { width: 390, height: 800 }, hasTouch: true, isMobile: true });
+  try {
+    await page.waitForLoadState("load");
+    // The tallest run of points inside a 60px column over the control that still land on it
+    const reach = (sel) => page.evaluate((s) => {
+      const e = document.querySelector(s), r = e.getBoundingClientRect(), x = r.left + r.width / 2;
+      let lo = r.top, hi = r.bottom;
+      for (let y = r.top; y > r.top - 30; y -= 1) { const h = document.elementFromPoint(x, y); if (h && (h === e || e.contains(h))) lo = y; else break; }
+      for (let y = r.bottom; y < r.bottom + 30; y += 1) { const h = document.elementFromPoint(x, y); if (h && (h === e || e.contains(h))) hi = y; else break; }
+      return Math.round(hi - lo);
+    }, sel);
+    for (const sel of ["header .theme-sw:not(.style-sw)", "header .style-sw", "#menuBtn"]) expect((await reach(sel)) >= 43, `${sel} is under 44px to hit`, await reach(sel));
+    await page.locator("#work").scrollIntoViewIfNeeded();
+    await page.locator('[data-case="dermatology"]').evaluate((b) => b.scrollIntoView({ block: "center", inline: "center", behavior: "instant" }));
+    expect((await reach('[data-case="dermatology"]')) >= 43, "a case's open button is under 44px to hit");
+    await page.locator('[data-case="dermatology"]').click(); await page.waitForTimeout(700);
+    expect((await reach(".case-close")) >= 43, "the case close button is under 44px to hit");
+    await page.keyboard.press("Escape"); await page.waitForTimeout(700);
+    await page.locator(".n1chat-launch").click();
+    await page.locator(".n1chat-tool").first().waitFor({ state: "visible" });
+    expect((await reach(".n1chat-tool")) >= 43, "Neo's header buttons are under 44px to hit");
+  } finally { await context.close(); }
+});
 
 (async () => {
   await new Promise((r) => server.listen(0, "127.0.0.1", r));
