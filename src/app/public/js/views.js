@@ -55,6 +55,18 @@
     if (focus) card.querySelector("[data-case]").focus({ preventScroll: true });
   }
   const reveal = (card) => { toView(card.closest(".view")); slide(card); };
+  // True while the page's own steered move is running (set by the steering below); a native smooth scroll is told by its position
+  let steering = () => false;
+  // Calls back once the page and the card row have stopped moving: still for 120ms, and no steered move running
+  function whenStill(cb) {
+    let at = [scrollY, rail ? rail.scrollLeft : 0], since = performance.now();
+    const t0 = since;
+    (function look() {
+      const now = performance.now(), cur = [scrollY, rail ? rail.scrollLeft : 0];
+      if (cur[0] !== at[0] || cur[1] !== at[1] || steering()) { at = cur; since = now; }
+      if (now - since >= 120 || now - t0 > 2500) cb(); else requestAnimationFrame(look);
+    })();
+  }
 
   if (rail) {
     document.addEventListener("click", (e) => {
@@ -65,8 +77,9 @@
       // The entry being left has already saved its spot (js/scroll-memory.js, or the memory below), for Back
       history.pushState({ card: card.id }, "", "#" + card.id);
       reveal(card);
-      // js/cases.js opens the card's panel on top of it
-      document.dispatchEvent(new CustomEvent("n1:case", { detail: { id: card.id } }));
+      // js/cases.js opens the card's panel on top of it: from the card itself, once the page has come to its section, so a link from
+      // another section (the landing's selected work) opens the card where it lives and closing returns to it there
+      whenStill(() => document.dispatchEvent(new CustomEvent("n1:case", { detail: { id: card.id, grow: true } })));
     });
     // Back or Forward to a card's entry shows the card; any other entry is put back by the scroll memory
     addEventListener("popstate", () => requestAnimationFrame(() => {
@@ -177,6 +190,7 @@
   let y = scrollY, target = scrollY; // rendered and wanted scroll positions
   let pull = 0, pullDir = 0, pullIndex = 0, pullBase = 0;
   let settling = null, detenting = false; // detenting: the settle is a detent after a native scroll, which a touch cuts short
+  steering = () => !!settling;
   let lastInput = 0, gestureFromEdge = false, blockUntilIdle = false, idleTimer = 0;
   // Momentum fades, a person scrolling doesn't: two steps in a row that don't shrink count as a push
   let prevAbs = 0, steady = 0, lastDirect = false;

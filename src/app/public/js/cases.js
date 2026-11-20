@@ -8,10 +8,10 @@
 // reloaded, and a #case-... link or address opens its panel. A panel opened from the address closes in place instead of stepping back,
 // so Esc never leaves the page.
 //
-// One overlay at a time: while a case study is open it owns the screen. Everything behind it,
-// the bar and its menu button included, is inert, so pointer, keyboard, and a screen reader's
-// cursor all stay in the panel; the menu (js/frame.js) and the white rabbit (js/white-rabbit.js)
-// can't open over it, and the chat steps aside (shared/chat.css hides it under body.case-open).
+// One overlay at a time: while a case study is open it owns the screen. The page behind it, the chat, and the rain controls are inert,
+// so pointer, keyboard, and a screen reader's cursor stay in the panel. The top bar is not: pressing anything in it closes the panel
+// first and then acts, and so does a press outside the panel. The white rabbit (js/white-rabbit.js) can't open over the panel, and the
+// chat steps aside (shared/chat.css hides it under body.case-open).
 
 (() => {
   "use strict";
@@ -30,7 +30,7 @@
   const SPRING = "cubic-bezier(.2, .9, .25, 1.06)";
   // What Tab can land on inside the panel, and what goes inert behind it
   const FOCUSABLE = 'a[href], button:not([disabled]), input, select, textarea, summary, [tabindex]:not([tabindex="-1"])';
-  const BEHIND = ".n1-bar, .top, .awake, .rainctl, .n1chat-launch, .n1chat";
+  const BEHIND = ".awake, .rainctl, .n1chat-launch, .n1chat";
   // closed -> open -> closing -> closed; closing can be cut short by a new open
   let card = null, opener = null, state = "closed", closeId = 0, backstop = 0, saved = [];
   let pushed = false; // the open panel's history entry was added in this visit, so closing steps back out of it
@@ -139,6 +139,15 @@
     if (history.state && history.state.card) history.replaceState({ ...history.state, card: undefined }, "", location.pathname + location.search);
   }, true);
 
+  // The top bar stays in use while a panel is open. Pressing anything in it (a link, the menu button, a switch, the logo) closes the
+  // panel first, at once and without refocusing the card, then does what it does; the bar's own click handling runs after this one.
+  // The entry the panel added now stands for the page without it, as for a link inside the panel
+  document.addEventListener("click", (e) => {
+    if (state === "closed" || e.defaultPrevented || !e.target.closest(".n1-bar, .top")) return;
+    settle(false);
+    if (history.state && history.state.card) history.replaceState({ ...history.state, card: undefined }, "", location.pathname + location.search);
+  }, true);
+
   // Card buttons open their case study; the scrim and close button close it
   document.addEventListener("click", (e) => {
     const b = e.target.closest("[data-case]");
@@ -182,7 +191,7 @@
   }
   addEventListener("popstate", sync);
   // js/views.js adds the entry for a #case-... link and brings the card into view; the panel follows
-  document.addEventListener("n1:case", (e) => { open(key(e.detail.id), null, { quiet: true }); pushed = true; });
+  document.addEventListener("n1:case", (e) => { open(key(e.detail.id), null, { quiet: !e.detail.grow }); pushed = true; });
   sync(); // an address that names a case
   // The browser's own jump to the fragment clears focus as the page finishes loading, so the panel takes it back then
   if (state === "open" && document.readyState !== "complete") addEventListener("load", () => { if (state === "open") panel.focus({ preventScroll: true }); }, { once: true });
