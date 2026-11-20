@@ -33,7 +33,7 @@
   background-position: calc(100% - 23px) 50%, calc(100% - 18px) 50%; background-size: 5px 5px, 5px 5px; background-repeat: no-repeat; }
 @supports (appearance: base-select) {
   .rb-form select, .rb-form select::picker(select) { appearance: base-select; }
-  .rb-form select { background-image: none; padding-right: 14px; display: inline-flex; align-items: center; gap: 12px; --arr-t: .105em; }
+  .rb-form select { background-image: none; padding-right: 10px; display: inline-flex; align-items: center; gap: 12px; --arr-t: .105em; }
   .rb-form select::picker-icon { content: ""; width: .95em; height: .75em; font: 15px var(--sans); background: var(--brand); clip-path: var(--arr-shape); align-self: center; margin-left: auto; margin-right: 2px; transition: rotate var(--t-base) var(--ease); }
   .rb-form select:open::picker-icon { rotate: -90deg; }
   .rb-form select[data-dir="up"]::picker(select) { position-area: block-start span-inline-end; margin: 0 0 4px; }

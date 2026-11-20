@@ -12,22 +12,31 @@ function page(values = {}, options = {}) {
   const storage = new Map(Object.entries(options.fresh || options.blocked ? values : { 'neon1.style': 'matrix', ...values })), listeners = {}, pending = [];
   const button = () => ({ attrs: {}, setAttribute(k, v) { this.attrs[k] = v; }, addEventListener(k, fn) { this[k] = fn; } });
   const mode = button(), family = button();
+  // The footer's two buttons for the family (data-look)
+  const looks = [{ ...button(), dataset: { look: 'sentinel' } }, { ...button(), dataset: { look: 'matrix' } }];
+  const bus = {};
   const links = [];
   const root = { dataset: { ...options.dataset }, classList: { add() {}, remove() {} } };
   const document = { documentElement: root, readyState: 'complete', querySelector: () => null,
-    querySelectorAll: (s) => s.includes(':not') ? [mode] : s === '.style-sw' ? [family] : [],
-    getElementById: () => null, dispatchEvent() {}, createElement: () => ({}), visibilityState: 'visible', addEventListener: (k, fn) => { listeners['doc:' + k] = fn; },
+    querySelectorAll: (s) => s.includes(':not') ? [mode] : s === '.style-sw' ? [family] : s === '[data-look]' ? looks : [],
+    getElementById: () => null, dispatchEvent(e) { (bus[e.type] || []).forEach((fn) => fn(e)); }, createElement: () => ({}), visibilityState: 'visible',
+    addEventListener: (k, fn) => { listeners['doc:' + k] = fn; (bus[k] ||= []).push(fn); },
     head: options.dataset ? { appendChild: (link) => links.push(link) } : undefined };
+  // A browser with script-built stylesheets: the page's adopted sheets, and the sheet class that fills them
+  if (options.adopt) document.adoptedStyleSheets = [];
+  document.referrer = options.referrer || '';
   if (options.transition) document.startViewTransition = (fn) => { pending.push(fn); return { finished: Promise.resolve() }; };
   vm.runInNewContext(source, { document, localStorage: {
     getItem(k) { if (options.blocked) throw Error('blocked'); return storage.get(k) ?? null; },
     setItem(k, v) { if (options.blocked || options.readOnly) throw Error('blocked'); storage.set(k, v); },
   }, matchMedia: (q) => ({ matches: q.includes('reduced') ? !options.transition : !!options.deviceDark }),
-    addEventListener: (k, fn) => { listeners[k] = fn; }, CustomEvent: function () {},
+    addEventListener: (k, fn) => { listeners[k] = fn; }, window: {}, URL, location: { origin: 'https://neon1.test' },
+    CSSStyleSheet: options.adopt ? function () { this.replaceSync = (css) => { this.css = css; }; } : undefined,
+    CustomEvent: function (type, init) { this.type = type; this.detail = init && init.detail; },
     MutationObserver: function () { this.observe = () => {}; this.disconnect = () => {}; },
     setTimeout: () => 0, clearTimeout() {}, getComputedStyle: () => ({ getPropertyValue: () => '' }),
   });
-  return { root, storage, mode, family, listeners, pending, links };
+  return { root, storage, mode, family, looks, listeners, pending, links, adopted: () => document.adoptedStyleSheets };
 }
 
 // Each family switch preserves the mode, even when the old per-family choices disagree
@@ -143,4 +152,55 @@ test('a tab brought forward catches up with a change it slept through', () => {
   p.storage.set('neon1.mode', 'dark');
   p.listeners['doc:visibilitychange']();
   assert.equal(p.root.dataset.siteLook, 'plugged');
+});
+
+// ---- The footer's look buttons ----
+test('the footer buttons set the family from any page and keep the mode', () => {
+  const p = page({ 'neon1.mode': 'dark' }, { fresh: true });
+  const [sentinel, matrix] = p.looks;
+  assert.equal(sentinel.attrs['aria-pressed'], 'true');
+  assert.equal(matrix.attrs['aria-pressed'], 'false');
+  matrix.click();
+  assert.equal(p.root.dataset.siteLook, 'plugged');
+  assert.equal(p.storage.get('neon1.theme.shared'), '1');
+  assert.equal(matrix.attrs['aria-pressed'], 'true');
+  assert.equal(sentinel.attrs['aria-pressed'], 'false');
+  sentinel.click();
+  assert.equal(p.root.dataset.siteLook, 'desert-of-the-real');
+  assert.equal(p.storage.get('neon1.mode'), 'dark');
+});
+
+test('pressing the button for the family already chosen changes nothing', () => {
+  const p = page({}, { fresh: true });
+  p.looks[0].click();
+  assert.equal(p.root.dataset.siteLook, 'providence');
+  assert.equal(p.storage.get('neon1.theme.shared'), undefined);
+});
+
+// ---- The fade between pages follows the family chosen in this page, not the one it loaded with (audit F-24) ----
+const fading = (p) => p.adopted().filter((s) => /view-transition/.test(s.css)).length;
+test('a page that loaded in Sentinel starts fading once Matrix is chosen in it, and stops when Sentinel returns', () => {
+  const p = page({}, { fresh: true, adopt: true });
+  assert.equal(fading(p), 0);
+  p.family.click();                                    // sentinel to matrix
+  assert.equal(p.root.dataset.siteStyle, 'matrix');
+  assert.equal(fading(p), 1);
+  p.mode.click(); p.pending.splice(0).forEach((fn) => fn());
+  assert.equal(fading(p), 1);                          // a mode change does not add another
+  p.family.click();                                    // matrix to sentinel
+  assert.equal(fading(p), 0);
+});
+
+test('a Matrix page entered from another neon1 page fades at once, and the footer buttons turn it off and on', () => {
+  const p = page({ 'neon1.style': 'matrix' }, { adopt: true, referrer: 'https://neon1.test/blog/' });
+  assert.equal(fading(p), 1);
+  p.looks[0].click();                                  // sentinel
+  assert.equal(fading(p), 0);
+  p.looks[1].click();                                  // matrix
+  assert.equal(fading(p), 1);
+});
+
+test('a Sentinel page entered from another neon1 page never fades', () => {
+  const p = page({}, { fresh: true, adopt: true, referrer: 'https://neon1.test/' });
+  assert.equal(fading(p), 0);
 });

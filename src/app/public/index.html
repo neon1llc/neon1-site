@@ -136,9 +136,10 @@
         <span class="theme-knob" aria-hidden="true"></span>
       </button>
       <!-- /frame:theme -->
-      <!-- Theme: matrix (the rain and the neon) or sentinel (plain). Only on the landing's first screen, hidden once the page scrolls:
-           in Matrix it takes the theme switch's place, in Sentinel it sits beside it. Its pick wins on every page (js/theme.js, css/sentinel.css) -->
-      <button class="theme-sw style-sw" type="button" role="switch" aria-checked="false" aria-label="matrix or sentinel" title="matrix or sentinel">
+      <!-- Look: matrix (the rain and the neon) or sentinel (plain), on when Sentinel. Only on the landing's first screen, hidden once the page scrolls:
+           in Matrix it takes the light/dark switch's place, in Sentinel it sits after the logo (css/frame.css). The footer offers the same choice on every page.
+           Its pick wins on every page (js/theme.js, css/sentinel.css) -->
+      <button class="theme-sw style-sw" type="button" role="switch" aria-checked="false" aria-label="Sentinel look" title="sentinel or matrix look">
         <svg class="theme-sun" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.5v6M12 3.5v9M17 3.5v5M7 14v6.5M12 16.5v4M17 12v8.5" /></svg>
         <svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path class="sentinel-case" d="M3.5 8h17v11.5h-17zM8.5 8V5.5h7V8M3.5 13h17" /></svg>
         <span class="theme-knob" aria-hidden="true"></span>
@@ -515,7 +516,9 @@
         <p class="slogan">1 is glad to be of service.</p>
       </div>
       <div>
-        <h3>contact</h3>
+        <!-- The look (sentinel or matrix) from any page, since the bar's switch shows only on the landing's first screen; js/theme.js -->
+        <p class="look-pick" role="group" aria-label="Look"><span class="look-lead" aria-hidden="true">look</span><button class="look-opt" type="button" data-look="sentinel" aria-pressed="false">sentinel</button><span class="sep" aria-hidden="true">\</span><button class="look-opt" type="button" data-look="matrix" aria-pressed="false">matrix</button></p>
+        <h2>contact</h2>
         <ul>
           <li><a class="ext" href="https://calendly.com/1isgladtobeofservice/neon1-consultation" target="_blank" rel="noopener"><span class="ext-end">book a call</span></a></li>
           <li><a class="ext" href="mailto:hello@neon1.tech"><span class="ext-end">email</span></a></li>
@@ -524,7 +527,7 @@
         </ul>
       </div>
       <div>
-        <h3>elsewhere</h3>
+        <h2>elsewhere</h2>
         <ul>
           <li><a href="/knowledge/">knowledge center</a></li>
           <li><a href="/blog/">blog</a></li>

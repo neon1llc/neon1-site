@@ -37,6 +37,7 @@
       b.title = "light or dark";
     });
     document.querySelectorAll(".style-sw").forEach((b) => b.setAttribute("aria-checked", String(biz)));
+    document.querySelectorAll("[data-look]").forEach((b) => b.setAttribute("aria-pressed", String((b.dataset.look === "sentinel") === biz)));
     // Light pages (the Knowledge Center, the blog) tint the browser's bar paper; in plugged it takes the dark ground; sentinel takes its own
     // plain grounds on every page, the landing included (its black belongs to the rain). The home page's bar color is otherwise left alone
     const meta = document.querySelector('meta[name="theme-color"]');
@@ -156,7 +157,21 @@
       });
     });
   }
-  if (document.readyState === "loading") addEventListener("DOMContentLoaded", wire); else wire();
+  // The footer's two buttons set the same family from any page, without moving the mode
+  function wireLook() {
+    document.querySelectorAll("[data-look]").forEach((b) => {
+      b.setAttribute("aria-pressed", String((b.dataset.look === "sentinel") === (style() === "sentinel")));
+      b.addEventListener("click", () => {
+        if (style() === b.dataset.look) return;
+        write(KEY_MODE, mode());
+        write(KEY_STYLE, b.dataset.look);
+        write(KEY_SHARED, "1");
+        change();
+      });
+    });
+  }
+  const start = () => { wire(); wireLook(); };
+  if (document.readyState === "loading") addEventListener("DOMContentLoaded", start); else start();
 
   // ---- Staying in step: other tabs, and a page restored by Back ----
   // A family change re-applies in place; the landing starts its Matrix effects only when needed
@@ -226,15 +241,26 @@
 // Script-built stylesheets are not inline styles, so the strict CSP allows them. Reduced motion never fades.
 (() => {
   if (!("adoptedStyleSheets" in document) || typeof CSSStyleSheet !== "function") return;
-  // The sentinel theme has no page effects at all, so pages simply change
-  if (document.documentElement.dataset.siteStyle === "sentinel") return;
+  // The opt-in is one stylesheet, added or removed as the look changes in this page: a visitor who switches to Matrix here gets the
+  // fade on the next move, and one who switches to Sentinel loses it, though the page loaded the other way
+  let sheet = null;
   const optIn = () => {
+    if (sheet || document.documentElement.dataset.siteStyle === "sentinel") return;
     try {
-      const sheet = new CSSStyleSheet();
-      sheet.replaceSync("@media (prefers-reduced-motion: no-preference) { @view-transition { navigation: auto; } }");
-      document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
+      const next = new CSSStyleSheet();
+      next.replaceSync("@media (prefers-reduced-motion: no-preference) { @view-transition { navigation: auto; } }");
+      document.adoptedStyleSheets = [...document.adoptedStyleSheets, next];
+      sheet = next;
     } catch { /* no fade: pages simply change */ }
   };
+  const optOut = () => {
+    if (!sheet) return;
+    document.adoptedStyleSheets = document.adoptedStyleSheets.filter((s) => s !== sheet);
+    sheet = null;
+  };
+  document.addEventListener("n1:theme", (e) => { if (e.detail.style === "sentinel") optOut(); else optIn(); });
+  // The sentinel theme has no page effects at all, so pages simply change
+  if (document.documentElement.dataset.siteStyle === "sentinel") return;
   let inside = false;
   try { inside = !!document.referrer && new URL(document.referrer).origin === location.origin; } catch { /* treat as outside */ }
   if (inside) optIn();

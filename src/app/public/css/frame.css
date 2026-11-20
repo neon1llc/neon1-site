@@ -208,7 +208,7 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 :is(:root[data-site-theme="awake"] .theme-sw:not(.style-sw), :root[data-site-style="matrix"] .style-sw) .theme-sun,
 :is(:root[data-site-theme="matrix"] .theme-sw:not(.style-sw), :root[data-site-style="sentinel"] .style-sw) .theme-moon { color: var(--brand); }
 :is(:root[data-site-theme="awake"] .theme-sw:not(.style-sw), :root[data-site-style="matrix"] .style-sw) .theme-moon,
-:is(:root[data-site-theme="matrix"] .theme-sw:not(.style-sw), :root[data-site-style="sentinel"] .style-sw) .theme-sun { opacity: .6; }
+:is(:root[data-site-theme="matrix"] .theme-sw:not(.style-sw), :root[data-site-style="sentinel"] .style-sw) .theme-sun { opacity: .78; }
 .n1-bar.light .theme-sw:focus-visible { outline-color: var(--brand); }
 .n1-bar:not(.light) .theme-sw { opacity: 0; visibility: hidden; pointer-events: none; }
 :root:not([data-site-theme]) .theme-sw { display: none; }
@@ -227,23 +227,20 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 .n1-bar:not(.light) .theme-sw.style-sw { opacity: 1; visibility: visible; pointer-events: auto; background: rgba(13,2,8,.4); color: #84a98c;
   --brand: var(--neon); --brand-rgb: 108 255 168; --ctl-line: rgba(108,255,168,.4); }
 .style-sw .sentinel-case { fill: none; stroke: currentColor; stroke-width: 1.8; }
-/* Sentinel: on the landing's first screen the two switches sit side by side, style first, then light or dark, so a visitor can
-   pick dark mode before scrolling. Matrix keeps the one switch over the rain. Where the switches share the bar's row, the style
-   switch keeps its place once it hides, so the links never move as the page scrolls; on a phone that place is free space anyway.
-   Wide enough for both in the page margin (from 1452px), the pair is centered there, like the single switch on other pages */
+/* Sentinel: the landing's first screen offers both switches, so a visitor can pick dark mode before scrolling. Neither one moves
+   anything else: the logo, links, contact, 1NEON, light/dark switch, and menu button sit where they sit on every other page.
+   Wide (from 1320px) the style switch takes the left page margin, mirroring the light/dark switch in the right one. Narrower, it
+   sits in the row right after the logo, where the bar always has room (the links and the light/dark switch are pinned right);
+   on a phone it keeps that place, and below 370px, where the row has no room for it, it leaves the bar (the footer has the same
+   choice). It keeps its place once it hides on scroll, so nothing in the bar moves then either */
 :root[data-site-style="sentinel"] .n1-bar :is(.theme-sw:not(.style-sw), .menu-btn) { order: 1; }
 :root[data-site-style="sentinel"] .n1-bar[data-top] .theme-sw:not(.style-sw) { opacity: 1; visibility: visible; pointer-events: auto; }
-:root[data-site-style="sentinel"] .n1-bar .theme-sw.style-sw { margin-left: 12px; }
+:root[data-site-style="sentinel"] .n1-bar:has(.style-sw) .n1-logo { order: -2; }
+:root[data-site-style="sentinel"] .n1-bar .theme-sw.style-sw { order: -1; margin: 0; }
 :root[data-site-style="sentinel"] .n1-bar:not([data-top]) .style-sw { display: inline-block; visibility: hidden; pointer-events: none; }
-/* In the row the pair is spaced by the bar's 20px gap alone */
-:root[data-site-style="sentinel"] .n1-bar:has(.style-sw) .theme-sw:not(.style-sw) { margin-left: 0; }
-@media (max-width: 1040px) { :root[data-site-style="sentinel"] .n1-bar .theme-sw.style-sw { margin-left: auto; } }
-@media (min-width: 1320px) and (max-width: 1451.98px) {
-  :root[data-site-style="sentinel"] .n1-bar:has(.style-sw) .theme-sw { position: relative; top: auto; right: auto; transform: none; }
-}
-@media (min-width: 1452px) {
-  :root[data-site-style="sentinel"] .n1-bar:has(.style-sw) .theme-sw:not(.style-sw) { right: calc((100% - 1200px) / 4 + 12px - 36px); }
-  :root[data-site-style="sentinel"] .n1-bar .theme-sw.style-sw { margin: 0; right: calc((100% - 1200px) / 4 + 12px + 36px); }
+@media (max-width: 369.98px) { :root[data-site-style="sentinel"] .n1-bar .theme-sw.style-sw { display: none; } }
+@media (min-width: 1320px) {
+  :root[data-site-style="sentinel"] .n1-bar .theme-sw.style-sw { right: auto; left: calc((100% - 1200px) / 4 + 12px); transform: translate(-50%, -50%); }
 }
 
 /* ---- Phone menu: below the width the links need, they fold into a full-screen menu ---- */
@@ -344,10 +341,18 @@ footer { position: relative; z-index: 2; border-top: 1px solid var(--line); back
 .awake footer { background: var(--surface-2); }
 .foot { max-width: 1200px; margin: 0 auto; display: grid; gap: 28px; grid-template-columns: 2fr 1fr 1fr; font-size: 14px; color: var(--muted);
   padding: 40px max(24px, env(safe-area-inset-right)) 28px max(24px, env(safe-area-inset-left)); }
-.foot h3 { font: 600 13px var(--mono); color: var(--text); margin: 0 0 10px; }
+/* Footer headings are h2: the page's own h1 and sections come before, so an h3 here skipped a level (the page-wide h2 rules lose to the extra element in this selector) */
+footer .foot h2 { font: 600 13px var(--mono); letter-spacing: .01em; color: var(--text); margin: 0 0 10px; }
 .foot ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
 .foot a { color: var(--muted); text-decoration: none; } .foot a:hover { color: var(--glow); }
 .foot .slogan { margin: 0; }
+/* The look picker: two plain text buttons for the same choice as the bar's style switch, which only the landing's first screen shows */
+.foot .look-pick { display: flex; align-items: baseline; gap: 6px; margin: 10px 0 0; font: 13px var(--mono); }
+.foot .look-lead { margin-right: .4em; }
+.foot .look-opt { padding: 0; border: 0; background: none; color: var(--muted); font: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; cursor: pointer; }
+.foot .look-opt:hover { color: var(--glow); }
+.foot .look-opt[aria-pressed="true"] { color: var(--text); text-decoration: none; font-weight: 600; cursor: default; }
+:root:not([data-site-style]) .look-pick { display: none; }
 .mark-light { font: 700 17px var(--mono); letter-spacing: .06em; color: var(--brand); margin: 0 0 10px; }
 @media (max-width: 700px) { .foot { grid-template-columns: 1fr 1fr; } .foot > div:first-child { grid-column: 1 / -1; } }
 /* Legal line. Its bottom padding is a resting place for Neo's launcher (fixed, bottom left, 48px tall, 16px from the bottom edge): the
@@ -422,3 +427,32 @@ a.ext:hover { color: var(--brand); }
 
 /* Text fields at 16px on touch screens: iPhone browsers zoom the page in when a field under 16px takes focus */
 @media (pointer: coarse) { :root:root :is(input:not([type=checkbox], [type=radio], [type=file], [type=range], [type=color]), textarea, select) { font-size: 16px; } }
+
+/* ---- Touch: 44px hit areas without changing how anything looks ----
+   On a phone or tablet (a coarse pointer), the small controls get an invisible area around them that takes the tap, so the bar's
+   switches, menu button, and logo, the case study buttons, Neo's header buttons, and the menu's rows are 44px to hit. The folds
+   and the footer's lists take real room instead, since their neighbors sit close. The legal row's links keep their layout and
+   get a hit area that reaches halfway to the next line */
+@media (pointer: coarse) {
+  .n1-logo, .menu-btn, .menu a, .n1chat-tool { position: relative; }
+  /* A pseudo-element's box starts inside the 1px border, so each side reaches one pixel further than the number says */
+  .theme-sw::after, .menu-btn::after { content: ""; position: absolute; inset: -9px 0; }
+  .n1-logo::after { content: ""; position: absolute; inset: -2px 0; }
+  .open::after { content: ""; position: absolute; inset: -4px; }
+  .case-close::after { content: ""; position: absolute; inset: -5px; }
+  .n1chat-tool::after { content: ""; position: absolute; inset: -11px 0; }
+  .menu a::after { content: ""; position: absolute; inset: -6px -8px; }
+  main .fold > summary { padding-block: 12px; }
+  .foot li a { display: inline-flex; align-items: center; min-height: 44px; }
+  .foot ul { gap: 0; }
+  .kc-crumbs a { display: inline-flex; align-items: center; min-height: 44px; margin-block: -14px; }
+  .legal :is(a.report-bug, a.report-feedback) { position: relative; }
+  .legal :is(a.report-bug, a.report-feedback)::after { content: ""; position: absolute; inset: -15px -4px; }
+  .foot .look-opt { position: relative; }
+  .foot .look-opt::after { content: ""; position: absolute; inset: -14px -6px; }
+  .kc-path li > a, .repo h3 > a { display: inline-flex; align-items: center; min-height: 44px; }
+  .kc-shelf-desc a { display: inline-block; padding-block: 12px; margin-block: -12px; }
+  .legal :is(.policies, .owner) a { position: relative; }
+  .legal :is(.policies, .owner) a::after { content: ""; position: absolute; inset: -13px -4px; }
+}
+
