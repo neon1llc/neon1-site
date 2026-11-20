@@ -25,6 +25,28 @@
       b.addEventListener("click", () => rail.scrollBy({ left: step() * +b.dataset.rail, behavior: reduce.matches ? "auto" : "smooth" })));
   }
 
+  // ---- Services: on a phone one swipeable row; its buttons step through it, and a link to a service slides it into place ----
+  const svcRail = document.getElementById("svc-rail");
+  const svcStep = () => { const c = svcRail.querySelector(".svc"); return c ? c.getBoundingClientRect().width + 20 : 0; };
+  const svcScrolls = () => svcRail && svcRail.scrollWidth > svcRail.clientWidth + 2;
+  let svcMark = 0;
+  if (svcRail) {
+    document.querySelectorAll("[data-svc-rail]").forEach((b) =>
+      b.addEventListener("click", () => svcRail.scrollBy({ left: svcStep() * +b.dataset.svcRail, behavior: reduce.matches ? "auto" : "smooth" })));
+  }
+  // Slides the row so the service sits at its start and marks it for a moment (cleared on its own, or at once when the row is swiped)
+  function showService(card) {
+    if (!svcRail || !svcScrolls()) return;
+    const pad = parseFloat(getComputedStyle(svcRail).scrollPaddingInlineStart) || 0;
+    svcRail.scrollTo({ left: svcRail.scrollLeft + card.getBoundingClientRect().left - svcRail.getBoundingClientRect().left - pad, behavior: reduce.matches ? "auto" : "smooth" });
+    svcRail.querySelectorAll(".svc.is-target").forEach((c) => c.classList.remove("is-target"));
+    card.classList.add("is-target");
+    clearTimeout(svcMark);
+    svcMark = setTimeout(() => card.classList.remove("is-target"), 2600);
+  }
+  window.n1ShowService = showService;
+  if (svcRail) svcRail.addEventListener("touchstart", () => svcRail.querySelectorAll(".svc.is-target").forEach((c) => c.classList.remove("is-target")), { passive: true });
+
   // ---- Folds open in place ----
   // Views start at their top (css/site.css), so a fold grows downward and nothing above it moves. The page stays where the
   // visitor is: opening a fold never scrolls back to the top of its view (it used to, when views centered their content)
@@ -387,6 +409,8 @@
     else { keepSpot(); history.pushState(null, "", url); }
     forgetSaved(); // the entry just made has no record yet: save where it ends up, even if that is where the last save was
     goTo(i, { link: true });
+    // A link to one service slides the phone's row to it
+    if (el.classList.contains("svc")) showService(el);
     // Keyboard focus follows the view, so the next Tab continues inside it (AS-02); the logo keeps its own
     if (!a.dataset.view) window.n1focus?.(id);
   });
@@ -540,6 +564,9 @@
   const landing = () => wantsLanding && !lastInput && !touched && !settling && performance.now() < 4000 && Math.abs(scrollY - aim()) > 2;
   const land = () => { if (wantsLanding && !lastInput && !touched && !settling) { scrollTo(0, aim()); sync(); } };
   land();
+  // The layout can still move in the first moments (fonts, images, entrances) while the page's total size stays the same, which the
+  // observer below never hears; so the landing is repeated every frame for the first two seconds, until the visitor touches the page
+  (function settleLanding() { land(); if (performance.now() < 2000) requestAnimationFrame(settleLanding); })();
 
   // ---- Coming back to the page: the remembered view, else the linked #section, is the truth ----
   // Some browsers (DuckDuckGo and Safari on iOS among them) show the page from their cache, reset or restore the scroll after
@@ -575,7 +602,7 @@
   // to load, which moves every view's top), so leaving only saves a scroll the rest save has not stored yet, taken from the last
   // scroll seen; a position unchanged since the last save keeps that save, measured while the page stood still
   let lastSaved = "", lastSavedY = NaN, seenY = scrollY;
-  const spotAt = (at) => { const i = indexAt(at), v = views[i]; return { v: v.id || "", i, dy: Math.max(0, Math.round(at - range(i)[0])) }; };
+  const spotAt = (at) => { const i = indexAt(at), v = views[i]; return { v: v.id || "", i, dy: Math.max(0, Math.round(at - range(i)[0])), y: Math.round(at) }; };
   function remember(leaving) {
     // Until the visitor has moved, a restored or linked page is still landing: keep the older memory. Only the visitor's own input
     // ends that, not a scroll or popstate the browser makes while showing the page (iOS can do both)
@@ -583,6 +610,10 @@
     if (hands && performance.now() - shownAt < 4000 && expected()) return;
     if (!window.n1Entry || document.body.classList.contains("case-open") || document.body.classList.contains("n1chat-open") || off) return;
     if (leaving && Math.abs(seenY - lastSavedY) <= 2) return;
+    // Leaving a page that stands where its remembered spot was written: the spot stays as written, since the views' layout as the page
+    // unloads can differ from the one the spot was measured in, and a new measurement there would move it (a reload read it back 144px low)
+    const kept = window.n1Entry && n1Entry.get(here);
+    if (leaving && kept && typeof kept.y === "number" && Math.abs(seenY - kept.y) <= 2) return;
     const at = leaving ? seenY : scrollY, pos = spotAt(at);
     const key = here + "|" + pos.v + "|" + pos.i + "|" + pos.dy;
     if (key === lastSaved) return;

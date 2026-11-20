@@ -194,6 +194,26 @@ for (const [style, mode] of [["sentinel", "light"], ["sentinel", "dark"], ["matr
   });
 }
 
+// On a phone the four services are one swipeable row, and a first-screen link slides it to its card and marks it for a moment; where they sit 2 by 2 nothing slides
+check("browser", "services: on a phone a first-screen link slides the row to its service and marks it; wide, the services stay 2 by 2", async () => {
+  const phone = await open({ reducedMotion: "no-preference", viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+  try {
+    await phone.page.waitForLoadState("load");
+    await phone.page.locator('.pitch-services a[href="#service-security"]').click();
+    await polled(phone.page, () => document.getElementById("svc-rail").scrollLeft > 100, undefined, 6000);
+    const state = await phone.page.evaluate(() => ({ scrolls: document.getElementById("svc-rail").scrollWidth > document.getElementById("svc-rail").clientWidth, target: (document.querySelector(".svc.is-target") || {}).id }));
+    expect(state.scrolls && state.target === "service-security", "the row did not slide to the service and mark it", state);
+    await phone.page.waitForTimeout(3200);
+    expect(!(await phone.page.locator(".svc.is-target").count()), "the mark stayed on the service");
+  } finally { await phone.context.close(); }
+  const wide = await open({ reducedMotion: "no-preference" });
+  try {
+    await wide.page.waitForLoadState("load");
+    const grid = await wide.page.evaluate(() => ({ display: getComputedStyle(document.getElementById("svc-rail")).display, nav: getComputedStyle(document.querySelector(".svc-nav")).display }));
+    expect(grid.display === "grid" && grid.nav === "none", "the wide services are not a 2 by 2 grid", grid);
+  } finally { await wide.context.close(); }
+});
+
 check("browser", "contact: missing fields are named and nothing is sent; a refusal says what to do", async () => {
   const { page, context } = await open();
   try {
@@ -1272,7 +1292,7 @@ check("browser", "case: an address or link naming #case-... opens that panel wit
       expect(!s.open && (await page.evaluate(() => location.pathname + location.hash)) === "/" && (await page.evaluate(() => history.length)) === length, "Esc did not close in place", s);
       expect(s.focused === "dermatology", "focus did not return to the case open button", s);
       // A link in the page's own words opens the same way
-      await page.evaluate(() => document.querySelector('a[href="#case-migration"]').click()); await page.waitForTimeout(3200); // the page reaches the client work first, then the card opens
+      await caseLink(page, "migration"); await page.evaluate(() => document.querySelector('a.test-case-link[href="#case-migration"]').click()); await page.waitForTimeout(3200); // the page reaches the client work first, then the card opens
       s = await caseState(page);
       expect(s.open && (await page.evaluate(() => location.hash)) === "#case-migration", "a case link did not open its panel");
       await page.goBack(); await page.waitForTimeout(700);

@@ -525,7 +525,17 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 .svc-next { margin: 8px 0 4px; font-size: var(--fs-ui); }
 .case-body .svc-next { margin-top: 24px; font-size: var(--fs-base); }
 .svc-foot { margin-top: 24px; max-width: 760px; }
-@media (max-width: 860px) { .svc-grid { grid-template-columns: 1fr; } }
+/* On a phone the services are one row you swipe, like the client work cards: each snaps to the start, the row fades into both screen edges, and a link to a
+   service slides it into place (js/views.js). Where they sit 2 by 2 the row's buttons and full-bleed width are not needed */
+@media (max-width: 860px) {
+  .svc-grid { display: flex; gap: 20px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; padding: 4px 24px 8px; scroll-padding-inline: 24px; scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 24px, #000 calc(100% - 24px), transparent); mask-image: linear-gradient(to right, transparent, #000 24px, #000 calc(100% - 24px), transparent); }
+  .svc-grid::-webkit-scrollbar { display: none; }
+  .svc { flex: 0 0 82vw; scroll-snap-align: start; }
+}
+@media (min-width: 861px) { .svc-rail-wrap { margin-inline: 0; } .svc-nav { display: none; } }
+/* The service a link brought you to, marked for a moment so you can tell which card the row slid to */
+.svc.is-target { border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand) inset; }
 
 /* ---- Evidence key: the six kinds of work, so none is mistaken for another ---- */
 .kinds { margin: 4px 0 14px; display: grid; grid-template-columns: minmax(150px, max-content) 1fr; gap: 8px 22px; max-width: 900px; }

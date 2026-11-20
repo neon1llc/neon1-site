@@ -6,6 +6,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ### Changed
 - Shorter copy on the landing page: the Services intro is one line pointing to the first call or a 1NEON account, its closing is the pricing link, the four service cards and their detail panels are rewritten for a quick read, and the process, contact, form, Neo, Knowledge Center, and blog wording is cut to what a visitor needs. The site now builds from neon1-corpus v0.51.6.
+- On a phone the four services are one swipeable row, like the client work cards, with previous and next buttons; the "reach by" links on the first screen slide the row to their service and mark it for a moment. Wide screens keep the 2 by 2 grid.
 - On a wide screen (1540px and up) the Knowledge Center index keeps its sections open at the right of the page, as a document's index does, and its "On this page" bar steps aside; narrower, the bar works as before.
 - One link rule in every look and mode: a link that stays on neon1 is underlined thinly at 55% of its color and takes the full color on hover and focus, and a link that leaves is bold, never underlined, and nudges its northeast arrow. The dimmed underline was Matrix-only before; the per-theme one-offs are gone, and a browser check holds the rule in all four looks.
 - The contact form has its own address, /#contact?message=1. Opening the form adds it as a history entry, so Back closes the form and Forward opens it again; opening the page at the address, or following 1NEON's Send a message link, opens it. Reload keeps it.
@@ -28,6 +29,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - In About, "LinkedIn profile" is an outbound link, and the sentence saying past work belonged to employers and their clients is gone (the Knowledge Center's About too, in corpus v0.51.2). "Portal trial" opens in the same tab, so Back works from it.
 
 ### Fixed
+- Reloading a page that stood on a section (Matrix, on a phone, such as Why) no longer reopens it 144px lower: leaving a page that is still where its remembered spot put it now keeps that spot as written, instead of measuring it again as the page unloads.
 - The top bar on the Knowledge Center and the blog keeps the light/dark switch and menu button pinned right, as on the landing. A rule meant for the landing's two switches pushed the light/dark switch against the logo there.
 - Back after a link to a section of the landing page (the menu, the logo, "Discuss a project", "See the work") returns to where the link was pressed. Each of those links used to replace the page's history entry instead of adding one, so Back left the site or skipped the landing. Each now adds an entry that remembers where the page stood, and Back, Forward, and reload restore every entry's exact spot. `make history` runs the whole matrix, on an iPhone profile in WebKit and Chromium, in both looks: every menu, button, footer, card, and cross-page link, A to B and Back and Forward, multi-step walks, and reloads.
 - Switching the look from the footer keeps the choice where it is on screen, so the page no longer jumps when the first screen's height changes.
