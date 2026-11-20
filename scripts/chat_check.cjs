@@ -90,7 +90,7 @@ async function check(name, fn) {
 
 // ---- Helpers that drive the window like a visitor ----
 
-const sel = { launch: ".n1chat-launch", panel: ".n1chat", input: ".n1chat-input", send: ".n1chat-send", log: ".n1chat-log", fresh: "button[aria-label='Start a new conversation']", close: "button[aria-label='Close']" };
+const sel = { launch: ".n1chat-launch", panel: ".n1chat", input: ".n1chat-input", send: ".n1chat-send", log: ".n1chat-log", fresh: "button[aria-label='Start a new conversation']", close: ".n1chat button[aria-label='Close']" };
 async function ask(page, text) {
   await page.fill(sel.input, text);
   await page.click(sel.send);

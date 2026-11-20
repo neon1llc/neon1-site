@@ -4,6 +4,8 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+## v0.84.0
+
 ### Changed
 - The "send a message" fold opens and closes at half its old speed, and its arrow turns on the same time.
 - Services are four cards like the client work cards. Each card shows the summary and when it fits, and opens a panel with what you get, what else fits better, limits, related work, and the next step, in place of the dropdown.
@@ -38,14 +40,8 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - Code blocks in the Knowledge Center scroll inside themselves, so a long command no longer widens a phone's page (DeployOps).
 - The guided walkthrough link in process has no outbound arrow, since 1NEON is part of neon1.
 - The theme script paints from the saved choice when a change runs, flips the family from the saved family rather than the painted one, and catches up when a tab is brought forward, so quick switches and changes made in another tab always end on the newest choice. Tests cover every run of up to four quick switches with the paints arriving in any order.
-
-
-### Fixed
 - Opening a fold (how to read the evidence, the questions, the code and resources groups) keeps the page where it is, instead of scrolling back to the top of its section.
-
-### Fixed
 - A link inside a service card or a client work card closes the card on the way, so the page it goes to, contact or another page, is never left behind the open card.
-
 
 ## v0.83.0
 
