@@ -10,6 +10,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - Services, process, and contact say to outline up to three projects in a free 1NEON account, then ask for a free assessment, with the free 30-minute call as the other way in. The account lines show only while sign-up is open.
 
 ### Fixed
+- The dermatology case study's table gives the intake time in days, matching its card.
 - On the Sentinel landing the top bar is light from the first paint. It used to start as Matrix glass and fade to light on every visit, and the style switch's knob slid across as if the look had just changed. The light/dark switch on other pages no longer slides on load in dark mode either.
 - Neo's chat window is fully opaque in Matrix, so the page no longer shows through it.
 - The code-and-resources row for this site names the current release; make check now compares it with the footer and version.json.
