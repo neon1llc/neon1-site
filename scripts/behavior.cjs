@@ -317,6 +317,31 @@ check("browser", "case: on a phone, the menu can't open over an open case study"
   } finally { await context.close(); }
 });
 
+// Making the page behind the menu inert restyles all of it; done in the frame the menu starts to move, that was a visible stutter
+// on phones. So the page behind turns inert only once the menu has finished moving, and the menu itself has no backdrop blur
+for (const [style, mode] of [["sentinel", "light"], ["sentinel", "dark"], ["matrix", "light"], ["matrix", "dark"]]) {
+  check("browser", `menu: on a phone the page behind turns inert after the menu moves, not as it starts (${style}, ${mode})`, async () => {
+    const look = ([s, m]) => { try { localStorage.setItem("neon1.style", s); localStorage.setItem("neon1.mode", m); } catch {} };
+    const { page, context, errors } = await open({ reducedMotion: "no-preference", ...PHONE });
+    try {
+      await page.evaluate(look, [style, mode]); await page.reload({ waitUntil: "load" }); await page.waitForTimeout(1200);
+      const state = () => page.evaluate(() => ({ shown: !document.getElementById("menu").hidden, inert: !!document.querySelector(".top")?.inert, blur: getComputedStyle(document.getElementById("menu")).backdropFilter }));
+      const atOpen = await page.evaluate(() => { document.getElementById("menuBtn").click(); return { shown: !document.getElementById("menu").hidden, inert: !!document.querySelector(".top")?.inert }; });
+      expect(atOpen.shown && !atOpen.inert, "the page behind turned inert in the frame the menu opened", atOpen);
+      await page.waitForTimeout(600);
+      const opened = await state();
+      expect(opened.shown && opened.inert, "the page behind is not inert once the menu is open", opened);
+      expect(!opened.blur || opened.blur === "none", "the menu blurs the page behind it, which costs every frame it moves", opened);
+      const atClose = await page.evaluate(() => { document.getElementById("menuBtn").click(); return { inert: !!document.querySelector(".top")?.inert }; });
+      expect(atClose.inert, "the page behind left inert in the frame the menu started to close", atClose);
+      await page.waitForTimeout(600);
+      const closed = await state();
+      expect(!closed.shown && !closed.inert, "the menu did not settle closed", closed);
+      expect(!errors.length, "page errors", errors);
+    } finally { await context.close(); }
+  });
+}
+
 check("browser", "case: closing settles after repeated input, cancelled animations, and a motion change", async () => {
   const { page, context, errors } = await open({ reducedMotion: "no-preference" });
   try {
