@@ -140,7 +140,7 @@ ${posts.map(card).join("\n")}
 ${list}
       </section>
 
-      <p class="kc-colophon">Posts come from ${CORPUS_LINK} and are shared under CC BY-ND 4.0. They explain things in general terms and aren't legal advice.</p>
+      <p class="kc-colophon">Posts come from ${CORPUS_LINK} and are shared under CC BY-ND 4.0.</p>
     </div>`
   return page({
     title: "Blog · neon1",

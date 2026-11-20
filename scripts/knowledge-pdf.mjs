@@ -67,7 +67,6 @@ function pageHtml(d) {
   const fillable = ["form", "template"].includes(d.type)
   const kind = d.type === "page" ? shelf : TYPE_LABELS[d.type] ?? d.type
   const dated = longDate(d.data.updated)
-  const note = d.type === "template" || d.type === "example" ? " Templates and examples are illustrations, not legal advice." : ""
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -90,7 +89,7 @@ function pageHtml(d) {
   ${facts(d)}
   ${shortOf(d)}
   <main>${keepFields(relink(singleH1(d.html, d.title), d, corpus, { absolute: true }))}</main>
-  <p class="colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit.${note}${fillNote(d) ? ` ${esc(fillNote(d))}` : ""} The latest version is at <a href="${SITE}${d.url}">${esc(`neon1.tech${d.url}`)}</a>.</p>
+  <p class="colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit.${fillNote(d) ? ` ${esc(fillNote(d))}` : ""} The latest version is at <a href="${SITE}${d.url}">${esc(`neon1.tech${d.url}`)}</a>.</p>
 </body>
 </html>`
 }
