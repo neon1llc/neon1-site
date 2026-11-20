@@ -4,6 +4,9 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+### Fixed
+- On the Matrix landing, a thin light line no longer shows about 40px below "Discuss a project" on an iPhone. The link's dimmed underline was a see-through color, which WebKit paints in the wrong place under text with a wide shadow; it is now an opaque mix.
+
 ### Added
 - Matrix text fields have a green caret, dark green in light mode and Matrix green in dark. A field without focus shows one after its text, and an empty one sits just before its placeholder. Only one blinks at a time, the focused field or else the first empty field in view, and the rest hold steady and dim; reduced motion keeps every caret steady. Sentinel is unchanged. 1NEON inherits it from shared/caret.js.
 

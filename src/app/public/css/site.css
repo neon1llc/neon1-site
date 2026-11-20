@@ -60,7 +60,8 @@ a.card { text-decoration: none; }
 .landing-line span { opacity: .9; }
 .landing-line :is(span, a) { text-shadow: 0 0 3px #0D0208, 0 0 8px #0D0208, 0 0 14px rgb(13 2 8 / .9); } /* the rain runs behind it */
 /* The way in is always its own line after the description. It rests white and underlined, and turns matrix green when pointed at or focused */
-.landing-line a { color: #e9ffee; text-decoration-line: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; transition: color var(--t-fast, .15s) var(--ease, ease); }
+/* The dimmed underline is an opaque mix with the page's dark, not a see-through color: WebKit (every iPhone browser) paints a see-through line under text with a wide shadow, as this has over the rain, about 40px below the words */
+.landing-line a { color: #e9ffee; text-decoration-line: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, #e9ffee 55%, #0D0208); transition: color var(--t-fast, .15s) var(--ease, ease); }
 .landing-line a:is(:hover, :focus-visible) { color: var(--neon); }
 
 /* Hero text fades up in turn */
