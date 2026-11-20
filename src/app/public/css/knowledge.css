@@ -370,3 +370,14 @@ body.kc { background: var(--page); }
 :root[data-site-theme="matrix"] .kc-text .callout.example { background: rgba(185, 163, 227, .1); }
 :root[data-site-theme="matrix"] .kc-text .callout.example .callout-title { color: #CDB8F5; }
 :root[data-site-theme="matrix"] .diagram-scroll { background: #E8ECE8; border-color: transparent; }
+
+/* The index's contents, open at the right of the page on a wide screen as a document's index is, where the "On this page" bar steps aside */
+.kc-index-side { display: none; }
+@media (min-width: 1540px) {
+  .kc-shelves { display: none; }
+  .kc-index-side { display: block; position: fixed; top: calc(88px + env(safe-area-inset-top)); right: var(--sp-5); width: 232px; max-height: calc(100vh - 120px); overflow-y: auto;
+    padding: var(--sp-1) 0 var(--sp-1) var(--sp-4); border-left: 1.5px solid var(--line); }
+  .kc-index-side ul { list-style: none; margin: 0; padding: 0; }
+  .kc-index-side a { display: flex; align-items: baseline; gap: .4em; padding: var(--sp-1) 0; color: var(--muted); text-decoration: none; font: var(--fs-ui)/1.4 var(--sans); }
+  .kc-index-side a:hover, .kc-index-side a[aria-current] { color: var(--brand); }
+}

@@ -178,6 +178,13 @@ ${nav}
       </div>
     </nav>
 
+    <nav class="kc-toc kc-index-side" aria-label="Sections">
+      <p class="kc-toc-title">On this page</p>
+      <ul>
+${nav}
+      </ul>
+    </nav>
+
     <div class="kc-body">
 ${groups}
 

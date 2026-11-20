@@ -44,6 +44,12 @@ if (bar) {
         label.replaceChildren(`${shelves.indexOf(current) + 1} of ${shelves.length} · `, ...(g ? [Object.assign(document.createElement("b"), { textContent: g }), " / "] : []), name);
       }
     }
+    // The open list at the side of a wide screen marks the same shelf
+    const side = document.querySelector(".kc-index-side");
+    if (side) for (const a of side.querySelectorAll("a[href^='#']")) {
+      const on = current && a.getAttribute("href") === current.a.getAttribute("href");
+      if (on) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current");
+    }
     // Keep the marked link in sight inside the open list
     const active = bar.querySelector("a[aria-current]");
     const list = bar.querySelector("ul");
@@ -62,11 +68,17 @@ if (bar) {
     scrollTo({ top: Math.max(0, Math.round(t.top + scrollY - stickAt() - gap)), behavior: smooth && !reduce.matches ? "smooth" : "auto" });
     return true;
   };
-  for (const s of [...shelves, ...groupLinks]) s.a.addEventListener("click", (e) => {
+  const go = (el) => (e) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
     if (fold) fold.open = false;
-    if (land(s.el, true)) { e.preventDefault(); history.pushState(null, "", `#${s.el.id}`); }
-  });
+    if (land(el, true)) { e.preventDefault(); history.pushState(null, "", `#${el.id}`); }
+  };
+  for (const s of [...shelves, ...groupLinks]) s.a.addEventListener("click", go(s.el));
+  // The open list at the side of a wide screen lands the same way
+  for (const a of document.querySelectorAll(".kc-index-side a[href^='#']")) {
+    const el = document.getElementById(a.getAttribute("href").slice(1));
+    if (el) a.addEventListener("click", go(el));
+  }
   const queue = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
 
   // Outside a tap, or Escape, shuts the list
