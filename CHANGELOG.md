@@ -5,7 +5,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 ## Unreleased
 
 ### Changed
-- Shorter copy on the landing page: the Services intro is one line pointing to the first call or a 1NEON account, its closing is the pricing link, the four service cards and their detail panels are rewritten for a quick read, and the process, contact, form, Neo, Knowledge Center, and blog wording is cut to what a visitor needs. The site now builds from neon1-corpus v0.51.5.
+- Shorter copy on the landing page: the Services intro is one line pointing to the first call or a 1NEON account, its closing is the pricing link, the four service cards and their detail panels are rewritten for a quick read, and the process, contact, form, Neo, Knowledge Center, and blog wording is cut to what a visitor needs. The site now builds from neon1-corpus v0.51.6.
 - On a wide screen (1540px and up) the Knowledge Center index keeps its sections open at the right of the page, as a document's index does, and its "On this page" bar steps aside; narrower, the bar works as before.
 - One link rule in every look and mode: a link that stays on neon1 is underlined thinly at 55% of its color and takes the full color on hover and focus, and a link that leaves is bold, never underlined, and nudges its northeast arrow. The dimmed underline was Matrix-only before; the per-theme one-offs are gone, and a browser check holds the rule in all four looks.
 - The contact form has its own address, /#contact?message=1. Opening the form adds it as a history entry, so Back closes the form and Forward opens it again; opening the page at the address, or following 1NEON's Send a message link, opens it. Reload keeps it.
