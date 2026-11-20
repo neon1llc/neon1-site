@@ -27,28 +27,8 @@
   }
 
   // ---- Folds open in place ----
-  // Views center their content, so a fold opening in the middle of one pushed everything above it up by
-  // half its height, and the browser scrolled to make up for it, leaving the page outside the view it
-  // was in; the next scroll then jumped. Before the first fold in a view opens, its content is pinned
-  // where it already sits and grows downward instead. Clicks, Enter, and Space all arrive as a click
-  function pin(v) {
-    if (v.dataset.pinned) return;
-    const first = v.firstElementChild;
-    if (!first) return;
-    const top = first.getBoundingClientRect().top - v.getBoundingClientRect().top - (parseFloat(getComputedStyle(first).marginTop) || 0);
-    v.style.paddingTop = `${Math.max(0, top)}px`;
-    v.style.justifyContent = "flex-start";
-    v.style.alignContent = "start";
-    v.dataset.pinned = "1";
-  }
-  const unpin = (v) => { v.style.paddingTop = v.style.justifyContent = v.style.alignContent = ""; delete v.dataset.pinned; delete v.dataset.top; };
-  document.addEventListener("click", (e) => {
-    const s = e.target instanceof Element && e.target.closest("summary");
-    const v = s && s.closest(".view");
-    if (v) pin(v);
-  }, true);
-  // A new screen size centers again any view whose folds are all closed
-  addEventListener("resize", () => document.querySelectorAll(".view[data-pinned]").forEach((v) => { if (!v.querySelector("details[open]")) unpin(v); }));
+  // Views start at their top (css/site.css), so a fold grows downward and nothing above it moves. The page stays where the
+  // visitor is: opening a fold never scrolls back to the top of its view (it used to, when views centered their content)
 
   // ---- Case links: a link to one card lands on that card ----
   // Case links, such as the contact form's "a similar project", point at single cards (#case-home). Its
@@ -324,15 +304,6 @@
   const foldEase = (token("--ease-open").match(/[\d.]+/g) || [0.25, 0.8, 0.25, 1]).map(Number);
   const TOP_GAP = 28; // the view's spacing above its heading once it sits at the top
   const viewOf = (d) => d.closest(".view");
-  const centeredPad = (v) => {
-    // Where the content sits when centered: measured with the pin lifted, then put straight back
-    const keep = v.style.cssText;
-    unpin(v);
-    const first = v.firstElementChild;
-    const pad = first.getBoundingClientRect().top - v.getBoundingClientRect().top - (parseFloat(getComputedStyle(first).marginTop) || 0);
-    v.style.cssText = keep; v.dataset.pinned = "1";
-    return Math.max(0, pad);
-  };
   function toggleFold(d) {
     const v = viewOf(d), i = views.indexOf(v);
     const opening = !d.open;
@@ -346,23 +317,12 @@
       const h1 = d.getBoundingClientRect().height;
       d.style.height = `${h0}px`;
       const runs = [animate(d, { height: [`${h0}px`, `${h1}px`] }, { duration: FOLD_TIME, ease: foldEase })];
-      const wasTop = !(v && v.dataset.pinned && !v.dataset.top), padFrom = v ? parseFloat(v.style.paddingTop) || 0 : 0;
-      // The first fold opened in a centered view: the view glides to its top while the fold opens
-      if (v && v.dataset.pinned && !v.dataset.top) {
-        v.dataset.top = "1";
-        const from = parseFloat(v.style.paddingTop) || 0;
-        runs.push(animate(v, { paddingTop: [`${from}px`, `${TOP_GAP}px`] }, { duration: FOLD_TIME, ease: foldEase }));
-        // The page lines up with the view's top in the same move, if it wasn't already there
-        // A fold that wants its label at the top (the contact form) scrolls there below instead of to the view's top
-        const top = range(i)[0];
-        if (!d.hasAttribute("data-focus-label") && Math.abs(scrollY - top) > 2) runs.push(animate(scrollY, top, { duration: FOLD_TIME, ease: foldEase, onUpdate: (p) => scrollTo(0, p) }));
-      }
       // data-focus-label: the page glides, in the fold's own time and curve, until the label sits under the bar with the
       // usual spacing and the form runs down from it, from wherever the visitor was, even at the bottom of the view
       if (d.hasAttribute("data-focus-label")) {
-        // Where the label will be once the fold is open and the view has settled at its top
-        const labelY = s.getBoundingClientRect().top + scrollY - (wasTop ? 0 : Math.max(0, padFrom - TOP_GAP));
-        const finalMax = maxY() + (h1 - h0) - (wasTop ? 0 : Math.max(0, padFrom - TOP_GAP));
+        // Where the label will be once the fold is open
+        const labelY = s.getBoundingClientRect().top + scrollY;
+        const finalMax = maxY() + (h1 - h0);
         // The space above the label (under the bar) equals the space between the label and the form's first field
         const first = s.nextElementSibling, below = first ? first.getBoundingClientRect().top - s.getBoundingClientRect().bottom : TOP_GAP;
         // On a short window the space shrinks (down to 12px) so the form's send button stays in view with the label under the bar
@@ -381,26 +341,17 @@
     } else {
       d.classList.add("closing"); // the arrow turns back now, not when the fold has finished shrinking
       const h1 = s.getBoundingClientRect().height + (parseFloat(getComputedStyle(d).paddingTop) || 0) + (parseFloat(getComputedStyle(d).paddingBottom) || 0);
-      const last = v && v.querySelectorAll("details[open]").length === 1;
       const runs = [animate(d, { height: [`${h0}px`, `${h1}px`] }, { duration: FOLD_TIME * 0.85, ease: foldEase })];
       Promise.all(runs.map((r) => r.finished ?? r)).then(() => {
         d.open = false;
         d.classList.remove("closing");
         d.style.height = d.style.overflow = "";
-        if (last && v.dataset.top) {
-          // Back to centered: the page returns to the view's top while the content glides down to center
-          delete v.dataset.top;
-          const to = centeredPad(v), from = parseFloat(v.style.paddingTop) || 0;
-          const moves = [animate(v, { paddingTop: [`${from}px`, `${to}px`] }, { duration: FOLD_TIME, ease: foldEase })];
-          const top = range(i)[0];
-          if (Math.abs(scrollY - top) > 2) moves.push(animate(scrollY, top, { duration: FOLD_TIME, ease: foldEase, onUpdate: (p) => scrollTo(0, p) }));
-          Promise.all(moves.map((r) => r.finished ?? r)).then(() => { unpin(v); done(); }, done);
-        } else done();
+        done();
       }, done);
     }
   }
   // Clicks, Enter, and Space all arrive as a click on the summary; the browser's own instant toggle is
-  // replaced by the eased one. The pin listener above has already fixed where the content sits
+  // replaced by the eased one
   document.addEventListener("click", (e) => {
     const s = e.target instanceof Element && e.target.closest("summary");
     const d = s && s.parentElement;

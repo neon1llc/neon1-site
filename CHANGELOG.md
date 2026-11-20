@@ -7,6 +7,9 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 ### Changed
 - The landing marks the section in view in the top bar and the phone menu, and every section link lands its heading the same distance below the bar: each view now starts at its top instead of centering its content.
 
+### Fixed
+- Opening a fold (how to read the evidence, the questions, the code and resources groups) keeps the page where it is, instead of scrolling back to the top of its section.
+
 ## v0.83.0
 
 ### Changed
