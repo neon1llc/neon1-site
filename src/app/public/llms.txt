@@ -112,5 +112,5 @@ neon1 is the independent engineering and technology consulting practice of neon1
 
 ## Blog
 
-- [Why I started neon1, and a free way to start with me](https://neon1.tech/blog/why-neon1/): Why neon1 exists, how I work, and the free 1NEON account that lets you start whenever you have the time. (2026-11-15)
+- [Why I started neon1](https://neon1.tech/blog/why-neon1/): Why neon1 exists, how I work, and how a 1NEON account lets you start whenever you have the time. (2026-11-15)
 - [Tax preparers are financial institutions, as far as the FTC is concerned](https://neon1.tech/blog/tax-preparers-are-financial-institutions/): What the FTC Safeguards Rule asks of a small tax or accounting office, and what to get done before tax season. (2026-11-12)
