@@ -5,13 +5,19 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 ## Unreleased
 
 ### Changed
-- On a phone or tablet the landing scrolls with the browser's own momentum, as roadmap.sh does, instead of steering the finger. A flick can carry across several sections. Once it stops, the page eases to the nearest section edge, like a detent, and touching again during that settle takes the page back. Wheel, trackpad, and keyboard keep the steered resistance.
+- The landing scrolls with the browser's own momentum for finger, wheel, and trackpad, as roadmap.sh does, instead of steering the input. A soft flick moves a little, and a strong one can run through several sections. Once the scroll stops, the page eases to the nearest section edge, like a wheel settling on its pointer: a soft push that crosses an edge falls back, a stronger one lands on the next, and touching again during the settle takes the page back. Keys and links settle with the same ease. Other pages already scroll natively.
 - "No account needed" is gone from the first screen, services, process, contact, and the questions. The free call is "book a call" or "the first call", and "free" stays where it names the free 1NEON account and its assessment.
 - The Selected work links on the Sentinel first screen take you to the client work section first, then open the card there from its place, so closing returns to it.
 - The top bar stays usable while a case or service panel is open: pressing a link, the menu button, or a switch in it closes the panel first, then acts. Pressing outside the panel closes it, as before.
 - The Sentinel first screen has the same room under it as every other section, so the pitch clears the phone toolbar and Neo's button.
 
+- The first-screen line is "reach by email \ book a call \ portal trial" in the report line's style, all outbound links; "portal trial" shows only while sign-up is open. "No account needed" is gone.
+- On the Sentinel landing the style switch sits beside the light/dark switch, never beside the logo, takes no room in the bar, and stays through the whole first screen. It hides once the page moves on to the next section, not on the first scroll.
+- The theme choice moved from under the footer's logo and slogan to the first line of the copyright strip, ending where the report line ends. It reads "theme", matrix first, then sentinel. The footer's link lists have their earlier spacing again; their 44px touch areas come from the links' own padding box, not from taller rows.
+- The Matrix landing's description and "Discuss a project" are always two lines. The link is white and underlined, and turns matrix green when pointed at or focused.
+
 ### Fixed
+- Dark mode no longer sets running text wider than light mode. It added letter spacing, so a line could wrap differently after switching and move everything below it.
 - Closing the phone menu no longer flashes its links: the fade replayed the links' entrance from invisible. The bar's menu look, the scroll lock, and the focus move now wait for the fade's first frame.
 - In the footer's copyright strip, a wrapped line sits 8px from the one above, whichever group it wraps in; the version used to sit closer than the other lines.
 
