@@ -10,6 +10,10 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 ### Added
 - Matrix text fields have a green caret, dark green in light mode and Matrix green in dark. A field without focus shows one after its text, and an empty one sits just before its placeholder. Only one blinks at a time, the focused field or else the first empty required field in view, and the rest hold steady and dim; reduced motion keeps every caret steady. Sentinel is unchanged. 1NEON inherits it from shared/caret.js.
 
+### Fixed
+- On a phone, opening the keyboard no longer shrinks every section and shifts the page under the field. The visible height holds while a text field has focus, so the field stays put when the keyboard opens and the page returns to where it was when it closes, and the page's steady-scroll snapping waits until typing ends.
+- On a phone, the contact form's first field shows a blinking caret when the form opens, where the browser gave none until a tap.
+
 ### Changed
 - The process steps' sign-up line invites anyone, ready or just curious, to start on their own by signing up in 1NEON, outlining up to three projects, and requesting an assessment.
 - About says a project that needs a specialty gets "a vetted specialist" with a defined role in the proposal, not "the partner".

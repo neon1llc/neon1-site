@@ -6,14 +6,23 @@
 
 (() => {
   const root = document.documentElement;
+  // A phone's keyboard shrinks the visible height, which would shrink every view and shift the page under the field being typed in;
+  // while a text field has focus the height holds, and it updates once focus leaves (a turned phone, which changes the width, still does)
+  let width = innerWidth, timer = 0;
+  const typing = () => { const a = document.activeElement; return !!a && /^(INPUT|TEXTAREA)$/.test(a.tagName) && !/^(checkbox|radio|button|submit|reset|file|range|color|image)$/.test(a.type || ""); };
   const set = () => {
     // Pinch zoom shrinks the visible height only because the page is magnified
     if (window.visualViewport && visualViewport.scale > 1.01) return;
+    const turned = innerWidth !== width;
+    width = innerWidth;
+    if (typing() && !turned && root.style.getPropertyValue("--vh")) return;
     root.style.setProperty("--vh", (window.visualViewport ? visualViewport.height : innerHeight) + "px");
     root.style.setProperty("--sbw", Math.max(0, innerWidth - root.clientWidth) + "px");
   };
   set();
   addEventListener("resize", set);
+  // The keyboard takes a moment to close after focus leaves
+  addEventListener("focusout", () => { clearTimeout(timer); timer = setTimeout(set, 500); }, true);
   if (window.visualViewport) visualViewport.addEventListener("resize", set);
   // The scrollbar only appears once the body exists and overflows
   addEventListener("DOMContentLoaded", set);

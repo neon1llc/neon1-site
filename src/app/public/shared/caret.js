@@ -9,7 +9,8 @@
   const NOT_TEXT = new Set(["checkbox", "radio", "file", "range", "color", "submit", "button", "reset", "image", "hidden"]);
   const carets = new Map(); // field -> its drawn caret
   const marks = new WeakMap(); // field -> what its caret was last placed from
-  let layer = null, mirror = null, queued = 0;
+  let layer = null, mirror = null, queued = 0, softField = null, userAt = 0, userTarget = null;
+  const coarse = matchMedia("(pointer: coarse)");
 
   // Text fields only: inputs that take typed text, and textareas
   const isText = (el) => el instanceof HTMLTextAreaElement || (el instanceof HTMLInputElement && !NOT_TEXT.has(el.type));
@@ -60,6 +61,21 @@
     return field.getBoundingClientRect().width - parseFloat(cs.borderLeftWidth) - parseFloat(cs.borderRightWidth);
   }
 
+  // A phone's browser focuses a field a script focused (the contact form opening) without a caret or keyboard, so that one is drawn
+  // here, blinking, until the person touches or types in it; then the browser's own caret takes over
+  function soften(field) {
+    if (softField && softField !== field) softField.removeAttribute("data-n1-soft");
+    softField = field;
+    if (field) field.setAttribute("data-n1-soft", "");
+  }
+  // A touch, click, or key is noted with where it landed: a field it landed on (or whose label it hit) was focused by the person
+  const sure = (e) => {
+    userAt = performance.now();
+    userTarget = e.type === "keydown" ? "key" : e.target;
+    if (softField && (e.type === "keydown" || e.target === softField)) { soften(null); refresh(); }
+  };
+  const byPerson = (field) => performance.now() - userAt < 600 && (userTarget === "key" || (userTarget instanceof Element && (userTarget === field || userTarget.closest("label")?.control === field)));
+
   // Whether a field can show a caret at all: in the page, shown, enabled, and editable
   function usable(field) {
     if (!field.isConnected || field.disabled || field.readOnly) return false;
@@ -72,9 +88,9 @@
   // A field whose box, text, and scroll are unchanged since the last pass is not measured again
   function place(field, el, focused, origin, full) {
     const hide = () => { el.hidden = true; marks.delete(field); return false; };
-    if (!usable(field) || field === focused) return hide();
+    if (!usable(field) || (field === focused && field !== softField)) return hide();
     const r = field.getBoundingClientRect();
-    const sig = [r.left - origin.left, r.top - origin.top, r.width, r.height, field.value, field.scrollTop, field.placeholder].join("|");
+    const sig = [field === softField, r.left - origin.left, r.top - origin.top, r.width, r.height, field.value, field.scrollTop, field.placeholder].join("|");
     if (!full && marks.get(field) === sig && !el.hidden) return true;
     const cs = getComputedStyle(field);
     const m = measure(field, cs);
@@ -104,7 +120,8 @@
   // The blink goes to the first empty required field in view, only while nothing has focus
   function pick() {
     let blinker = null;
-    if (!isText(document.activeElement)) for (const [field, el] of carets) {
+    if (softField && carets.has(softField) && !carets.get(softField).hidden) blinker = carets.get(softField);
+    else if (!isText(document.activeElement)) for (const [field, el] of carets) {
       if (blinker || el.hidden || field.value || !(field.required || field.getAttribute("aria-required") === "true")) continue;
       const r = field.getBoundingClientRect();
       if (r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth) blinker = el;
@@ -146,8 +163,13 @@
   function resized() { clearTimeout(calm); calm = setTimeout(refresh, 150); }
 
   document.addEventListener("input", light, true);
-  document.addEventListener("focusin", refresh, true);
-  document.addEventListener("focusout", () => setTimeout(refresh), true);
+  document.addEventListener("focusin", (e) => {
+    // On a touch screen, focus that no touch on the field itself (or a key) just led to was a script's
+    if (coarse.matches && isText(e.target) && !byPerson(e.target)) soften(e.target); else soften(null);
+    refresh();
+  }, true);
+  for (const type of ["pointerdown", "touchstart", "keydown"]) document.addEventListener(type, sure, true);
+  document.addEventListener("focusout", () => { soften(null); setTimeout(refresh); }, true);
   document.addEventListener("transitionend", light, true);
   document.addEventListener("animationend", light, true);
   document.addEventListener("scroll", scrolled, { capture: true, passive: true });

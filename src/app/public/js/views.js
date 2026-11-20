@@ -499,7 +499,7 @@
   }, { passive: true, capture: true });
   addEventListener("touchend", (e) => { fingers = e.touches.length; rest(); }, { passive: true, capture: true });
   addEventListener("touchcancel", () => { fingers = 0; rest(); }, { passive: true, capture: true });
-  const typing = () => { const a = document.activeElement; return !!a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && !!a.closest(".n1chat"); };
+  const typing = () => { const a = document.activeElement; return !!a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && !/^(checkbox|radio|button|submit|reset|file|range|color|image)$/.test(a.type || ""); };
   function rest(wait = 160) {
     clearTimeout(restTimer);
     restTimer = setTimeout(function check() {
