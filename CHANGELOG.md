@@ -7,6 +7,10 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 ### Changed
 - Services are four cards like the client work cards. Each card shows the summary and when it fits, and opens a panel with what you get, what else fits better, limits, related work, and the next step, in place of the dropdown.
 
+### Fixed
+- A link inside a service card or a client work card closes the card on the way, so the page it goes to, contact or another page, is never left behind the open card.
+
+
 ## v0.83.0
 
 ### Changed

@@ -113,11 +113,14 @@
     backstop = setTimeout(finish, 700);
   }
 
-  // A link in the story to a section of this page (contact) closes the panel at once, before the page's
-  // own link handling (js/views.js) scrolls there and focuses it: captured, so the order doesn't depend
-  // on which module registered first, and settled without the shrink or a refocus of the card (RC-C1)
+  // A link in the panel closes it at once, whether it goes to a section of this page (contact, written "#contact" or
+  // "/#contact") or to another page, so the page is never left, or come back to, with the panel still over it. Before the
+  // page's own link handling (js/views.js) scrolls there and focuses it: captured, so the order doesn't depend on which
+  // module registered first, and settled without the shrink or a refocus of the card (RC-C1). A link opened in a new tab
+  // leaves the panel as it is
   document.addEventListener("click", (e) => {
-    if (state === "closed" || !e.target.closest('.case-panel a[href^="#"]')) return;
+    const a = state !== "closed" && e.target.closest(".case-panel a[href]");
+    if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || a.target === "_blank") return;
     settle(false);
   }, true);
 
