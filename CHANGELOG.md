@@ -25,6 +25,10 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 ### Fixed
 - Opening a fold (how to read the evidence, the questions, the code and resources groups) keeps the page where it is, instead of scrolling back to the top of its section.
 
+### Fixed
+- A link inside a service card or a client work card closes the card on the way, so the page it goes to, contact or another page, is never left behind the open card.
+
+
 ## v0.83.0
 
 ### Changed

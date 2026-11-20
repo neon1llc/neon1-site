@@ -302,6 +302,36 @@ check("browser", "case: Shift+Tab from the panel, full Tab cycle, Escape, and fo
   } finally { await context.close(); }
 });
 
+// A link inside a service card goes where it points with the card closed, to this page's contact or to another page, and
+// Back from that page doesn't find the card still open
+for (const [label, options] of [["wide", {}], ["phone", { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true }]]) {
+  check("browser", `case: a link inside a service card closes the card on the way (${label})`, async () => {
+    const { page, context, errors } = await open({ reducedMotion: "no-preference", ...options }, "/#services");
+    try {
+      await page.waitForTimeout(1500);
+      await page.locator("[data-case=service-workflow]").click();
+      await page.waitForTimeout(700);
+      expect((await caseState(page)).open, "the service card did not open");
+      await page.locator('.case-panel a[href="/#contact"]').click();
+      await page.waitForTimeout(2200);
+      const s = await caseState(page), inContact = await page.evaluate(() => { const c = document.getElementById("contact").getBoundingClientRect(); return c.top < innerHeight && c.bottom > 0; });
+      expect(!s.open && !s.locked && inContact, "the card stayed over the page, or the page didn't reach contact", { s, inContact });
+      await page.locator("[data-case=service-workflow]").evaluate((b) => b.scrollIntoView({ block: "center", behavior: "instant" }));
+      await page.waitForTimeout(800);
+      await page.locator("[data-case=service-workflow]").click();
+      await page.waitForTimeout(700);
+      await page.locator('.case-panel a[href^="/knowledge/"]').first().click();
+      await page.waitForURL(/\/knowledge\//);
+      await page.waitForTimeout(800);
+      await page.goBack();
+      await page.waitForTimeout(2000);
+      const back = await caseState(page);
+      expect(!back.open && !back.locked, "Back found the card still open", back);
+      expect(!realErrors(errors).length, "page errors", errors);
+    } finally { await context.close(); }
+  });
+}
+
 check("browser", "case: on a phone, the menu can't open over an open case study", async () => {
   const { page, context } = await open({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
   try {
