@@ -12,6 +12,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - Services, process, and contact say to outline up to three projects in a free 1NEON account, then ask for a free assessment, with the free 30-minute call as the other way in. The account lines show only while sign-up is open.
 
 ### Fixed
+- On the bug report form, a screenshot that is too large, too many screenshots, or a file that isn't an image now says so under the Add screenshots button, naming the file and, for a large one, its size and the 3 MB limit. The message used to be removed the moment it appeared.
 - Text fields are 16px on touch screens, so focusing one on an iPhone no longer zooms the page in.
 - Back, Forward, and reload return every page to where that history entry was left, however many steps back, even when the same page is in the history twice. Each entry gets its own id, and its scroll is kept under that id for this tab only; a new link opens at its top or its #section, and a new tab starts with nothing remembered. This replaces the record kept by page address, which put a page visited twice at its latest spot.
 - The phone menu opens and closes without stutter. Making the page behind inert, which restyled all of it in the frame the menu moved, now waits until the menu has finished moving; the menu is opaque with no backdrop blur; and the Matrix rain holds still while the menu is up.

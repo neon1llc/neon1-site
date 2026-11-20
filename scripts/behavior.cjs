@@ -1011,6 +1011,22 @@ check("browser", "AS-03: the wheel over a long contact message scrolls the box, 
   } finally { await context.close(); }
 });
 
+check("browser", "report-bug: a screenshot over the limit is left out with a message naming the file, its size, and the limit", async () => {
+  const { page, context, errors } = await open({}, "/report-bug/");
+  try {
+    const png = Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), Buffer.alloc(4 * 1024 * 1024)]);
+    await page.locator("#rb-file").setInputFiles({ name: "big.png", mimeType: "image/png", buffer: png });
+    await page.waitForTimeout(500);
+    const text = await page.locator(".rb-err").first().textContent().catch(() => "");
+    expect(/big\.png/.test(text) && /4(\.0)? MB/.test(text) && /3 MB/.test(text), "no message names the file, its size, and the limit", text);
+    expect(!(await page.locator("#rb-list li").count()), "the large file was added");
+    await page.locator("#rb-file").setInputFiles({ name: "note.png", mimeType: "image/png", buffer: Buffer.from("not an image") });
+    await page.waitForTimeout(500);
+    expect(/isn't a PNG or JPEG/.test(await page.locator(".rb-err").first().textContent().catch(() => "")), "a file that isn't an image gets no message");
+    expect(!errors.length, "page errors", errors);
+  } finally { await context.close(); }
+});
+
 check("browser", "AS-09: an empty send marks each required field with its own described error", async () => {
   const { page, context } = await open();
   try {

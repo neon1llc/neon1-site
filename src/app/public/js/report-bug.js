@@ -85,7 +85,8 @@ if (form) {
     el.setAttribute("aria-describedby", id);
   }
   form.addEventListener("input", (e) => { if (e.target.getAttribute?.("aria-invalid") === "true") fieldError(e.target, ""); });
-  form.addEventListener("change", (e) => { if (e.target.getAttribute?.("aria-invalid") === "true") fieldError(e.target, ""); });
+  // (not the screenshots: its own handler below says why a file was left out, and this one, which runs after it, would wipe that)
+  form.addEventListener("change", (e) => { if (e.target.type !== "file" && e.target.getAttribute?.("aria-invalid") === "true") fieldError(e.target, ""); });
 
   // The same minimums the API holds: a description of a sentence or so; an email only when one is given
   function problems() {
@@ -134,11 +135,12 @@ if (form) {
     const files = [...fileInput.files];
     fileInput.value = "";
     const notes = [];
+    fieldError(fileInput, "");
     for (const file of files) {
-      if (picked.length >= MAX_IMAGES) { notes.push(`Up to ${MAX_IMAGES} screenshots.`); break; }
-      if (file.size > MAX_BYTES) { notes.push(`${file.name} is over 3 MB.`); continue; }
+      if (picked.length >= MAX_IMAGES) { notes.push(`Up to ${MAX_IMAGES} screenshots, so the rest weren't added.`); break; }
+      if (file.size > MAX_BYTES) { notes.push(`${file.name} is ${size(file.size)}, over the ${MAX_BYTES / 1024 / 1024} MB limit, so it wasn't added.`); continue; }
       const type = await kindOf(file);
-      if (!type) { notes.push(`${file.name} isn't a PNG or JPEG.`); continue; }
+      if (!type) { notes.push(`${file.name} isn't a PNG or JPEG, so it wasn't added.`); continue; }
       picked.push({ file, type, preview: await preview(file) });
     }
     drawList();
