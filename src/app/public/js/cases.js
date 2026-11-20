@@ -102,6 +102,8 @@
     halt();
     layer.hidden = true;
     document.body.classList.remove("case-open");
+    // The card was marked while its panel was open; once closed it goes back to looking like the others
+    document.querySelectorAll(".case.is-target").forEach((c) => c.classList.remove("is-target"));
     document.documentElement.classList.remove("case-lock");
     isolate(false);
     panel.style.transform = ""; body.style.opacity = "";

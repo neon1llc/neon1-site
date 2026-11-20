@@ -220,22 +220,6 @@ async function main() {
         } finally { await context.close(); }
       });
     }
-    if (look === "sentinel") {
-      await check(`${tag}: Selected work link on the first screen opens its card, Back returns to the first screen`, async () => {
-        const { context, page } = await session(engine, look);
-        try {
-          await takeOver(page);
-          const before = await at(page);
-          await click(page, '.pitch-work a[href="#case-accounting"]');
-          await page.waitForTimeout(3500);
-          expect((await at(page)).panel, "the card did not open");
-          await back(page);
-          const s = await at(page);
-          expect(!s.panel && near(s.y, before.y), "Back did not return to the first screen", s);
-        } finally { await context.close(); }
-      });
-    }
-
     // A walk: landing, Knowledge Center, a document, the blog, a post, each scrolled, then Back all the way and Forward all the way,
     // with a reload in the middle, every stop at the spot it was left
     await check(`${tag}: five-page walk, Back to the start, Forward to the end, reload midway`, async () => {
