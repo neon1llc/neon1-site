@@ -359,7 +359,7 @@ footer .foot h2 { font: 600 13px var(--mono); letter-spacing: .01em; color: var(
    launcher's own distance from the edge is also its distance above the line's last row, so at the end of any page it never covers text.
    "report bug \\ feedback" sits in the same strip at the right, centered on the launcher (see its rule below) */
 :root { --foot-gap: max(16px, env(safe-area-inset-bottom)); --foot-neo: 48px; }
-.legal { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+.legal { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; gap: 8px 12px; flex-wrap: wrap; /* 8px between wrapped lines, whether the line wrapped inside a group or between groups */
   font: 12px var(--mono); color: var(--muted); border-top: 1px solid var(--line);
   padding: 16px max(24px, env(safe-area-inset-right)) calc(var(--foot-gap) * 2 + var(--foot-neo)) max(24px, env(safe-area-inset-left)); }
 .legal a { color: inherit; text-decoration: none; } .legal a:hover { color: var(--glow); }

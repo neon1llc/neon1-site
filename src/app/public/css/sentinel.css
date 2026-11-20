@@ -125,7 +125,9 @@
 :root:not([data-site-style]) .pitch-services a { display: block; text-decoration: none; }
 :root:not([data-site-style]) .pitch-services :is(b, span) { display: block; }
 :root:not([data-site-style]) .landing-line { display: none; }
-:root[data-site-style="sentinel"] .hero { display: flex; align-items: center; justify-content: center; text-align: left; padding: 88px max(24px, env(safe-area-inset-left)) 40px; }
+:root[data-site-style="sentinel"] .hero { display: flex; align-items: center; justify-content: center; text-align: left; padding: 88px max(24px, env(safe-area-inset-left)) clamp(28px, 5vh, 56px); }
+/* The same room under the first screen as under every other view, so the pitch clears a phone's toolbar and Neo's launcher */
+@media (pointer: coarse) { :root[data-site-style="sentinel"] .hero { padding-bottom: calc(clamp(28px, 5vh, 56px) + 72px); } }
 :root[data-site-style="sentinel"] .hero-pane { width: 100%; max-width: 1152px; padding: 0; display: flex; flex-direction: column; align-items: flex-start; }
 :root[data-site-style="sentinel"] .hero-pane .brand { margin: 0 0 18px; font-size: 30px; }
 :root[data-site-style="sentinel"] .pitch-title { margin: 0 0 18px; max-width: 15em; font: 600 clamp(34px, 5vw, 62px)/1.04 var(--sans); letter-spacing: -.028em; color: var(--ink); }
