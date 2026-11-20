@@ -4,6 +4,9 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+### Changed
+- The landing marks the section in view in the top bar and the phone menu, and every section link lands its heading the same distance below the bar: each view now starts at its top instead of centering its content.
+
 ## v0.83.0
 
 ### Changed
