@@ -63,7 +63,7 @@ const leaks = [], violations = [];
 
 // A fresh context per check: loopback only, CSP violations and page errors recorded
 async function open(options = {}, url = "/") {
-  const { init, ...contextOptions } = options;
+  const { init, initArg, ...contextOptions } = options;
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, reducedMotion: "reduce", ...contextOptions });
   await context.route("**/*", (r) => {
     if (r.request().url().startsWith(origin)) return r.continue();
@@ -74,7 +74,7 @@ async function open(options = {}, url = "/") {
   const errors = [];
   page.on("pageerror", (e) => errors.push(String(e)));
   page.on("console", (m) => { if (/Content.Security.Policy|Refused to/i.test(m.text())) violations.push(m.text()); });
-  if (init) await page.addInitScript(init);
+  if (init) await page.addInitScript(init, initArg);
   await page.goto(origin + url, { waitUntil: "domcontentloaded" });
   return { page, context, errors };
 }
@@ -89,6 +89,11 @@ const COUNT_FRAMES = () => {
   const pending = (window.__frames = new Map());
   window.requestAnimationFrame = (cb) => { const id = raf((t) => { pending.delete(id); cb(t); }); pending.set(id, cb.name); return id; };
   window.cancelAnimationFrame = (id) => { pending.delete(id); caf(id); };
+};
+// Polls a page predicate through evaluate: waitForFunction builds its predicate with eval, which the page's CSP refuses once the home page's motion is on
+const polled = async (page, fn, arg, timeout = 5000) => {
+  const end = Date.now() + timeout;
+  while (!(await page.evaluate(fn, arg))) { if (Date.now() > end) throw new Error("timed out waiting for the page"); await page.waitForTimeout(50); }
 };
 const sceneFrames = (page) => page.evaluate(() => [...window.__frames.values()].filter((n) => n === "frame").length);
 
@@ -159,6 +164,18 @@ check("browser", "contact: the form has its own address, /#contact?message=1: a 
   } finally { await context.close(); }
 });
 
+// One outbound look: bold, no underline, and the arrow, the same in Sentinel and Matrix, light and dark
+for (const [style, mode] of [["sentinel", "light"], ["sentinel", "dark"], ["matrix", "light"], ["matrix", "dark"]]) {
+  check("browser", `links: outbound links are bold with no underline (${style}, ${mode})`, async () => {
+    const { page, context } = await open({ init: ([s, m]) => { try { localStorage.setItem("neon1.style", s); localStorage.setItem("neon1.mode", m); localStorage.setItem("neon1.theme.shared", "1"); } catch {} }, initArg: [style, mode] });
+    try {
+      await page.waitForLoadState("load");
+      const bad = await page.evaluate(() => [...document.querySelectorAll("main a.ext, .legal a.ext")].filter((a) => a.getClientRects().length && (getComputedStyle(a).textDecorationLine !== "none" || +getComputedStyle(a).fontWeight < 500)).map((a) => a.textContent.trim().slice(0, 24)));
+      expect(!bad.length, "outbound links with an underline or without weight", bad);
+    } finally { await context.close(); }
+  });
+}
+
 check("browser", "contact: missing fields are named and nothing is sent; a refusal says what to do", async () => {
   const { page, context } = await open();
   try {
@@ -210,7 +227,7 @@ check("browser", "home: the first screen has no offer block, and the bar's conta
     await page.waitForLoadState("load");
     expect(!(await page.locator(".hero .offer, .hero .start").count()), "the offer block is back on the first screen");
     await page.locator('.links a[data-view="contact"]').click();
-    await page.waitForFunction(() => Math.abs(document.getElementById("contact").getBoundingClientRect().top - 64) < 3, null, { timeout: 5000 });
+    await polled(page, () => Math.abs(document.getElementById("contact").getBoundingClientRect().top - 64) < 3);
     // The address says where the visitor is, so the view can be shared; only the logo goes home to "/"
     expect((await page.evaluate(() => location.pathname + location.hash)) === "/#contact", "the bar's contact link leaves #contact in the address");
     await page.locator('.n1-logo').click();
@@ -261,10 +278,10 @@ check("browser", "home: a wheel gesture past halfway settles on services, and a 
     await page.mouse.move(640, 450);
     // A soft push crosses no more than halfway: the page falls back to the first screen
     for (let i = 0; i < 4; i++) { await page.mouse.wheel(0, 30); await page.waitForTimeout(20); }
-    await page.waitForFunction(() => scrollY === 0, null, { timeout: 5000 });
+    await polled(page, () => scrollY === 0);
     // A stronger one carries past halfway and lands on services
     for (let i = 0; i < 10; i++) { await page.mouse.wheel(0, 60); await page.waitForTimeout(20); }
-    await page.waitForFunction(() => Math.abs(document.getElementById("services").getBoundingClientRect().top - 64) < 3, null, { timeout: 5000 });
+    await polled(page, () => Math.abs(document.getElementById("services").getBoundingClientRect().top - 64) < 3);
   } finally { await context.close(); }
 });
 
@@ -441,7 +458,7 @@ check("browser", "case: closing settles after repeated input, cancelled animatio
 
 // Resolves once the card is in view vertically and inside the row sideways, marked, named in the URL, and its panel is open over it
 // with focus inside (a #case-... link or address opens the case study, and the card is where closing it leaves the visitor)
-const landed = (page, id) => page.waitForFunction((id) => {
+const landed = (page, id) => polled(page, (id) => {
   const card = document.getElementById("case-" + id), rail = document.getElementById("cases");
   const c = card.getBoundingClientRect(), r = rail.getBoundingClientRect();
   const panel = document.querySelector(".case-panel");
@@ -449,7 +466,7 @@ const landed = (page, id) => page.waitForFunction((id) => {
     !document.getElementById("caseLayer").hidden && panel.contains(document.activeElement) &&
     document.getElementById("casePanelTitle").textContent === card.querySelector("h3").textContent &&
     location.hash === "#case-" + id && card.classList.contains("is-target");
-}, id, { timeout: 5000 }).then(() => true, () => false);
+}, id).then(() => true, () => false);
 
 // The cards a link is tried on, and a link to one placed in the contact view
 const CARDS = ["dermatology", "accounting", "migration", "security"];
@@ -487,7 +504,7 @@ for (const motion of ["reduce", "no-preference"]) {
       // The visitor goes to contact from the bar, so the page rests at the top of that view
       await page.locator('.links a[data-view="contact"]').click();
       // At rest means the same place twice, a moment apart, near the top of the screen
-      await page.waitForFunction(() => new Promise((ok) => { const a = document.getElementById("contact").getBoundingClientRect().top; setTimeout(() => { const b = document.getElementById("contact").getBoundingClientRect().top; ok(a === b && b >= -2 && b <= 160); }, 250); }), null, { timeout: 5000, polling: 300 });
+      await page.waitForFunction(() => new Promise((ok) => { const a = document.getElementById("contact").getBoundingClientRect().top; setTimeout(() => { const b = document.getElementById("contact").getBoundingClientRect().top; ok(a === b && b >= -2 && b <= 160); }, 250); }), undefined, { timeout: 5000, polling: 300 });
       await caseLink(page, "migration");
       const link = page.locator('a.test-case-link[href="#case-migration"]');
       const at = await link.evaluate((a) => a.getBoundingClientRect().top + scrollY);
@@ -1034,7 +1051,7 @@ check("browser", "AS-03: the wheel over a long contact message scrolls the box, 
     await page.waitForTimeout(1200);
     await page.locator("#cfold > summary").click();
     // The fold eases open while its view glides to the top; the check starts once both have settled
-    await page.waitForFunction(() => document.getElementById("cfold").open && !document.getElementById("cfold").style.height);
+    await polled(page, () => document.getElementById("cfold").open && !document.getElementById("cfold").style.height);
     await page.waitForTimeout(100);
     const box = page.locator("[name=today]");
     await box.fill(Array.from({ length: 40 }, (_, i) => `synthetic line ${i}`).join("\n"));

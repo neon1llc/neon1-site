@@ -494,9 +494,9 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 /* ---- Matrix readability: light text on dark ----
    Running text has the same letter spacing in light and dark, so switching mode never changes where a line wraps */
 /* Inline links in running text carry an underline, so they do not rely on color alone */
-:root[data-site-theme="matrix"] :is(.awake :is(p, li), .kc-text, .case-body, .say) a:not(.btn, .btn-primary, .row, .card, .kc-card, .go) {
+:root[data-site-theme="matrix"] :is(.awake :is(p, li), .kc-text, .case-body, .say) a:not(.ext, .btn, .btn-primary, .row, .card, .kc-card, .go) {
   text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: rgb(var(--brand-rgb) / .55); }
-:root[data-site-theme="matrix"] :is(.awake :is(p, li), .kc-text, .case-body, .say) a:not(.btn, .btn-primary, .row, .card, .kc-card, .go):hover { text-decoration-color: var(--brand); }
+:root[data-site-theme="matrix"] :is(.awake :is(p, li), .kc-text, .case-body, .say) a:not(.ext, .btn, .btn-primary, .row, .card, .kc-card, .go):hover { text-decoration-color: var(--brand); }
 /* Fields: a visible edge (>= 3:1 on the surface), labels one step softer than typed text, placeholders at the faint level */
 :root[data-site-theme="matrix"] .cform :is(textarea, input, select), :root[data-site-theme="matrix"] .ctopic .pick { border-color: rgb(var(--ink-rgb) / .45); }
 :root[data-site-theme="matrix"] .cform [aria-invalid="true"] { border-color: var(--err); }
