@@ -241,7 +241,7 @@ html.case-lock { overflow: hidden; }
 .row p b { color: var(--ink); font-weight: 600; }
 
 /* Process view centers as a grid */
-.view.split { display: grid; align-content: center; }
+.view.split { display: grid; align-content: start; }
 
 /* Script scrolling replaces smooth scrolling; reduced motion keeps the header still */
 .glide, .glide body { scroll-behavior: auto; }
