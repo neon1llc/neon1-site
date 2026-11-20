@@ -199,6 +199,10 @@ html.case-lock { overflow: hidden; }
 .case-body h4 { font: 600 19px var(--sans); margin: 30px 0 8px; } .case-body h4 span { font-family: var(--mono); color: var(--brand); }
 .case-body p, .case-body li { color: var(--ink-soft); font-size: 16px; line-height: 1.6; }
 .case-body ul { padding-left: 20px; } .case-body li { margin-bottom: 6px; }
+/* The close button says what it does: the word, then the arrow turning in toward the panel */
+.case-close { display: inline-flex; gap: 6px; width: auto; padding: 0 6px 0 12px; font: 600 13px var(--mono); letter-spacing: .02em; border: 1px solid var(--ctl-line); border-radius: var(--glass-r); background: var(--surface); }
+.case-close svg { width: 18px; height: 18px; }
+.case-close:hover { border-color: var(--brand); }
 .case-body table { width: 100%; border-collapse: collapse; font-size: 15px; margin: 6px 0 10px; }
 .case-body th, .case-body td { text-align: left; padding: 9px 10px 9px 0; border-bottom: 1px solid rgb(var(--ink-rgb) / .1); vertical-align: top; }
 .case-body th { font: 500 12px var(--mono); color: var(--brand); }

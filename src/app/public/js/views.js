@@ -33,9 +33,9 @@
   // ---- Case links: a link to one card lands on that card ----
   // Case links, such as the contact form's "a similar project", point at single cards (#case-home). Its
   // section comes into view, the row slides sideways to the card, the card is marked, and focus goes
-  // to its open button, so keyboard and screen reader users arrive where the link said. Each case link
-  // is a history entry: Back returns to where the link was, and Forward comes back to the card. Opening
-  // the page at #case-... takes the same route. Wired before the Motion check, like the arrows; when
+  // to its open button, and its panel opens over it (js/cases.js). Each case link is a history entry: Back
+  // closes the panel and returns to where the link was, and Forward comes back to the card. Opening the
+  // page at #case-... takes the same route. Wired before the Motion check, like the arrows; when
   // Motion steers the page it swaps in its own eased moves for toView and toY below
   const native = () => (reduce.matches ? "auto" : "smooth");
   let toView = (view) => view.scrollIntoView({ block: "start", behavior: native() });
@@ -46,13 +46,13 @@
   };
 
   // Sideways to the card, to the same place a snap would put it, then mark and focus it
-  function slide(card) {
+  function slide(card, focus = true) {
     const pad = parseFloat(getComputedStyle(rail).scrollPaddingInlineStart) || 0;
     const left = rail.scrollLeft + card.getBoundingClientRect().left - rail.getBoundingClientRect().left - pad;
     rail.scrollTo({ left, behavior: native() });
     rail.querySelectorAll(".case.is-target").forEach((c) => c.classList.remove("is-target"));
     card.classList.add("is-target");
-    card.querySelector("[data-case]").focus({ preventScroll: true });
+    if (focus) card.querySelector("[data-case]").focus({ preventScroll: true });
   }
   const reveal = (card) => { toView(card.closest(".view")); slide(card); };
 
@@ -65,6 +65,8 @@
       // The entry being left has already saved its spot (js/scroll-memory.js, or the memory below), for Back
       history.pushState({ card: card.id }, "", "#" + card.id);
       reveal(card);
+      // js/cases.js opens the card's panel on top of it
+      document.dispatchEvent(new CustomEvent("n1:case", { detail: { id: card.id } }));
     });
     // Back or Forward to a card's entry shows the card; any other entry is put back by the scroll memory
     addEventListener("popstate", () => requestAnimationFrame(() => {
@@ -76,7 +78,7 @@
   // Opened at #case-...: the slide and focus wait for load, because the browser's own jump to the
   // fragment, which also scrolls the row, clears focus as the page finishes loading
   const first = rail && caseCard(location.hash);
-  const arrive = () => slide(first);
+  const arrive = () => slide(first, !document.body.classList.contains("case-open")); // js/cases.js opens the panel for the address
   if (first) { if (document.readyState === "complete") arrive(); else addEventListener("load", arrive, { once: true }); }
 
   // Native scrolling stays in charge without Motion or with reduced motion
@@ -302,21 +304,36 @@
   const foldEase = (token("--ease-open").match(/[\d.]+/g) || [0.25, 0.8, 0.25, 1]).map(Number);
   const TOP_GAP = 28; // the view's spacing above its heading once it sits at the top
   const viewOf = (d) => d.closest(".view");
+  // A fold in motion is turned round by the next press, from the height it has reached, so no press is dropped: its panel and arrow
+  // head back together, as the Knowledge Center's folds do (js/fold.js). `moving` holds each fold's runs, direction, and the entry
+  // that retires the runs a later press has replaced (a cancelled run still reports finished)
+  const moving = new Map();
   function toggleFold(d) {
     const v = viewOf(d), i = views.indexOf(v);
-    const opening = !d.open;
+    const was = moving.get(d);
+    const opening = was ? !was.opening : !d.open;
     // A fold may set its own length (the contact form's, which is tall, moves slower); the stylesheet times its arrow on the same value
     const own = parseFloat(getComputedStyle(d).getPropertyValue("--t-open")), T = Number.isNaN(own) ? FOLD_TIME : own;
     const s = d.querySelector(":scope > summary");
-    folding++;
-    const done = () => { folding = Math.max(0, folding - 1); y = target = scrollY; };
-    const h0 = d.getBoundingClientRect().height;
+    const h0 = d.getBoundingClientRect().height; // where it is now, partway if it was moving
+    if (was) was.runs.forEach((r) => r.cancel()); // before or after measuring h0 matters: a cancelled run restores its first value
+    const entry = { opening, runs: [] };
+    moving.set(d, entry);
+    folding = moving.size;
+    const done = () => {
+      if (moving.get(d) !== entry) return;
+      moving.delete(d);
+      folding = moving.size;
+      y = target = scrollY;
+    };
     d.style.overflow = "hidden";
     if (opening) {
+      d.classList.remove("closing"); // a turn back from closing: the arrow heads for open again at once
+      d.style.height = "";
       d.open = true;
       const h1 = d.getBoundingClientRect().height;
       d.style.height = `${h0}px`;
-      const runs = [animate(d, { height: [`${h0}px`, `${h1}px`] }, { duration: T, ease: foldEase })];
+      entry.runs.push(animate(d, { height: [`${h0}px`, `${h1}px`] }, { duration: T, ease: foldEase }));
       // data-focus-label: the page glides, in the fold's own time and curve, until the label sits under the bar with the
       // usual spacing and the form runs down from it, from wherever the visitor was, even at the bottom of the view
       if (d.hasAttribute("data-focus-label")) {
@@ -329,9 +346,10 @@
         const room = innerHeight - HEADER - h1 - 12;
         const gap = Math.max(12, Math.min(96, Math.round(below), Math.floor(room)));
         const dest = Math.max(range(i)[0], Math.min(finalMax, Math.round(labelY - HEADER - gap)));
-        if (Math.abs(scrollY - dest) > 2) runs.push(animate(scrollY, dest, { duration: T, ease: foldEase, onUpdate: (p) => scrollTo(0, p) }));
+        if (Math.abs(scrollY - dest) > 2) entry.runs.push(animate(scrollY, dest, { duration: T, ease: foldEase, onUpdate: (p) => scrollTo(0, p) }));
       }
-      Promise.all(runs.map((r) => r.finished ?? r)).then(() => {
+      Promise.all(entry.runs.map((r) => r.finished ?? r)).then(() => {
+        if (moving.get(d) !== entry) return;
         d.style.height = d.style.overflow = "";
         // An opened fold's label stays in view: if it sits under the bar, the page eases to it
         const r = s.getBoundingClientRect();
@@ -340,9 +358,11 @@
       }, done);
     } else {
       d.classList.add("closing"); // the arrow turns back now, not when the fold has finished shrinking
+      d.style.height = `${h0}px`;
       const h1 = s.getBoundingClientRect().height + (parseFloat(getComputedStyle(d).paddingTop) || 0) + (parseFloat(getComputedStyle(d).paddingBottom) || 0);
-      const runs = [animate(d, { height: [`${h0}px`, `${h1}px`] }, { duration: T * 0.85, ease: foldEase })];
-      Promise.all(runs.map((r) => r.finished ?? r)).then(() => {
+      entry.runs.push(animate(d, { height: [`${h0}px`, `${h1}px`] }, { duration: T * 0.85, ease: foldEase }));
+      Promise.all(entry.runs.map((r) => r.finished ?? r)).then(() => {
+        if (moving.get(d) !== entry) return;
         d.open = false;
         d.classList.remove("closing");
         d.style.height = d.style.overflow = "";
@@ -357,7 +377,6 @@
     const d = s && s.parentElement;
     if (!d || d.tagName !== "DETAILS" || !viewOf(d) || off || e.defaultPrevented) return;
     e.preventDefault();
-    if (folding && d.style.height) return; // this fold is already moving
     toggleFold(d);
   });
 
