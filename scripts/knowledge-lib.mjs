@@ -96,10 +96,13 @@ export function singleH1(html, title) {
 // links are marked external and open in a new tab. mailto: and the like are left alone.
 const SAME_ORIGIN = /^https?:\/\/(?:www\.)?neon1\.tech(?=[/?#]|$)/i
 export function classifyLinks(html) {
-  return html.replace(/<a href="(https?:[^"]+)">/g, (whole, href) => {
-    if (SAME_ORIGIN.test(href)) return `<a href="${href.replace(SAME_ORIGIN, "") || "/"}">`
-    return `<a class="ext" href="${href}" target="_blank" rel="noopener">`
-  })
+  return html
+    .replace(/<a href="(https?:[^"]+)">/g, (whole, href) => {
+      if (SAME_ORIGIN.test(href)) return `<a href="${href.replace(SAME_ORIGIN, "") || "/"}">`
+      return `<a class="ext" href="${href}" target="_blank" rel="noopener">`
+    })
+    // An address or a number opens the reader's own mail or phone app, in place, and is marked like any outbound link
+    .replace(/<a href="((?:mailto|tel):[^"]+)">/g, (whole, href) => `<a class="ext" href="${href}">`)
 }
 
 // An outbound link's arrow is drawn after its last word, and that word and the arrow never part at a line

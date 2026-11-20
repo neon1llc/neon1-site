@@ -31,6 +31,18 @@ const toHome = (html) => html.replace(/href="#/g, 'href="/#')
 export const jsonLd = (graph) => JSON.stringify({ "@context": "https://schema.org", "@graph": graph }).replace(/</g, "\\u003c")
 
 
+// neon1 is always lowercase, but the stylesheet sets some labels in capitals: table headings, a card's kicker, a group's title
+// and its link in the index. In those elements the name is wrapped in a span that turns the capitals off (".lc" in css/knowledge.css)
+const KEEP_CASE = [
+  /(<th\b[^>]*>)([\s\S]*?)(<\/th>)/g,
+  /(<span class="kc-kicker">)([\s\S]*?)(<\/span>)/g,
+  /(<div class="kc-group-head">\s*<h2\b[^>]*>)([\s\S]*?)(<\/h2>)/g,
+  /(<li class="kc-nav-group"><a\b[^>]*>)([\s\S]*?)(<\/a>)/g,
+]
+export const keepBrandCase = (html) => KEEP_CASE.reduce((out, re) => out.replace(re, (m, open, inner, close) =>
+  open + inner.replace(/(<[^>]*>)|neon1/g, (x, tag) => tag || '<span class="lc">neon1</span>') + close), html)
+
+
 // One page. current names the area whose bar link is marked as the current page; generator names the script
 // and make target that wrote it, for the comment at the top; head adds lines to <head>, such as a feed link
 export function page(frame, { title, description, path, main, kind, ld, current, generator, styles = [], scripts = [], head = "" }) {
@@ -61,6 +73,7 @@ export function page(frame, { title, description, path, main, kind, ld, current,
   <!-- What this page is, for search engines and AI answers: built from the same corpus fields the page shows -->
   <script type="application/ld+json">${jsonLd(ld)}</script>` : ""}${head}
   ${frame.block("icons")}
+  ${frame.block("fonts")}
   <link rel="stylesheet" href="/shared/neon1.css" />
   <link rel="stylesheet" href="/shared/chat.css" />
   <link rel="stylesheet" href="/css/frame.css" />
@@ -73,7 +86,6 @@ ${styles.map((s) => `  <link rel="stylesheet" href="${s}" />`).join("\n")}
   <header class="n1-bar light">
     <nav class="n1-inner" aria-label="Main">
       ${frame.block("logo")}
-  ${frame.block("fonts")}
       <ul class="links">
 ${navLinks}
         ${frame.block("actions")}
@@ -91,7 +103,7 @@ ${frame.menuLinks}
 
   <div class="top awake kc-page">
   <main id="main">
-${main}
+${keepBrandCase(main)}
   </main>
 
   ${frame.block("footer")}

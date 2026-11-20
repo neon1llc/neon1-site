@@ -142,9 +142,9 @@ export function gather(dir) {
 export const RELEASES_URL = `${BASE}company/releases/`
 
 // The body docMain wraps: the current versions, then the newest releases across every product
-// The page links to GitHub dozens of times, so only links inside the release notes and each product's name
-// (its full history) carry the outbound arrow; version numbers open GitHub without one (the link rule's exception)
-const plainOut = (href, text) => `<a class="kc-plain" href="${href}" target="_blank" rel="noopener">${text}</a>`
+// A version opens its release on GitHub, so it is an outbound link like the others: a new tab, with the arrow after its last
+// word. It keeps the mono face the version numbers had (css/knowledge.css a.kc-ver)
+const plainOut = (href, text) => `<a class="ext kc-ver" href="${href}" target="_blank" rel="noopener"><span class="ext-end">${text}</span></a>`
 export function releasesBody({ all, current }) {
   const relUrl = (r) => (r.tagged ? `${GH}${r.repo}/releases/tag/${r.version}` : `${GH}${r.repo}/blob/main/CHANGELOG.md`)
   // Each product links to its whole history on GitHub; the version opens that release's notes

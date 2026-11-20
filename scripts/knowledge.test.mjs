@@ -263,3 +263,22 @@ test("the bar and phone menu use the home page's links and words, pointed back a
   assert.match(html, /<a href="\/1NEON\/" data-handoff>1NEON client portal<\/a>/)
   assert.doesNotMatch(html, /tools I'm building|href="#work"/)
 })
+
+// Labels the stylesheet sets in capitals keep neon1 lowercase: the name is wrapped only in text, never in a link's address
+test("keepBrandCase wraps neon1 in capitalized labels and nowhere else", async () => {
+  const { keepBrandCase } = await import("./page-shell.mjs")
+  const lc = '<span class="lc">neon1</span>'
+  assert.equal(keepBrandCase("<table><tr><th>What it does for neon1</th><td>neon1 LLC</td></tr></table>"), `<table><tr><th>What it does for ${lc}</th><td>neon1 LLC</td></tr></table>`)
+  assert.equal(keepBrandCase('<span class="kc-kicker">neon1 engagement</span>'), `<span class="kc-kicker">${lc} engagement</span>`)
+  assert.equal(keepBrandCase('<li class="kc-nav-group"><a href="#about" data-group>About neon1<span class="kc-n"> 3</span></a></li>'), `<li class="kc-nav-group"><a href="#about" data-group>About ${lc}<span class="kc-n"> 3</span></a></li>`)
+  assert.equal(keepBrandCase('<th><a href="https://github.com/neon1llc/x">neon1llc</a></th>'), `<th><a href="https://github.com/neon1llc/x">${lc}llc</a></th>`)
+  assert.equal(keepBrandCase("<p>neon1 in a paragraph</p>"), "<p>neon1 in a paragraph</p>")
+})
+
+// Addresses and numbers open the reader's own app in place and are marked like any outbound link
+test("classifyLinks marks mailto and tel links as outbound without opening a tab", async () => {
+  const { classifyLinks } = await import("./knowledge-lib.mjs")
+  assert.equal(classifyLinks('<a href="mailto:hello@neon1.tech">hello@neon1.tech</a>'), '<a class="ext" href="mailto:hello@neon1.tech">hello@neon1.tech</a>')
+  assert.equal(classifyLinks('<a href="tel:+14243263661">call</a>'), '<a class="ext" href="tel:+14243263661">call</a>')
+  assert.equal(classifyLinks('<a href="https://example.com/">x</a>'), '<a class="ext" href="https://example.com/" target="_blank" rel="noopener">x</a>')
+})

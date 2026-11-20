@@ -69,7 +69,7 @@ ${WHERE.map(([v, t]) => `            <option value="${v}">${t}</option>`).join("
         </form>
         <div class="rb-done" id="rb-done" hidden tabindex="-1">
           <p><strong>Thanks.</strong> Your reference is <span class="rb-ref" id="rb-ref"></span>.</p>
-          <p class="rb-help" id="rb-done-note">Quote it if you write to <a href="mailto:hello@neon1.tech">hello@neon1.tech</a>.</p>
+          <p class="rb-help" id="rb-done-note">Quote it if you write to <a class="ext" href="mailto:hello@neon1.tech"><span class="ext-end">hello@neon1.tech</span></a>.</p>
           <button class="btn btn-ghost" type="button" id="rb-again">Send more feedback</button>
         </div>
         <p class="rb-help rb-security">Something broken? <a class="ext" href="/report-bug/" target="_blank" rel="noopener"><span class="ext-end">Report a bug</span></a> instead.</p>
@@ -78,7 +78,7 @@ ${WHERE.map(([v, t]) => `            <option value="${v}">${t}</option>`).join("
 
 const html = page_(frame, {
   title: "Feedback · neon1",
-  description: "Send feedback on neon1.tech, 1NEON, or Neo.",
+  description: "Send feedback on neon1.tech, 1NEON, or Neo: a comment, a complaint, or a concern. Leave an email only if you want a reply.",
   path: "/feedback/",
   main,
   kind: "page",
