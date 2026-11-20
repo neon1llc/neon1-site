@@ -4,6 +4,9 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+### Added
+- Matrix text fields have a green caret, dark green in light mode and Matrix green in dark. A field without focus shows one after its text, and an empty one sits just before its placeholder. Only one blinks at a time, the focused field or else the first empty field in view, and the rest hold steady and dim; reduced motion keeps every caret steady. Sentinel is unchanged. 1NEON inherits it from shared/caret.js.
+
 ### Changed
 - On a phone, the Start here cards no longer space their links 44px apart. The tap area reaches halfway to the next line, as the footer's links do, so the lists read as lists.
 - "I do the work myself" is gone from the first screen and About.

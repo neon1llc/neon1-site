@@ -37,7 +37,7 @@
 :root[data-site-theme="matrix"] ::selection { background: rgb(108 255 168 / .3); color: var(--m-ink); }
 :where(:root[data-site-theme="matrix"]) .awake :is(option, optgroup) { background-color: var(--surface); color: var(--ink); }
 :root[data-site-theme="matrix"] :is(input, textarea, select):-webkit-autofill, :root[data-site-theme="matrix"] :is(input, textarea, select):-webkit-autofill:is(:hover, :focus) {
-  -webkit-text-fill-color: var(--m-ink); caret-color: var(--m-ink); box-shadow: 0 0 0 100px var(--page) inset; transition: background-color 9999s; }
+  -webkit-text-fill-color: var(--m-ink); caret-color: var(--n1-caret, var(--m-ink)); box-shadow: 0 0 0 100px var(--page) inset; transition: background-color 9999s; }
 :root[data-site-theme="matrix"] .awake :is(input, textarea, select):-webkit-autofill, :root[data-site-theme="matrix"] .awake :is(input, textarea, select):-webkit-autofill:is(:hover, :focus) { box-shadow: 0 0 0 100px var(--surface) inset; }
 :root[data-site-theme="matrix"] .n1chat:not(.n1chat-light) { --fg: var(--m-ink); --muted: var(--m-muted); }
 :root[data-site-theme="matrix"] .n1chat-send:disabled { opacity: .6; }
