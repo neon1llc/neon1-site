@@ -4,6 +4,9 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+### Fixed
+- On the Sentinel landing the top bar is light from the first paint. It used to start as Matrix glass and fade to light on every visit, and the style switch's knob slid across as if the look had just changed. The light/dark switch on other pages no longer slides on load in dark mode either.
+
 ## v0.83.0
 
 ### Changed
