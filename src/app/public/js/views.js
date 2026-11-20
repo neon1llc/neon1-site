@@ -305,6 +305,8 @@
   function toggleFold(d) {
     const v = viewOf(d), i = views.indexOf(v);
     const opening = !d.open;
+    // A fold may set its own length (the contact form's, which is tall, moves slower); the stylesheet times its arrow on the same value
+    const own = parseFloat(getComputedStyle(d).getPropertyValue("--t-open")), T = Number.isNaN(own) ? FOLD_TIME : own;
     const s = d.querySelector(":scope > summary");
     folding++;
     const done = () => { folding = Math.max(0, folding - 1); y = target = scrollY; };
@@ -314,7 +316,7 @@
       d.open = true;
       const h1 = d.getBoundingClientRect().height;
       d.style.height = `${h0}px`;
-      const runs = [animate(d, { height: [`${h0}px`, `${h1}px`] }, { duration: FOLD_TIME, ease: foldEase })];
+      const runs = [animate(d, { height: [`${h0}px`, `${h1}px`] }, { duration: T, ease: foldEase })];
       // data-focus-label: the page glides, in the fold's own time and curve, until the label sits under the bar with the
       // usual spacing and the form runs down from it, from wherever the visitor was, even at the bottom of the view
       if (d.hasAttribute("data-focus-label")) {
@@ -327,7 +329,7 @@
         const room = innerHeight - HEADER - h1 - 12;
         const gap = Math.max(12, Math.min(96, Math.round(below), Math.floor(room)));
         const dest = Math.max(range(i)[0], Math.min(finalMax, Math.round(labelY - HEADER - gap)));
-        if (Math.abs(scrollY - dest) > 2) runs.push(animate(scrollY, dest, { duration: FOLD_TIME, ease: foldEase, onUpdate: (p) => scrollTo(0, p) }));
+        if (Math.abs(scrollY - dest) > 2) runs.push(animate(scrollY, dest, { duration: T, ease: foldEase, onUpdate: (p) => scrollTo(0, p) }));
       }
       Promise.all(runs.map((r) => r.finished ?? r)).then(() => {
         d.style.height = d.style.overflow = "";
@@ -339,7 +341,7 @@
     } else {
       d.classList.add("closing"); // the arrow turns back now, not when the fold has finished shrinking
       const h1 = s.getBoundingClientRect().height + (parseFloat(getComputedStyle(d).paddingTop) || 0) + (parseFloat(getComputedStyle(d).paddingBottom) || 0);
-      const runs = [animate(d, { height: [`${h0}px`, `${h1}px`] }, { duration: FOLD_TIME * 0.85, ease: foldEase })];
+      const runs = [animate(d, { height: [`${h0}px`, `${h1}px`] }, { duration: T * 0.85, ease: foldEase })];
       Promise.all(runs.map((r) => r.finished ?? r)).then(() => {
         d.open = false;
         d.classList.remove("closing");

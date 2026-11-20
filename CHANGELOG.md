@@ -5,12 +5,14 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 ## Unreleased
 
 ### Changed
+- The "send a message" fold opens and closes at half its old speed, and its arrow turns on the same time.
 - Services are four cards like the client work cards. Each card shows the summary and when it fits, and opens a panel with what you get, what else fits better, limits, related work, and the next step, in place of the dropdown.
 - The landing marks the section in view in the top bar and the phone menu, and every section link lands its heading the same distance below the bar: each view now starts at its top instead of centering its content.
 - On the Sentinel landing's first screen, the style switch and the light/dark switch sit side by side, so dark mode is one tap away before scrolling, on a phone too. Once the page scrolls the style switch hides in place, so nothing in the bar moves. Matrix keeps its one switch over the rain.
 - Services, process, and contact say to outline up to three projects in a free 1NEON account, then ask for a free assessment, with the free 30-minute call as the other way in. The account lines show only while sign-up is open.
 
 ### Fixed
+- Text fields are 16px on touch screens, so focusing one on an iPhone no longer zooms the page in.
 - Back, Forward, and reload return every page to where that history entry was left, however many steps back, even when the same page is in the history twice. Each entry gets its own id, and its scroll is kept under that id for this tab only; a new link opens at its top or its #section, and a new tab starts with nothing remembered. This replaces the record kept by page address, which put a page visited twice at its latest spot.
 - The phone menu opens and closes without stutter. Making the page behind inert, which restyled all of it in the frame the menu moved, now waits until the menu has finished moving; the menu is opaque with no backdrop blur; and the Matrix rain holds still while the menu is up.
 - The dermatology case study's table gives the intake time in days, matching its card.
