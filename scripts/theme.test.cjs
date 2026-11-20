@@ -24,6 +24,7 @@ function page(values = {}, options = {}) {
     setItem(k, v) { if (options.blocked || options.readOnly) throw Error('blocked'); storage.set(k, v); },
   }, matchMedia: (q) => ({ matches: q.includes('reduced') ? !options.transition : !!options.deviceDark }),
     addEventListener: (k, fn) => { listeners[k] = fn; }, CustomEvent: function () {},
+    MutationObserver: function () { this.observe = () => {}; this.disconnect = () => {}; },
     setTimeout: () => 0, clearTimeout() {}, getComputedStyle: () => ({ getPropertyValue: () => '' }),
   });
   return { root, storage, mode, family, listeners, pending, links };
