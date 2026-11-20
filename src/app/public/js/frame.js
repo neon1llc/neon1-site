@@ -80,19 +80,27 @@
   // opened or closed, it held back the first frame of the fade, so the menu stuttered. Now the menu moves first: the page goes
   // inert once the entrance has played, and comes back once the fade out is over. The chat steps aside at once (a class on
   // its own two elements, which costs nothing), since it sits above the menu
-  let fading = 0, settling = 0;
+  let fading = 0, settling = 0, turn = 0;
   const chatAway = (away) => document.querySelectorAll(".n1chat, .n1chat-launch").forEach((el) => el.classList.toggle("under-menu", away));
   function setMenu(open, restore = true) {
     clearTimeout(fading); clearTimeout(settling);
     const moving = !still.matches;
-    menu.classList.remove("shown"); // the entrance plays again on the next open
+    // The entrance plays again on the next open. A close leaves "shown" on: dropping it would replay the links' rise as the fade starts
+    if (open) menu.classList.remove("shown");
     menu.classList.toggle("closing", !open && !menu.hidden && moving);
     const closing = menu.classList.contains("closing");
     if (open || !closing) menu.hidden = !open;
     menuBtn.setAttribute("aria-expanded", String(open));
-    menuBtn.textContent = open ? "close" : "menu";
-    header.classList.toggle("menu-open", open);
-    document.body.style.overflow = open ? "hidden" : "";
+    // What restyles or reflows the page (the bar's menu look, the scroll lock that brings the scrollbar back) waits for the fade's
+    // first frame, so that frame carries only the fade
+    const mine = ++turn;
+    const frame = () => {
+      if (mine !== turn) return; // opened or closed again meanwhile
+      menuBtn.textContent = open ? "close" : "menu";
+      header.classList.toggle("menu-open", open);
+      document.body.style.overflow = open ? "hidden" : "";
+    };
+    if (closing) requestAnimationFrame(() => requestAnimationFrame(frame)); else frame();
     if (open) chatAway(true);
     // The home page restores its rain controls' own inert state when the menu closes, so the event follows the page's own restore
     const settle = () => {
@@ -103,7 +111,7 @@
     if (open && moving) settling = setTimeout(settle, 380); // the links' rise (.36s) is over
     else if (closing) fading = setTimeout(settle, 220); // the fade out (.22s) is over
     else settle();
-    if (open) menu.querySelector("a").focus(); else if (restore) menuBtn.focus();
+    if (open) menu.querySelector("a").focus(); else if (restore) menuBtn.focus({ preventScroll: true });
   }
   if (menu && menuBtn) {
     // The entrance is over: drop its animations so a screenshot or restyle can't replay them from the first frame
