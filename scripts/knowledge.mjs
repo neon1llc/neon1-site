@@ -84,7 +84,7 @@ ${p.ids.map((id) => `            <li><a href="${corpus.byId.get(id).url}">${esc(
           </ul>
         </li>`).join("\n")}
       </ul>
-      <p class="kc-paths-more">Not sure where you fit? <a href="/#services">See services</a> or <a href="/#contact">get in touch</a>.${releasesDir ? ` <a href="${RELEASES_URL}">Releases</a> lists what changed in each product.` : ""}</p>
+      <p class="kc-paths-more">Not sure where you fit? <a href="/#services">See services</a> or <a href="/#contact">get in touch</a>.${releasesDir ? ` <a href="${RELEASES_URL}">Releases</a> lists product changes.` : ""}</p>
     </section>`
 }
 
@@ -141,7 +141,7 @@ ${g.shelves.map(shelfSection).join("\n\n")}
     .map((g) => `        <li class="kc-nav-group"><a href="#${g.key}" data-group>${esc(g.label)}${countMark(g)}</a></li>
 ${g.shelves.map((s) => `        <li><a href="#${s.key}">${esc(s.label)}${shelfMark(s)}</a></li>`).join("\n")}`)
     .join("\n")
-  const main = `${band({ id: "kc-title", eyebrow: "neon1 · knowledge center", title: "Everything neon1", lead: "Guides, policies, and answers.", after: `
+  const main = `${band({ id: "kc-title", eyebrow: "neon1", title: "Knowledge center", lead: "Guides, policies, and answers.", after: `
         <form class="kc-search" role="search" action="${BASE}" method="get">
           <label for="kc-q">Search the knowledge center</label>
           <input id="kc-q" name="q" type="search" placeholder="Try &quot;backup&quot;, &quot;passkey&quot;, or &quot;privacy&quot;" autocomplete="off" />
