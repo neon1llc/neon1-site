@@ -178,6 +178,10 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 .n1-bar.light .n1-logo { color: var(--brand); text-shadow: none; }
 .n1-bar.light .links a:not(.btn), .n1-bar.light .links .note { color: var(--muted-ink); }
 .n1-bar.light .links a:not(.btn):hover { color: var(--brand); }
+/* The section in view: its link in the bar and in the menu is marked (js/page.js sets aria-current) */
+.links a:not(.btn)[aria-current] { color: var(--neon); text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 6px; }
+.n1-bar.light .links a:not(.btn)[aria-current] { color: var(--brand); }
+.menu a[aria-current] { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 8px; }
 .n1-bar.light .btn-ghost { color: var(--brand); border-color: var(--brand); }
 .n1-bar.light .links .portal { color: var(--brand); border-color: var(--ctl-line); }
 

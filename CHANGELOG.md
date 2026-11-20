@@ -5,6 +5,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 ## Unreleased
 
 ### Changed
+- The landing marks the section in view in the top bar and the phone menu, and every section link lands its heading the same distance below the bar: each view now starts at its top instead of centering its content.
 - On the Sentinel landing's first screen, the style switch and the light/dark switch sit side by side, so dark mode is one tap away before scrolling, on a phone too. Once the page scrolls the style switch hides in place, so nothing in the bar moves. Matrix keeps its one switch over the rain.
 - Services, process, and contact say to outline up to three projects in a free 1NEON account, then ask for a free assessment, with the free 30-minute call as the other way in. The account lines show only while sign-up is open.
 
