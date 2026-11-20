@@ -1,11 +1,10 @@
 // src/app/public/js/views.js - Moves the page one section ("view") at a time.
 //
-// Scrolling at the edge of a view meets resistance: the page gives a little
-// and the next view, if already seen, starts to fade in. Past a threshold the
-// page settles into the next view, fast at first and slowing as it arrives.
-// Views taller than the screen scroll normally until their edge. The first
-// arrival at a view plays its entrance once: the heading fades in, then each
-// piece rises into place in order. Later visits fade the whole view.
+// Wheel, trackpad, and finger scroll natively, with the platform's own momentum, so a soft flick moves a little and a strong
+// one can run through several views. Once the scroll has stopped, the page eases to the nearest view edge, like a wheel
+// settling on its pointer: a soft flick that crossed an edge falls back, a stronger one carries on and lands on the next.
+// Views taller than the screen scroll freely until their edge. The first arrival at a view plays its entrance once: the heading
+// fades in, then each piece rises into place in order. Later visits fade the whole view. Keys and links settle with the same ease.
 //
 // Motion (motion.dev, MIT) runs the animations. With reduced motion or without
 // Motion, the page scrolls natively and everything is visible. Turning on reduced
@@ -104,17 +103,7 @@
 
   // Gesture feel and easing curves
   const HEADER = 64;
-  const THRESHOLD = 110;   // touch: finger travel (px) needed to move to the next view (55 still tipped over too easily; Pradeep asked for double)
-  // Wheel and trackpad: a mouse notch is about 100px and a trackpad flick sends hundreds, so 55px tipped
-  // over on a single notch. The wheel needs more travel, each event counts for at most WHEEL_STEP, and a
-  // pull holds for WHEEL_HOLD ms between notches, so it takes about five deliberate notches or a long
-  // swipe, never a stray notch or a flick's tail (three notches still felt too easy on desktop)
-  const WHEEL_THRESHOLD = 250;
-  const WHEEL_STEP = 50;
-  const WHEEL_HOLD = 380;
-  const GIVE = 0.7;        // how far the page moves per px of input while resisting
-  const MAX_GIVE = 60;     // the most the page gives before it settles (more travel to tip over, so a bit more give to feel it)
-  const IDLE = 160;        // ms without input that ends a gesture
+  const IDLE = 160;        // ms of quiet before the page may settle on a view edge
   const settleEase = [0.22, 1, 0.36, 1];
   const enterEase = [0.19, 1, 0.22, 1];
 
@@ -185,15 +174,11 @@
   const setFade = (v, t) => { if (v && v !== hero && visited.has(v)) v.style.opacity = t.toFixed(3); };
 
   // ---- State ----
-  // Resistance tracks input so far, its direction, the view, and where it started
-  // Trailing momentum after a settle is swallowed until input goes idle
   let y = scrollY, target = scrollY; // rendered and wanted scroll positions
   let pull = 0, pullDir = 0, pullIndex = 0, pullBase = 0;
   let settling = null, detenting = false; // detenting: the settle is a detent after a native scroll, which a touch cuts short
   steering = () => !!settling;
-  let lastInput = 0, gestureFromEdge = false, blockUntilIdle = false, idleTimer = 0;
-  // Momentum fades, a person scrolling doesn't: two steps in a row that don't shrink count as a push
-  let prevAbs = 0, steady = 0, lastDirect = false;
+  let lastInput = 0, blockUntilIdle = false;
 
   // Eases the page toward the target every frame, except while a settle runs
   // The loop stops once the page is at rest, and input wakes it, so a still page costs nothing
@@ -249,59 +234,6 @@
     setFade(views[pullIndex], 1);
     setFade(views[pullIndex + pullDir], 0);
     pull = 0; pullDir = 0;
-  }
-
-  // One step of input, positive is down
-  // Direct input, from touch, moves the page at once instead of easing
-  function input(d, direct) {
-    if (paused() || !d || folding) return;
-    const now = performance.now();
-    const newGesture = now - lastInput > IDLE;
-    lastInput = now;
-    const abs = Math.abs(d);
-    // A sudden jump in speed is a new flick starting before the last one has faded
-    const jump = abs > prevAbs * 1.5 + 4;
-    steady = newGesture || direct || jump ? 2 : abs >= 2 && abs >= prevAbs ? steady + 1 : 0;
-    prevAbs = abs;
-    const pushing = steady >= 2;
-    clearTimeout(idleTimer);
-    // A wheel pull under way holds a little longer, so slow notches add up instead of springing back
-    lastDirect = direct;
-    idleTimer = setTimeout(function idle() {
-      if (!lastDirect && pullDir && performance.now() - lastInput < WHEEL_HOLD) { idleTimer = setTimeout(idle, 40); return; }
-      blockUntilIdle = false; release();
-    }, IDLE);
-    if (settling) return; // a settle runs to the end, and its input still counts toward idle
-    wake();
-    // Fading momentum after a settle is swallowed, but someone still scrolling carries on at once
-    if (blockUntilIdle && !pushing) return;
-    blockUntilIdle = false;
-
-    // Inside a view the input scrolls; past its edge, resistance begins
-    if (!pullDir) {
-      const i = indexAt(target), [top, bottom] = range(i);
-      if (newGesture) gestureFromEdge = (d > 0 && target >= bottom - 1) || (d < 0 && target <= top + 1);
-      const next = target + d;
-      if (next >= top && next <= bottom) { target = next; if (direct) { y = target; scrollTo(0, y); } return; }
-      const dir = next > bottom ? 1 : -1;
-      target = dir > 0 ? bottom : top;
-      if ((dir > 0 && i === views.length - 1) || (dir < 0 && i === 0)) return;
-      pullDir = dir; pullIndex = i; pullBase = target; pull = 0;
-    }
-    if (Math.sign(d) !== pullDir) { // reversing while resisting
-      pull = Math.max(0, pull - Math.abs(d));
-      if (!pull) { release(); return; }
-    } else pull += direct ? Math.abs(d) : Math.min(WHEEL_STEP, Math.abs(d));
-
-    // Momentum that runs into an edge is held back; a fresh push, or scrolling that keeps going, carries on
-    const need = direct ? THRESHOLD : WHEEL_THRESHOLD;
-    if (newGesture || pushing) gestureFromEdge = true;
-    if (!gestureFromEdge) pull = Math.min(pull, need * 0.6);
-    const t = Math.min(1, pull / need);
-    target = pullBase + pullDir * Math.min(MAX_GIVE, pull * GIVE);
-    setFade(views[pullIndex], 1 - 0.5 * t);
-    setFade(views[pullIndex + pullDir], t);
-    if (pull >= need) goTo(pullIndex + pullDir);
   }
 
   // ---- Folds: eased open and close, and the view makes room ----
@@ -396,15 +328,9 @@
   });
 
   // ---- Wheel and trackpad ----
-  // Line and page deltas are converted to pixels
-  addEventListener("wheel", (e) => {
-    if (e.ctrlKey || paused() || inChat(e.target)) return; // pinch zoom, open menu or case study, the chat
-    if (rail && rail.contains(e.target) && (Math.abs(e.deltaX) > Math.abs(e.deltaY) || e.shiftKey)) return; // sideways through the cards
-    if (innerScrolls(e.target, e.deltaY)) return;
-    e.preventDefault();
-    const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? vh() : 1;
-    input(e.deltaY * unit);
-  }, { passive: false });
+  // Left to the browser, like a finger: a notch, a trackpad flick, and its momentum scroll natively, however far they carry. The
+  // detent below (rest()) settles on the nearest view edge once the scroll has stopped, so a strong flick can run through several
+  // views, a soft one can cross an edge and fall back, and none rests between two views
 
   // ---- Touch ----
   // A finger and its flick belong to the browser: the page scrolls natively, with the platform's own momentum (iOS's included),
@@ -588,7 +514,7 @@
   // Fonts can change heights after the first paint, so land again until the visitor scrolls
   // The first few seconds of a visit opened at a #section or restored, until the visitor scrolls, clicks, or types
   let touched = false;
-  for (const ev of ["pointerdown", "keydown", "touchstart", "popstate", "hashchange"]) addEventListener(ev, () => { touched = true; }, { capture: true, once: true });
+  for (const ev of ["pointerdown", "keydown", "touchstart", "wheel", "popstate", "hashchange"]) addEventListener(ev, () => { touched = true; }, { capture: true, once: true });
   const landing = () => wantsLanding && !lastInput && !touched && !settling && performance.now() < 4000 && Math.abs(scrollY - aim()) > 2;
   const land = () => { if (wantsLanding && !lastInput && !touched && !settling) { scrollTo(0, aim()); sync(); } };
   land();

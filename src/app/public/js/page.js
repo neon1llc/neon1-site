@@ -1,6 +1,12 @@
 // src/app/public/js/page.js - The landing's assistant and the style-specific effects.
 
 const header = document.querySelector("header");
+// Sentinel's first screen is everything above the second section (the first view): the style switch shows through all of it
+const onFirstScreen = () => {
+  const next = document.querySelector(".view");
+  return next ? scrollY < next.getBoundingClientRect().top + scrollY - 64 - 2 : scrollY < innerHeight * 0.6;
+};
+window.n1FirstScreen = onFirstScreen;
 const rabbitIn = document.getElementById("whiteRabbitIn");
 let matrixStart, matrixReady = false;
 
@@ -10,7 +16,7 @@ function showStyle() {
     if (rabbitIn) rabbitIn.hidden = true;
     document.body.classList.add("woke");
     header.classList.add("light");
-    header.toggleAttribute("data-top", scrollY < innerHeight * 0.6);
+    header.toggleAttribute("data-top", onFirstScreen());
     return;
   }
   // The keyboard way in appears once the rabbit is wired (white-rabbit.js shows it), so Enter on it always catches one;
@@ -23,7 +29,7 @@ function showStyle() {
 }
 
 addEventListener("scroll", () => {
-  if (document.documentElement.dataset.siteStyle === "sentinel") header.toggleAttribute("data-top", scrollY < innerHeight * 0.6);
+  if (document.documentElement.dataset.siteStyle === "sentinel") header.toggleAttribute("data-top", onFirstScreen());
 }, { passive: true });
 document.addEventListener("n1:theme", showStyle);
 showStyle();

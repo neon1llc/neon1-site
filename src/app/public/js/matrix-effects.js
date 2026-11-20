@@ -34,7 +34,7 @@ export async function start() {
     if (document.documentElement.dataset.siteStyle === "sentinel") {
       document.body.classList.add("woke");
       header.classList.add("light");
-      header.toggleAttribute("data-top", scrollY < innerHeight * 0.6);
+      header.toggleAttribute("data-top", window.n1FirstScreen ? window.n1FirstScreen() : scrollY < innerHeight * 0.6);
       ctl.inert = true;
       return;
     }

@@ -56,11 +56,12 @@ a.card { text-decoration: none; }
   color: var(--neon); opacity: .78; margin: 18px auto 0; max-width: 560px; }
 
 /* Matrix's one quiet line under the slogan: what neon1 is, and the way in */
-.landing-line { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 1em; margin: 14px auto 0; max-width: 640px; font: clamp(12px, 1.3vw, 13px)/1.6 var(--mono); color: var(--neon); }
+.landing-line { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 14px auto 0; max-width: 640px; font: clamp(12px, 1.3vw, 13px)/1.6 var(--mono); color: var(--neon); }
 .landing-line span { opacity: .9; }
 .landing-line :is(span, a) { text-shadow: 0 0 3px #0D0208, 0 0 8px #0D0208, 0 0 14px rgb(13 2 8 / .9); } /* the rain runs behind it */
-.landing-line a { color: var(--neon); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, currentColor 55%, transparent); }
-.landing-line a:is(:hover, :focus-visible) { color: #e9ffee; text-decoration-color: currentColor; }
+/* The way in is always its own line after the description. It rests white and underlined, and turns matrix green when pointed at or focused */
+.landing-line a { color: #e9ffee; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: currentColor; transition: color var(--t-fast, .15s) var(--ease, ease); }
+.landing-line a:is(:hover, :focus-visible) { color: var(--neon); }
 
 /* Hero text fades up in turn */
 .reveal { opacity: 0; animation: rise .9s ease-out forwards; }
@@ -490,10 +491,8 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 /* Matrix (dark) theme: the launcher's dark ground and glow live in frame.css, shared with every page; hover lifts it a little */
 :root[data-site-theme="matrix"]:has(.n1-bar.light) .n1chat-launch:not(.n1chat-light):hover { background: rgb(18 34 24 / .96); }
 
-/* ---- Matrix readability: light text on dark ---- */
-/* A little more tracking for running text (not headings, mono, nav, or the landing) */
-:root[data-site-theme="matrix"] :is(.awake, .kc-text, .case-body) :is(p, li):not(.idx, .stat, .price, .state, .tag) { letter-spacing: .01em; }
-:root[data-site-theme="matrix"] :is(.foot, .legal, .cform, .n1-bar, .menu) :is(p, li) { letter-spacing: normal; }
+/* ---- Matrix readability: light text on dark ----
+   Running text has the same letter spacing in light and dark, so switching mode never changes where a line wraps */
 /* Inline links in running text carry an underline, so they do not rely on color alone */
 :root[data-site-theme="matrix"] :is(.awake :is(p, li), .kc-text, .case-body, .say) a:not(.btn, .btn-primary, .row, .card, .kc-card, .go) {
   text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: rgb(var(--brand-rgb) / .55); }
