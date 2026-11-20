@@ -36,16 +36,21 @@
     }
     const multi = field instanceof HTMLTextAreaElement;
     for (const key of MIRRORED) mirror.style[key] = cs[key];
-    // The mirror never takes the field's indent: the placeholder's own shift would move the caret off the field's start
-    mirror.style.textIndent = "0";
+    // An empty field shows its placeholder, with the caret just before it: the mirror holds the placeholder with the field's own indent,
+    // and the caret goes at the line's start (the marker, less the indent), wherever the text is aligned. A field with text puts the
+    // caret at the end of it, and the mirror leaves the indent out, since typed text is not shifted
+    const holder = !field.value && field.placeholder;
+    const indent = holder ? parseFloat(cs.textIndent) || 0 : 0;
+    mirror.style.textIndent = indent + "px";
     mirror.style.boxSizing = "border-box";
     mirror.style.width = boxWidth(field, cs) + "px";
     mirror.style.whiteSpace = multi ? "pre-wrap" : "pre";
-    mirror.textContent = field.value;
-    const end = document.createElement("span");
-    end.textContent = "​";
-    mirror.appendChild(end);
-    return { x: end.offsetLeft, y: end.offsetTop, h: end.offsetHeight };
+    mirror.textContent = "";
+    const mark = document.createElement("span");
+    mark.textContent = "\u200b";
+    if (holder) { mirror.appendChild(mark); mirror.appendChild(document.createTextNode(field.placeholder)); }
+    else { mirror.appendChild(document.createTextNode(field.value)); mirror.appendChild(mark); }
+    return { x: mark.offsetLeft - indent, y: mark.offsetTop, h: mark.offsetHeight };
   }
 
   // The padding box's width, left of the scrollbar. An input's clientWidth leaves its padding out, so this is worked from the box instead
