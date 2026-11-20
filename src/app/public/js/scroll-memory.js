@@ -64,7 +64,7 @@
   // ---- Coming back: from the browser's cache, or between entries of this same page (#fragment links) ----
   // An entry never scrolled takes its fragment, else the top
   const fragmentY = () => {
-    const id = decodeURIComponent(location.hash.slice(1)), el = id && document.getElementById(id);
+    const id = decodeURIComponent(location.hash.slice(1)).split("?")[0], el = id && document.getElementById(id);
     if (!el) return 0;
     return Math.round(el.getBoundingClientRect().top + scrollY - (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0));
   };

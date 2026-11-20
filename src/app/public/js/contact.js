@@ -1,7 +1,7 @@
 // src/app/public/js/contact.js - The contact form, folded under "send a message": pick any of the
 // four services (or none), add your own words in "something else", say what's going on, and send.
 // Messages go to 1NEON's contact route, which mails neon1's inbox and no one else. Nothing is stored in
-// the browser or put in the URL. Without this script the fold stays hidden and the email and phone links
+// the browser, and the draft never goes in the URL, only whether the form is open (/#contact?message=1). Without this script the fold stays hidden and the email and phone links
 // above it do the job. A send waits at most WAIT ms; past that the outcome is unknown, so the draft stays
 // and the visitor is told to check before sending again (no auto-retry).
 
@@ -152,5 +152,28 @@ if (fold && form) {
     swap(done, form).then(() => form.elements.today.focus());
   });
 
+  // ---- The form has an address: /#contact?message=1 ----
+  // Opening the form adds that address as a history entry, so Back closes it and Forward opens it again; opening the page at the
+  // address, or following a link to it from 1NEON, opens it too. Closing with a press steps back when this page opened it, and
+  // otherwise just takes the question mark off the address, so a reload or a shared link never leaves the site
+  const ADDRESS = "#contact?message=1";
+  let opened = false; // true once this page itself pushed the address
+  const show = (open) => (window.n1Fold ? window.n1Fold(fold, open) : (fold.open = open));
+  const match = () => show(location.hash === ADDRESS);
+  fold.querySelector(":scope > summary").addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const open = location.hash === ADDRESS;
+    if (!open) {
+      window.n1KeepSpot?.();
+      history.pushState(null, "", ADDRESS);
+      opened = true;
+    } else if (opened) history.back();
+    else { history.replaceState(history.state, "", "#contact"); match(); }
+  });
+  addEventListener("popstate", () => { if (location.hash !== ADDRESS) opened = false; match(); });
+  addEventListener("n1:entry", match);
+  addEventListener("hashchange", match);
   fold.hidden = false;
+  if (location.hash === ADDRESS) fold.open = true;
 }

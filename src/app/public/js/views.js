@@ -317,6 +317,8 @@
       }, done);
     }
   }
+  // A page script (js/contact.js) opens or closes a fold to match the address, with the same eased move as a press
+  window.n1Fold = (d, open) => { if (off) d.open = open; else if ((moving.get(d) ? moving.get(d).opening : d.open) !== open) toggleFold(d); };
   // Clicks, Enter, and Space all arrive as a click on the summary; the browser's own instant toggle is
   // replaced by the eased one
   document.addEventListener("click", (e) => {
@@ -366,7 +368,8 @@
     if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return; // case links route above
     const a = e.target.closest('a[href^="#"], a[data-view]');
     if (!a || off) return;
-    const id = a.dataset.view || a.getAttribute("href").slice(1);
+    // A section link may carry a query (#contact?message=1); the section is what comes before it
+    const id = a.dataset.view || a.getAttribute("href").slice(1).split("?")[0];
     const el = document.getElementById(id);
     const v = el && (el.closest(".view") || el.closest(".hero") || (el.id === "top" ? hero : null));
     const i = views.indexOf(v);
@@ -378,7 +381,7 @@
     // The top bar's Contact link points at /#contact so it also works from other pages, which is why it carries data-view
     // Each is a new history entry, so Back returns to where the link was pressed: the entry being left keeps its spot first. A link to
     // the place the page already stands at (the same address, resting on that section's top) replaces instead, so it adds nothing
-    const url = a.dataset.view === "top" ? "/" : "#" + id;
+    const url = a.dataset.view === "top" ? "/" : a.dataset.view ? "#" + id : a.getAttribute("href");
     const sameAddress = location.pathname + location.search + location.hash === location.pathname + location.search + (url === "/" ? "" : url);
     if (sameAddress && Math.abs(scrollY - range(i)[0]) <= 2) history.replaceState(history.state, "", url);
     else { keepSpot(); history.pushState(null, "", url); }
@@ -513,7 +516,7 @@
   toY = (y) => (off ? nativeY(y) : goTo(indexAt(y), { y }));
 
   // Opened with a section link, or a case link's card: land on that view once fonts and layout settle
-  const start = views.indexOf(first ? first.closest(".view") : document.getElementById(location.hash.slice(1)));
+  const start = views.indexOf(first ? first.closest(".view") : document.getElementById(decodeURIComponent(location.hash.slice(1)).split("?")[0]));
   history.scrollRestoration = "manual";
 
   // Where this history entry was last scrolled, kept under the entry's id (window.n1Entry, js/theme.js), so Back, Forward and
@@ -548,7 +551,7 @@
   const expected = () => {
     const m = spotNow(), i = m ? (m.v ? views.findIndex((v) => v.id === m.v) : m.i) : -1;
     if (m && i >= 0 && (i > 0 || m.dy > 2)) return { i, y: Math.min(range(i)[0] + m.dy, maxY()) };
-    const el = location.hash.length > 1 && document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    const el = location.hash.length > 1 && document.getElementById(decodeURIComponent(location.hash.slice(1)).split("?")[0]);
     const j = views.indexOf(el && el.closest ? el.closest(".view") : null);
     return j > 0 ? { i: j, y: range(j)[0] } : null;
   };
@@ -595,6 +598,7 @@
     if (!window.n1Entry || document.body.classList.contains("case-open") || document.body.classList.contains("n1chat-open") || off) return;
     n1Entry.set(here, spotAt(scrollY));
   };
+  window.n1KeepSpot = keepSpot;
   for (const ev of ["pointerdown", "click"]) document.addEventListener(ev, (e) => { if (e.target.closest && e.target.closest("a[href]")) keepSpot(); }, true);
   document.addEventListener("click", (e) => { if (e.target.closest && e.target.closest("a[href]")) { seenY = scrollY; lastSaved = ""; } }, true);
   // Another entry of this page (a case link's card, pushed above): follow it, and coming back to one with a spot puts that spot back
