@@ -4,6 +4,9 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+### Fixed
+- Back, Forward, and reload return every page to where that history entry was left, however many steps back, even when the same page is in the history twice. Each entry gets its own id, and its scroll is kept under that id for this tab only; a new link opens at its top or its #section, and a new tab starts with nothing remembered. This replaces the record kept by page address, which put a page visited twice at its latest spot.
+
 ## v0.83.0
 
 ### Changed

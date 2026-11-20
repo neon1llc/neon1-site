@@ -554,6 +554,79 @@ for (const [label, options] of [["wide", {}], ["phone", PHONE]]) {
       expect(!realErrors(errors).length, "page errors", errors);
     } finally { await context.close(); }
   });
+
+  // Each entry keeps its own spot, so a walk several steps deep comes back right at every step, both ways, even when one
+  // page is in the history twice at different spots. A new link opens at its top, and a new tab starts with nothing remembered
+  check("browser", `back: a five-page walk with the same page twice, Back to the start and Forward to the end, each at its spot (${label})`, async () => {
+    const { page, context, errors } = await open({ reducedMotion: "no-preference", ...options }, "/knowledge/");
+    try {
+      const walk = [["/knowledge/", 1200], ["/blog/why-neon1/", 700], ["/knowledge/", 400], ["/knowledge/engagement/services/", 1500], ["/blog/why-neon1/", 300]];
+      const spots = [];
+      for (const [at, [url, y]] of walk.entries()) {
+        if (at) {
+          // Followed as a reader would, through a link on the page, so the click saves the spot first
+          await page.evaluate((url) => { const a = Object.assign(document.createElement("a"), { href: url }); document.body.append(a); a.click(); }, url);
+          await page.waitForURL((u) => u.pathname === url);
+          await page.waitForLoadState("load");
+          await page.waitForTimeout(1500);
+          const top = await spot(page);
+          expect(top.y === 0, `a new link to ${url} did not open at its top`, top);
+        } else await page.waitForTimeout(1800);
+        await jump(page, y);
+        spots.push(await spot(page));
+      }
+      for (let i = spots.length - 2; i >= 0; i--) {
+        await page.goBack();
+        await page.waitForTimeout(2200);
+        expect(sameSpot(spots[i], await spot(page)), `Back to step ${i + 1} missed its spot`, { want: spots[i], now: await spot(page) });
+      }
+      for (let i = 1; i < spots.length; i++) {
+        await page.goForward();
+        await page.waitForTimeout(2200);
+        expect(sameSpot(spots[i], await spot(page)), `Forward to step ${i + 1} missed its spot`, { want: spots[i], now: await spot(page) });
+      }
+      await page.reload({ waitUntil: "load" });
+      await page.waitForTimeout(2200);
+      expect(sameSpot(spots[spots.length - 1], await spot(page)), "reload at the end of the walk missed its spot", { want: spots[spots.length - 1], now: await spot(page) });
+      // A new tab shares nothing with this one
+      const tab = await context.newPage();
+      await tab.goto(origin + "/blog/why-neon1/", { waitUntil: "load" });
+      await tab.waitForTimeout(1800);
+      expect((await spot(tab)).y === 0, "a new tab opened at a remembered spot", await spot(tab));
+      await tab.close();
+      expect(!realErrors(errors).length, "page errors", errors);
+    } finally { await context.close(); }
+  });
+}
+
+// The home page's views keep their own spot per entry too: two visits to the home page in one walk return to their own views
+for (const [label, options] of [["wide", {}], ["phone", PHONE]]) {
+  if (!HAS_KC) break;
+  check("browser", `back: the home page twice in one walk, Back returns each visit to its own view (${label})`, async () => {
+    const { page, context, errors } = await open({ reducedMotion: "no-preference", ...options });
+    try {
+      const view = () => page.evaluate(() => { const v = [...document.querySelectorAll(".view")].find((e) => { const r = e.getBoundingClientRect(); return r.top <= innerHeight / 2 && r.bottom > innerHeight / 2; }); return { id: v && v.id, y: Math.round(scrollY) }; });
+      const goView = async (id) => { await page.evaluate((id) => document.getElementById(id).scrollIntoView({ behavior: "instant" }), id); await page.mouse.wheel(0, 1); await page.waitForTimeout(1500); };
+      const follow = async (url) => { await page.evaluate((url) => { const a = Object.assign(document.createElement("a"), { href: url }); document.body.append(a); a.click(); }, url); await page.waitForURL((u) => u.pathname + u.hash === url || u.pathname === url); await page.waitForLoadState("load"); await page.waitForTimeout(1800); };
+      await page.waitForTimeout(1500);
+      await goView("process");
+      const first = await view();
+      await follow("/knowledge/");
+      await jump(page, 900);
+      const kc = await spot(page);
+      await follow("/");
+      await goView("faq");
+      const second = await view();
+      await follow("/blog/why-neon1/");
+      await page.goBack(); await page.waitForTimeout(2800);
+      expect((await view()).id === second.id, "Back to the second home visit missed its view", { second, now: await view() });
+      await page.goBack(); await page.waitForTimeout(2200);
+      expect(sameSpot(kc, await spot(page)), "Back to the Knowledge Center missed its spot", { kc, now: await spot(page) });
+      await page.goBack(); await page.waitForTimeout(2800);
+      expect((await view()).id === first.id, "Back to the first home visit missed its view", { first, now: await view() });
+      expect(!realErrors(errors).length, "page errors", errors);
+    } finally { await context.close(); }
+  });
 }
 
 
