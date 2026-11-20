@@ -105,10 +105,9 @@
 .n1chat-ext:hover::after, .n1chat-ext:focus-visible::after { transform: translate(1px, -1px); }
 @media (prefers-reduced-motion: reduce) { .n1chat-ext::after { transition: none; } }
 .n1chat-plain { color: var(--link); font-weight: 600; text-decoration: none; }
-.n1chat-plain:hover { text-decoration: underline; }
-.n1chat-plain.n1chat-ext:hover { text-decoration: none; }
-/* A link that stays on the site ("Privacy") is underlined, thinly, in both looks */
-.n1chat-plain:not(.n1chat-ext) { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+/* A link that stays on the site ("Privacy") is underlined, thinly at 55% and in full on hover, as every internal link is (css/frame.css) */
+.n1chat-plain:not(.n1chat-ext) { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, currentColor 55%, transparent); }
+.n1chat-plain:not(.n1chat-ext):is(:hover, :focus-visible) { text-decoration-color: currentColor; }
 /* Outbound links (the arrow ones) follow the site's rule: no underline in either look, since the arrow marks them */
 .n1chat-ext, .n1chat-ext:hover { text-decoration: none; }
 

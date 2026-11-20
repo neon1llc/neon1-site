@@ -131,7 +131,10 @@ body.woke { background-color: var(--page); }
 html.arriving { background: var(--page); }
 html.arriving body { opacity: 0; }
 body { transition: background-color .4s; }
-a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+/* Links, one rule: a link that stays on neon1 is underlined thinly at 55% of its color and takes the full color on hover and focus; a link that leaves
+   (a.ext) is never underlined and moves its arrow instead. This holds in every look and mode, so nothing below restates it per theme */
+a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, currentColor 55%, transparent); }
+a:is(:hover, :focus-visible) { text-decoration-color: currentColor; }
 :focus-visible { outline: 2px solid var(--glow); outline-offset: 3px; border-radius: 6px; }
 /* Focus rings take the color that reads on the surface they sit on: brand green on the light bar and the
  * white case panel, neon on the dark menu (and the bar while the menu is open over a light page) */
@@ -377,7 +380,7 @@ footer .foot h2 { font: 600 var(--fs-sm) var(--mono); letter-spacing: .01em; col
 /* A separator inside running text (the contact table): the footer's backslash, with room on both sides */
 .sep { font-family: var(--mono); opacity: .6; margin: 0 .2em; }
 /* The legal line sits among plain text, so its internal links are underlined, thinly and in the line's own gray, to tell them apart; internal links never carry an arrow */
-.legal a:not(.ext) { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: currentColor; }
+.legal a:not(.ext) { text-decoration-line: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
 /* The copyright line ends with the company's public state record: an internal link, so it carries no arrow */
 .legal .owner { display: inline-flex; gap: 8px; flex-wrap: wrap; align-items: baseline; }
 
@@ -419,11 +422,12 @@ a.ext:hover { color: var(--brand); }
 @media (min-width: 1320px) { .legal .report-links { right: calc((100% - 1200px) / 4 - 14px); } }
 /* ---- Links, one rule for the whole site ----
    Links that leave the page (another site, mailto:, tel:) end in the northeast arrow and carry no underline in either look or mode, since the
-   arrow marks them. Links that stay on the site are underlined, thinly, so they never rely on color alone; in matrix that underline is dimmed
-   and turns the link's full color on hover. (Bar, menu, buttons, and cards are controls, not links in text, and are left alone.) */
-.foot a:not(.ext) { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
-:root[data-site-theme="matrix"] .foot a:not(.ext) { text-decoration-color: color-mix(in srgb, currentColor 55%, transparent); }
-:root[data-site-theme="matrix"] .foot a:not(.ext):is(:hover, :focus-visible) { text-decoration-color: currentColor; }
+   arrow marks them. Links that stay on the site are underlined, thinly, so they never rely on color alone; the underline is dimmed
+   and turns the link's full color on hover, in every look and mode (the base `a` rule above). (Bar, menu, buttons, and cards are controls, not links in text, and are left alone.) */
+.foot a:not(.ext) { text-decoration-line: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+/* A rule above that resets `text-decoration` (the footer's plain links) also resets the line's color, so the dimmed color is stated again here, after them */
+a:not(.ext) { text-decoration-color: color-mix(in srgb, currentColor 55%, transparent); }
+a:not(.ext):is(:hover, :focus-visible) { text-decoration-color: currentColor; }
 
 /* Text fields at 16px on touch screens: iPhone browsers zoom the page in when a field under 16px takes focus */
 @media (pointer: coarse) { :root:root :is(input:not([type=checkbox], [type=radio], [type=file], [type=range], [type=color]), textarea, select) { font-size: var(--fs-base); } }

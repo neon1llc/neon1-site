@@ -164,14 +164,32 @@ check("browser", "contact: the form has its own address, /#contact?message=1: a 
   } finally { await context.close(); }
 });
 
-// One outbound look: bold, no underline, and the arrow, the same in Sentinel and Matrix, light and dark
+// One link rule in every look: a link that stays on neon1 is underlined at about half color and takes the full color on hover; a link that
+// leaves (a.ext) is bold, never underlined, even on hover
 for (const [style, mode] of [["sentinel", "light"], ["sentinel", "dark"], ["matrix", "light"], ["matrix", "dark"]]) {
-  check("browser", `links: outbound links are bold with no underline (${style}, ${mode})`, async () => {
+  check("browser", `links: internal links dim-underline and brighten on hover, outbound links never underline (${style}, ${mode})`, async () => {
     const { page, context } = await open({ init: ([s, m]) => { try { localStorage.setItem("neon1.style", s); localStorage.setItem("neon1.mode", m); localStorage.setItem("neon1.theme.shared", "1"); } catch {} }, initArg: [style, mode] });
     try {
       await page.waitForLoadState("load");
-      const bad = await page.evaluate(() => [...document.querySelectorAll("main a.ext, .legal a.ext")].filter((a) => a.getClientRects().length && (getComputedStyle(a).textDecorationLine !== "none" || +getComputedStyle(a).fontWeight < 500)).map((a) => a.textContent.trim().slice(0, 24)));
-      expect(!bad.length, "outbound links with an underline or without weight", bad);
+      const alpha = (c) => { const m = c.match(/\/\s*([\d.]+)/) || c.match(/rgba\([^)]*,\s*([\d.]+)\)/); return m ? +m[1] : 1; };
+      const look = (sel) => page.locator(sel).first().evaluate((a) => { const c = getComputedStyle(a); return { line: c.textDecorationLine, color: c.textDecorationColor, weight: +c.fontWeight }; });
+      const SAMPLES = [["internal", ".legal a:not(.ext)"], ["internal", ".foot a:not(.ext)"], ["internal", "#contact .fit a:not(.ext, [class])"], ["outbound", "main a.ext"]].filter(() => true);
+      for (const [kind, sel] of SAMPLES) {
+        if (!(await page.locator(sel).count())) continue;
+        const loc = page.locator(sel).first();
+        await loc.scrollIntoViewIfNeeded();
+        const rest = await look(sel);
+        await loc.hover({ force: true });
+        await page.waitForTimeout(400);
+        const over = await look(sel);
+        if (kind === "internal") {
+          expect(rest.line.includes("underline"), `${sel}: an internal link is not underlined`, rest);
+          expect(alpha(rest.color) > 0.4 && alpha(rest.color) < 0.7, `${sel}: the underline is not dimmed at rest`, rest);
+          expect(alpha(over.color) === 1, `${sel}: the underline does not reach full color on hover`, over);
+        } else {
+          expect(rest.line === "none" && over.line === "none" && rest.weight >= 500, `${sel}: an outbound link is underlined or light`, { rest, over });
+        }
+      }
     } finally { await context.close(); }
   });
 }

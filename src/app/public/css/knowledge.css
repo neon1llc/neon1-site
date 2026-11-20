@@ -217,8 +217,7 @@ body.kc { background: var(--page); }
 /* A line of reading holds about 75 characters (56ch in Figtree, whose zero is wide: the 68ch the audit named still gave 90); tables, code,
    figures, and headings keep the whole column */
 .kc-text :is(p, ul, ol, dl, blockquote) { max-width: 56ch; }
-.kc-text a { color: var(--brand); text-decoration-color: rgb(var(--brand-rgb) / .4); }
-.kc-text a:hover { text-decoration-color: var(--brand); }
+.kc-text a { color: var(--brand); }
 /* Long outside links wrap like text, so a source title never widens a phone's page */
 .kc-text a.ext { white-space: normal; overflow-wrap: anywhere; }
 .kc-text strong { color: var(--deep); }
