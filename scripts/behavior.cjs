@@ -136,6 +136,29 @@ check("browser", "contact: the fold opens with its arrow turned down, and a send
   } finally { await context.close(); }
 });
 
+check("browser", "contact: the form has its own address, /#contact?message=1: a link opens it, Back closes it, Forward opens it again, and a reload keeps it", async () => {
+  const { page, context, errors } = await open();
+  try {
+    const isOpen = () => page.locator("#cfold").evaluate((d) => d.open);
+    const settle = (want) => page.waitForFunction((w) => document.getElementById("cfold").open === w && !document.getElementById("cfold").style.height, want);
+    await page.goto(`${page.url().split("#")[0]}#contact?message=1`);
+    await page.reload();
+    await settle(true);
+    expect(await isOpen(), "the address did not open the form on arrival");
+    await page.locator("#cfold > summary").click();
+    await settle(false);
+    expect(!page.url().includes("message=1"), "closing left the address on the form", page.url());
+    await page.locator("#cfold > summary").click();
+    await settle(true);
+    expect(page.url().endsWith("#contact?message=1"), "opening did not put the address in the URL", page.url());
+    await page.goBack();
+    await settle(false);
+    await page.goForward();
+    await settle(true);
+    expect(!errors.length, "page errors", errors);
+  } finally { await context.close(); }
+});
+
 check("browser", "contact: missing fields are named and nothing is sent; a refusal says what to do", async () => {
   const { page, context } = await open();
   try {
