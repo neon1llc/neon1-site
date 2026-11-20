@@ -87,12 +87,16 @@
   }
   // Every change of theme after the first load goes through here. Matrix: leaving matrix is slow, entering it is the quick flick.
   // Sentinel: always one plain, instant change, with no flicker, fade, or easing at all (the effects belong to the matrix look)
+  // Painting always reads the saved choice (storage) when it runs, never a value captured earlier: a dawn paints a frame or more
+  // after it starts, and the choice may have moved on (another switch, another tab). `revision` also retires a dawn that a newer
+  // change has replaced, so the page can only end on the newest saved choice, however quickly the switches are pressed
   let revision = 0;
-  function change(next) {
+  function change() {
     const current = ++revision;
+    const next = wantedLook();
     if (root.dataset.siteLook === next) return;
     if (next === "providence" || next === "desert-of-the-real" || root.dataset.siteStyle === "sentinel") { apply(next); return; }
-    if (root.dataset.siteTheme === "matrix") dawn(() => { if (current === revision) apply(next); });
+    if (root.dataset.siteTheme === "matrix") dawn(() => { if (current === revision) apply(wantedLook()); });
     else { shift(next); apply(next); }
   }
 
@@ -137,17 +141,18 @@
       b.addEventListener("click", () => {
         write(KEY_MODE, mode() === "dark" ? "light" : "dark");
         write(KEY_SHARED, "1");
-        change(wantedLook());
+        change();
       });
     });
     document.querySelectorAll(".style-sw").forEach((b) => {
       b.setAttribute("aria-checked", String(style() === "sentinel"));
       b.addEventListener("click", () => {
-        const next = root.dataset.siteStyle === "sentinel" ? "matrix" : "sentinel";
+        // From the saved family, not from what is painted (a dawn may still be waiting to paint)
+        const next = style() === "sentinel" ? "matrix" : "sentinel";
         write(KEY_MODE, mode());
         write(KEY_STYLE, next);
         write(KEY_SHARED, "1");
-        change(lookFor(next, mode()));
+        change();
       });
     });
   }
@@ -156,11 +161,15 @@
   // ---- Staying in step: other tabs, and a page restored by Back ----
   // A family change re-applies in place; the landing starts its Matrix effects only when needed
   addEventListener("storage", (e) => {
-    if (e.key === KEY_STYLE || e.key === KEY_MODE || e.key === null) change(wantedLook());
+    if (e.key === KEY_STYLE || e.key === KEY_MODE || e.key === null) change();
   });
   addEventListener("pageshow", (e) => {
     if (!e.persisted) return;
-    if (root.dataset.siteLook !== wantedLook()) change(wantedLook());
+    if (root.dataset.siteLook !== wantedLook()) change();
+  });
+  // A tab brought forward may have slept through a change made elsewhere
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && root.dataset.siteLook !== wantedLook()) change();
   });
 })();
 

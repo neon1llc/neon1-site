@@ -13,6 +13,8 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - The code-and-resources row for this site names the current release; make check now compares it with the footer and version.json.
 - Code blocks in the Knowledge Center scroll inside themselves, so a long command no longer widens a phone's page (DeployOps).
 - The guided walkthrough link in process has no outbound arrow, since 1NEON is part of neon1.
+- The theme script paints from the saved choice when a change runs, flips the family from the saved family rather than the painted one, and catches up when a tab is brought forward, so quick switches and changes made in another tab always end on the newest choice. Tests cover every run of up to four quick switches with the paints arriving in any order.
+
 
 ## v0.83.0
 
