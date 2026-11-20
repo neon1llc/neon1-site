@@ -181,7 +181,7 @@ ${nav}
     <div class="kc-body">
 ${groups}
 
-    <p class="kc-colophon">These documents come from ${CORPUS_LINK} and are shared under CC BY-ND 4.0. Templates and examples are illustrations, not legal advice.</p>
+    <p class="kc-colophon">These documents come from ${CORPUS_LINK} and are shared under CC BY-ND 4.0.</p>
     </div>
     </div>`
   return page({
@@ -235,12 +235,11 @@ function docPage(d) {
           <a class="btn btn-primary" href="${d.pdf}" download>${ICON_PDF}Download PDF</a>
           <a class="btn btn-outline" href="${d.pdf}" target="_blank" rel="noopener">${ICON_VIEW}Preview PDF<span class="kc-sr"> (opens in a new tab)</span></a>` : ""}
         </div>`
-  const note = d.type === "template" || d.type === "example" ? "Templates and examples are illustrations, not legal advice. " : ""
   const main = docMain({
     crumbs: [["Knowledge center", BASE], [shelf.label, `${BASE}#${d.section}`]],
     flag: d.data.fictional ? '<p class="kc-flag">Fictional example</p>' : "",
     title: d.title, summary: d.summary, facts, short, actions, sections: d.sections, body, next,
-    colophon: `${rights(d.source)} ${note}${esc(fillNote(d))}`,
+    colophon: `${rights(d.source)} ${esc(fillNote(d))}`,
   })
   // An article for every document; a questions page also lists each question with its answer
   const url = SITE + d.url
