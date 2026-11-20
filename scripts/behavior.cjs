@@ -231,12 +231,16 @@ check("browser", "home: Sentinel's first screen states the offer and the next st
   } finally { await matrix.context.close(); }
 });
 
-check("browser", "home: one wheel gesture from the first screen settles on services (motion, wide)", async () => {
+check("browser", "home: a wheel gesture past halfway settles on services, and a soft one falls back to the first screen (motion, wide)", async () => {
   const { page, context } = await open({ reducedMotion: "no-preference" });
   try {
     await page.waitForLoadState("load");
     await page.mouse.move(640, 450);
-    for (let i = 0; i < 10; i++) { await page.mouse.wheel(0, 30); await page.waitForTimeout(20); }
+    // A soft push crosses no more than halfway: the page falls back to the first screen
+    for (let i = 0; i < 4; i++) { await page.mouse.wheel(0, 30); await page.waitForTimeout(20); }
+    await page.waitForFunction(() => scrollY === 0, null, { timeout: 5000 });
+    // A stronger one carries past halfway and lands on services
+    for (let i = 0; i < 10; i++) { await page.mouse.wheel(0, 60); await page.waitForTimeout(20); }
     await page.waitForFunction(() => Math.abs(document.getElementById("services").getBoundingClientRect().top - 64) < 3, null, { timeout: 5000 });
   } finally { await context.close(); }
 });
@@ -1083,7 +1087,7 @@ check("browser", "bar: on a 320px phone the Sentinel landing's menu button stays
       expect(r.menuRight <= width - 12 && !r.overflow, `the menu button reaches ${r.menuRight}px of ${width}`, r);
       if (width < 370) expect(!r.switchShown, `the style switch is still in the bar at ${width}px`);
       else expect(r.switchShown, `the style switch is missing at ${width}px`);
-      expect(await page.locator('.foot [data-look="matrix"]').count() === 1, "the footer lacks the look choice");
+      expect(await page.locator('.legal [data-look="matrix"]').count() === 1, "the footer lacks the theme choice");
     } finally { await context.close(); }
   }
 });
@@ -1093,11 +1097,11 @@ check("browser", "look: the footer buttons switch Sentinel and Matrix on any pag
   try {
     await page.waitForLoadState("load");
     const state = () => page.evaluate(() => ({ style: document.documentElement.dataset.siteStyle, theme: document.documentElement.dataset.siteTheme, pressed: [...document.querySelectorAll("[data-look]")].map((b) => b.getAttribute("aria-pressed")) }));
-    expect(JSON.stringify(await state()) === JSON.stringify({ style: "sentinel", theme: "awake", pressed: ["true", "false"] }), "the footer does not show Sentinel on", await state());
+    expect(JSON.stringify(await state()) === JSON.stringify({ style: "sentinel", theme: "awake", pressed: ["false", "true"] }), "the footer does not show Sentinel on", await state());
     await page.locator("header .theme-sw:not(.style-sw)").click();   // dark
     await page.locator('[data-look="matrix"]').click();
     const s = await state();
-    expect(s.style === "matrix" && s.theme === "matrix" && s.pressed.join() === "false,true", "Matrix did not take, or dark was lost", s);
+    expect(s.style === "matrix" && s.theme === "matrix" && s.pressed.join() === "true,false", "Matrix did not take, or dark was lost", s);
     expect((await page.evaluate(() => localStorage.getItem("neon1.theme.shared"))) === "1", "the choice was not shared with 1NEON");
     await page.reload(); await page.waitForLoadState("load");
     expect((await state()).style === "matrix", "the choice did not survive a reload");

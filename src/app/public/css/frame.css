@@ -228,19 +228,19 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
   --brand: var(--neon); --brand-rgb: 108 255 168; --ctl-line: rgba(108,255,168,.4); }
 .style-sw .sentinel-case { fill: none; stroke: currentColor; stroke-width: 1.8; }
 /* Sentinel: the landing's first screen offers both switches, so a visitor can pick dark mode before scrolling. The style switch sits
-   right beside the light/dark switch, never beside the logo, which keeps the bar's left edge to the logo alone. It stays through the
-   whole first screen and hides in place (it keeps its room, so nothing in the bar moves) once the page moves on to the next
-   section (js/page.js sets [data-top]). Below 370px, where the row has no room for it, it leaves the bar; the footer has the same
-   choice */
+   right beside the light/dark switch, never beside the logo, which keeps the bar's left edge to the logo alone. It takes no room in the
+   row (its width is given back with a negative margin and it is drawn 52px to the left), so no other box in the bar moves on the landing,
+   hidden or shown. It stays through the whole first screen and hides in place once the page moves on to the next section
+   (js/page.js sets [data-top]). Below 370px, where the row has no room for it, it leaves the bar; the footer has the same choice */
 :root[data-site-style="sentinel"] .n1-bar :is(.theme-sw:not(.style-sw), .menu-btn) { order: 1; }
 :root[data-site-style="sentinel"] .n1-bar[data-top] .theme-sw:not(.style-sw) { opacity: 1; visibility: visible; pointer-events: auto; }
-:root[data-site-style="sentinel"] .n1-bar .theme-sw.style-sw { order: 0; margin: 0 0 0 12px; }
-/* The bar's 20px gap between items would put the two switches 32px apart; pulled together they sit 12px apart, as a pair */
-:root[data-site-style="sentinel"] .n1-bar .theme-sw:not(.style-sw) { margin-left: -8px; }
-@media (max-width: 1040px) { :root[data-site-style="sentinel"] .n1-bar .theme-sw.style-sw { margin-left: auto; } }
+:root[data-site-style="sentinel"] .n1-bar .theme-sw.style-sw { order: 0; margin: 0 -72px 0 0; transform: translateX(-52px); }
+@media (max-width: 1040px) {
+  :root[data-site-style="sentinel"] .n1-bar .theme-sw.style-sw { margin-left: auto; }
+  :root[data-site-style="sentinel"] .n1-bar .theme-sw:not(.style-sw) { margin-left: 12px; }
+}
 :root[data-site-style="sentinel"] .n1-bar:not([data-top]) .style-sw { display: inline-block; visibility: hidden; pointer-events: none; }
 @media (max-width: 369.98px) { :root[data-site-style="sentinel"] .n1-bar .theme-sw.style-sw { display: none; } :root[data-site-style="sentinel"] .n1-bar .theme-sw:not(.style-sw) { margin-left: auto; } }
-}
 
 /* ---- Phone menu: below the width the links need, they fold into a full-screen menu ---- */
 .menu-btn { margin-left: auto; display: none; border-radius: var(--glass-r); }
