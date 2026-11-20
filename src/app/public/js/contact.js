@@ -17,7 +17,7 @@ if (fold && form) {
   // How long a send may stay pending before the page stops waiting. The server may still have accepted it,
   // so this is an uncertain outcome, not a failure: nothing is resent automatically
   const WAIT = 15000;
-  const UNSURE = "I couldn't confirm your message was sent. It may still have arrived, so before sending it again, please email hello@neon1.tech.";
+  const UNSURE = "I couldn't confirm it sent. It may have arrived, so email hello@neon1.tech before sending again.";
   let pending = false;
 
   // Opening the fold puts the cursor in the first field it asks for
@@ -31,7 +31,7 @@ if (fold && form) {
     const clean = (el) => el.value.trim().replace(/\s+/g, " ");
     const today = clean(f.today), name = clean(f.name), org = clean(f.company), other = clean(f.other), where = clean(f.foundOther);
     if (!today) out.push(["today", "Say what's going on."]);
-    else if (today.length < 10) out.push(["today", "Tell me a little more, at least 10 characters."]);
+    else if (today.length < 10) out.push(["today", "Add a little more, at least 10 characters."]);
     if (!name) out.push(["name", "Add your name."]);
     else if ((name.match(/\p{L}/gu) || []).length < 2) out.push(["name", "Enter at least 2 letters of your name."]);
     if (!/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(f.email.value.trim())) out.push(["email", "Enter a full email address, like you@company.com."]);

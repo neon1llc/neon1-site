@@ -17,7 +17,7 @@ if (form) {
   const submit = form.querySelector('[type="submit"]');
 
   const WAIT = 15000;
-  const UNSURE = "I couldn't confirm that was sent. It may still have arrived, so before sending it again, please email hello@neon1.tech.";
+  const UNSURE = "I couldn't confirm it sent. It may have arrived, so email hello@neon1.tech before sending again.";
   const NO_NET = "That didn't send. You can also email hello@neon1.tech.";
   let pending = false;
 

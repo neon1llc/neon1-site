@@ -183,7 +183,7 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
   // The greeting says plainly that Neo is automated
   const log = el("div", "n1chat-log", null, { role: "log", "aria-live": "polite" });
   const hello = el("div", "n1chat-msg n1chat-bot");
-  render(hello, "Hi, I'm Neo, neon1's automated assistant. Ask about services, how a project works, the case studies, or 1NEON.");
+  render(hello, "I'm Neo, neon1's automated assistant. Ask about services, process, case studies, or 1NEON.");
 
   // Suggested questions, shown until the first question is asked
   const chips = el("div", "n1chat-chips");
@@ -211,7 +211,7 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
 
   // A reminder by the box: Neo needs nothing private. The policy opens in a new tab, since the
   // conversation lives only in this page
-  const note = el("p", "n1chat-note", "Please don't share passwords, health details, or anything private. ", { id: "n1chat-note" });
+  const note = el("p", "n1chat-note", "Don't share passwords, health details, or anything private. ", { id: "n1chat-note" });
   note.append(el("a", "n1chat-plain", "Privacy", { href: "/1NEON/privacy", target: "_blank", rel: "noopener" }));
 
   // A person is always one click away, whatever Neo says
@@ -454,11 +454,11 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
   // What to say when a question gets no answer. A long question and a long conversation are
   // told apart: the first is the visitor's to shorten, the second the window fixes itself
   function trouble(res, data, late) {
-    if (late) return "Neo is taking too long to answer. Please try again in a moment.";
-    if (!res) return "No connection right now. Please try again in a moment.";
-    if (data.code === "question_too_long") return `Please keep your question under ${LIMITS.chars.toLocaleString("en-US")} characters.`;
-    if (data.code === "conversation_too_long") return "This conversation got longer than Neo can follow, so Neo will start fresh from your next question.";
-    return data.error ?? "Neo couldn't answer just now. Please try again in a moment.";
+    if (late) return "Neo is taking too long to answer. Try again in a moment.";
+    if (!res) return "No connection. Try again in a moment.";
+    if (data.code === "question_too_long") return `Keep your question under ${LIMITS.chars.toLocaleString("en-US")} characters.`;
+    if (data.code === "conversation_too_long") return "This conversation is too long for Neo to follow, so Neo will start fresh with your next question.";
+    return data.error ?? "Neo couldn't answer. Try again in a moment.";
   }
 
   // ---- Ask: the recent turns go up, one reply comes back ----
@@ -466,7 +466,7 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
     q = q.trim();
     if (!q || active) return;
     // Still resting: the question stays in the box for later, and nothing is sent
-    if (resting()) return void say(`Neo is still resting ${left()}. Your question will wait in the box.`, "bot");
+    if (resting()) return void say(`Neo is still resting ${left()}. Your question stays in the box.`, "bot");
     // The box can't hold more than the limit, but a pasted or scripted question still gets words
     if (q.length > LIMITS.chars) return void say(trouble({}, { code: "question_too_long" }), "bot");
 
