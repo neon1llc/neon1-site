@@ -4,6 +4,17 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+### Changed
+- On a phone or tablet the landing scrolls with the browser's own momentum, as roadmap.sh does, instead of steering the finger. A flick can carry across several sections. Once it stops, the page eases to the nearest section edge, like a detent, and touching again during that settle takes the page back. Wheel, trackpad, and keyboard keep the steered resistance.
+- "No account needed" is gone from the first screen, services, process, contact, and the questions. The free call is "book a call" or "the first call", and "free" stays where it names the free 1NEON account and its assessment.
+- The Selected work links on the Sentinel first screen take you to the client work section first, then open the card there from its place, so closing returns to it.
+- The top bar stays usable while a case or service panel is open: pressing a link, the menu button, or a switch in it closes the panel first, then acts. Pressing outside the panel closes it, as before.
+- The Sentinel first screen has the same room under it as every other section, so the pitch clears the phone toolbar and Neo's button.
+
+### Fixed
+- Closing the phone menu no longer flashes its links: the fade replayed the links' entrance from invisible. The bar's menu look, the scroll lock, and the focus move now wait for the fade's first frame.
+- In the footer's copyright strip, a wrapped line sits 8px from the one above, whichever group it wraps in; the version used to sit closer than the other lines.
+
 ## v0.84.0
 
 ### Changed
