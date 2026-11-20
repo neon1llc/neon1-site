@@ -511,7 +511,7 @@ for (const motion of ["reduce", "no-preference"]) {
       await link.click();
       expect(await landed(page, "migration"), "the link did not land on case-migration");
       await page.goBack();
-      const back = await page.waitForFunction((at) => location.hash !== "#case-migration" && Math.abs(scrollY + innerHeight / 2 - at) < innerHeight / 2, at, { timeout: 5000 }).then(() => true, () => false);
+      const back = await polled(page, (at) => location.hash !== "#case-migration" && Math.abs(scrollY + innerHeight / 2 - at) < innerHeight / 2, at).then(() => true, () => false);
       expect(back, "Back did not return to the form", { at, now: await page.evaluate(() => [location.hash, scrollY, innerHeight]) });
       await page.goForward();
       expect(await landed(page, "migration"), "Forward did not return to case-migration");
