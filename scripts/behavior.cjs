@@ -1109,6 +1109,24 @@ check("browser", "look: the footer buttons switch Sentinel and Matrix on any pag
   } finally { await context.close(); }
 });
 
+// The bar's boxes sit in the same places on the landing, the Knowledge Center, and the blog on a phone and at 900px, in both looks
+for (const style of ["sentinel", "matrix"]) {
+  check("browser", `bar: the logo, light/dark switch, and menu button sit in the same places on the landing, the Knowledge Center, and the blog at 390 and 900px (${style})`, async () => {
+    for (const width of [390, 900]) {
+      const spots = [];
+      for (const url of ["/", "/knowledge/", "/blog/"]) {
+        const { page, context } = await open({ viewport: { width, height: 800 }, hasTouch: width < 500, init: style === "matrix" ? MATRIX_STYLE : undefined }, url);
+        try {
+          await page.waitForLoadState("load");
+          await page.waitForTimeout(500);
+          spots.push(await page.evaluate(() => [".n1-logo", ".theme-sw:not(.style-sw)", ".menu-btn"].map((s) => { const r = document.querySelector(s).getBoundingClientRect(); return [Math.round(r.left), Math.round(r.width)]; })));
+        } finally { await context.close(); }
+      }
+      expect(JSON.stringify(spots[0]) === JSON.stringify(spots[1]) && JSON.stringify(spots[0]) === JSON.stringify(spots[2]), `the bar differs between pages at ${width}px`, spots);
+    }
+  });
+}
+
 // Switching the look from the footer keeps the choice where it is on screen: the first screens differ in height, and the page used to jump
 check("browser", "look: switching Matrix to Sentinel from the footer does not move the choice on screen", async () => {
   const { page, context, errors } = await open({ viewport: { width: 390, height: 844 } }, "/");

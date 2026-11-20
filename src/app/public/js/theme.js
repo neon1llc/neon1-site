@@ -96,6 +96,14 @@
     const current = ++revision;
     const next = wantedLook();
     if (root.dataset.siteLook === next) return;
+    // Sentinel to Matrix: the light page goes down to the dark and the rain page comes up out of it. The browser's own fade between the two
+    // let the light page show through the dark one as a grey haze, with the rain's glass area darker than the rest
+    if (root.dataset.siteStyle === "sentinel" && (next === "awake" || next === "plugged") && !still.matches && root.dataset.motion !== "off" && typeof document.startViewTransition === "function") {
+      root.classList.add("dusk-vt");
+      const done = () => root.classList.remove("dusk-vt");
+      try { document.startViewTransition(() => { if (current === revision) apply(wantedLook()); }).finished.then(done, done); } catch { done(); apply(next); }
+      return;
+    }
     if (next === "providence" || next === "desert-of-the-real" || root.dataset.siteStyle === "sentinel") { apply(next); return; }
     if (root.dataset.siteTheme === "matrix") dawn(() => { if (current === revision) apply(wantedLook()); });
     else { shift(next); apply(next); }

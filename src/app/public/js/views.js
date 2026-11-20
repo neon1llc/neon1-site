@@ -207,7 +207,7 @@
     const fromView = views[from], toView = views[i];
     pull = 0; pullDir = 0;
     const distance = Math.abs(dest - y);
-    const duration = opts.detent ? Math.min(0.55, 0.28 + distance / 2400) : Math.min(1.25, 0.7 + distance / 4000);
+    const duration = opts.detent ? Math.min(0.5, 0.24 + distance / 2800) : Math.min(1.25, 0.7 + distance / 4000);
     if (fromView !== toView && fromView !== hero && visited.has(fromView)) animate(fromView, { opacity: 0 }, { duration: duration * 0.6 });
     let entered = false;
     blockUntilIdle = true;
@@ -482,10 +482,24 @@
       const i = indexAt(at), [, bottom] = range(i);
       if (at <= bottom + 2 || i === views.length - 1) return; // inside a view
       const nextTop = range(i + 1)[0];
-      goTo(at - bottom <= nextTop - at ? i : i + 1, { y: at - bottom <= nextTop - at ? bottom : nextTop, detent: true });
+      // The pointer leans with the travel: a scroll still heading down takes the next view from 38% of the way across the gap, one
+      // heading up gives it up from 62%, and one with no direction splits the gap evenly. So a flick that has slowed just past an edge
+      // is caught on the far side, and one that has slowed just short is caught on the near side
+      const share = (at - bottom) / Math.max(1, nextTop - bottom), lean = travel > 0 ? 0.38 : travel < 0 ? 0.62 : 0.5;
+      const forwards = share >= lean;
+      goTo(forwards ? i + 1 : i, { y: forwards ? nextTop : bottom, detent: true });
     }, wait);
   }
-  addEventListener("scroll", () => rest(), { passive: true });
+  // How fast and which way the page is travelling, so the detent can lean with it and catch a scroll that has slowed
+  let travel = 0, speed = 0, seenAt = scrollY, seenTime = performance.now();
+  addEventListener("scroll", () => {
+    const now = performance.now(), dy = scrollY - seenAt;
+    speed = Math.abs(dy) / Math.max(1, now - seenTime);
+    if (dy) travel = Math.sign(dy);
+    seenAt = scrollY; seenTime = now;
+    // Slowed to a crawl (under 0.3px/ms), the pointer engages at once instead of waiting for the scroll to stop
+    rest(speed < 0.3 ? 70 : 160);
+  }, { passive: true });
   addEventListener("focusout", () => rest(400));
   addEventListener("pageshow", () => rest());
   if (window.visualViewport) visualViewport.addEventListener("resize", () => rest(300));

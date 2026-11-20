@@ -73,6 +73,13 @@
 :root.dawn-vt::view-transition-old(n1-logo), :root.dawn-vt::view-transition-old(n1-neo) { animation: dawn-glow-out var(--dawn) var(--dawn-ease) both !important; }
 @keyframes dawn-glow-out { from { opacity: 1; } 40% { opacity: .65; } to { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { :root.dawn-vt::view-transition-new(*) { animation: none !important; } }
+/* Sentinel to Matrix: the light page fades down to the page's dark and the rain page comes up out of it, so no light page shows through */
+:root.dusk-vt::view-transition { background: #0d0208; }
+:root.dusk-vt::view-transition-old(root) { animation: dusk-out .4s ease-in both; mix-blend-mode: normal; }
+:root.dusk-vt::view-transition-new(root) { animation: dusk-in .7s ease-out .3s both; mix-blend-mode: normal; }
+@keyframes dusk-out { to { opacity: 0; } }
+@keyframes dusk-in { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { :root.dusk-vt::view-transition-old(root), :root.dusk-vt::view-transition-new(root) { animation: none !important; } }
 
 /* ---- Neon: the theme switch flickers like a sign ----
    The logo, its wordmark, and Neo's launcher are the neon: lighting up (matrix) they ease up smoothly once and hold;
@@ -237,7 +244,7 @@ a { color: var(--glow); text-decoration-thickness: 1px; text-underline-offset: 3
 :root[data-site-style="sentinel"] .n1-bar .theme-sw.style-sw { order: 0; margin: 0 -72px 0 0; transform: translateX(-52px); }
 @media (max-width: 1040px) {
   :root[data-site-style="sentinel"] .n1-bar .theme-sw.style-sw { margin-left: auto; }
-  :root[data-site-style="sentinel"] .n1-bar .theme-sw:not(.style-sw) { margin-left: 12px; }
+  :root[data-site-style="sentinel"] .n1-bar:has(.style-sw) .theme-sw:not(.style-sw) { margin-left: 12px; } /* pages without the style switch keep the pinned-right default */
 }
 :root[data-site-style="sentinel"] .n1-bar:not([data-top]) .style-sw { display: inline-block; visibility: hidden; pointer-events: none; }
 @media (max-width: 369.98px) { :root[data-site-style="sentinel"] .n1-bar .theme-sw.style-sw { display: none; } :root[data-site-style="sentinel"] .n1-bar .theme-sw:not(.style-sw) { margin-left: auto; } }

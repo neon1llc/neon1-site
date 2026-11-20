@@ -17,7 +17,12 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - The theme choice moved from under the footer's logo and slogan to the first line of the copyright strip, ending where the report line ends. It reads "theme", matrix first, then sentinel. The footer's link lists have their earlier spacing again; their 44px touch areas come from the links' own padding box, not from taller rows.
 - The Matrix landing's description and "Discuss a project" are always two lines. The link is white and underlined, and turns matrix green when pointed at or focused.
 
+- The section detent is stronger. It leans with the travel: a scroll still heading down takes the next section from 38% of the way across, one heading up gives it up from 62%, and it engages as soon as the scroll slows to a crawl instead of waiting for it to stop. The catch is also a little quicker.
+- Switching from Sentinel to Matrix no longer shows the light page through the dark one as a grey haze with a darker box in the middle. The light page fades down to the page's dark and the rain page comes up out of it.
+- In About, "LinkedIn profile" is an outbound link, and the sentence saying past work belonged to employers and their clients is gone (the Knowledge Center's About too, in corpus v0.51.2). "Portal trial" opens in the same tab, so Back works from it.
+
 ### Fixed
+- The top bar on the Knowledge Center and the blog keeps the light/dark switch and menu button pinned right, as on the landing. A rule meant for the landing's two switches pushed the light/dark switch against the logo there.
 - Back after a link to a section of the landing page (the menu, the logo, "Discuss a project", "See the work") returns to where the link was pressed. Each of those links used to replace the page's history entry instead of adding one, so Back left the site or skipped the landing. Each now adds an entry that remembers where the page stood, and Back, Forward, and reload restore every entry's exact spot. `make history` runs the whole matrix, on an iPhone profile in WebKit and Chromium, in both looks: every menu, button, footer, card, and cross-page link, A to B and Back and Forward, multi-step walks, and reloads.
 - Switching the look from the footer keeps the choice where it is on screen, so the page no longer jumps when the first screen's height changes.
 - Dark mode no longer sets running text wider than light mode. It added letter spacing, so a line could wrap differently after switching and move everything below it.
