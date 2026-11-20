@@ -454,7 +454,11 @@ a:not(.ext):is(:hover, :focus-visible) { text-decoration-color: currentColor; }
   .legal :is(a.report-bug, a.report-feedback)::after { content: ""; position: absolute; inset: -15px -4px; }
   .legal .look-opt { position: relative; }
   .legal .look-opt::after { content: ""; position: absolute; inset: -14px -6px; }
-  .kc-path li > a, .repo h3 > a { display: inline-flex; align-items: center; min-height: 44px; }
+  .repo h3 > a { display: inline-flex; align-items: center; min-height: 44px; }
+  /* The Start here cards keep their lines close: the tap area reaches halfway to the next line instead of adding height */
+  .kc-path li > a { position: relative; }
+  .kc-path li > a::after { content: ""; position: absolute; inset: -6px -4px; }
+  .kc-path li + li { margin-top: var(--sp-2); }
   .kc-shelf-desc a { display: inline-block; padding-block: 12px; margin-block: -12px; }
   .legal :is(.policies, .owner) a { position: relative; }
   .legal :is(.policies, .owner) a::after { content: ""; position: absolute; inset: -13px -4px; }
