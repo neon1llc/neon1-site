@@ -347,7 +347,8 @@ footer .foot h2 { font: 600 13px var(--mono); letter-spacing: .01em; color: var(
 .foot .slogan { margin: 0; }
 /* The look picker: two plain text buttons for the same choice as the bar's style switch, which only the landing's first screen shows */
 /* The theme choice: the legal strip's first line, ending where the report line ends */
-.legal .look-pick { flex: 0 0 100%; display: flex; justify-content: flex-end; align-items: baseline; gap: 6px; margin: 0; font: 12px var(--mono); }
+/* 32px under it, the room between the copyright lines and the report line (the strip's bottom padding less half the launcher row), the strip's 8px gap included */
+.legal .look-pick { flex: 0 0 100%; display: flex; justify-content: flex-end; align-items: baseline; gap: 6px; margin: 0 0 24px; font: 12px var(--mono); }
 @media (min-width: 1320px) { .legal .look-pick { margin-right: calc(-1 * ((100vw - var(--sbw, 0px) - 1200px) / 4 + 38px)); } }
 .legal .look-lead { margin-right: .4em; }
 .legal .look-opt { padding: 0; border: 0; background: none; color: var(--muted); font: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; cursor: pointer; }
@@ -368,7 +369,7 @@ footer .foot h2 { font: 600 13px var(--mono); letter-spacing: .01em; color: var(
 .legal .sep { opacity: .6; }
 /* A separator inside running text (the contact table): the footer's backslash, with room on both sides */
 .sep { font-family: var(--mono); opacity: .6; margin: 0 .2em; }
-/* The legal line mixes links and plain text ("no ads or trackers"), so its internal links are underlined, thinly and in the line's own gray, to tell them apart; internal links never carry an arrow */
+/* The legal line sits among plain text, so its internal links are underlined, thinly and in the line's own gray, to tell them apart; internal links never carry an arrow */
 .legal a:not(.ext) { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: currentColor; }
 /* The copyright line ends with the company's public state record: an internal link, so it carries no arrow */
 .legal .owner { display: inline-flex; gap: 8px; flex-wrap: wrap; align-items: baseline; }

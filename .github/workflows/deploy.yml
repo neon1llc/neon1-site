@@ -223,6 +223,42 @@ jobs:
           ONLY: ${{ needs.changes.outputs.only }}
         run: make behavior
 
+  # Back, Forward, and reload at the exact spot, for every menu, button, footer, card, and cross-page link, on an iPhone profile in
+  # WebKit and in Chromium, in both looks (scripts/history.cjs). One job for each engine and look, beside the behavior shards
+  history:
+    needs: [plan, build, changes]
+    if: needs.plan.outputs.go == 'true' && needs.changes.outputs.behavior == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [webkit, chromium]
+        look: [sentinel, matrix]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: knowledge/package-lock.json
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: site
+          path: ${{ runner.temp }}/site
+      - run: tar xzf "$RUNNER_TEMP/site/site.tgz" -C src/app/public
+      - name: Install Playwright and its browser
+        run: |
+          npm ci --prefix knowledge
+          npx --prefix knowledge playwright install --with-deps ${{ matrix.engine }}
+      - name: make history (${{ matrix.engine }}, ${{ matrix.look }})
+        env:
+          NODE_PATH: ${{ github.workspace }}/knowledge/node_modules
+          ENGINES: ${{ matrix.engine }}
+          LOOKS: ${{ matrix.look }}
+        run: make history
+
   # The chat window's checks, beside the shards, when the chat or anything shared changed
   chat:
     needs: [plan, build, changes]
@@ -255,8 +291,8 @@ jobs:
   # schedule run that found a new corpus release comes here too, since dev must show the release production does.
   # The called workflows need contents to push dev and an OIDC token for the dev deploy role
   dev:
-    needs: [plan, changes, build, check, behavior, chat, pdf]
-    if: ${{ always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.plan.outputs.go == 'true' && needs.build.result == 'success' && needs.check.result == 'success' && contains('success skipped', needs.behavior.result) && contains('success skipped', needs.chat.result) && contains('success skipped', needs.pdf.result) }}
+    needs: [plan, changes, build, check, behavior, history, chat, pdf]
+    if: ${{ always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.plan.outputs.go == 'true' && needs.build.result == 'success' && needs.check.result == 'success' && contains('success skipped', needs.behavior.result) && contains('success skipped', needs.history.result) && contains('success skipped', needs.chat.result) && contains('success skipped', needs.pdf.result) }}
     uses: ./.github/workflows/dev-sync.yml
     with:
       corpus_tag: ${{ needs.plan.outputs.corpus_tag }}
@@ -268,8 +304,8 @@ jobs:
   # CloudFront before then. It uploads the site the checks ran on, so it needs no Node, Playwright, or build
   # A job skipped because nothing it covers changed counts as passed; one skipped because something before it failed does not (build and check must succeed)
   deploy:
-    needs: [plan, changes, build, check, behavior, chat, pdf]
-    if: ${{ always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.plan.outputs.go == 'true' && needs.changes.result == 'success' && needs.build.result == 'success' && needs.check.result == 'success' && contains('success skipped', needs.behavior.result) && contains('success skipped', needs.chat.result) && contains('success skipped', needs.pdf.result) }}
+    needs: [plan, changes, build, check, behavior, history, chat, pdf]
+    if: ${{ always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.plan.outputs.go == 'true' && needs.changes.result == 'success' && needs.build.result == 'success' && needs.check.result == 'success' && contains('success skipped', needs.behavior.result) && contains('success skipped', needs.history.result) && contains('success skipped', needs.chat.result) && contains('success skipped', needs.pdf.result) }}
     runs-on: ubuntu-latest
     env:
       CORPUS_TAG: ${{ needs.plan.outputs.corpus_tag }}

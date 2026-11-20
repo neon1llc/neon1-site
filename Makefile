@@ -36,7 +36,7 @@ GITLEAKS_IMAGE := ghcr.io/gitleaks/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79
 
 # Plain make shows the help
 .DEFAULT_GOAL := help
-.PHONY: help content corpus-tag static corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf releases-export blog blog-check blog-export report-bug report-bug-check feedback feedback-check check html js links logic frame frame-check release rollback manifest rehash models budget secrets behavior perf serve three icons deploy invalidate verify indexnow dev-build dev-check dev-push dev-drop dev-rollback dev-gate dev-signout dev-allow dev-deny
+.PHONY: help content corpus-tag static corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf releases-export blog blog-check blog-export report-bug report-bug-check feedback feedback-check check html js links logic frame frame-check release rollback manifest rehash models budget secrets behavior history perf serve three icons deploy invalidate verify indexnow dev-build dev-check dev-push dev-drop dev-rollback dev-gate dev-signout dev-allow dev-deny
 
 
 ##@ Checks
@@ -182,6 +182,11 @@ budget: ## Fail if the deployed files outside the knowledge center exceed BUDGET
 behavior: ## Check the contact form, case studies, case links, and white rabbit in a real browser
 	@command -v node >/dev/null 2>&1 || { echo "behavior: install Node.js"; exit 1; }
 	node scripts/behavior.cjs $(SITE_DIR)
+
+# Back, Forward, and reload at the exact spot, on an iPhone profile in WebKit and Chromium, both looks; ENGINES, LOOKS, and ONLY narrow it
+history: ## Check that Back, Forward, and reload restore the exact spot for every link, in WebKit and Chromium
+	@command -v node >/dev/null 2>&1 || { echo "history: install Node.js"; exit 1; }
+	node scripts/history.cjs $(SITE_DIR)
 
 # Also headless Chromium, and a few minutes of software rendering, so it stays out of check too
 perf: ## Measure the white rabbit's draw calls, triangles, and resources, and fail past scripts/perf-budget.json

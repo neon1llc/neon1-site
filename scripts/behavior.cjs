@@ -1109,6 +1109,28 @@ check("browser", "look: the footer buttons switch Sentinel and Matrix on any pag
   } finally { await context.close(); }
 });
 
+// Switching the look from the footer keeps the choice where it is on screen: the first screens differ in height, and the page used to jump
+check("browser", "look: switching Matrix to Sentinel from the footer does not move the choice on screen", async () => {
+  const { page, context, errors } = await open({ viewport: { width: 390, height: 844 } }, "/");
+  try {
+    await page.addInitScript(() => { try { localStorage.setItem("neon1.style", "matrix"); } catch { /* storage off */ } });
+    await page.reload({ waitUntil: "load" });
+    await page.waitForTimeout(800);
+    await page.evaluate(() => dispatchEvent(new WheelEvent("wheel", { deltaY: 1, bubbles: true })));
+    await page.evaluate(() => scrollTo({ top: document.body.scrollHeight, behavior: "instant" }));
+    await page.waitForTimeout(600);
+    const top = () => page.evaluate(() => Math.round(document.querySelector(".look-pick").getBoundingClientRect().top));
+    const before = await top();
+    await page.locator('.look-pick [data-look="sentinel"]').click();
+    await page.waitForTimeout(900);
+    const after = await top();
+    // The footer's own text sets differently in the two looks (Matrix's is larger and wraps more, 30px at this width), and at the very
+    // bottom the page cannot scroll further to make that up; the 470px the first screens differ by is what must not show
+    expect(Math.abs(after - before) <= 40, "the footer's theme choice moved when the look changed", { before, after });
+    expect(!errors.length, "page errors", errors);
+  } finally { await context.close(); }
+});
+
 // ---- AUDIT-07: a fold pressed while it moves turns round from where it is ----
 check("browser", "folds: pressing a home fold while it opens or closes reverses it, and an odd or even run of presses ends open or shut with the arrow to match (motion)", async () => {
   const { page, context, errors } = await open({ reducedMotion: "no-preference" });

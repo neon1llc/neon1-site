@@ -163,10 +163,22 @@
       b.setAttribute("aria-pressed", String((b.dataset.look === "sentinel") === (style() === "sentinel")));
       b.addEventListener("click", () => {
         if (style() === b.dataset.look) return;
+        // The two looks differ in height above the footer (Sentinel's first screen is taller than Matrix's), so the page would jump:
+        // the choice stays where it is on screen while the layout changes, for the moment the change takes to settle
+        const row = (b.closest && b.closest(".look-pick")) || b, can = typeof row.getBoundingClientRect === "function" && typeof scrollBy === "function";
+        const from = can ? row.getBoundingClientRect().top : 0;
+        const hold = () => { if (!can) return; const d = row.getBoundingClientRect().top - from; if (Math.abs(d) > 0.5) scrollBy({ top: d, behavior: "instant" }); };
+        const watch = can && window.ResizeObserver ? new ResizeObserver(hold) : null;
+        watch?.observe(document.documentElement);
+        const stop = () => { watch?.disconnect(); for (const ev of ["wheel", "touchstart", "keydown"]) removeEventListener(ev, stop, true); };
+        for (const ev of ["wheel", "touchstart", "keydown"]) addEventListener(ev, stop, { capture: true, passive: true });
+        setTimeout(stop, 1200);
         write(KEY_MODE, mode());
         write(KEY_STYLE, b.dataset.look);
         write(KEY_SHARED, "1");
         change();
+        hold();
+        if (can) requestAnimationFrame(() => requestAnimationFrame(hold));
       });
     });
   }

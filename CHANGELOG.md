@@ -13,10 +13,13 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 - The first-screen line is "reach by email \ book a call \ portal trial" in the report line's style, all outbound links; "portal trial" shows only while sign-up is open. "No account needed" is gone.
 - On the Sentinel landing the style switch sits beside the light/dark switch, never beside the logo, takes no room in the bar, and stays through the whole first screen. It hides once the page moves on to the next section, not on the first scroll.
+- "No ads or trackers" is gone from the footer; the policies say it.
 - The theme choice moved from under the footer's logo and slogan to the first line of the copyright strip, ending where the report line ends. It reads "theme", matrix first, then sentinel. The footer's link lists have their earlier spacing again; their 44px touch areas come from the links' own padding box, not from taller rows.
 - The Matrix landing's description and "Discuss a project" are always two lines. The link is white and underlined, and turns matrix green when pointed at or focused.
 
 ### Fixed
+- Back after a link to a section of the landing page (the menu, the logo, "Discuss a project", "See the work") returns to where the link was pressed. Each of those links used to replace the page's history entry instead of adding one, so Back left the site or skipped the landing. Each now adds an entry that remembers where the page stood, and Back, Forward, and reload restore every entry's exact spot. `make history` runs the whole matrix, on an iPhone profile in WebKit and Chromium, in both looks: every menu, button, footer, card, and cross-page link, A to B and Back and Forward, multi-step walks, and reloads.
+- Switching the look from the footer keeps the choice where it is on screen, so the page no longer jumps when the first screen's height changes.
 - Dark mode no longer sets running text wider than light mode. It added letter spacing, so a line could wrap differently after switching and move everything below it.
 - Closing the phone menu no longer flashes its links: the fade replayed the links' entrance from invisible. The bar's menu look, the scroll lock, and the focus move now wait for the fade's first frame.
 - In the footer's copyright strip, a wrapped line sits 8px from the one above, whichever group it wraps in; the version used to sit closer than the other lines.

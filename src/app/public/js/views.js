@@ -376,8 +376,13 @@
     if (!menu.hidden && !menu.classList.contains("closing")) document.getElementById("menuBtn").click();
     // Every section link puts its #section in the address, so the view can be shared; only the logo goes home to "/".
     // The top bar's Contact link points at /#contact so it also works from other pages, which is why it carries data-view
-    history.replaceState(null, "", a.dataset.view === "top" ? "/" : "#" + id);
-    forgetSaved(); // the entry's state was just cleared: save where it ends up, even if that is where the last save was
+    // Each is a new history entry, so Back returns to where the link was pressed: the entry being left keeps its spot first. A link to
+    // the place the page already stands at (the same address, resting on that section's top) replaces instead, so it adds nothing
+    const url = a.dataset.view === "top" ? "/" : "#" + id;
+    const sameAddress = location.pathname + location.search + location.hash === location.pathname + location.search + (url === "/" ? "" : url);
+    if (sameAddress && Math.abs(scrollY - range(i)[0]) <= 2) history.replaceState(history.state, "", url);
+    else { keepSpot(); history.pushState(null, "", url); }
+    forgetSaved(); // the entry just made has no record yet: save where it ends up, even if that is where the last save was
     goTo(i, { link: true });
     // Keyboard focus follows the view, so the next Tab continues inside it (AS-02); the logo keeps its own
     if (!a.dataset.view) window.n1focus?.(id);
