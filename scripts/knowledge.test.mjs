@@ -48,7 +48,7 @@ function fixture({ dropId = null, noPdf = [] } = {}) {
   // The bar and phone menu links come from the home page, so the fixture home page carries a few
   const bar = `<ul class="links">\n        <li><a href="#work">code</a></li>\n        <li><a href="/knowledge/">knowledge</a></li>\n        ${frame("actions")}</ul>`
   const menu = `<div class="menu" id="menu" hidden>\n    <ul>\n      <li><a href="#work">code</a></li>\n      <li><a href="/1NEON/" data-handoff>1NEON client portal</a></li>\n    </ul>\n  </div>`
-  writeFileSync(join(site, "index.html"), `<meta name="version" content="v0">${["icons", "logo", "theme", "menu-button", "footer"].map(frame).join("")}${bar}${menu}`)
+  writeFileSync(join(site, "index.html"), `<meta name="version" content="v0">${["icons", "fonts", "logo", "theme", "menu-button", "footer"].map(frame).join("")}${bar}${menu}`)
   writeFileSync(join(site, "sitemap.xml"), "<urlset>\n  <!-- knowledge -->\n  <!-- /knowledge -->\n</urlset>")
   return { exp, site, list }
 }

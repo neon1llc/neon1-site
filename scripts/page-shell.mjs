@@ -73,6 +73,7 @@ ${styles.map((s) => `  <link rel="stylesheet" href="${s}" />`).join("\n")}
   <header class="n1-bar light">
     <nav class="n1-inner" aria-label="Main">
       ${frame.block("logo")}
+  ${frame.block("fonts")}
       <ul class="links">
 ${navLinks}
         ${frame.block("actions")}
