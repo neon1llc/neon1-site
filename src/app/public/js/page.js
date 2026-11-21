@@ -59,3 +59,32 @@ if (sections.length && "IntersectionObserver" in window) {
   }, { rootMargin: "-50% 0px -50% 0px" });
   sections.forEach((s) => watch.observe(s));
 }
+
+// ---- The address follows the section the page rests on ----
+// Once the page stops moving, #section is written into the address (the first screen clears it), so the view can be copied or reloaded
+// as it is. It replaces the current history entry and never adds one, so Back and Forward still step between the places the visitor
+// went on purpose (a link, a case card), each entry keeping its own remembered spot. Nothing is written while the page is still landing
+// on a linked section or a remembered spot, over a case card or the chat, or while the hash already names the section in view
+{
+  const started = performance.now();
+  let hands = false, timer = 0;
+  for (const ev of ["pointerdown", "wheel", "touchstart", "keydown"]) addEventListener(ev, () => { hands = true; }, { capture: true, passive: true, once: true });
+  const views = () => [document.querySelector(".hero"), ...document.querySelectorAll(".view")].filter(Boolean);
+  const inView = () => {
+    const list = views(), max = document.documentElement.scrollHeight - innerHeight;
+    let current = list[0];
+    for (const v of list.slice(1)) if (Math.min(Math.round(v.getBoundingClientRect().top + scrollY - 64), max) <= scrollY + 2) current = v;
+    return current;
+  };
+  const write = () => {
+    if (!hands && performance.now() - started < 4000) return;
+    if (history.state?.card || document.body.classList.contains("case-open") || document.body.classList.contains("n1chat-open") || document.body.classList.contains("white-rabbit-on")) return;
+    const v = inView(), want = v.classList.contains("hero") ? "" : v.id;
+    if (!v.classList.contains("hero") && !want) return;
+    const named = decodeURIComponent(location.hash.slice(1)).split("?")[0], el = named && document.getElementById(named);
+    const at = el && el.closest ? (el.closest(".view") || el.closest(".hero")) : null;
+    if (at === v || (!want && !named)) return;
+    history.replaceState(history.state, "", location.pathname + location.search + (want ? "#" + want : ""));
+  };
+  addEventListener("scroll", () => { clearTimeout(timer); timer = setTimeout(write, 250); }, { passive: true });
+}

@@ -96,7 +96,8 @@
     const m = measure(field, cs);
     const multi = field instanceof HTMLTextAreaElement;
     const edgeL = r.left + parseFloat(cs.borderLeftWidth), edgeT = r.top + parseFloat(cs.borderTopWidth);
-    const left = edgeL + m.x;
+    // The bar ends exactly where the text starts: the placeholder neither moves nor leaves a gap, and focus changes nothing but the bar's blink
+    const left = edgeL + m.x - 2;
     const room = edgeL + boxWidth(field, cs) - parseFloat(cs.paddingRight);
     // A line of text longer than the field is shown scrolled to its start, so the end of it is out of sight
     if (!multi && left > room) return hide();

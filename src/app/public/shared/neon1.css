@@ -184,12 +184,11 @@
 :root[data-motion="off"] .n1-fold > summary::after { transition: none; }
 
 /* The Matrix look's input caret (shared/caret.js draws the unfocused one; a focused field uses the browser's own, colored here).
-   Dark green in light mode, Matrix green in dark; Sentinel is left alone. A field with no text and no focus shows its caret first,
-   so its placeholder starts just past it. Only a required one blinks. The blink is the usual one second, off under reduced motion (a steady caret) */
+   Dark green in light mode, Matrix green in dark; Sentinel is left alone. A field with no text and no focus shows its caret
+   where the browser's own would stand, at the very start of the placeholder, which never moves (no gap, no jump on focus). Only a required one blinks. The blink is the usual one second, off under reduced motion (a steady caret) */
 :root:not([data-site-style="sentinel"], [data-style="sentinel"]) { --n1-caret: var(--brand); }
 :root:not([data-site-style="sentinel"], [data-style="sentinel"]):is([data-site-theme="matrix"], [data-theme="matrix"], .n1-dark) { --n1-caret: var(--glow); }
 :root:not([data-site-style="sentinel"], [data-style="sentinel"]) :is(textarea, input:not([type="checkbox"], [type="radio"], [type="file"], [type="range"], [type="color"], [type="submit"], [type="button"], [type="reset"], [type="image"], [type="hidden"])) { caret-color: var(--n1-caret); }
-:root:not([data-site-style="sentinel"], [data-style="sentinel"]) :is(textarea, input):placeholder-shown:not(:focus) { text-indent: calc(var(--sp-0) + var(--sp-1)); }
 :root:not([data-site-style="sentinel"], [data-style="sentinel"]) :is(textarea, input)[data-n1-soft] { caret-color: transparent; }
 .n1-carets { position: absolute; left: 0; top: 0; width: 0; height: 0; z-index: 5; pointer-events: none; } /* below the fixed bar (8), so a field scrolled under it hides its caret too */
 .n1-caret { position: absolute; left: 0; top: 0; width: var(--sp-0); height: var(--h, 1em); background: var(--n1-caret, var(--brand)); opacity: .45; border-radius: 1px;
