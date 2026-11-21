@@ -5,6 +5,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 ## Unreleased
 
 ### Fixed
+- A menu link to the section the address already names (written by the page as you read) adds its own history entry, so Back returns to where you pressed it instead of leaving the site.
 - On a phone, a scroll that slows between two sections settles the way it was going, and no longer jumps back about 290px against it; it turns back only when it stopped almost on the edge it left.
 - On a phone, the bar and Neo's button fade out once while a text field has focus and return after the last field lets go, in place of blinking in and out as the phone pans from one field to the next.
 - On a phone, Neo's launcher stays in place when the menu opens and closes. The menu covers it, as it covers the rest of the page, in place of the launcher disappearing and blinking back.

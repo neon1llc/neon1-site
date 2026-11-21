@@ -416,7 +416,8 @@ let base;
       await page.click(sel.close);
       await page.waitForTimeout(60);
       await interrupt(page);
-      await page.waitForTimeout(150);
+      // The menu covers the chat without hiding it, so the fold finishes beneath it (the slowed 2s); a case study hides it, which ends the fold at once
+      await page.waitForTimeout(name === "the menu opening over it" ? 2200 : 150);
       const s = await state(page);
       assert.ok(usableClosed(s), JSON.stringify(s));
       await page.evaluate(() => document.body.classList.remove("menu-open", "case-open"));

@@ -85,6 +85,7 @@ if (sections.length && "IntersectionObserver" in window) {
     const at = el && el.closest ? (el.closest(".view") || el.closest(".hero")) : null;
     if (at === v || (!want && !named)) return;
     history.replaceState(history.state, "", location.pathname + location.search + (want ? "#" + want : ""));
+    window.n1AutoAddress = location.hash; // views.js: a link to this section still adds the entry it would have added
   };
   addEventListener("scroll", () => { clearTimeout(timer); timer = setTimeout(write, 250); }, { passive: true });
 }

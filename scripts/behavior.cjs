@@ -309,15 +309,15 @@ check("browser", "home: Sentinel's first screen states the offer and the next st
   } finally { await matrix.context.close(); }
 });
 
-check("browser", "home: a wheel gesture past halfway settles on services, and a soft one falls back to the first screen (motion, wide)", async () => {
+check("browser", "home: a wheel gesture settles on services the way it was going, and a tiny one falls back to the first screen (motion, wide)", async () => {
   const { page, context } = await open({ reducedMotion: "no-preference" });
   try {
     await page.waitForLoadState("load");
     await page.mouse.move(640, 450);
-    // A soft push crosses no more than halfway: the page falls back to the first screen
-    for (let i = 0; i < 4; i++) { await page.mouse.wheel(0, 30); await page.waitForTimeout(20); }
+    // A scroll settles the way it was going and turns back only when it stopped almost on the edge it left (12% of the gap)
+    await page.mouse.wheel(0, 6); await page.waitForTimeout(20);
     await polled(page, () => scrollY === 0);
-    // A stronger one carries past halfway and lands on services
+    // A real push lands on services
     for (let i = 0; i < 10; i++) { await page.mouse.wheel(0, 60); await page.waitForTimeout(20); }
     await polled(page, () => Math.abs(document.getElementById("services").getBoundingClientRect().top - 64) < 3);
   } finally { await context.close(); }
@@ -1151,7 +1151,13 @@ for (const [family, look] of [["sentinel", { "neon1.style": "sentinel" }], ["mat
         const { page, context } = await open({ viewport: { width, height: 800 }, init: new Function(init) }, url);
         try { await page.waitForLoadState("load"); boxes[url] = await page.evaluate(BAR_BOXES); } finally { await context.close(); }
       }
-      for (const url of ["/", "/blog/", "/report-bug/"]) expect(JSON.stringify(boxes[url]) === JSON.stringify(boxes["/knowledge/"]), `the bar differs between ${url} and /knowledge/ at ${width}px`, [boxes[url], boxes["/knowledge/"]]);
+      // At the top of the home page the Sentinel style switch stacks above the light/dark switch, which sits 15px lower there: same slot across, other pages unchanged
+      const flat = (url) => (url === "/" && family === "sentinel" ? { ...boxes[url], mode: boxes[url].mode.slice(0, 2) } : boxes[url]);
+      const rest = { ...boxes["/knowledge/"], mode: boxes["/knowledge/"].mode.slice(0, 2) };
+      for (const url of ["/", "/blog/", "/report-bug/"]) {
+        const here = url === "/" && family === "sentinel" ? flat(url) : boxes[url], there = url === "/" && family === "sentinel" ? rest : boxes["/knowledge/"];
+        expect(JSON.stringify(here) === JSON.stringify(there), `the bar differs between ${url} and /knowledge/ at ${width}px`, [here, there]);
+      }
     }
   });
 }

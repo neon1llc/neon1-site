@@ -405,7 +405,8 @@
     // the place the page already stands at (the same address, resting on that section's top) replaces instead, so it adds nothing
     const url = a.dataset.view === "top" ? "/" : a.dataset.view ? "#" + id : a.getAttribute("href");
     const sameAddress = location.pathname + location.search + location.hash === location.pathname + location.search + (url === "/" ? "" : url);
-    if (sameAddress && Math.abs(scrollY - range(i)[0]) <= 2) history.replaceState(history.state, "", url);
+    // An address the page wrote on its own (js/page.js) isn't somewhere the reader went, so it doesn't count as the place
+    if (sameAddress && window.n1AutoAddress !== location.hash && Math.abs(scrollY - range(i)[0]) <= 2) history.replaceState(history.state, "", url);
     else { keepSpot(); history.pushState(null, "", url); }
     forgetSaved(); // the entry just made has no record yet: save where it ends up, even if that is where the last save was
     goTo(i, { link: true });
