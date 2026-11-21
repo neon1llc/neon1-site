@@ -23,6 +23,13 @@
   addEventListener("resize", set);
   // The keyboard takes a moment to close after focus leaves
   addEventListener("focusout", () => { clearTimeout(timer); timer = setTimeout(set, 500); }, true);
+
+  // While a person types on a touch screen, the bar and Neo's button fade out once and stay out, and return after the last field lets go.
+  // The phone pans the page to keep the field above the keyboard, which drags fixed things in and out of sight on every move between fields
+  const touch = matchMedia("(pointer: coarse)");
+  let typed = 0;
+  addEventListener("focusin", () => { if (touch.matches && typing()) { clearTimeout(typed); root.classList.add("n1-typing"); } }, true);
+  addEventListener("focusout", () => { clearTimeout(typed); typed = setTimeout(() => { if (!typing()) root.classList.remove("n1-typing"); }, 450); }, true);
   if (window.visualViewport) visualViewport.addEventListener("resize", set);
   // The scrollbar only appears once the body exists and overflows
   addEventListener("DOMContentLoaded", set);

@@ -199,3 +199,9 @@
 @media (prefers-reduced-motion: reduce) { .n1-caret.live { animation: none; } }
 :root[data-motion="off"] .n1-caret.live { animation: none; }
 .n1-caret-mirror { position: absolute; left: -9999px; top: 0; visibility: hidden; pointer-events: none; overflow: hidden; border: 0; }
+
+/* Typing on a touch screen: the bar and Neo's button fade out and stay out (js/viewport.js sets the class) rather than blinking in and out as the phone pans between fields */
+@media (pointer: coarse) {
+  .n1-bar, .n1chat-launch { transition: opacity var(--t-base) var(--ease); }
+  :root.n1-typing .n1-bar, :root.n1-typing .n1chat-launch { opacity: 0; pointer-events: none; }
+}

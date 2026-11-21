@@ -509,10 +509,10 @@
       const i = indexAt(at), [, bottom] = range(i);
       if (at <= bottom + 2 || i === views.length - 1) return; // inside a view
       const nextTop = range(i + 1)[0];
-      // The pointer leans with the travel: a scroll still heading down takes the next view from 38% of the way across the gap, one
-      // heading up gives it up from 62%, and one with no direction splits the gap evenly. So a flick that has slowed just past an edge
-      // is caught on the far side, and one that has slowed just short is caught on the near side
-      const share = (at - bottom) / Math.max(1, nextTop - bottom), lean = travel > 0 ? 0.38 : travel < 0 ? 0.62 : 0.5;
+      // The pointer leans with the travel: a scroll still heading down takes the next view from 12% of the way across the gap, one
+      // heading up gives it up from 88%, and one with no direction splits the gap evenly. So the page settles the way it was going and
+      // only turns back when it stopped almost on the edge it left; a flick that slowed in the gap never jumps back against its travel
+      const share = (at - bottom) / Math.max(1, nextTop - bottom), lean = travel > 0 ? 0.12 : travel < 0 ? 0.88 : 0.5;
       const forwards = share >= lean;
       goTo(forwards ? i + 1 : i, { y: forwards ? nextTop : bottom, detent: true });
     }, wait);
