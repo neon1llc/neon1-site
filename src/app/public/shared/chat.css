@@ -147,5 +147,7 @@
   .n1chat-log { flex: 0 0 auto; overflow: visible; }
 }
 
-/* The menu, a case study, or the white rabbit owns the screen; the chat steps aside until it closes */
-.n1chat.under-menu, .n1chat-launch.under-menu, body.menu-open .n1chat, body.menu-open .n1chat-launch, body.case-open .n1chat, body.case-open .n1chat-launch, body.white-rabbit-on .n1chat, body.white-rabbit-on .n1chat-launch { display: none; }
+/* A case study or the white rabbit owns the screen; the chat steps aside until it closes */
+body.case-open .n1chat, body.case-open .n1chat-launch, body.white-rabbit-on .n1chat, body.white-rabbit-on .n1chat-launch { display: none; }
+/* The menu is opaque and covers the screen, so the chat goes under it (the menu is z-index 7) and stays put, rather than vanishing and returning as it opens and closes */
+.n1chat.under-menu, .n1chat-launch.under-menu { z-index: 6; }

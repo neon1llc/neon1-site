@@ -5,6 +5,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 ## Unreleased
 
 ### Fixed
+- On a phone, Neo's launcher stays in place when the menu opens and closes. The menu covers it, as it covers the rest of the page, in place of the launcher disappearing and blinking back.
 - On the Matrix landing, a thin light line no longer shows about 40px below "Discuss a project" on an iPhone. The link's dimmed underline was a see-through color, which WebKit paints in the wrong place under text with a wide shadow; it is now an opaque mix.
 
 ### Added
