@@ -4,7 +4,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
-## v0.85.0 - 2026-11-21
+## v0.85.0
 
 ### Fixed
 - A menu link to the section the address already names (written by the page as you read) adds its own history entry, so Back returns to where you pressed it instead of leaving the site.
