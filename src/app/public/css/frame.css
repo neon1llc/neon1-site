@@ -396,6 +396,13 @@ footer .foot h2 { font: 600 var(--fs-sm) var(--mono); letter-spacing: .01em; col
 .legal a:not(.ext) { text-decoration-line: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
 /* The copyright line ends with the company's public state record: an internal link, so it carries no arrow */
 .legal .owner { display: inline-flex; gap: 8px; flex-wrap: wrap; align-items: baseline; }
+/* On a phone these lines wrap, and a backslash left hanging at the end of a line points at nothing. The links are underlined already, so the
+   backslashes go and a wider gap separates them (the report line, which never wraps, keeps its own) */
+@media (max-width: 599px) {
+  .legal .policies { column-gap: var(--sp-4); }
+  .legal .owner a { margin-inline-start: var(--sp-2); }
+  .legal :is(.owner, .policies) .sep { display: none; }
+}
 
 /* Running-text links (about, contact, case studies, the legal line), after the footer's plain links so they win: brand green, bold, and a small
    arrow instead of an underline; the arrow nudges out on hover and focus */
