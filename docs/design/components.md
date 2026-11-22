@@ -7,7 +7,7 @@ What already exists. Extend one of these before building another. Class names ar
 | Part | Where | Notes |
 |---|---|---|
 | Top bar, logo | `.n1-bar`, `.n1-inner`, `.n1-logo` in `shared/neon1.css` | 64px, same boxes on every page. `scripts/frame.py check` fails if a page's bar or footer differs from `index.html`. |
-| Wordmark | `.wm` with `.ne` and `.one`; `.wm-sans`, `.wm-mono` | Always lowercase. The 1 keeps the surrounding size and weight and "neon" is scaled up and lightened to meet it (see DESIGN.md, Wordmark). Never redrawn, stretched, or recolored. Use `.wm-sans` in headings and running text. |
+| Wordmark | `.wm` with `.ne` and `.one` | Branding only: the bar's logo, the landing hero, the footer mark. The 1 keeps the surrounding size and weight and "neon" is scaled up and lightened to meet it (DESIGN.md, Wordmark). Everywhere else `neon1` is plain text at the text's size, lowercase. Never redrawn, stretched, or recolored. |
 | Helper text | `.helper`, `.helper.warn` | One style for every hint, caption, and status line. A problem is the same line in red. |
 | Required mark | `.req` | After the label, sans face at the label's size. |
 | Arrow | `.arr`, `.arr-next`, `.arr-mixed` | Drawn, not typed. Set `--arr-t` where the text weight differs. |

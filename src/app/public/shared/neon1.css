@@ -83,7 +83,8 @@
 /* A glass pane holding a few lines: room inside it about one and a half times the gap between them */
 .glass-pane { padding: 28px 36px; }
 
-/* The neon1 wordmark, one rule for every page and every size. The "1" keeps the surrounding text's size and weight, so it stands at
+/* The neon1 wordmark, one rule wherever it is branding: the logo lockup in the bar, the landing's hero, and the footer's brand mark. In menus,
+   nav items, headings, and running text the name is plain text at the text's own size, never this lockup. The "1" keeps the surrounding text's size and weight, so it stands at
    its figure height. "neon" is drawn larger so its lowercase height meets that figure height, and at a lighter weight so its
    strokes, thickened by the larger size, match the "1" stroke. The ratios come from each face's own metrics, measured by rendering
    them (a weight change alone moves no height, since a face's x-height does not depend on its weight):

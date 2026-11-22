@@ -137,19 +137,11 @@ export const crumbs = (items) => ({
 
 // ---- Parts of a page ----
 
-// The standard neon1 wordmark, the one the top-left logo uses (the rule is above ".wm" in shared/neon1.css): the "1" keeps the
-// surrounding size and weight, and "neon" is drawn larger and lighter so its lowercase meets the 1's height and its strokes
-// match. The look picks the face's values; "face" ("sans" or "mono") forces one where the face is fixed, as a heading is always
-// sans. Size, color, and glow are set by the surrounding element. The wrapper turns off the eyebrow's capitals, so "neon1"
-// never becomes "NEON1".
-export const wordmark = (text, face = "") =>
-  text.replace(/neon1/g, `<span class="wm${face ? ` wm-${face}` : ""}"><span class="ne">neon</span><span class="one">1</span></span>`)
-
 // The band that opens an index page: a small eyebrow, the heading, a lead line, and anything after it (a search box)
 export const band = ({ id, eyebrow, title, lead = "", after = "" }) => `    <section class="kc-band" aria-labelledby="${id}">
       <div class="kc-band-inner">
-        <p class="kc-eyebrow">${wordmark(eyebrow)}</p>
-        <h1 id="${id}">${wordmark(title, "sans")}</h1>
+        <p class="kc-eyebrow">${eyebrow.replace(/neon1/g, '<span class="lc">neon1</span>')}</p>
+        <h1 id="${id}">${title}</h1>
         ${lead ? `<p class="kc-lead">${lead}</p>` : ""}${after}
       </div>
     </section>`
@@ -223,7 +215,7 @@ export function docMain({ crumbs: trail, flag = "", title, summary, facts, short
     <article class="kc-doc">
       <header class="kc-doc-head">
         <nav class="kc-crumbs" aria-label="Breadcrumb">${trailHtml}</nav>
-        ${flag}<h1>${wordmark(esc(title), "sans")}</h1>
+        ${flag}<h1>${esc(title)}</h1>
         <p class="kc-summary">${esc(summary)}</p>
         <dl class="kc-facts">
 ${facts.map(([k, v, html]) => `          <div><dt>${esc(k)}</dt><dd>${html ? v : esc(v)}</dd></div>`).join("\n")}

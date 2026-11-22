@@ -58,14 +58,16 @@ Corners: `--glass-r` 8 for panes and chips, 1NEON's `--r-sm` 10 for controls and
 
 ## Wordmark
 
-`neon1` is set in live text with one rule at every size and on every surface (header, hero, footer, eyebrows, headings, running text, 1NEON, admin). The "1" keeps the surrounding text's size and weight, so it stands at its figure height. "neon" is drawn larger so its lowercase height meets that figure height, and lighter so its strokes, thickened by the larger size, match the "1" stroke. A weight change alone moves no height (a face's x-height does not depend on its weight), so size and weight are matched together. The values come from each face's metrics, measured by rendering them at 6x and comparing ink height and stem width:
+The scaled wordmark is branding only: the logo lockup in the bar, the landing's hero, and the footer's brand mark (and the same three in 1NEON and admin). In menus, nav items, headings, eyebrows, cards, tables, and running text, `neon1` is plain text at the text's own size and weight, always lowercase (wrap it in `.lc` where the stylesheet sets capitals). Do not wrap the name in the lockup to "brand" a sentence or a heading.
+
+Where it is branding, the "1" keeps the surrounding size and weight, so it stands at its figure height. "neon" is drawn larger so its lowercase height meets that figure height, and lighter so its strokes, thickened by the larger size, match the "1" stroke. A weight change alone moves no height (a face's x-height does not depend on its weight), so size and weight are matched together. The values come from each face's metrics, measured by rendering them at 6x and comparing ink height and stem width:
 
 | Face | Used for | `neon` size | `neon` weight | `1` |
 |---|---|---|---|---|
-| JetBrains Mono | Matrix logo, hero, eyebrow, footer mark | 1.3em | 450 | 1em at 700 |
-| Figtree | Sentinel logo, hero, eyebrow, footer mark; headings and running text in both looks | 1.36em | 530 | 1em at 700 |
+| JetBrains Mono | Matrix logo, hero, footer mark | 1.3em | 450 | 1em at 700 |
+| Figtree | Sentinel logo, hero, footer mark | 1.36em | 530 | 1em at 700 |
 
-Markup is `<span class="wm"><span class="ne">neon</span><span class="one">1</span></span>`. The properties `--wm-ne`, `--wm-ne-w`, `--wm-one`, `--wm-one-w` hold the numbers (`:root` has the mono set, and Sentinel's `data-site-style` or `data-style` switches to the Figtree set). Where the face does not follow the look, say so on the wrapper: `.wm-sans` for headings and running text (Figtree in every look), `.wm-mono` for a mono label. Color, glow, size and letter spacing come from the surrounding element. `make behavior` measures it (the "1" height against the mean of n, e, o heights within 0.5px, and the stems within 12%, in Sentinel light and Matrix dark); the review also runs it at 390 and 1440 in WebKit and in all four looks. Plain-text mentions of the name inside a sentence stay plain text. Print (the PDFs) and email set the name in their own styles.
+Markup is `<span class="wm"><span class="ne">neon</span><span class="one">1</span></span>` (the bare `.ne` and `.one` pair also works inside an element that sets the look). The properties `--wm-ne`, `--wm-ne-w`, `--wm-one`, `--wm-one-w` hold the numbers (`:root` has the mono set, and Sentinel's `data-site-style` or `data-style` switches to the Figtree set). Where a branded mark's face does not follow the look, say so on the wrapper: `.wm-sans` or `.wm-mono`. Color, glow, size and letter spacing come from the surrounding element. `make behavior` measures every pair on the page (the "1" height against the mean of the n, e, o heights within 0.5px, and the stems within 12%, in Sentinel light and Matrix dark). Print (the PDFs) and email set the name in their own styles.
 
 ## Links
 
