@@ -9,14 +9,14 @@
   height: 48px; min-width: 48px; padding: 0 var(--sp-3); border-radius: 24px; cursor: pointer;
   font: 500 var(--fs-sm) var(--mono); letter-spacing: .02em; color: var(--neon); background: transparent;
   border: 1px solid var(--neon); transition: background-color .25s, color .25s, border-color .25s, box-shadow .25s; }
-.n1chat-launch:hover { background: rgba(108, 255, 168, .08); }
+.n1chat-launch:hover { background: rgb(var(--neon-rgb) / .08); }
 .n1chat-launch .n1chat-mark { width: 22px; height: 22px; flex: none; }
 .n1chat-label { max-width: 0; opacity: 0; margin-left: 0; overflow: hidden; white-space: nowrap;
   transition: max-width .35s ease, opacity .25s ease, margin-left .35s ease; }
 .n1chat-launch:hover .n1chat-label, .n1chat-launch:focus-visible .n1chat-label, .n1chat-launch.n1chat-peek .n1chat-label {
   max-width: 80px; opacity: 1; margin-left: var(--sp-2); }
 /* On light pages the launcher floats over text of the same paper color, so a soft shadow lifts it off */
-.n1chat-launch.n1chat-light { color: var(--brand); background: var(--paper); border-color: var(--brand); box-shadow: 0 4px 14px rgba(18, 36, 26, .16); }
+.n1chat-launch.n1chat-light { color: var(--brand); background: var(--paper); border-color: var(--brand); box-shadow: 0 4px 14px rgb(var(--ink-shadow-rgb) / .16); }
 .n1chat-launch.n1chat-light:hover { background: #fff; }
 /* On a phone the launcher stays the round mark: its label opening to "ask Neo" covered page text such as a download link */
 @media (max-width: 700px), (hover: none) {
@@ -25,8 +25,8 @@
 .n1chat-hidden { display: none; }
 
 /* ---- The window: colors are variables, so the light look only swaps the palette ---- */
-.n1chat { --bg: rgb(13, 2, 8); --fg: #d8f5e1; --line: rgba(108, 255, 168, .45); --soft: rgba(108, 255, 168, .2);
-  --bot: rgba(0, 59, 0, .45); --you: rgba(108, 255, 168, .14); --muted: #84a98c; --accent: var(--neon);
+.n1chat { --bg: rgb(13, 2, 8); --fg: #d8f5e1; --line: rgb(var(--neon-rgb) / .45); --soft: rgb(var(--neon-rgb) / .2);
+  --bot: rgba(0, 59, 0, .45); --you: rgb(var(--neon-rgb) / .14); --muted: #84a98c; --accent: var(--neon);
   --accent-ink: var(--void); --field: rgba(255, 255, 255, .04); --link: var(--neon);
   position: fixed; left: max(16px, env(safe-area-inset-left)); bottom: var(--n1chat-bottom, max(16px, env(safe-area-inset-bottom))); z-index: 10; width: min(380px, calc(100vw - 32px));
   height: min(540px, calc(100dvh - 80px - var(--n1chat-bottom, 16px))); display: flex; flex-direction: column;
@@ -35,7 +35,7 @@
   transition: background-color .3s, color .3s, border-color .3s; }
 .n1chat.n1chat-light { --bg: var(--paper); --fg: var(--ink); --line: rgba(3, 87, 4, .35); --soft: rgba(3, 87, 4, .14);
   --bot: #fff; --you: rgba(3, 87, 4, .08); --muted: #56665c; --accent: var(--brand); --accent-ink: #fff;
-  --field: #fff; --link: var(--brand); box-shadow: 0 12px 40px rgba(18, 36, 26, .18); }
+  --field: #fff; --link: var(--brand); box-shadow: 0 12px 40px rgb(var(--ink-shadow-rgb) / .18); }
 .n1chat[hidden] { display: none; }
 
 .n1chat-head { display: flex; align-items: center; justify-content: space-between; padding: var(--sp-2) var(--sp-3); border-bottom: 1px solid var(--soft); }

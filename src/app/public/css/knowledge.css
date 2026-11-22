@@ -27,14 +27,14 @@ body.kc { background: var(--page); }
   position: relative; background: #035704; color: var(--band-text);
   box-shadow: 0 1px 0 rgb(var(--ink-rgb) / .08), 0 10px 20px -10px rgb(var(--ink-rgb) / .35); }
 :root[data-site-theme="matrix"] .kc-band { --band-soft: var(--m-muted); --band-eyebrow: var(--neon);
-  background: #0F0A0D; border-bottom: 1px solid rgba(108, 255, 168, .55); box-shadow: 0 1px 18px -4px rgba(108, 255, 168, .35);
-  background-image: linear-gradient(180deg, rgba(108, 255, 168, .13), rgba(108, 255, 168, .03)), radial-gradient(ellipse at 20% 0%, rgba(0, 143, 17, .28), transparent 60%); }
+  background: #0F0A0D; border-bottom: 1px solid rgb(var(--neon-rgb) / .55); box-shadow: 0 1px 18px -4px rgb(var(--neon-rgb) / .35);
+  background-image: linear-gradient(180deg, rgb(var(--neon-rgb) / .13), rgb(var(--neon-rgb) / .03)), radial-gradient(ellipse at 20% 0%, rgba(0, 143, 17, .28), transparent 60%); }
 /* The band's own space: the same above and below its words, and the same on the Knowledge Center and the blog; the Knowledge Center's
    search results line holds its room inside the bottom space (about 26px, less 5 for the line-height gap a lone last line brings), so the box does not grow when a search starts */
 .kc-band-inner { --band-y: 48px; max-width: 1040px; margin: 0 auto; padding: var(--band-y) 24px var(--band-y); }
 .kc-band-inner:has(.kc-results) { padding-bottom: max(8px, calc(var(--band-y) - 21px)); }
 .kc-eyebrow { margin: 0 0 var(--sp-3); font: 600 var(--fs-xs) var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--band-eyebrow); }
-:root[data-site-theme="matrix"] .kc-eyebrow { text-shadow: 0 0 8px rgba(108, 255, 168, .35); }
+:root[data-site-theme="matrix"] .kc-eyebrow { text-shadow: 0 0 8px rgb(var(--neon-rgb) / .35); }
 /* "neon1" stays lowercase. The face's lowercase is 0.55 as tall as its digits (0.73), so "neon" is 1.33 times larger to stand as tall
    as the 1, and its weight drops so the larger strokes read as thick as the 1's */
 .kc-band h1 { margin: 0 0 var(--sp-4); font: 700 clamp(30px, 4.4vw, 48px)/1.12 var(--sans); letter-spacing: -.01em; color: var(--band-text); max-width: 22ch; }
@@ -48,9 +48,9 @@ body.kc { background: var(--page); }
   background: #fff; color: #12241a; font: var(--fs-base) var(--sans); }
 .kc-search input::placeholder { color: #5f7567; }
 .kc-search input:focus { outline: none; border-color: #fff; box-shadow: 0 0 0 3px rgba(255, 255, 255, .35); }
-:root[data-site-theme="matrix"] .kc-search input { border-color: rgba(108, 255, 168, .55); background: rgba(13, 2, 8, .6); color: var(--m-ink); }
+:root[data-site-theme="matrix"] .kc-search input { border-color: rgb(var(--neon-rgb) / .55); background: rgb(var(--void-rgb) / .6); color: var(--m-ink); }
 :root[data-site-theme="matrix"] .kc-search input::placeholder { color: var(--m-faint); }
-:root[data-site-theme="matrix"] .kc-search input:focus { border-color: var(--neon); box-shadow: 0 0 0 3px rgba(108, 255, 168, .2); outline: 2px solid var(--neon); outline-offset: 2px; }
+:root[data-site-theme="matrix"] .kc-search input:focus { border-color: var(--neon); box-shadow: 0 0 0 3px rgb(var(--neon-rgb) / .2); outline: 2px solid var(--neon); outline-offset: 2px; }
 .kc-results { min-height: 1.4em; margin: var(--sp-2) 0 0; font: var(--fs-sm) var(--mono); color: var(--band-soft); }
 
 /* ---- Shelf links under the band ---- */
@@ -63,10 +63,10 @@ body.kc { background: var(--page); }
 .kc-shelves-in { position: relative; max-width: 1040px; height: 100%; margin: 0 auto; padding: 0 var(--sp-5); box-sizing: border-box; }
 .kc-shelves-fold { --fold-arrow: var(--brand); --arr-t: .13em; position: absolute; top: 0; left: 24px; right: 24px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface);
   transition: left .34s cubic-bezier(.28,.11,.32,1), right .34s cubic-bezier(.28,.11,.32,1), top .34s cubic-bezier(.28,.11,.32,1), border-radius .34s cubic-bezier(.28,.11,.32,1), box-shadow .34s cubic-bezier(.28,.11,.32,1), background-color .34s, border-color .34s; }
-.kc-shelves-fold[open] { box-shadow: 0 8px 20px rgba(18,36,26,.07); }
+.kc-shelves-fold[open] { box-shadow: 0 8px 20px rgb(var(--ink-shadow-rgb) / .07); }
 .kc-shelves.is-stuck { --bar-pad: calc((100vw - min(100vw, 1040px)) / 2 + var(--kc-pad)); }
 .kc-shelves.is-stuck .kc-shelves-fold { top: 0; left: calc((100% - 100vw) / 2); right: calc((100% - 100vw) / 2); border-radius: 0; border-color: transparent transparent var(--line);
-  background: rgb(var(--surface-rgb) / .94); -webkit-backdrop-filter: saturate(1.8) blur(16px); backdrop-filter: saturate(1.8) blur(16px); box-shadow: 0 8px 20px rgba(18,36,26,.07); }
+  background: rgb(var(--surface-rgb) / .94); -webkit-backdrop-filter: saturate(1.8) blur(16px); backdrop-filter: saturate(1.8) blur(16px); box-shadow: 0 8px 20px rgb(var(--ink-shadow-rgb) / .07); }
 .kc-shelves-fold > summary { display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; min-height: 44px; padding: 0 var(--bar-pad); cursor: pointer; list-style: none; font: 600 var(--fs-ui) var(--sans); color: var(--brand);
   transition: padding .34s cubic-bezier(.28,.11,.32,1), min-height .34s cubic-bezier(.28,.11,.32,1); }
 .kc-shelves-fold > summary::-webkit-details-marker { display: none; }
@@ -191,7 +191,7 @@ body.kc { background: var(--page); }
   transition: left .34s cubic-bezier(.28,.11,.32,1), right .34s cubic-bezier(.28,.11,.32,1), border-radius .34s cubic-bezier(.28,.11,.32,1),
     box-shadow .34s cubic-bezier(.28,.11,.32,1), background-color .34s; }
 .kc-toc-fold.docked.wide { left: 0; right: 0; border-radius: 0; border-color: transparent transparent var(--line); background: rgb(var(--surface-rgb) / .94);
-  -webkit-backdrop-filter: saturate(1.8) blur(16px); backdrop-filter: saturate(1.8) blur(16px); box-shadow: 0 8px 20px rgba(18,36,26,.07); }
+  -webkit-backdrop-filter: saturate(1.8) blur(16px); backdrop-filter: saturate(1.8) blur(16px); box-shadow: 0 8px 20px rgb(var(--ink-shadow-rgb) / .07); }
 .kc-toc-fold.docked > summary { padding: 0 max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left)); }
 .kc-toc-fold.docked.wide > summary, .kc-toc-fold.docked.wide ol { padding-left: max(24px, env(safe-area-inset-left)); padding-right: max(24px, env(safe-area-inset-right)); }
 @media (max-width: 600px) { .kc-toc-fold.docked.wide > summary, .kc-toc-fold.docked.wide ol { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); } }
@@ -201,7 +201,7 @@ body.kc { background: var(--page); }
 .kc-toc-fold.settling { transition: margin .34s cubic-bezier(.28,.11,.32,1), border-radius .34s cubic-bezier(.28,.11,.32,1),
     box-shadow .34s cubic-bezier(.28,.11,.32,1), background-color .34s; }
 .kc-toc-fold.settling.bleed { margin-left: var(--bleed-l, 0); margin-right: var(--bleed-r, 0); border-radius: 0; border-color: transparent transparent var(--line);
-  background: rgb(var(--surface-rgb) / .94); box-shadow: 0 8px 20px rgba(18,36,26,.07); }
+  background: rgb(var(--surface-rgb) / .94); box-shadow: 0 8px 20px rgb(var(--ink-shadow-rgb) / .07); }
 @media (prefers-reduced-motion: reduce) { .kc-toc-fold.docked, .kc-toc-fold.settling, .kc-toc a { transition: none; } }
 @media (max-width: 1139px) { .has-toc .kc-text h2, .kc-text h2 { scroll-margin-top: 64px; } }
 /* Every Knowledge Center and blog page starts its words at one left edge: the band's (1040px box, its 24px padding), so a reader's eye

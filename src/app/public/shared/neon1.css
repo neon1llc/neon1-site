@@ -19,6 +19,8 @@
   --mark: #327641;
   --paper: #F2F4F2;   /* very light grey: the professional surface */
   --ink: #12241A;
+  /* The same colors as channel triples, so a rule can take an alpha (rgb(var(--neon-rgb) / .4)) without writing the color again */
+  --neon-rgb: 108 255 168; --void-rgb: 13 2 8; --glow-rgb: 0 230 118; --ink-shadow-rgb: 18 36 26; /* ink as a shadow stays dark in both looks, unlike --ink-rgb */
   --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --sans: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --glass-r: 8px;
@@ -99,7 +101,7 @@
 .n1-inner { max-width: 1200px; height: 64px; margin: 0 auto; display: flex; align-items: center; gap: 20px;
   padding: 0 max(24px, env(safe-area-inset-right)) 0 max(24px, env(safe-area-inset-left)); }
 .n1-logo { display: inline-flex; align-items: center; gap: 10px; padding: 7px 12px; border-radius: var(--glass-r); color: var(--neon);
-  text-decoration: none; font: 700 var(--fs-sm) var(--mono); letter-spacing: .06em; text-shadow: 0 0 8px rgba(108, 255, 168, .45); }
+  text-decoration: none; font: 700 var(--fs-sm) var(--mono); letter-spacing: .06em; text-shadow: 0 0 8px rgb(var(--neon-rgb) / .45); }
 /* The logo's padding is its hover pill, so the pill hangs outside the page padding and the mark itself sits on the content's left line, as the menu button and 1NEON sit on the right one */
 .n1-logo { margin-left: -12px; }
 .n1-logo svg { width: 26px; height: 26px; }
@@ -110,7 +112,7 @@
   height: 48px; display: flex; align-items: center; gap: 8px; transition: opacity .3s; }
 .rainctl button { font: var(--fs-xs) var(--mono); color: #84a98c; background: transparent; border: 1px solid rgba(0, 255, 65, .16);
   border-radius: var(--glass-r); padding: 6px 12px; cursor: pointer; }
-.rainctl button:hover, .rainctl button[aria-pressed="true"] { color: var(--glow); border-color: rgba(108, 255, 168, .45); }
+.rainctl button:hover, .rainctl button[aria-pressed="true"] { color: var(--glow); border-color: rgb(var(--neon-rgb) / .45); }
 /* The narrowest phones: tighter chips, so they stay clear of "ask Neo" while it shows its label */
 @media (max-width: 360px) { .rainctl { gap: 6px; } .rainctl button { padding: 6px 9px; } }
 
@@ -118,7 +120,7 @@
    signal dropped; the word itself stays put and readable. Still under reduced motion */
 .glitch { position: relative; display: inline-block; }
 .glitch::before, .glitch::after { content: attr(data-text); position: absolute; inset: 0; pointer-events: none; opacity: 0; }
-.glitch::before { color: var(--neon); text-shadow: -2px 0 rgba(108, 255, 168, .7); animation: n1-tear-a 3.2s steps(1) infinite; }
+.glitch::before { color: var(--neon); text-shadow: -2px 0 rgb(var(--neon-rgb) / .7); animation: n1-tear-a 3.2s steps(1) infinite; }
 .glitch::after { color: #e9ffee; text-shadow: 2px 0 rgba(233, 255, 238, .6); animation: n1-tear-b 3.2s steps(1) infinite; }
 @keyframes n1-tear-a {
   0%, 62%, 100% { opacity: 0; transform: none; clip-path: inset(0); }
