@@ -15,6 +15,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - On a phone, the footer's legal line no longer leaves a backslash hanging at the end of a wrapped line. The links are underlined already, so a wider gap separates them.
 
 ### Changed
+- The About section opens "I'm Pradeep Tathineni — neon1 is my independent consulting practice, formed in July 2025.", with the name linking out and neon1 linking to the About page.
 - The link-preview card says "Independent engineering and technology consulting." under the name, the landing's own first line, in place of "cloud · AI · IT · New York". It is drawn by `scripts/og-card.cjs` as `media/og-card-2.png`; the earlier card stays for previews already shared.
 - 63 more color literals in the stylesheets (the neon, void, glow, and ink-shadow colors with an alpha) take channel tokens from shared/neon1.css (`--neon-rgb`, `--void-rgb`, `--glow-rgb`, `--ink-shadow-rgb`), written `rgb(var(--neon-rgb) / .4)`. A gradient shifts by at most one level in a channel.
 - The Knowledge Center's flag, warning, example, and diagram colors are named once as tokens, and the Matrix override block is gone. No visual change.
