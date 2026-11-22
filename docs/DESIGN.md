@@ -56,6 +56,17 @@ Sentinel is a plain sans with no rain. Matrix keeps the mono labels, rain, and c
 
 Corners: `--glass-r` 8 for panes and chips, 1NEON's `--r-sm` 10 for controls and `--r` 14 for cards. Primary touch targets are at least 44 by 44. Fields are 16px or larger on a touch screen. Focus is a 2px ring on `--focus`, offset 2.
 
+## Wordmark
+
+`neon1` is set in live text with one rule at every size and on every surface (header, hero, footer, eyebrows, headings, running text, 1NEON, admin). The "1" keeps the surrounding text's size and weight, so it stands at its figure height. "neon" is drawn larger so its lowercase height meets that figure height, and lighter so its strokes, thickened by the larger size, match the "1" stroke. A weight change alone moves no height (a face's x-height does not depend on its weight), so size and weight are matched together. The values come from each face's metrics, measured by rendering them at 6x and comparing ink height and stem width:
+
+| Face | Used for | `neon` size | `neon` weight | `1` |
+|---|---|---|---|---|
+| JetBrains Mono | Matrix logo, hero, eyebrow, footer mark | 1.3em | 450 | 1em at 700 |
+| Figtree | Sentinel logo, hero, eyebrow, footer mark; headings and running text in both looks | 1.36em | 530 | 1em at 700 |
+
+Markup is `<span class="wm"><span class="ne">neon</span><span class="one">1</span></span>`. The properties `--wm-ne`, `--wm-ne-w`, `--wm-one`, `--wm-one-w` hold the numbers (`:root` has the mono set, and Sentinel's `data-site-style` or `data-style` switches to the Figtree set). Where the face does not follow the look, say so on the wrapper: `.wm-sans` for headings and running text (Figtree in every look), `.wm-mono` for a mono label. Color, glow, size and letter spacing come from the surrounding element. `make behavior` measures it (the "1" height against the mean of n, e, o heights within 0.5px, and the stems within 12%, in Sentinel light and Matrix dark); the review also runs it at 390 and 1440 in WebKit and in all four looks. Plain-text mentions of the name inside a sentence stay plain text. Print (the PDFs) and email set the name in their own styles.
+
 ## Links
 
 A link that stays in the product is underlined thinly at 55% of its color and takes the full color on hover and focus. A link that leaves (`a.ext`, `a.out`) is bold, never underlined, and ends in the northeast arrow. Same in every look and mode.
@@ -63,7 +74,7 @@ A link that stays in the product is underlined thinly at 55% of its color and ta
 ## Components that already inherit
 
 - Helper text: `.helper` is one style for every hint, caption, and status line, and `.helper.warn` is the same line in red. A problem is never different text in the same place.
-- Links, arrows, folds, and the wordmark follow the website rules in the corpus design standard.
+- Links, arrows, and folds follow the website rules in the corpus design standard. The wordmark follows the rule above.
 - Motion uses `--t-fast`, `--t-base`, `--t-slow`, `--t-open`, and `--ease`.
 
 ## Adding to it

@@ -258,6 +258,55 @@ check("browser", "contact: a send that never answers stops waiting, keeps the dr
   } finally { await context.close(); }
 });
 
+// ---- The wordmark: the "1" and neon's lowercase meet in height, and their strokes match, in every look ----
+// Each ".ne"/".one" pair is drawn at 6x on a canvas in its own face, size, and weight, and its ink is measured: the "1" height against
+// the mean of n, e, and o (within half a pixel), and the stem of the "n" against the stem of the "1" (within 12 percent)
+const wordmarkProbe = async () => {
+  await document.fonts.ready;
+  const S = 6, out = [];
+  const ink = (font, ch) => {
+    const c = document.createElement("canvas"); c.width = 900; c.height = 900;
+    const x = c.getContext("2d", { willReadFrequently: true });
+    x.fillStyle = "#fff"; x.fillRect(0, 0, 900, 900); x.fillStyle = "#000"; x.font = font; x.textBaseline = "alphabetic"; x.fillText(ch, 60, 600);
+    const d = x.getImageData(0, 0, 900, 900).data;
+    let top = 900, bot = 0;
+    for (let y = 0; y < 900; y++) for (let xx = 0; xx < 900; xx++) if (d[(y * 900 + xx) * 4] < 128) { top = Math.min(top, y); bot = Math.max(bot, y); }
+    const row = Math.round((top + bot) / 2) + (ch === "n" ? Math.round((bot - top) * 0.17) : 0);
+    let stem = 0, run = 0;
+    for (let xx = 0; xx < 900; xx++) { if (d[(row * 900 + xx) * 4] < 128) run++; else if (run) { stem = run; break; } }
+    return { h: (bot - top + 1) / S, stem: stem / S };
+  };
+  for (const one of document.querySelectorAll(".one")) {
+    const ne = one.previousElementSibling;
+    if (!ne || !ne.classList.contains("ne") || one.getBoundingClientRect().width === 0 || getComputedStyle(one).visibility === "hidden") continue;
+    const f = (el) => { const cs = getComputedStyle(el); return `${cs.fontStyle} ${cs.fontWeight} ${parseFloat(cs.fontSize) * S}px ${cs.fontFamily}`; };
+    const [n, e, o, one1] = [ink(f(ne), "n"), ink(f(ne), "e"), ink(f(ne), "o"), ink(f(one), "1")];
+    out.push({ at: one.parentElement.className, dh: one1.h - (n.h + e.h + o.h) / 3, stemN: n.stem, stem1: one1.stem });
+  }
+  return out;
+};
+for (const [label, init, urls] of [
+  ["Sentinel light", ([s, m]) => { try { localStorage.setItem("neon1.style", s); localStorage.setItem("neon1.mode", m); } catch {} }, ["/", "/knowledge/", "/blog/why-neon1/"]],
+  ["Matrix dark", ([s, m]) => { try { localStorage.setItem("neon1.style", s); localStorage.setItem("neon1.mode", m); } catch {} }, ["/", "/knowledge/", "/blog/why-neon1/"]],
+]) {
+  check("browser", `wordmark: the 1 and neon's lowercase match in height and stroke (${label})`, async () => {
+    const [style, mode] = label === "Sentinel light" ? ["sentinel", "light"] : ["matrix", "dark"];
+    const { page, context } = await open({ reducedMotion: "reduce", init, initArg: [style, mode] });
+    try {
+      for (const u of urls) {
+        await page.goto(origin + u, { waitUntil: "load" });
+        await page.waitForTimeout(500);
+        const rows = await page.evaluate(wordmarkProbe);
+        expect(rows.length > 0, `no wordmark found on ${u}`);
+        for (const r of rows) {
+          expect(Math.abs(r.dh) <= 0.5, `${u} ${r.at}: the 1 is ${r.dh.toFixed(2)}px off neon's lowercase height`, r);
+          expect(Math.abs(r.stemN - r.stem1) <= Math.max(0.6, r.stem1 * 0.12), `${u} ${r.at}: neon's stroke ${r.stemN}px against the 1's ${r.stem1}px`, r);
+        }
+      }
+    } finally { await context.close(); }
+  });
+}
+
 // ---- The first screen is the wordmark and tagline; the bar's contact link settles on contact, and the views still snap ----
 check("browser", "home: the first screen has no offer block, and the bar's contact link settles on contact (motion, wide)", async () => {
   const { page, context, errors } = await open({ reducedMotion: "no-preference" });

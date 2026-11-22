@@ -137,12 +137,13 @@ export const crumbs = (items) => ({
 
 // ---- Parts of a page ----
 
-// The standard neon1 wordmark, the one the top-left logo uses (see ".ne" and ".one" in shared/neon1.css): "neon" is drawn
-// larger so its letters match the height of the digit, and lighter so its strokes match the digit's. "face" picks the
-// font's proportions: "mono" (the logo's face, the default) or "sans" (headings). Size, color, and glow are set by the
-// surrounding element. The wrapper turns off the eyebrow's capitals, so "neon1" never becomes "NEON1".
-export const wordmark = (text, face = "mono") =>
-  text.replace(/neon1/g, `<span class="wm wm-${face}"><span class="ne">neon</span><span class="one">1</span></span>`)
+// The standard neon1 wordmark, the one the top-left logo uses (the rule is above ".wm" in shared/neon1.css): the "1" keeps the
+// surrounding size and weight, and "neon" is drawn larger and lighter so its lowercase meets the 1's height and its strokes
+// match. The look picks the face's values; "face" ("sans" or "mono") forces one where the face is fixed, as a heading is always
+// sans. Size, color, and glow are set by the surrounding element. The wrapper turns off the eyebrow's capitals, so "neon1"
+// never becomes "NEON1".
+export const wordmark = (text, face = "") =>
+  text.replace(/neon1/g, `<span class="wm${face ? ` wm-${face}` : ""}"><span class="ne">neon</span><span class="one">1</span></span>`)
 
 // The band that opens an index page: a small eyebrow, the heading, a lead line, and anything after it (a search box)
 export const band = ({ id, eyebrow, title, lead = "", after = "" }) => `    <section class="kc-band" aria-labelledby="${id}">

@@ -83,14 +83,21 @@
 /* A glass pane holding a few lines: room inside it about one and a half times the gap between them */
 .glass-pane { padding: 28px 36px; }
 
-/* The neon1 wordmark, one standard for every page. Set apart (the logo, eyebrows), "neon" is larger so its letters match
-   the height of the "1", and lighter so its strokes match the "1" stroke: JetBrains Mono, 1.3x at 450 (digit 0.73 over
-   lowercase 0.56). Set inline in a sentence or heading (.wm-sans, Figtree), the surrounding text decides: "neon" takes its
-   size and weight, and the "1" is drawn smaller so its height equals the letters' (0.515 / 0.70 = .736em) and heavier to
-   keep its stroke equal to theirs (880 against 700, from stem widths). Size, color, glow, and background come from the
-   surrounding element. */
-.wm { --wm-ne: 1.3em; --wm-ne-w: 450; --wm-one: 1em; --wm-one-w: 700; text-transform: none; }
-.wm-sans { --wm-ne: 1em; --wm-ne-w: 700; --wm-one: .736em; --wm-one-w: 880; }
+/* The neon1 wordmark, one rule for every page and every size. The "1" keeps the surrounding text's size and weight, so it stands at
+   its figure height. "neon" is drawn larger so its lowercase height meets that figure height, and at a lighter weight so its
+   strokes, thickened by the larger size, match the "1" stroke. The ratios come from each face's own metrics, measured by rendering
+   them (a weight change alone moves no height, since a face's x-height does not depend on its weight):
+   - JetBrains Mono (Matrix, and 1NEON's mono): figure height .73em over lowercase .56, so neon is 1.3em at 450 against the 1 at 700.
+   - Figtree (Sentinel, and every heading): figure .70em over lowercase .512 (.524 with the round letters' overshoot), so neon is 1.36em
+     at 530 against the 1 at 700 (stems 14.1 against 14 at 100px).
+   Set the pair inside one element: <span class="wm"><span class="ne">neon</span><span class="one">1</span></span>. The look picks the
+   face's values (Sentinel is Figtree, Matrix is mono), and .wm-sans or .wm-mono force one where the face is fixed whatever the look
+   (a heading is always Figtree). Size, color, glow, and background come from the surrounding element. */
+:root { --wm-ne: 1.3em; --wm-ne-w: 450; --wm-one: 1em; --wm-one-w: 700; }
+:root:is([data-site-style="sentinel"], [data-style="sentinel"]) { --wm-ne: 1.36em; --wm-ne-w: 530; }
+.wm { text-transform: none; }
+.wm-sans { --wm-ne: 1.36em; --wm-ne-w: 530; --wm-one: 1em; --wm-one-w: 700; }
+.wm-mono { --wm-ne: 1.3em; --wm-ne-w: 450; --wm-one: 1em; --wm-one-w: 700; }
 .ne { font-size: var(--wm-ne, 1.3em); font-weight: var(--wm-ne-w, 450); }
 .one { font-size: var(--wm-one, 1em); font-weight: var(--wm-one-w, 700); }
 
