@@ -4,6 +4,14 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+### Fixed
+- On a phone, a wide table in the Knowledge Center keeps readable columns and scrolls sideways, with a soft edge on the side that has more, instead of squeezing every column into one-word lines.
+- The feedback and report-a-bug pages no longer say "the page you came from (no page)" when you arrive without one. The line names only what is sent.
+- On a phone, the footer's legal line no longer leaves a backslash hanging at the end of a wrapped line. The links are underlined already, so a wider gap separates them.
+
+### Changed
+- The Knowledge Center's flag, warning, example, and diagram colors are named once as tokens, and the Matrix override block is gone. No visual change.
+
 ## v0.85.0
 
 ### Fixed

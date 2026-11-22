@@ -57,11 +57,12 @@ if (form) {
     return m ? `${name} ${m[2]}` : "your browser";
   }
   const viewport = () => `${innerWidth}x${innerHeight}${devicePixelRatio && devicePixelRatio !== 1 ? ` @${devicePixelRatio}x` : ""}`;
+  // Empty when the visitor arrived without a page to come from, so the line names only what is sent
   function pageLabel() {
-    try { const u = new URL(referrer); return u.origin === location.origin ? u.pathname : u.origin; } catch { return "no page"; }
+    try { const u = new URL(referrer); return u.origin === location.origin ? u.pathname : u.origin; } catch { return ""; }
   }
   const sentLine = document.getElementById("rb-sent");
-  const showSent = () => { sentLine.textContent = `Sent with it: the page you came from (${pageLabel()}), your ${theme === "matrix" ? "dark" : "light"} mode, ${browserName()}, and a ${innerWidth} by ${innerHeight} window.`; };
+  const showSent = () => { sentLine.textContent = `Sent with it: ${pageLabel() ? `the page you came from (${pageLabel()}), ` : ""}your ${theme === "matrix" ? "dark" : "light"} mode, ${browserName()}, and a ${innerWidth} by ${innerHeight} window.`; };
   showSent();
   // The theme is read again at send time, and the line under the form follows a switch
   document.addEventListener("n1:theme", () => { theme = currentTheme(); showSent(); });
