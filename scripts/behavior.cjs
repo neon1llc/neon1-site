@@ -1202,7 +1202,7 @@ for (const [family, look] of [["sentinel", { "neon1.style": "sentinel" }], ["mat
         const { page, context } = await open({ viewport: { width, height: 800 }, init: new Function(init) }, url);
         try { await page.waitForLoadState("load"); boxes[url] = await page.evaluate(BAR_BOXES); } finally { await context.close(); }
       }
-      // At the top of the home page the Sentinel style switch stacks above the light/dark switch, which sits 15px lower there: same slot across, other pages unchanged
+      // At the top of the home page the Sentinel style switch takes the light/dark switch's slot, which is hidden there: same boxes across
       const flat = (url) => (url === "/" && family === "sentinel" ? { ...boxes[url], mode: boxes[url].mode.slice(0, 2) } : boxes[url]);
       const rest = { ...boxes["/knowledge/"], mode: boxes["/knowledge/"].mode.slice(0, 2) };
       for (const url of ["/", "/blog/", "/report-bug/"]) {
@@ -1371,7 +1371,11 @@ check("browser", "touch: the bar's switches and menu button, the case open and c
       for (let y = r.bottom; y < r.bottom + 30; y += 1) { const h = document.elementFromPoint(x, y); if (h && (h === e || e.contains(h))) hi = y; else break; }
       return Math.round(hi - lo);
     }, sel);
-    for (const sel of ["header .theme-sw:not(.style-sw)", "header .style-sw", "#menuBtn"]) expect((await reach(sel)) >= 43, `${sel} is under 44px to hit`, await reach(sel));
+    // The landing's first screen shows the style switch alone; the light/dark switch takes its slot once the page scrolls on
+    for (const sel of ["header .style-sw", "#menuBtn"]) expect((await reach(sel)) >= 43, `${sel} is under 44px to hit`, await reach(sel));
+    await page.evaluate(() => window.scrollTo(0, innerHeight * 1.5)); await page.waitForTimeout(700);
+    expect((await reach("header .theme-sw:not(.style-sw)")) >= 43, "the light/dark switch is under 44px to hit", await reach("header .theme-sw:not(.style-sw)"));
+    await page.evaluate(() => window.scrollTo(0, 0)); await page.waitForTimeout(500);
     await page.locator("#work").scrollIntoViewIfNeeded();
     await page.locator('[data-case="dermatology"]').evaluate((b) => b.scrollIntoView({ block: "center", inline: "center", behavior: "instant" }));
     expect((await reach('[data-case="dermatology"]')) >= 43, "a case's open button is under 44px to hit");

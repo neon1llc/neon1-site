@@ -237,26 +237,22 @@ a:is(:hover, :focus-visible) { text-decoration-color: currentColor; }
 .n1-bar:not(.light) .theme-sw.style-sw { opacity: 1; visibility: visible; pointer-events: auto; background: rgb(var(--void-rgb) / .4); color: #84a98c;
   --brand: var(--neon); --brand-rgb: 108 255 168; --ctl-line: rgb(var(--neon-rgb) / .4); }
 .style-sw .sentinel-case { fill: none; stroke: currentColor; stroke-width: 1.8; }
-/* Sentinel: the landing's first screen offers both switches, so a visitor can pick dark mode before scrolling. The style switch sits
-   right beside the light/dark switch, never beside the logo, which keeps the bar's left edge to the logo alone. It takes no room in the
-   row (its width is given back with a negative margin and it is drawn 52px to the left), so no other box in the bar moves on the landing,
-   hidden or shown. It stays through the whole first screen and hides in place once the page moves on to the next section
-   (js/page.js sets [data-top]). Below 370px, where the row has no room for it, it leaves the bar; the footer has the same choice */
+/* Sentinel: the landing's first screen offers the style switch alone, in the light/dark switch's own slot (that switch is hidden there, as
+   in Matrix, and returns once the page scrolls on; it is also in the footer's choice). The style switch takes no room in the row (its
+   width is given back with a negative margin and it is drawn over that slot), so no other box in the bar moves on the landing, hidden
+   or shown. It hides in place once the page moves on to the next section (js/page.js sets [data-top]). Below 370px, where the row
+   has no room for it, it leaves the bar; the footer has the same choice */
 :root[data-site-style="sentinel"] .n1-bar :is(.theme-sw:not(.style-sw), .menu-btn) { order: 1; }
-:root[data-site-style="sentinel"] .n1-bar[data-top] .theme-sw:not(.style-sw) { opacity: 1; visibility: visible; pointer-events: auto; }
-:root[data-site-style="sentinel"] .n1-bar .theme-sw.style-sw { order: 0; margin: 0 -72px 0 0; transform: translateX(-52px); }
-/* Desktop, 1041px up: the two switches stack in the one slot the light/dark switch has on every page (in the row after 1NEON, or in the
-   wide margin from 1320px), the style switch above and the light/dark switch below, 2px clear of each other and of the bar's edges. When the
-   style switch leaves, the light/dark switch glides back to the middle of the slot */
+:root[data-site-style="sentinel"] .n1-bar .theme-sw.style-sw { order: 0; margin: 0 -72px 0 0; transform: translateX(12px); }
+/* Desktop, 1041px up: the style switch sits in the slot the light/dark switch has on every page (in the row after 1NEON, or in the wide
+   margin from 1320px); when it leaves, the light/dark switch fades in there */
 @media (min-width: 1041px) {
   :root[data-site-style="sentinel"] .n1-bar .theme-sw:not(.style-sw) { transition: opacity var(--t-base) var(--ease), visibility var(--t-base), border-color var(--t-fast) var(--ease), transform var(--t-base) var(--ease); }
-  :root[data-site-style="sentinel"] .n1-bar .theme-sw.style-sw { margin: 0 -72px 0 0; transform: translate(12px, -15px); }
-  :root[data-site-style="sentinel"] .n1-bar[data-top] .theme-sw:not(.style-sw) { transform: translateY(15px); }
+  :root[data-site-style="sentinel"] .n1-bar .theme-sw.style-sw { margin: 0 -72px 0 0; transform: translate(12px, 0); }
 }
 @media (min-width: 1320px) {
   :root[data-site-style="sentinel"] .n1-bar .theme-sw.style-sw { position: absolute; margin: 0; top: calc(env(safe-area-inset-top) + 32px);
-    right: calc((100% - 1200px) / 4 + 12px); transform: translate(50%, calc(-50% - 15px)); }
-  :root[data-site-style="sentinel"] .n1-bar[data-top] .theme-sw:not(.style-sw) { transform: translate(50%, calc(-50% + 15px)); }
+    right: calc((100% - 1200px) / 4 + 12px); transform: translate(50%, -50%); }
 }
 @media (max-width: 1040px) {
   :root[data-site-style="sentinel"] .n1-bar .theme-sw.style-sw { margin-left: auto; }
