@@ -31,6 +31,23 @@ Run on every visual or interaction change before reporting it. Each item is pass
 - [ ] Scrolling past the element, Back and Forward, open and close, resize and rotate.
 - [ ] Contrast meets WCAG 2.2 AA on every background in every look. Works at 200% zoom and 320px wide.
 
+## States and feedback
+
+- [ ] Render order is loading, then error, then empty, then content. The error says what failed and offers retry.
+- [ ] Empty: a short title that says what is missing, one line of description under 14 words, an action that matches the title. A filter that returns nothing shows plain text and no create action.
+- [ ] Loading: delay the spinner 200 to 300ms so quick fetches do not flash. Keep navigation and tab bars in place while a tab loads. A saving button shows a pending state. Size the spinner to the area it fills.
+- [ ] Toast for temporary feedback after an action, a few words and gone on its own. Banner for a persistent problem that needs action.
+- [ ] Error text names what happened and what to do next, in under 90 characters where a line allows.
+- [ ] Components take explicit variants (`danger`), not a pile of boolean props.
+- [ ] Anything personalized or automatic shows why and can be reset or turned off.
+
+## Auditing
+
+- Score each finding with a severity (0 cosmetic to 4 blocking) against the usability heuristics, and list the top five fixes first.
+- Draft copy as several options and pick one. Mark assumptions in any persona or research summary.
+- A static read of the markup is not an accessibility result. Confirm with a keyboard, a screen reader, and a phone.
+- Measure whether people finish and understand, not only whether they click.
+
 ## Evidence
 
 - [ ] Tested on the matrix in testing.md. Interactions tested, not only screenshots.
