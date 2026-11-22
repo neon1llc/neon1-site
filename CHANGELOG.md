@@ -5,6 +5,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 ## Unreleased
 
 ### Fixed
+- Each landing view centers its content in the snap viewport again, so a short section such as about no longer sits at the top over empty space. A view taller than the screen still starts at its top, and section links and back/forward land as before.
 - The Sentinel wordmark draws "neon" at the "1"'s height and strokes. The first screen's "neon1" had its "1" 0.8px taller and heavier than the lowercase (a mono ratio used on Figtree). "neon" is now 1.36em at weight 530 beside the 1 at 700 in Figtree (1.3em at 450 in mono), set by the look, with `.wm-sans` and `.wm-mono` to force a face. One rule in shared/neon1.css, written up in docs/DESIGN.md, with a check in `make behavior`. 288 pairs across both engines, four looks, 390 and 1440 fall within half a pixel in height and 12 percent in stroke.
 - The scaled "neon1" wordmark is for branding only (the bar's logo, the landing hero, the footer mark). The Knowledge Center, blog, feedback, and report-a-bug headings and eyebrows set the name as plain text at the text's size, lowercase.
 - On a phone, a wide table in the Knowledge Center keeps readable columns and scrolls sideways, with a soft edge on the side that has more, instead of squeezing every column into one-word lines.

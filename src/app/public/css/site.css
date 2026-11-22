@@ -229,8 +229,8 @@ html.case-lock { overflow: hidden; }
 
 /* Views: each section is a "view". Motion (js/motion) runs the entrances; without JS everything is visible */
 .motion-ready .view h2, .motion-ready .view .reveal-on { opacity: 0; }
-/* Each view starts at its top, so every section link lands its heading the same distance below the bar */
-.view { min-height: calc(var(--vh, 100svh) - 64px); display: flex; flex-direction: column; justify-content: flex-start; scroll-margin-top: 0; /* the page's scroll-padding already clears the bar; both together landed 72px low */
+/* A view centers its content in the snap viewport; a view taller than the screen starts at its top (safe) */
+.view { min-height: calc(var(--vh, 100svh) - 64px); display: flex; flex-direction: column; justify-content: safe center; scroll-margin-top: 0; /* the page's scroll-padding already clears the bar; both together landed 72px low */
   padding-top: clamp(28px, 5vh, 56px); padding-bottom: clamp(28px, 5vh, 56px); }
 .view > .btn { align-self: center; }
 
@@ -255,7 +255,7 @@ html.case-lock { overflow: hidden; }
 .row p b { color: var(--ink); font-weight: 600; }
 
 /* Process view centers as a grid */
-.view.split { display: grid; align-content: start; }
+.view.split { display: grid; align-content: safe center; }
 
 /* Script scrolling replaces smooth scrolling; reduced motion keeps the header still */
 .glide, .glide body { scroll-behavior: auto; }
