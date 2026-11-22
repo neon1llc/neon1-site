@@ -125,6 +125,12 @@
 :root:not([data-site-style]) .pitch-services a { display: block; text-decoration: none; }
 :root:not([data-site-style]) .pitch-services :is(b, span) { display: block; }
 :root:not([data-site-style]) .landing-line { display: none; }
+/* The reach line keeps its gaps, and its links read on the dark ground (the brand green is for the light one). The rain's buttons do nothing without a script */
+:root:not([data-site-style]) .pitch-reach { margin: 0 0 var(--sp-5); font-size: var(--fs-ui); color: var(--muted); }
+:root:not([data-site-style]) .pitch-reach .reach-lead { margin-right: .7em; }
+:root:not([data-site-style]) .pitch-reach .sep { margin: 0 .5em; }
+:root:not([data-site-style]) .pitch-reach a { color: var(--glow); }
+:root:not([data-site-style]) .rainctl { display: none; }
 :root[data-site-style="sentinel"] .hero { display: flex; align-items: center; justify-content: center; text-align: left; padding: 88px max(24px, env(safe-area-inset-left)) clamp(28px, 5vh, 56px); }
 /* The same room under the first screen as under every other view, so the pitch clears a phone's toolbar and Neo's launcher */
 @media (pointer: coarse) { :root[data-site-style="sentinel"] .hero { padding-bottom: calc(clamp(28px, 5vh, 56px) + 72px); } }
