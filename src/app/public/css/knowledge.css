@@ -239,6 +239,18 @@ body.kc { background: var(--page); }
 /* Tables scroll sideways on phones; from tablet width up they span the column like any table */
 .kc-text table { width: 100%; margin: var(--sp-3) 0 var(--sp-4); border-collapse: collapse; font-size: var(--fs-md); display: block; overflow-x: auto; }
 @media (min-width: 700px) { .kc-text table { display: table; } }
+/* On a phone a wide table keeps readable columns and scrolls, and a soft edge on the side that has more says so. The cover gradients
+   ride with the content (local) and hide the edge shadows (scroll) once that end is reached, as Lea Verou's scroll shadows and GOV.UK's scrollable tables do */
+@media (max-width: 699px) {
+  .kc-text table :is(th, td) { min-width: 8rem; }
+  .kc-text table {
+    background:
+      linear-gradient(to right, var(--page) 30%, transparent) left / var(--sp-5) 100% no-repeat local,
+      linear-gradient(to left, var(--page) 30%, transparent) right / var(--sp-5) 100% no-repeat local,
+      linear-gradient(to right, rgb(var(--brand-rgb) / .22), transparent) left / var(--sp-3) 100% no-repeat scroll,
+      linear-gradient(to left, rgb(var(--brand-rgb) / .22), transparent) right / var(--sp-3) 100% no-repeat scroll;
+  }
+}
 .lc { text-transform: none; } /* neon1 keeps its lowercase inside labels set in capitals (scripts/page-shell.mjs) */
 .kc-text th { padding: var(--sp-2) var(--sp-2); border-bottom: 1.5px solid var(--brand); text-align: left; font: 600 var(--fs-xs) var(--mono); letter-spacing: .04em;
   text-transform: uppercase; color: var(--brand); vertical-align: bottom; }
