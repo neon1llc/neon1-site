@@ -546,7 +546,9 @@ for (const motion of ["reduce", "no-preference"]) {
       await caseLink(page, "migration");
       const link = page.locator('a.test-case-link[href="#case-migration"]');
       const at = await link.evaluate((a) => a.getBoundingClientRect().top + scrollY);
-      await link.click();
+      // Forced, so the test does not scroll the page before the press: a scroll of its own can leave the page between two views, which the
+      // detent never lets Back return to
+      await link.click({ force: true });
       expect(await landed(page, "migration"), "the link did not land on case-migration");
       await page.goBack();
       const back = await polled(page, (at) => location.hash !== "#case-migration" && Math.abs(scrollY + innerHeight / 2 - at) < innerHeight / 2, at).then(() => true, () => false);
