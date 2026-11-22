@@ -127,7 +127,7 @@ export const ORG = { "@id": `${SITE}/#organization` }
 export const WEBSITE = { "@id": `${SITE}/#website` }
 export const AUTHOR = { "@type": "Person", "@id": `${SITE}/#pradeep`, name: "Pradeep Tathineni", url: "https://www.linkedin.com/in/pradeep-tathineni/", worksFor: ORG }
 export const LICENSE = "https://creativecommons.org/licenses/by-nd/4.0/"
-export const OG_IMAGE = `${SITE}/media/og-card-1.png`
+export const OG_IMAGE = `${SITE}/media/og-card-2.png`
 // A breadcrumb trail from the home page down; the last step, the page itself, has no link
 export const crumbs = (items) => ({
   "@type": "BreadcrumbList",

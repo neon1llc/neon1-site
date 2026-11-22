@@ -10,6 +10,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - On a phone, the footer's legal line no longer leaves a backslash hanging at the end of a wrapped line. The links are underlined already, so a wider gap separates them.
 
 ### Changed
+- The link-preview card says "Independent engineering and technology consulting." under the name, the landing's own first line, in place of "cloud · AI · IT · New York". It is drawn by `scripts/og-card.cjs` as `media/og-card-2.png`; the earlier card stays for previews already shared.
 - The Knowledge Center's flag, warning, example, and diagram colors are named once as tokens, and the Matrix override block is gone. No visual change.
 
 ## v0.85.0

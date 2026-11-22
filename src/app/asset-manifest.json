@@ -145,7 +145,7 @@
     "og-card": {
       "title": "Link-preview card",
       "origin": "first-party",
-      "made": "The neon1 mark and name on a dark card, made for neon1 LLC.",
+      "made": "The neon1 mark, name, and the landing's first line on a dark card, drawn for neon1 LLC by scripts/og-card.cjs. og-card-1.png is the earlier card, kept for link previews already shared.",
       "consumers": [
         "index.html"
       ]
@@ -378,6 +378,10 @@
     },
     "media/og-card-1.png": {
       "sha256": "7a06a3a04aecf5533a9fe7ecf72b76fda7f37e5f0b8423230db9a60dfbddd06f",
+      "asset": "og-card"
+    },
+    "media/og-card-2.png": {
+      "sha256": "380ac661c77b1413b6cdf6959dbc2b2e660482f3e99ea9c596ca3ef9cf12fb41",
       "asset": "og-card"
     },
     "media/pradeep-380.jpg": {
