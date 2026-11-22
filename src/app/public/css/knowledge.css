@@ -3,6 +3,13 @@
  * read as dark ink on paper, with a dark band at the top that echoes the PDFs' header. Pages are written
  * by scripts/knowledge.mjs from neon1-corpus. */
 
+/* The colors a document's flag, warning, example, and diagram card use, named once so a look changes them in one place. Warnings stay amber
+   and examples violet, lifted in Matrix to read on the dark ground. Diagrams keep a light card in both, since their drawings are made for a light ground */
+:root { --kc-warn-line: #c98a00; --kc-warn-bg: #fff8e6; --kc-warn-ink: #7a5200; --kc-ex-line: #b9a3e3; --kc-ex-bg: #f6f2fd; --kc-ex-ink: #4b2f8a;
+  --kc-flag-bg: #fff4d6; --kc-flag-ink: #6b4e00; --kc-diagram-bg: #fff; }
+:root[data-site-theme="matrix"] { --kc-warn-bg: rgb(255 181 71 / .08); --kc-warn-ink: #FFB547; --kc-ex-bg: rgb(185 163 227 / .1); --kc-ex-ink: #CDB8F5;
+  --kc-flag-bg: rgb(255 181 71 / .14); --kc-flag-ink: #FFB547; --kc-diagram-bg: #E8ECE8 }
+
 body.kc { background: var(--page); }
 .kc-page { background: var(--paper); min-height: 100vh; }
 .kc main { padding-top: calc(64px + env(safe-area-inset-top)); }
@@ -130,7 +137,7 @@ body.kc { background: var(--page); }
 .kc-doc { max-width: 780px; margin: 0 auto; padding: var(--sp-6) var(--sp-5) var(--sp-7); }
 .kc-crumbs { display: flex; gap: var(--sp-2); flex-wrap: wrap; margin-bottom: var(--sp-4); font: var(--fs-sm) var(--mono); color: var(--muted); }
 .kc-crumbs a { color: var(--muted); text-decoration: none; } .kc-crumbs a:hover { color: var(--brand); text-decoration: underline; }
-.kc-flag { display: inline-block; margin: 0 0 var(--sp-3); padding: var(--sp-0) var(--sp-2); border-radius: 4px; background: #fff4d6; color: #6b4e00;
+.kc-flag { display: inline-block; margin: 0 0 var(--sp-3); padding: var(--sp-0) var(--sp-2); border-radius: 4px; background: var(--kc-flag-bg); color: var(--kc-flag-ink);
   font: 600 var(--fs-xs) var(--mono); letter-spacing: .06em; text-transform: uppercase; }
 .kc-doc-head h1 { margin: 0 0 var(--sp-3); font: 700 clamp(28px, 4vw, 40px)/1.15 var(--sans); color: var(--deep); letter-spacing: -.01em; }
 .kc-summary { margin: 0 0 var(--sp-4); font-size: var(--fs-lg); color: var(--muted); }
@@ -250,10 +257,10 @@ body.kc { background: var(--page); }
 .kc-text .callout { margin: var(--sp-4) 0; padding: var(--sp-3) var(--sp-4); border: 1px solid rgb(var(--brand-rgb) / .45); border-left-width: 4px; border-radius: 6px; background: rgb(var(--brand-rgb) / .06); }
 .kc-text .callout > :last-child { margin-bottom: 0; }
 .kc-text .callout-title { margin: 0 0 var(--sp-1); font: 600 var(--fs-xs) var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--brand); }
-.kc-text .callout.warning { border-color: #c98a00; background: #fff8e6; }
-.kc-text .callout.warning .callout-title { color: #7a5200; }
-.kc-text .callout.example { border-color: #b9a3e3; background: #f6f2fd; }
-.kc-text .callout.example .callout-title { color: #4b2f8a; }
+.kc-text .callout.warning { border-color: var(--kc-warn-line); background: var(--kc-warn-bg); }
+.kc-text .callout.warning .callout-title { color: var(--kc-warn-ink); }
+.kc-text .callout.example { border-color: var(--kc-ex-line); background: var(--kc-ex-bg); }
+.kc-text .callout.example .callout-title { color: var(--kc-ex-ink); }
 
 /* Where to go next */
 .kc-next { margin-top: var(--sp-7); padding-top: var(--sp-5); border-top: 1px solid var(--line); }
@@ -336,7 +343,8 @@ body.kc { background: var(--page); }
 /* --- Diagrams (drawn by neon1-corpus tools/diagrams.mjs): a white card that scrolls sideways on narrow
    screens rather than shrinking labels past reading, with the Mermaid source folded beneath --- */
 .diagram { margin: var(--sp-5) 0; }
-.diagram-scroll { overflow-x: auto; padding: var(--sp-3); border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+.diagram-scroll { overflow-x: auto; padding: var(--sp-3); border: 1px solid var(--line); border-radius: 10px; background: var(--kc-diagram-bg); }
+:root[data-site-theme="matrix"] .diagram-scroll { border-color: transparent; }
 .diagram-scroll img { display: block; max-width: none; height: auto; margin: 0 auto; }
 /* Wide screens fit the drawing to the column; narrower ones keep it readable (up to 820px wide) and scroll */
 @media (min-width: 900px) { .diagram-scroll img { max-width: 100%; } }
@@ -361,15 +369,6 @@ body.kc { background: var(--page); }
 .kc-text .kc-rel-date { margin: 0 0 var(--sp-2); font: var(--fs-sm) var(--mono); color: var(--muted); }
 .kc-text .kc-rel-kind { margin: var(--sp-3) 0 var(--sp-1); font: 600 var(--fs-xs) var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--brand); }
 .kc-text a.kc-ver { font-family: var(--mono); font-size: .9em; }
-
-/* ---- Matrix (dark) theme: the few colors that are not tokens. Warnings stay amber and examples violet, lifted to read on
-   the dark ground. Diagrams keep their white card in both themes, since their drawings are made for a light ground ---- */
-:root[data-site-theme="matrix"] .kc-flag { background: rgba(255, 181, 71, .14); color: #FFB547; }
-:root[data-site-theme="matrix"] .kc-text .callout.warning { background: rgba(255, 181, 71, .08); }
-:root[data-site-theme="matrix"] .kc-text .callout.warning .callout-title { color: #FFB547; }
-:root[data-site-theme="matrix"] .kc-text .callout.example { background: rgba(185, 163, 227, .1); }
-:root[data-site-theme="matrix"] .kc-text .callout.example .callout-title { color: #CDB8F5; }
-:root[data-site-theme="matrix"] .diagram-scroll { background: #E8ECE8; border-color: transparent; }
 
 /* The index's contents, open at the right of the page on a wide screen as a document's index is, where the "On this page" bar steps aside */
 .kc-index-side { display: none; }
