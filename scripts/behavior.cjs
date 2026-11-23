@@ -1145,6 +1145,8 @@ check("browser", "AS-03: the wheel over a long contact message scrolls the box, 
     const box = page.locator("[name=today]");
     await box.fill(Array.from({ length: 40 }, (_, i) => `synthetic line ${i}`).join("\n"));
     await box.evaluate((t) => (t.scrollTop = 0));
+    // The centered view re-snaps once the message grows it, so the check starts when the page has stopped
+    await page.waitForTimeout(1200);
     const y0 = await page.evaluate(() => scrollY);
     const b = await box.boundingBox();
     await page.mouse.move(b.x + 20, b.y + 20);
