@@ -194,6 +194,39 @@ for (const [style, mode] of [["sentinel", "light"], ["sentinel", "dark"], ["matr
   });
 }
 
+// A link's title keeps every space: a flex or grid box turns a text run and the element beside it (the arrow's last word) into separate items and
+// drops the space between them ("Secure,Go"), so no such box may hold words on both sides of a space. A phone gets its own rules (pointer: coarse), so it
+// is checked as a touch device as well as at desktop width
+check("browser", "links: no flex or grid box swallows the space between a link's words and its arrow word, on a phone or a desktop", async () => {
+  const PAGES = ["/", "/knowledge/", "/knowledge/company/releases/", "/blog/"].filter((p) => fs.existsSync(path.join(SITE, p, "index.html")));
+  for (const phone of [true, false]) {
+    for (const url of PAGES) {
+      const { page, context } = await open(phone ? { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true } : {}, url);
+      try {
+        await page.waitForLoadState("load");
+        const lost = await page.evaluate(() => {
+          const words = (n) => /\S/.test(n.textContent || "");
+          const flat = /flex|grid/;
+          const found = [];
+          for (const a of document.querySelectorAll("a.ext, a.n1chat-link")) {
+            for (const e of [a, ...a.querySelectorAll("*")]) {
+              if (!flat.test(getComputedStyle(e).display)) continue;
+              const kids = [...e.childNodes];
+              kids.forEach((n, i) => {
+                const [next, prev] = [kids[i + 1], kids[i - 1]];
+                const apart = (/\s$/.test(n.data || "") && next && next.nodeType === 1 && words(next)) || (/^\s/.test(n.data || "") && prev && prev.nodeType === 1 && words(prev));
+                if (n.nodeType === 3 && /\S/.test(n.data) && apart) found.push(`${e.tagName.toLowerCase()}.${e.className}: ${e.textContent.replace(/\s+/g, " ").trim().slice(0, 60)}`);
+              });
+            }
+          }
+          return [...new Set(found)];
+        });
+        expect(!lost.length, `${url} (${phone ? "phone" : "desktop"}): a link title loses a space`, lost);
+      } finally { await context.close(); }
+    }
+  }
+});
+
 // On a phone the four services are one swipeable row, and a first-screen link slides it to its card and marks it for a moment; where they sit 2 by 2 nothing slides
 check("browser", "services: on a phone a first-screen link slides the row to its service and marks it; wide, the services stay 2 by 2", async () => {
   const phone = await open({ reducedMotion: "no-preference", viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });

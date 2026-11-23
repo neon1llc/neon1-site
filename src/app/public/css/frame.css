@@ -470,7 +470,9 @@ a:not(.ext):is(:hover, :focus-visible) { text-decoration-color: currentColor; }
   .legal :is(a.report-bug, a.report-feedback)::after { content: ""; position: absolute; inset: -15px -4px; }
   .legal .look-opt { position: relative; }
   .legal .look-opt::after { content: ""; position: absolute; inset: -14px -6px; }
-  .repo h3 > a { display: inline-flex; align-items: center; min-height: 44px; }
+  /* Not a flex box: flex would make the text and the arrow's word separate items and drop the space between them. The padding
+     brings one line to the 44px target; a wrapped title is taller than that already */
+  .repo h3 > a { display: inline-block; padding-block: max(0px, calc((44px - 1lh) / 2)); }
   /* The Start here cards keep their lines close: the tap area reaches halfway to the next line instead of adding height */
   .kc-path li > a { position: relative; }
   .kc-path li > a::after { content: ""; position: absolute; inset: -6px -4px; }
