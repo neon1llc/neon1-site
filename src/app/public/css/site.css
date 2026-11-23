@@ -538,9 +538,3 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 /* The service a link brought you to, marked for a moment so you can tell which card the row slid to */
 .svc.is-target { border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand) inset; }
 
-/* ---- Evidence key: the six kinds of work, so none is mistaken for another ---- */
-.kinds { margin: 4px 0 14px; display: grid; grid-template-columns: minmax(150px, max-content) 1fr; gap: 8px 22px; max-width: 900px; }
-.kinds dt { font: 700 var(--fs-sm)/1.5 var(--mono); color: var(--brand); }
-.kinds dd { margin: 0; color: var(--ink-soft); font-size: var(--fs-md); line-height: 1.5; }
-@media (max-width: 640px) { .kinds { grid-template-columns: 1fr; gap: 2px; } .kinds dd { margin-bottom: 10px; } }
-.evidence-key { margin-top: 18px; }

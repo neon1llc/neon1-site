@@ -4,6 +4,9 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+### Removed
+- The "how to read the evidence" fold under client work on the home page.
+
 ### Fixed
 - "signing up for free" and the other 1NEON sign-up links styled as outbound now open in a new tab, as every outbound link does. `make static` fails on an outbound link without `target="_blank"`. Mail and phone links keep opening in place.
 - The Sentinel landing's first screen no longer shows the light/dark switch. It carries the look switch alone, in the light/dark switch's usual slot, and light/dark returns there once the page scrolls on; the footer's theme choice is unchanged.
