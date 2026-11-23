@@ -2,11 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
-## Unreleased
+## v0.86.0
 
 ### Added
-- Neo's window takes tabs from the page that mounts it: Neo stays the first, and 1NEON adds Pradeep beside it for a signed-in person, with a count on the tab and the launcher, and the launcher reading "ask Neo or Pradeep".
-- Neo's "Reach a person" line starts with chat, which opens sign-up in 1NEON (a free account can chat with Pradeep), before book, email, and call.
+- Neo's window takes tabs from the page that mounts it: Neo stays the first, and 1NEON adds a tab named neon1 beside it for a signed-in person (a person icon and "Replies by email", where Neo has its mark and "Instant answers"), with a count on the tab and the launcher, and the launcher reading "ask Neo or neon1".
+- Neo's "Reach a person" line starts with chat, which opens sign-up in 1NEON (a free account can chat with me), before book, email, and call.
 
 ### Removed
 - The "how to read the evidence" fold under client work on the home page.
