@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.86.1
+
+### Fixed
+- The Knowledge Center's releases page shows the newest 30 releases, not 40, so it stays under the page size limit and the corpus keeps reaching the site.
+
 ## v0.86.0
 
 ### Added

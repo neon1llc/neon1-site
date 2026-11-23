@@ -31,7 +31,7 @@ export const REPOS = PRODUCTS.map(([r]) => r)
 const GH = "https://github.com/neon1llc/"
 
 // How many releases the timeline shows; every older one is a click away on GitHub
-export const RECENT = 40
+export const RECENT = 30
 
 
 // ---- Reading a changelog ----
