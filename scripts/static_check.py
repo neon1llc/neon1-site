@@ -23,6 +23,11 @@ MAIN = re.compile(r"<main[\s>].*?</main>", re.S)
 TAGS = re.compile(r"<script[\s>].*?</script>|<[^>]+>", re.S)
 MIN_TEXT = 200
 
+# An outbound link (a.ext) that leaves for another site or for the 1NEON app opens in a new tab; mailto: and tel: links open the
+# reader's own app in place, so they are left out
+EXT_LINK = re.compile(r'<a\b[^>]*\bclass="[^"]*\bext\b[^"]*"[^>]*>')
+LEAVES = re.compile(r'href="(?:https?:|/1NEON)')
+
 
 def main():
     if len(sys.argv) != 2:
@@ -52,6 +57,12 @@ def main():
             problems.append(f"{page.relative_to(root)} has no <h1>")
         if len(text) < MIN_TEXT:
             problems.append(f"{page.relative_to(root)} has {len(text)} characters of text in <main>, under {MIN_TEXT}")
+
+    # Outbound links on every page: a link that leaves the site opens in a new tab
+    for page in sorted(root.rglob("*.html")):
+        for m in EXT_LINK.finditer(page.read_text()):
+            if LEAVES.search(m.group(0)) and 'target="_blank"' not in m.group(0):
+                problems.append(f"{page.relative_to(root)}: an outbound link lacks target=\"_blank\": {m.group(0)[:100]}")
 
     if problems:
         sys.exit("static: " + "\nstatic: ".join(problems))

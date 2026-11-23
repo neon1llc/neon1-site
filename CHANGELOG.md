@@ -5,6 +5,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 ## Unreleased
 
 ### Fixed
+- "signing up for free" and the other 1NEON sign-up links styled as outbound now open in a new tab, as every outbound link does. `make static` fails on an outbound link without `target="_blank"`. Mail and phone links keep opening in place.
 - The Sentinel landing's first screen no longer shows the light/dark switch. It carries the look switch alone, in the light/dark switch's usual slot, and light/dark returns there once the page scrolls on; the footer's theme choice is unchanged.
 - Each landing view centers its content in the snap viewport again, so a short section such as about no longer sits at the top over empty space. A view taller than the screen still starts at its top, and section links and back/forward land as before.
 - The Sentinel wordmark draws "neon" at the "1"'s height and strokes. The first screen's "neon1" had its "1" 0.8px taller and heavier than the lowercase (a mono ratio used on Figtree). "neon" is now 1.36em at weight 530 beside the 1 at 700 in Figtree (1.3em at 450 in mono), set by the look, with `.wm-sans` and `.wm-mono` to force a face. One rule in shared/neon1.css, written up in docs/DESIGN.md, with a check in `make behavior`. 288 pairs across both engines, four looks, 390 and 1440 fall within half a pixel in height and 12 percent in stroke.
