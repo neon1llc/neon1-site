@@ -227,6 +227,33 @@ check("browser", "links: no flex or grid box swallows the space between a link's
   }
 });
 
+// Links in a case study are the brand green in every look and mode. Matrix's light-mode glow is a pale neon that cannot be read on the light
+// page, so a case's related-work and next-step links once showed in it instead of the dark brand green
+for (const [style, mode] of [["sentinel", "light"], ["sentinel", "dark"], ["matrix", "light"], ["matrix", "dark"]]) {
+  check("browser", `links: case study links are the brand green (${style}, ${mode})`, async () => {
+    const { page, context } = await open({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, init: ([s, m]) => { try { localStorage.setItem("neon1.style", s); localStorage.setItem("neon1.mode", m); localStorage.setItem("neon1.theme.shared", "1"); } catch {} }, initArg: [style, mode] }, "/#projects");
+    try {
+      await page.waitForLoadState("load");
+      const buttons = page.locator("#cases button.open");
+      for (let i = 0; i < await buttons.count(); i++) {
+        await buttons.nth(i).click({ force: true });
+        await page.waitForTimeout(400);
+        const seen = await page.evaluate(() => {
+          // The brand token as the case body sees it, resolved to a color through a probe element
+          const probe = document.querySelector(".case-body").appendChild(document.createElement("i"));
+          probe.style.color = "var(--brand)";
+          const brand = getComputedStyle(probe).color;
+          probe.remove();
+          return { brand, off: [...document.querySelectorAll(".case-body a:not(.ext)")].filter((a) => getComputedStyle(a).color !== brand).map((a) => `${a.textContent.trim().slice(0, 30)}: ${getComputedStyle(a).color}`) };
+        });
+        expect(!seen.off.length, `case ${i} (${style}, ${mode}): links are not the brand green ${seen.brand}`, seen.off);
+        await page.keyboard.press("Escape");
+        await page.waitForTimeout(300);
+      }
+    } finally { await context.close(); }
+  });
+}
+
 // On a phone the four services are one swipeable row, and a first-screen link slides it to its card and marks it for a moment; where they sit 2 by 2 nothing slides
 check("browser", "services: on a phone a first-screen link slides the row to its service and marks it; wide, the services stay 2 by 2", async () => {
   const phone = await open({ reducedMotion: "no-preference", viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
