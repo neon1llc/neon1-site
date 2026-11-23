@@ -153,7 +153,7 @@ body.case-open .n1chat, body.case-open .n1chat-launch, body.white-rabbit-on .n1c
 .n1chat.under-menu, .n1chat-launch.under-menu { z-index: 6; }
 
 
-/* ---- Tabs: Neo beside another conversation (1NEON adds Pradeep). A hidden part stays hidden whatever display it has ---- */
+/* ---- Tabs: Neo beside another conversation (1NEON adds neon1). A hidden part stays hidden whatever display it has ---- */
 .n1chat [hidden] { display: none !important; }
 .n1chat-tabs { display: inline-flex; align-items: center; gap: var(--sp-3); }
 .n1chat-tab { background: none; border: 0; padding: 0 0 2px; cursor: pointer; opacity: .6; border-bottom: 2px solid transparent; }
@@ -166,3 +166,9 @@ body.case-open .n1chat, body.case-open .n1chat-launch, body.white-rabbit-on .n1c
 @media (max-width: 700px), (hover: none) {
   .n1chat-launch.n1chat-wide:hover .n1chat-label, .n1chat-launch.n1chat-wide:focus-visible .n1chat-label, .n1chat-launch.n1chat-wide.n1chat-peek .n1chat-label { max-width: 0; }
 }
+
+/* Which is which: Neo is the round mark and "instant answers"; the person tab has a person icon and its own tint */
+.n1chat-sub { margin: 0; padding: var(--sp-1) var(--sp-3); color: var(--muted); font-size: var(--fs-xs); border-bottom: 1px solid var(--soft); }
+.n1chat-tab-person { display: inline-flex; align-items: center; gap: var(--sp-1); }
+.n1chat-tab-person .n1chat-mark { width: 1em; height: 1em; }
+.n1chat.n1chat-person .n1chat-head { box-shadow: inset 0 -2px 0 var(--accent); }

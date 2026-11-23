@@ -457,21 +457,21 @@ let base;
     const { ctx, page } = await portal(browser);
     await page.evaluate(() => {
       window.heard = [];
-      window.tab = window.widget.addTab({ id: "pradeep", label: "Pradeep", launcher: { label: "ask Neo or Pradeep", aria: "Ask Neo or message Pradeep" }, onselect: (on) => window.heard.push(on) });
+      window.tab = window.widget.addTab({ id: "pradeep", label: "neon1", hint: "Replies by email", launcher: { label: "ask Neo or neon1", aria: "Ask Neo or message neon1" }, onselect: (on) => window.heard.push(on) });
       window.tab.el.append(Object.assign(document.createElement("p"), { id: "mine", textContent: "the other conversation" }));
     });
-    assert.deepEqual(await page.$$eval(".n1chat-tab", (b) => b.map((x) => x.firstChild.textContent === "" ? x.textContent : x.textContent)), ["Neo", "Pradeep"]);
-    assert.equal(await page.$eval(".n1chat-launch .n1chat-label", (n) => n.textContent), "ask Neo or Pradeep");
+    assert.deepEqual(await page.$$eval(".n1chat-tab", (b) => b.map((x) => x.firstChild.textContent === "" ? x.textContent : x.textContent)), ["Neo", "neon1"]);
+    assert.equal(await page.$eval(".n1chat-launch .n1chat-label", (n) => n.textContent), "ask Neo or neon1");
     await page.evaluate(() => window.tab.badge(3));
     assert.equal(await page.$eval(".n1chat-launch .n1chat-badge", (n) => n.textContent), "3");
-    assert.match(await page.getAttribute(sel.launch, "aria-label"), /message Pradeep, 3 new/);
+    assert.match(await page.getAttribute(sel.launch, "aria-label"), /message neon1, 3 new/);
     await open(page);
-    // Neo shows first; then the Pradeep tab hides Neo's log, box and notes and shows its own part
+    // Neo shows first; then the neon1 tab hides Neo's log, box and notes and shows its own part
     assert.ok(await page.isVisible(sel.log));
-    await page.click('.n1chat-tab:has-text("Pradeep")');
+    await page.click('.n1chat-tab:has-text("neon1")');
     assert.ok(!(await page.isVisible(sel.log)) && !(await page.isVisible(sel.input)) && !(await page.isVisible(".n1chat-human")));
     assert.ok(await page.isVisible("#mine"));
-    assert.equal(await page.getAttribute('.n1chat-tab:has-text("Pradeep")', "aria-selected"), "true");
+    assert.equal(await page.getAttribute('.n1chat-tab:has-text("neon1")', "aria-selected"), "true");
     assert.ok(!(await page.isVisible(sel.fresh)));
     await page.click('.n1chat-tab:has-text("Neo")');
     assert.ok(await page.isVisible(sel.log) && !(await page.isVisible("#mine")) && await page.isVisible(sel.fresh));

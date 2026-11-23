@@ -63,6 +63,15 @@ function feedbackMark() {
 }
 
 // The neon1 mark (the site logo's eight arcs), drawn in the current text color
+function person() {
+  const svg = document.createElementNS(SVG, "svg");
+  for (const [k, v] of Object.entries({ viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "2", "stroke-linecap": "round", "aria-hidden": "true", class: "n1chat-mark" })) svg.setAttribute(k, v);
+  const c = document.createElementNS(SVG, "circle"); c.setAttribute("cx", "12"); c.setAttribute("cy", "8"); c.setAttribute("r", "4");
+  const b = document.createElementNS(SVG, "path"); b.setAttribute("d", "M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7");
+  svg.append(c, b);
+  return svg;
+}
+
 function mark() {
   const svg = document.createElementNS(SVG, "svg");
   for (const [k, v] of Object.entries({ viewBox: "3 4 58 58", fill: "none", stroke: "currentColor", "stroke-width": "3.4", "stroke-linecap": "round", "aria-hidden": "true", class: "n1chat-mark" })) svg.setAttribute(k, v);
@@ -180,6 +189,8 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
   const tools = el("span", "n1chat-tools");
   tools.append(fresh, close);
   head.append(title, tools);
+  // One line under the tabs says what this conversation is: Neo is instant and automated, the other is a person who replies later
+  const sub = el("p", "n1chat-sub", "Instant answers, automated");
 
   // The greeting says plainly that Neo is automated
   const log = el("div", "n1chat-log", null, { role: "log", "aria-live": "polite" });
@@ -239,11 +250,12 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
   feedbackLink.append(feedbackMark(), "feedback");
   bug.append(el("span", "n1chat-lead", "report"), bugLink, el("span", "n1chat-sep", "\\", { "aria-hidden": "true" }), feedbackLink);
 
-  panel.append(head, log, form, note, human, bug);
+  sub.hidden = true;
+  panel.append(head, sub, log, form, note, human, bug);
   for (const cls of className.split(/\s+/).filter(Boolean)) for (const node of [launcher, panel]) node.classList.add(cls);
   root.append(launcher, panel);
 
-  // ---- Other conversations beside Neo: a host page adds a tab (1NEON adds Pradeep), and Neo's own parts hide while it shows ----
+  // ---- Other conversations beside Neo: a host page adds a tab (1NEON adds neon1), and Neo's own parts hide while it shows ----
   const neoParts = [log, form, note, human];
   const tabs = [];
   let neoTab = null;
@@ -260,6 +272,9 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
     for (const n of neoParts) n.hidden = !neo;
     fresh.hidden = !neo;
     neoTab?.setAttribute("aria-selected", String(neo));
+    sub.textContent = neo ? "Instant answers, automated" : tabs.find((t) => t.id === id)?.hint ?? "";
+    sub.hidden = !tabs.length;
+    panel.classList.toggle("n1chat-person", !neo);
     for (const t of tabs) { t.el.hidden = t.id !== id; t.button.setAttribute("aria-selected", String(t.id === id)); }
     tell();
   }
@@ -273,7 +288,7 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
     launcher.setAttribute("aria-label", `${named ? named.launcher?.aria ?? launchAria : launchAria}${n > 0 ? `, ${n} new` : ""}`);
     launcher.classList.toggle("n1chat-wide", Boolean(named?.launcher?.label));
   }
-  function addTab({ id, label, launcher: spec, onselect }) {
+  function addTab({ id, label, hint, launcher: spec, onselect }) {
     if (!neoTab) {
       neoTab = el("button", "n1chat-title n1chat-tab", null, { type: "button", role: "tab", "aria-selected": "true" });
       neoTab.append(mark(), "Neo");
@@ -283,14 +298,15 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
       title.replaceWith(bar);
       neoTab.bar = bar;
     }
-    const button = el("button", "n1chat-title n1chat-tab", label, { type: "button", role: "tab", "aria-selected": "false" });
+    const button = el("button", "n1chat-title n1chat-tab n1chat-tab-person", null, { type: "button", role: "tab", "aria-selected": "false" });
+    button.append(person(), label);
     const count = badge(0);
     button.append(count);
     button.addEventListener("click", () => select(id));
     neoTab.bar.append(button);
     const box = el("div", "n1chat-extra", null, { hidden: "" });
     form.before(box);
-    const t = { id, button, el: box, count: 0, launcher: spec, onselect };
+    const t = { id, button, el: box, count: 0, launcher: spec, onselect, hint };
     tabs.push(t);
     paintLauncher();
     tell();
