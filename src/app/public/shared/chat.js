@@ -243,6 +243,73 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
   for (const cls of className.split(/\s+/).filter(Boolean)) for (const node of [launcher, panel]) node.classList.add(cls);
   root.append(launcher, panel);
 
+  // ---- Other conversations beside Neo: a host page adds a tab (1NEON adds Pradeep), and Neo's own parts hide while it shows ----
+  const neoParts = [log, form, note, human];
+  const tabs = [];
+  let neoTab = null;
+  let current = "neo";
+  const launchLabel = launcher.querySelector(".n1chat-label");
+  const launchAria = launcher.getAttribute("aria-label");
+  const launchText = launchLabel.textContent;
+  const badge = (n) => { const b = el("b", "n1chat-badge", n > 0 ? String(n > 9 ? "9+" : n) : "", { "aria-hidden": "true" }); b.hidden = !(n > 0); return b; };
+  // Each tab hears whether it is the one in view (shown and the window open), so a conversation reads only while someone can see it
+  const tell = () => { for (const t of tabs) t.onselect?.(t.id === current && !panel.hidden); };
+  function select(id) {
+    current = id;
+    const neo = id === "neo";
+    for (const n of neoParts) n.hidden = !neo;
+    fresh.hidden = !neo;
+    neoTab?.setAttribute("aria-selected", String(neo));
+    for (const t of tabs) { t.el.hidden = t.id !== id; t.button.setAttribute("aria-selected", String(t.id === id)); }
+    tell();
+  }
+  const total = () => tabs.reduce((n, t) => n + t.count, 0);
+  function paintLauncher() {
+    const n = total();
+    launcher.querySelector(".n1chat-badge")?.remove();
+    if (n > 0) launcher.append(Object.assign(badge(n), { className: "n1chat-badge n1chat-badge-launch" }));
+    const named = tabs[0];
+    launchLabel.textContent = named ? named.launcher?.label ?? launchText : launchText;
+    launcher.setAttribute("aria-label", `${named ? named.launcher?.aria ?? launchAria : launchAria}${n > 0 ? `, ${n} new` : ""}`);
+    launcher.classList.toggle("n1chat-wide", Boolean(named?.launcher?.label));
+  }
+  function addTab({ id, label, launcher: spec, onselect }) {
+    if (!neoTab) {
+      neoTab = el("button", "n1chat-title n1chat-tab", null, { type: "button", role: "tab", "aria-selected": "true" });
+      neoTab.append(mark(), "Neo");
+      neoTab.addEventListener("click", () => select("neo"));
+      const bar = el("span", "n1chat-tabs", null, { role: "tablist" });
+      bar.append(neoTab);
+      title.replaceWith(bar);
+      neoTab.bar = bar;
+    }
+    const button = el("button", "n1chat-title n1chat-tab", label, { type: "button", role: "tab", "aria-selected": "false" });
+    const count = badge(0);
+    button.append(count);
+    button.addEventListener("click", () => select(id));
+    neoTab.bar.append(button);
+    const box = el("div", "n1chat-extra", null, { hidden: "" });
+    form.before(box);
+    const t = { id, button, el: box, count: 0, launcher: spec, onselect };
+    tabs.push(t);
+    paintLauncher();
+    tell();
+    return {
+      el: box,
+      // How many are new in this conversation: on the tab and on the launcher
+      badge(n) { t.count = n; count.textContent = n > 9 ? "9+" : String(n); count.hidden = !(n > 0); paintLauncher(); },
+      show() { open(true); select(id); },
+      remove() {
+        tabs.splice(tabs.indexOf(t), 1);
+        box.remove();
+        button.remove();
+        if (!tabs.length && neoTab) { neoTab.bar.replaceWith(title); neoTab = null; }
+        select("neo");
+        paintLauncher();
+      },
+    };
+  }
+
   // ---- Follow the page between its dark and light looks ----
   let frame = 0;
   const theme = () => {
@@ -341,6 +408,8 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
   }
   launcher.addEventListener("click", () => open(true));
   close.addEventListener("click", () => open(false));
+  // Tabs hear when the window opens or closes (it is hidden at the start of each fold's end and shown at each open)
+  new MutationObserver(tell).observe(panel, { attributes: true, attributeFilter: ["hidden"] });
   panel.addEventListener("keydown", (e) => {
     if (e.key === "Escape") return open(false);
     // On a narrow screen the window covers the page, so it behaves as a modal there: Tab and Shift+Tab
@@ -523,5 +592,5 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
     if (!panel.hidden && (!now || now === document.body || panel.contains(now))) input.focus({ preventScroll: true });
   }
 
-  return { open: () => open(true), close: () => open(false) };
+  return { open: () => open(true), close: () => open(false), addTab, show: (id) => { open(true); select(id); } };
 }

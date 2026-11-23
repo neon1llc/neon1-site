@@ -453,6 +453,43 @@ let base;
 
   // ---- CHAT-03 and rendering ----
 
+  await check("a host page can add a tab beside Neo: Neo's parts hide while it shows, it hears when it is in view, and its count shows on the tab and the launcher", async () => {
+    const { ctx, page } = await portal(browser);
+    await page.evaluate(() => {
+      window.heard = [];
+      window.tab = window.widget.addTab({ id: "pradeep", label: "Pradeep", launcher: { label: "ask Neo or Pradeep", aria: "Ask Neo or message Pradeep" }, onselect: (on) => window.heard.push(on) });
+      window.tab.el.append(Object.assign(document.createElement("p"), { id: "mine", textContent: "the other conversation" }));
+    });
+    assert.deepEqual(await page.$$eval(".n1chat-tab", (b) => b.map((x) => x.firstChild.textContent === "" ? x.textContent : x.textContent)), ["Neo", "Pradeep"]);
+    assert.equal(await page.$eval(".n1chat-launch .n1chat-label", (n) => n.textContent), "ask Neo or Pradeep");
+    await page.evaluate(() => window.tab.badge(3));
+    assert.equal(await page.$eval(".n1chat-launch .n1chat-badge", (n) => n.textContent), "3");
+    assert.match(await page.getAttribute(sel.launch, "aria-label"), /message Pradeep, 3 new/);
+    await open(page);
+    // Neo shows first; then the Pradeep tab hides Neo's log, box and notes and shows its own part
+    assert.ok(await page.isVisible(sel.log));
+    await page.click('.n1chat-tab:has-text("Pradeep")');
+    assert.ok(!(await page.isVisible(sel.log)) && !(await page.isVisible(sel.input)) && !(await page.isVisible(".n1chat-human")));
+    assert.ok(await page.isVisible("#mine"));
+    assert.equal(await page.getAttribute('.n1chat-tab:has-text("Pradeep")', "aria-selected"), "true");
+    assert.ok(!(await page.isVisible(sel.fresh)));
+    await page.click('.n1chat-tab:has-text("Neo")');
+    assert.ok(await page.isVisible(sel.log) && !(await page.isVisible("#mine")) && await page.isVisible(sel.fresh));
+    // The tab hears true only while it is selected and the window is open, and false otherwise
+    await page.evaluate(() => window.tab.show());
+    await page.click(sel.close);
+    await page.waitForTimeout(700);
+    const heard = await page.evaluate(() => window.heard);
+    assert.equal(heard.at(-1), false);
+    assert.ok(heard.includes(true));
+    // Removing it puts the plain Neo title and launcher back
+    await page.evaluate(() => window.tab.remove());
+    assert.equal(await page.$$eval(".n1chat-tab", (b) => b.length), 0);
+    assert.equal(await page.$eval(".n1chat-launch .n1chat-label", (n) => n.textContent), "ask Neo");
+    assert.equal(await page.$(".n1chat-launch .n1chat-badge"), null);
+    await ctx.close();
+  });
+
   await check("the box carries a privacy reminder with a link to the policy", async () => {
     const { ctx, page } = await portal(browser);
     await open(page);

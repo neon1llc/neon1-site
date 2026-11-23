@@ -151,3 +151,18 @@
 body.case-open .n1chat, body.case-open .n1chat-launch, body.white-rabbit-on .n1chat, body.white-rabbit-on .n1chat-launch { display: none; }
 /* The menu is opaque and covers the screen, so the chat goes under it (the menu is z-index 7) and stays put, rather than vanishing and returning as it opens and closes */
 .n1chat.under-menu, .n1chat-launch.under-menu { z-index: 6; }
+
+
+/* ---- Tabs: Neo beside another conversation (1NEON adds Pradeep). A hidden part stays hidden whatever display it has ---- */
+.n1chat [hidden] { display: none !important; }
+.n1chat-tabs { display: inline-flex; align-items: center; gap: var(--sp-3); }
+.n1chat-tab { background: none; border: 0; padding: 0 0 2px; cursor: pointer; opacity: .6; border-bottom: 2px solid transparent; }
+.n1chat-tab[aria-selected="true"] { opacity: 1; border-bottom-color: var(--accent); }
+.n1chat-badge { min-width: 18px; height: 18px; padding: 0 5px; margin-left: var(--sp-1); border-radius: 9px; background: var(--accent); color: var(--accent-ink); font: 700 var(--fs-xs) var(--mono); display: inline-grid; place-items: center; }
+.n1chat-launch .n1chat-badge-launch { position: absolute; top: -6px; right: -6px; margin: 0; }
+.n1chat-extra { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+/* The launcher names both when it has a second tab, so its label is wider (a phone keeps the round mark, as above) */
+.n1chat-launch.n1chat-wide:hover .n1chat-label, .n1chat-launch.n1chat-wide:focus-visible .n1chat-label, .n1chat-launch.n1chat-wide.n1chat-peek .n1chat-label { max-width: 170px; }
+@media (max-width: 700px), (hover: none) {
+  .n1chat-launch.n1chat-wide:hover .n1chat-label, .n1chat-launch.n1chat-wide:focus-visible .n1chat-label, .n1chat-launch.n1chat-wide.n1chat-peek .n1chat-label { max-width: 0; }
+}

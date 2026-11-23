@@ -5,6 +5,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 ## Unreleased
 
 ### Added
+- Neo's window takes tabs from the page that mounts it: Neo stays the first, and 1NEON adds Pradeep beside it for a signed-in person, with a count on the tab and the launcher, and the launcher reading "ask Neo or Pradeep".
 - Neo's "Reach a person" line starts with chat, which opens sign-up in 1NEON (a free account can chat with Pradeep), before book, email, and call.
 
 ### Removed
