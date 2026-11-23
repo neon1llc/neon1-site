@@ -24,7 +24,7 @@ neon1 is the independent engineering and technology consulting practice of neon1
 - [Capability statement](https://neon1.tech/knowledge/engagement/capabilities/): neon1 on one page for a buyer, partner, or procurement office: what it does, how it differs, work it has delivered, and the company's details.
 - [Contact](https://neon1.tech/knowledge/engagement/contact/): How to reach neon1, when, and what the first call covers.
 - [Services](https://neon1.tech/knowledge/engagement/services/): Workflow automation, cloud and AI engineering, networks and connected systems, and security readiness, from a focused assessment to a complete implementation.
-- [How I price my work](https://neon1.tech/knowledge/engagement/pricing/): How a neon1 project is priced: a fixed price or a capped estimate, rough ranges, what the price includes, when it can change, and how paying works.
+- [How I price my work](https://neon1.tech/knowledge/engagement/pricing/): How a neon1 project is priced: an estimate set after discovery, rough ranges, what the price includes, how changes are agreed, and how paying works.
 - [How a project runs](https://neon1.tech/knowledge/engagement/process/): Listen, propose, decide, build and hand over.
 - [Publishing client work](https://neon1.tech/knowledge/engagement/publishing-client-work/): When and how a client's work appears as a case study: permission, anonymity, quotes, and figures.
 - [Service agreement](https://neon1.tech/knowledge/engagement/service-agreement/): neon1's service agreement, as a client organization signs it once in 1NEON: how work is agreed, purchases, paying, ownership, confidentiality, records, quality, limits, and ending.

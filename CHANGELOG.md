@@ -2,7 +2,7 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
-## Unreleased
+## v0.86.2
 
 ### Changed
 - The landing line reads "I help modernize the software, cloud, AI, networks, and security you already run, for what you need now and next."
