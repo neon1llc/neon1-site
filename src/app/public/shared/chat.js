@@ -25,6 +25,7 @@ const FOLD_MS = 450;
 // Starting points for a first-time visitor, and the ways to reach a person
 const SUGGESTIONS = ["What does neon1 do?", "How does a project work?", "What is 1NEON?", "When are you available?"];
 const BOOKING = "https://calendly.com/1isgladtobeofservice/neon1-consultation";
+const CHAT = "/1NEON/?signup=1";
 const EMAIL = "mailto:hello@neon1.tech";
 const PHONE = "tel:+14243263661";
 
@@ -218,6 +219,9 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
   const human = el("p", "n1chat-human");
   human.append(
     "Reach a person: ",
+    // Chat is in 1NEON, with an account: this opens sign-up, where a free account is enough
+    el("a", "n1chat-plain n1chat-ext", "chat", { href: CHAT, target: "_blank", rel: "noopener", title: "Chat with me in 1NEON, with a free account" }),
+    ", ",
     el("a", "n1chat-plain n1chat-ext", "book", { href: BOOKING, target: "_blank", rel: "noopener" }),
     ", ",
     el("a", "n1chat-plain n1chat-ext", "email", { href: EMAIL, target: "_blank", rel: "noopener" }),

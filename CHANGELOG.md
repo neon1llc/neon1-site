@@ -4,6 +4,9 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+### Added
+- Neo's "Reach a person" line starts with chat, which opens sign-up in 1NEON (a free account can chat with Pradeep), before book, email, and call.
+
 ### Removed
 - The "how to read the evidence" fold under client work on the home page.
 
