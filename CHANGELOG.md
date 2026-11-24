@@ -2,10 +2,14 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
-## Unreleased
+## v0.87.0
 
 ### Added
 - What's new (`/knowledge/company/whats-new/`, linked from the footer's left side): releases and updated documents across neon1 since the relaunch on November 5, 2026, newest day first, each release linked to GitHub. `scripts/whats-new-external.json` lists updates that have no feed, such as profiles elsewhere.
+
+### Changed
+- Neo's greeting links "automated assistant" to How I work with AI. AI quality and oversight is a Knowledge Center page again. The diagram source dropdown styles are gone, since the diagrams show as images.
+- The checks run faster: the browser jobs run in Playwright's image, the history checks split in thirds, and `make bump VERSION=X.Y.Z` writes every version place.
 
 ### Fixed
 - A release's date on the releases page is the day of the commit its tag names, so versions tagged afterward show when the work was done.
