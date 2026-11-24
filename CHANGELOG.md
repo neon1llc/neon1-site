@@ -2,7 +2,7 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
-## Unreleased
+## v0.87.2
 
 ### Changed
 - The old address of Outlining a project now opens the What to write section of How 1NEON accounts work.
