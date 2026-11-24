@@ -87,9 +87,19 @@ async function read(page, fn) {
     }
   }
 }
+// Where the page stands, once it has stopped moving. The page restores a spot with a timed glide that starts on a
+// frame, so on a busy machine (WebKit drawing the Matrix look in software) the glide can begin late or crawl at its
+// end. A position that held for one poll can be the old one; it counts as settled only after two frames have been
+// drawn and it has held for three polls in a row
 async function at(page) {
-  let last = -1, y = await read(page, () => Math.round(scrollY));
-  for (let i = 0; i < 12 && y !== last; i++) { last = y; await page.waitForTimeout(250); y = await read(page, () => Math.round(scrollY)); }
+  await read(page, () => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+  let last = NaN, held = 0, y = NaN;
+  for (let i = 0; i < 24 && held < 3; i++) {
+    y = await read(page, () => Math.round(scrollY));
+    held = y === last ? held + 1 : 0;
+    last = y;
+    if (held < 3) await page.waitForTimeout(250);
+  }
   return {
     y, path: await read(page, () => location.pathname), hash: await read(page, () => location.hash),
     panel: await read(page, () => document.body.classList.contains("case-open")),
@@ -124,10 +134,10 @@ async function viaMenu(page, selector) {
   await click(page, "#menuBtn");
   await page.waitForTimeout(700);
   await click(page, selector);
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(700);
 }
-async function back(page) { await page.goBack({ waitUntil: "load" }).catch(() => {}); await page.waitForTimeout(1500); }
-async function forward(page) { await page.goForward({ waitUntil: "load" }).catch(() => {}); await page.waitForTimeout(1500); }
+async function back(page) { await page.goBack({ waitUntil: "load" }).catch(() => {}); await page.waitForTimeout(700); }
+async function forward(page) { await page.goForward({ waitUntil: "load" }).catch(() => {}); await page.waitForTimeout(700); }
 
 async function main() {
   await new Promise((r) => server.listen(0, "127.0.0.1", r));
