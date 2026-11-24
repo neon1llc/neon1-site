@@ -36,7 +36,7 @@ GITLEAKS_IMAGE := ghcr.io/gitleaks/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79
 
 # Plain make shows the help
 .DEFAULT_GOAL := help
-.PHONY: help content corpus-tag static corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf releases-export blog blog-check blog-export report-bug report-bug-check feedback feedback-check check html js links logic frame frame-check release rollback manifest rehash models budget secrets behavior history perf serve three icons deploy invalidate verify indexnow dev-build dev-check dev-push dev-drop dev-rollback dev-gate dev-signout dev-allow dev-deny
+.PHONY: help content corpus-tag static corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf releases-export blog blog-check blog-export report-bug report-bug-check feedback feedback-check check html js links logic frame frame-check release bump rollback manifest rehash models budget secrets behavior history perf serve three icons deploy invalidate verify indexnow dev-build dev-check dev-push dev-drop dev-rollback dev-gate dev-signout dev-allow dev-deny
 
 
 ##@ Checks
@@ -155,6 +155,11 @@ knowledge-pdf: knowledge-export ## Print the knowledge center's PDFs next to the
 # The version meta on every page, the footer link, the CHANGELOG's top entry, and any literal ?v=
 release: ## Fail if the places that name the release disagree
 	@python3 scripts/release.py $(SITE_DIR) CHANGELOG.md
+
+# One command for the release number, so a release is one commit: write the CHANGELOG entry first, then make bump VERSION=X.Y.Z
+bump: ## Write VERSION into every place that names the release, then check them
+	@test -n "$(VERSION)" || { echo "bump: make bump VERSION=X.Y.Z"; exit 1; }
+	@python3 scripts/release.py --bump $(VERSION) $(SITE_DIR) CHANGELOG.md
 
 # Fonts and media are immutable once deployed: a path keeps its bytes for good (see README, Deploy)
 MANIFEST := src/app/asset-manifest.json
