@@ -507,7 +507,8 @@ let base;
     await ask(page, "Synthetic renderer test");
     await api.reply(await api.next(1), { reply: "<img src=x onerror=alert(1)> [bad](javascript:alert(1)) [safe](https://example.invalid/path)" });
     await page.waitForFunction(() => document.querySelector(".n1chat-log").textContent.includes("safe"));
-    const hrefs = await page.$$eval(".n1chat-log a[href]", (as) => as.map((a) => a.getAttribute("href")));
+    // The replies' links only: the greeting (no n1chat-in) carries neon1's own link to how it works with AI
+    const hrefs = await page.$$eval(".n1chat-log .n1chat-in a[href]", (as) => as.map((a) => a.getAttribute("href")));
     assert.deepEqual(hrefs, ["https://example.invalid/path"]);
     assert.equal(await page.$$eval(".n1chat-log img", (i) => i.length), 0);
     await ctx.close();
