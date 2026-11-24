@@ -224,7 +224,7 @@ jobs:
           NODE_PATH: ${{ github.workspace }}/knowledge/node_modules
           SHARD: ${{ matrix.shard }}/${{ strategy.job-total }}
           ONLY: ${{ needs.changes.outputs.only }}
-        run: make behavior
+        run: node scripts/behavior.cjs src/app/public
 
   # Back, Forward, and reload at the exact spot, for every menu, button, footer, card, and cross-page link, on an iPhone profile in
   # WebKit and in Chromium, in both looks (scripts/history.cjs). One job for each engine and look, beside the behavior shards
@@ -263,7 +263,7 @@ jobs:
           NODE_PATH: ${{ github.workspace }}/knowledge/node_modules
           ENGINES: ${{ matrix.engine }}
           LOOKS: ${{ matrix.look }}
-        run: make history
+        run: node scripts/history.cjs src/app/public
 
   # The chat window's checks, beside the shards, when the chat or anything shared changed
   chat:
