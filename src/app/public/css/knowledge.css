@@ -366,11 +366,8 @@ body.kc { background: var(--page); }
    clear: 50vw - 530px is the margin left of the column (its left edge is 50vw - 506px, with 24px kept at the page edge), up to 260px */
 @media (min-width: 1140px) {
   .has-toc .diagram { --bleed: min(260px, max(0px, 50vw - 530px)); margin-left: calc(-1 * var(--bleed)); }
-  .has-toc .diagram > :not(.diagram-scroll) { margin-left: var(--bleed); } /* the links and source stay in the text column */
+  .has-toc .diagram > :not(.diagram-scroll) { margin-left: var(--bleed); } /* the link stays in the text column */
 }
-.diagram details { margin-top: var(--sp-2); }
-.diagram summary { cursor: pointer; font: var(--fs-sm) var(--mono); color: var(--brand); min-height: 32px; display: inline-flex; align-items: center; }
-.diagram pre { overflow-x: auto; padding: var(--sp-3); border-radius: 8px; background: rgb(var(--brand-rgb) / .045); font: var(--fs-xs)/1.5 var(--mono); }
 .diagram-open { margin: var(--sp-2) 0 0; font: var(--fs-sm) var(--mono); }
 .diagram-open a { color: var(--brand); }
 
