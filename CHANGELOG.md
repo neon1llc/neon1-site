@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.87.1
+
+### Changed
+- The landing's about says how neon1 began, with free work for people I already knew, and drops the line about who you talk to. The process note says what you do in 1NEON, and the call request in 1NEON is "Ask me to email you". The networks service is Networks, devices, and connected systems, and names IoT, sensors, and hardware. Smaller trims: "weighing" for "with attention to" in two service lines, and the contact line for writing first. The copy guide's voice line matches the corpus.
+
 ## v0.87.0
 
 ### Added
