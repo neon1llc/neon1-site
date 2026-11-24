@@ -334,6 +334,8 @@ const RETIRED = {
   "company/charter": "company/charter.md",
   "company/how-it-works": "company/how-it-works.md",
   "neo/motifs": null,
+  // Merged into another page: a value that starts with "/" is an address on this site
+  "guides/outline-a-project": "/knowledge/guides/free-accounts/#what-to-write",
   ...Object.fromEntries(["code-style", "customers", "design-and-accessibility", "development",
     "discovery-and-delivery", "documentation", "measurement", "operating-principles", "outreach", "partners",
     "reliability-and-recovery", "security-and-data", "technology-decisions", "testing-and-review", "version-control",
@@ -357,7 +359,8 @@ const moved = (to) => `<!doctype html>
 for (const [path, source] of Object.entries(RETIRED)) {
   const key = `knowledge/${path}/index.html`
   if (want.has(key)) continue
-  want.set(key, moved(source ? `https://github.com/neon1llc/neon1-corpus/blob/main/corpus/${source}` : "/knowledge/"))
+  const onSite = source?.startsWith("/")
+  want.set(key, moved(onSite ? source : source ? `https://github.com/neon1llc/neon1-corpus/blob/main/corpus/${source}` : "/knowledge/"))
 }
 
 // Diagrams the documents draw (neon1-corpus tools/diagrams.mjs), served beside them as image files
