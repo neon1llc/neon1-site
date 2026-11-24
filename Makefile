@@ -71,7 +71,7 @@ logic: ## Check the white rabbit's scene lifetime, and that the links check fail
 	@node scripts/rabbit_lifecycle.cjs $(SITE_DIR)
 	@python3 scripts/test_check_page.py
 	@python3 scripts/test_change_map.py
-	@node --test scripts/knowledge.test.mjs scripts/releases.test.mjs scripts/theme.test.cjs scripts/scale.test.cjs scripts/caret.test.cjs
+	@node --test scripts/knowledge.test.mjs scripts/releases.test.mjs scripts/whats-new.test.mjs scripts/theme.test.cjs scripts/scale.test.cjs scripts/caret.test.cjs
 
 # The bar and footer markup lives once, in index.html; other pages get copies
 frame: ## Copy the shared bar and footer blocks from index.html into the other pages

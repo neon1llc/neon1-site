@@ -2,7 +2,7 @@
 # scripts/releases.sh - Gathers what the Knowledge Center's releases page is written from (make releases-export).
 # Usage: scripts/releases.sh OUT_DIR
 #
-# For every public neon1 repository it writes OUT_DIR/<repo>.tags (each tag and the day it was made) and
+# For every public neon1 repository it writes OUT_DIR/<repo>.tags (each tag and the day of the commit it names, so a tag made later still shows when the work was done) and
 # OUT_DIR/<repo>.md (CHANGELOG.md at the newest vX.Y.Z tag, so only released work shows). neon1-site's own
 # changelog is this checkout's, since the release being built isn't tagged until it's live. OUT_DIR/pin.txt names
 # the tag read from each other repository; RELEASES_PIN (the same repo@tag list, comma separated) fixes the set,
@@ -18,7 +18,7 @@ pin=()
 for repo in neon1-site $REPOS; do
   g="$out/git/$repo.git"
   git clone -q --bare --filter=tree:0 "https://github.com/neon1llc/$repo.git" "$g"
-  git -C "$g" for-each-ref --format='%(refname:short) %(creatordate:short)' 'refs/tags/v*' > "$out/$repo.tags"
+  git -C "$g" for-each-ref --format='%(refname:short) %(if)%(*committerdate:short)%(then)%(*committerdate:short)%(else)%(committerdate:short)%(end)' 'refs/tags/v*' > "$out/$repo.tags"
   [ "$repo" = neon1-site ] && continue
   # The pinned tag when the deploy job gave one, else the newest release (pre-releases left out)
   tag=$(tr ',' '\n' <<< "${RELEASES_PIN:-}" | sed -n "s|^$repo@||p")

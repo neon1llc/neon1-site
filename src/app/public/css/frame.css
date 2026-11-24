@@ -367,7 +367,9 @@ footer .foot h2 { font: 600 var(--fs-sm) var(--mono); letter-spacing: .01em; col
 /* The look picker: two plain text buttons for the same choice as the bar's style switch, which only the landing's first screen shows */
 /* The theme choice: the legal strip's first line, ending where the report line ends */
 /* 32px under it, the room between the copyright lines and the report line (the strip's bottom padding less half the launcher row), the strip's 8px gap included */
-.legal .look-pick { flex: 0 0 100%; display: flex; justify-content: flex-end; align-items: baseline; gap: 6px; margin: 0 0 24px; font: var(--fs-xs) var(--mono); }
+/* What's new sits at the left of that line, the theme choice at the right */
+.legal .foot-meta { flex: 0 0 100%; display: flex; justify-content: space-between; align-items: baseline; gap: var(--sp-3); margin: 0 0 24px; font: var(--fs-xs) var(--mono); }
+.legal .look-pick { display: flex; align-items: baseline; gap: 6px; margin: 0 0 0 auto; }
 @media (min-width: 1320px) { .legal .look-pick { margin-right: calc(-1 * ((100vw - var(--sbw, 0px) - 1200px) / 4 + 38px)); } }
 .legal .look-lead { margin-right: .4em; }
 .legal .look-opt { padding: 0; border: 0; background: none; color: var(--muted); font: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; cursor: pointer; }

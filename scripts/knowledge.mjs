@@ -15,6 +15,7 @@ import { readFileSync, readdirSync, existsSync } from "node:fs"
 import { join } from "node:path"
 import { load, pageBody, relink, classifyLinks, bindExtArrows, fillNote, TASK_PATHS, searchIndex, esc, longDate, TYPE_LABELS, SITE, BASE, slugOf } from "./knowledge-lib.mjs"
 import { gather, releasesBody, releasesSections, releasesLd, pinOf, RELEASES_URL } from "./releases-lib.mjs"
+import { releaseItems, docItems, externalItems, feedBody, whatsNewLd, monthLabel, SINCE, WHATS_NEW_URL } from "./whats-new-lib.mjs"
 import { homeFrame, page as page_, ORG, WEBSITE, AUTHOR, LICENSE, OG_IMAGE, crumbs, band, card as cardOf, CORPUS_LINK, rights, dateFacts, docMain, sitemapWith, syncFolder } from "./page-shell.mjs"
 
 
@@ -301,6 +302,27 @@ if (releases) {
     ld: [releasesLd(updated), crumbs([["Knowledge center", `${SITE}${BASE}`], ["Releases"]])],
   }))
   want.set("knowledge/releases.json", JSON.stringify({ pin: pinOf(releasesDir) }) + "\n")
+  // What's new: the same releases, the corpus documents' update dates, and the hand-kept outside list, one feed by day
+  const feed = feedBody([
+    ...releaseItems(releases.all),
+    ...docItems(corpus.docs),
+    ...externalItems(JSON.parse(readFileSync(new URL("./whats-new-external.json", import.meta.url), "utf8"))),
+  ])
+  const feedMain = docMain({
+    crumbs: [["Knowledge center", BASE], ["What's new"]],
+    title: "What's new",
+    summary: `Releases and updated documents across neon1, since ${monthLabel(SINCE)}.`,
+    facts: [feed.latest ? ["Updated", longDate(feed.latest)] : null].filter(Boolean),
+    sections: feed.sections,
+    body: feed.html,
+    colophon: `Release notes are on the <a href="${RELEASES_URL}">releases page</a>.`,
+  })
+  want.set(`${WHATS_NEW_URL.slice(1)}index.html`, page({
+    title: "What's new · neon1 knowledge center",
+    description: "Releases and updated documents across neon1.tech, 1NEON, Neo, the Knowledge Center, and neon1's public tools.",
+    path: WHATS_NEW_URL, main: feedMain, kind: "doc",
+    ld: [whatsNewLd(feed.latest), crumbs([["Knowledge center", `${SITE}${BASE}`], ["What's new"]])],
+  }))
 }
 // Which corpus release these pages came from. The deploy workflow's watch reads it from the live site and
 // publishes when a newer release exists, so it must name the tag and the bundle's digest exactly
@@ -346,7 +368,7 @@ if (existsSync(diagramsDir)) for (const f of readdirSync(diagramsDir)) if (f.end
 const sitemapFile = join(siteDir, "sitemap.xml")
 const sitemapNow = readFileSync(sitemapFile, "utf8")
 const lastmod = corpus.docs.map((d) => d.data.updated).sort().at(-1)
-const sitemapWant = sitemapWith(sitemapNow, "knowledge", [[`${SITE}${BASE}`, lastmod], ...(releases ? [[`${SITE}${RELEASES_URL}`, releases.all[0]?.date]] : []), ...corpus.docs.map((d) => [`${SITE}${d.url}`, d.data.updated])])
+const sitemapWant = sitemapWith(sitemapNow, "knowledge", [[`${SITE}${BASE}`, lastmod], ...(releases ? [[`${SITE}${RELEASES_URL}`, releases.all[0]?.date], [`${SITE}${WHATS_NEW_URL}`, releases.all[0]?.date]] : []), ...corpus.docs.map((d) => [`${SITE}${d.url}`, d.data.updated])])
 
 // llms.txt (llmstxt.org): a plain map of the site for AI assistants and answer engines, written from the same
 // corpus so it never drifts from the pages. Each shelf lists its documents with their one-line summaries

@@ -32,6 +32,10 @@ Every build reads the newest corpus release (the highest `vX.Y.Z` tag; `make cor
 - Try unreleased corpus edits with `CORPUS_DIR=../neon1-corpus`.
 - Checks need network access once, to fetch the release into `.corpus/`.
 
+### What's new
+
+`/knowledge/company/whats-new/` lists releases and updated documents since the relaunch (`SINCE` in `scripts/whats-new-lib.mjs`, November 5, 2026), newest day first. It is built with the Knowledge Center from the same inputs as the releases page, plus each document's `updated` date from the corpus. Updates with no feed, such as a profile elsewhere, go in `scripts/whats-new-external.json` as `{ "date": "YYYY-MM-DD", "source": "Upwork", "title": "...", "url": "https://..." }`; the build fails on an incomplete row. Raw commits never appear.
+
 ### Publishing a corpus release
 
 A corpus release reaches neon1.tech without a site change. The deploy workflow's watch runs every 15 minutes, or on demand from the Actions tab. It compares the newest corpus release with `/knowledge/corpus.json` on the live site. When they differ, it runs the same checks, browser tests, PDF printing, and release switch as a site deploy, built from `main` and that corpus release. The site's version and tags don't move, and `/knowledge/corpus.json` names the corpus release that's live.

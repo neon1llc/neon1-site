@@ -2,6 +2,14 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## Unreleased
+
+### Added
+- What's new (`/knowledge/company/whats-new/`, linked from the footer's left side): releases and updated documents across neon1 since the relaunch on November 5, 2026, newest day first, each release linked to GitHub. `scripts/whats-new-external.json` lists updates that have no feed, such as profiles elsewhere.
+
+### Fixed
+- A release's date on the releases page is the day of the commit its tag names, so versions tagged afterward show when the work was done.
+
 ## v0.86.3
 
 ### Changed
