@@ -27,7 +27,7 @@ Least and best words for understanding, interest, and confidence. Judge every li
 
 ## Voice
 
-First person where the company speaks, because neon1 is one person's practice. Plain, specific, candid about limits. Say what neon1 does not do when someone else fits better.
+First person where the company speaks, because neon1 is one person's practice. Plain, specific, confident about what neon1 covers. Name the specialist or tool that fits when one does, and state a limit only where it changes the reader's decision.
 
 ## Check
 
