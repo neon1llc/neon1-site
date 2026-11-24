@@ -312,7 +312,7 @@ const RETIRED = {
   "company/charter": "company/charter.md",
   "company/how-it-works": "company/how-it-works.md",
   "neo/motifs": null,
-  ...Object.fromEntries(["ai-quality", "code-style", "customers", "design-and-accessibility", "development",
+  ...Object.fromEntries(["code-style", "customers", "design-and-accessibility", "development",
     "discovery-and-delivery", "documentation", "measurement", "operating-principles", "outreach", "partners",
     "reliability-and-recovery", "security-and-data", "technology-decisions", "testing-and-review", "version-control",
     "versioning", "writing"].map((n) => [`standards/${n}`, `standards/${n}.md`])),
