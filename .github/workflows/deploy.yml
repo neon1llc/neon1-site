@@ -227,7 +227,7 @@ jobs:
         run: node scripts/behavior.cjs src/app/public
 
   # Back, Forward, and reload at the exact spot, for every menu, button, footer, card, and cross-page link, on an iPhone profile in
-  # WebKit and in Chromium, in both looks (scripts/history.cjs). One job for each engine and look, beside the behavior shards
+  # WebKit and in Chromium, in both looks (scripts/history.cjs). One job for each engine, look, and third of the cases, beside the behavior shards
   history:
     needs: [plan, build, changes]
     if: needs.plan.outputs.go == 'true' && needs.changes.outputs.behavior == 'true'
@@ -242,6 +242,8 @@ jobs:
       matrix:
         engine: [webkit, chromium]
         look: [sentinel, matrix]
+        # A third of the cases on each machine, so the longest job is about three minutes, not nine
+        shard: [1, 2, 3]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -258,11 +260,12 @@ jobs:
       - run: tar xzf "$RUNNER_TEMP/site/site.tgz" -C src/app/public
       - name: Install the checks' packages
         run: npm ci --prefix knowledge
-      - name: make history (${{ matrix.engine }}, ${{ matrix.look }})
+      - name: history (${{ matrix.engine }}, ${{ matrix.look }}, shard ${{ matrix.shard }} of 3)
         env:
           NODE_PATH: ${{ github.workspace }}/knowledge/node_modules
           ENGINES: ${{ matrix.engine }}
           LOOKS: ${{ matrix.look }}
+          SHARD: ${{ matrix.shard }}/3
         run: node scripts/history.cjs src/app/public
 
   # The chat window's checks, beside the shards, when the chat or anything shared changed

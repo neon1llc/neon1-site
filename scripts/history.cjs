@@ -24,6 +24,11 @@ const ENGINES = (process.env.ENGINES || "webkit,chromium").split(",");
 const LOOKS = (process.env.LOOKS || "sentinel,matrix").split(",");
 const ONLY = process.env.ONLY ? new RegExp(process.env.ONLY) : null;
 const TOLERANCE = 2;
+// SHARD="2/3" runs every third case, so CI can split one engine and look across machines; each case lands in exactly one shard
+const SHARD = (process.env.SHARD || "").match(/^(\d+)\/(\d+)$/);
+const [shardIndex, shardTotal] = SHARD ? [Number(SHARD[1]), Number(SHARD[2])] : [1, 1];
+if (shardIndex < 1 || shardIndex > shardTotal) throw new Error(`SHARD ${shardIndex}/${shardTotal}: the shard must be between 1 and ${shardTotal}`);
+let seen = 0;
 
 // ---- Server: SITE_DIR on loopback; a directory answers with its index.html ----
 const TYPES = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".woff2": "font/woff2", ".webp": "image/webp",
@@ -46,6 +51,7 @@ const RETRIES = Number(process.env.RETRIES ?? (process.env.CI ? 1 : 0));
 const retried = [];
 async function check(name, fn) {
   if (ONLY && !ONLY.test(name)) return;
+  if (seen++ % shardTotal !== shardIndex - 1) return;
   ran++;
   const t0 = Date.now();
   for (let tries = RETRIES; ; tries--) {
