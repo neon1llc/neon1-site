@@ -2,6 +2,16 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## v0.86.3
+
+### Changed
+- The landing line reads "I design, build, and modernize software, cloud, AI, and network systems, and the security around them."
+- The four service panels say what I choose, who does what, and what surrounds a review, in place of what I refuse. Their cue reads "details".
+
+### Fixed
+- An outbound link keeps the space before its last word on phones.
+- Running-text links show in the brand green in Matrix light mode.
+
 ## v0.86.2
 
 ### Changed
