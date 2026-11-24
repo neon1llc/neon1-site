@@ -191,6 +191,8 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
   head.append(title, tools);
   // One line under the tabs says what this conversation is: Neo is instant and automated, the other is a person who replies later
   const sub = el("p", "n1chat-sub", "Instant answers, automated");
+  // "automated" links to how neon1 works with AI, in a new tab so the conversation stays open
+  const aiLink = el("a", "n1chat-plain", "automated", { href: "/knowledge/policies/ai-use/", target: "_blank", rel: "noopener" });
 
   // The greeting says plainly that Neo is automated
   const log = el("div", "n1chat-log", null, { role: "log", "aria-live": "polite" });
@@ -272,7 +274,8 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
     for (const n of neoParts) n.hidden = !neo;
     fresh.hidden = !neo;
     neoTab?.setAttribute("aria-selected", String(neo));
-    sub.textContent = neo ? "Instant answers, automated" : tabs.find((t) => t.id === id)?.hint ?? "";
+    if (neo) sub.replaceChildren("Instant answers, ", aiLink);
+    else sub.textContent = tabs.find((t) => t.id === id)?.hint ?? "";
     sub.hidden = !tabs.length;
     panel.classList.toggle("n1chat-person", !neo);
     for (const t of tabs) { t.el.hidden = t.id !== id; t.button.setAttribute("aria-selected", String(t.id === id)); }

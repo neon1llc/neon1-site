@@ -24,7 +24,7 @@ neon1 is the independent engineering and technology consulting practice of neon1
 - [Capability statement](https://neon1.tech/knowledge/engagement/capabilities/): neon1 on one page for a buyer, partner, or procurement office: what it does, how it differs, work it has delivered, and the company's details.
 - [Contact](https://neon1.tech/knowledge/engagement/contact/): How to reach neon1, when, and what the first call covers.
 - [Services](https://neon1.tech/knowledge/engagement/services/): Workflow automation, cloud and AI engineering, networks and connected systems, and security readiness, from a focused assessment to a complete implementation.
-- [How I price my work](https://neon1.tech/knowledge/engagement/pricing/): How a neon1 project is priced: an estimate set after discovery, rough ranges, what the price includes, how changes are agreed, and how paying works.
+- [How I price my work](https://neon1.tech/knowledge/engagement/pricing/): How a neon1 project is priced: a first call, a written estimate for each piece of work, changes agreed before they are added, approval before work starts, and how paying works.
 - [How a project runs](https://neon1.tech/knowledge/engagement/process/): Listen, propose, decide, build and hand over.
 - [Publishing client work](https://neon1.tech/knowledge/engagement/publishing-client-work/): When and how a client's work appears as a case study: permission, anonymity, quotes, and figures.
 - [Service agreement](https://neon1.tech/knowledge/engagement/service-agreement/): neon1's service agreement, as a client organization signs it once in 1NEON: how work is agreed, purchases, paying, ownership, confidentiality, records, quality, limits, and ending.
@@ -39,10 +39,10 @@ neon1 is the independent engineering and technology consulting practice of neon1
 - [Outlining a project in 1NEON](https://neon1.tech/knowledge/guides/outline-a-project/): The six parts of a project outline, what a good answer looks like, where each part goes once work starts, and how Ready for Execute adds it up.
 - [A password manager for your family](https://neon1.tech/knowledge/guides/password-manager-for-family/): How to move a household onto a password manager, step by step, without locking anyone out.
 - [Cloud and AI engineering](https://neon1.tech/knowledge/guides/use-case-cloud/): Cloud architecture, infrastructure as code, delivery, migrations, and AI applications: when an independent engineer is worth bringing in, what I deliver, and how ownership stays with your team.
-- [Networks and connected systems](https://neon1.tech/knowledge/guides/use-case-networks/): Designing and integrating networks, devices, and connected environments: when it's worth doing, what I deliver, and which work belongs to licensed trades.
+- [Networks and connected systems](https://neon1.tech/knowledge/guides/use-case-networks/): Designing and integrating networks, devices, and connected environments: when it's worth doing, what I deliver, and how I work with installers and licensed trades.
 - [Security awareness sessions](https://neon1.tech/knowledge/guides/use-case-security-awareness/): How an informational security awareness session for a team or group runs, and what people leave able to do.
-- [Security readiness](https://neon1.tech/knowledge/guides/use-case-security-readiness/): Assessing technical risk, strengthening controls, and preparing systems for a security review or audit: what I deliver, and where an auditor or specialist takes over.
-- [Workflow automation](https://neon1.tech/knowledge/guides/use-case-workflows/): Integrating business systems, automating processes, and building the software in between: when it's worth doing, what I deliver, and when something else fits better.
+- [Security readiness](https://neon1.tech/knowledge/guides/use-case-security-readiness/): Assessing technical risk, strengthening controls, and preparing systems for a security review or audit: what I deliver, and how I work with auditors and specialists.
+- [Workflow automation](https://neon1.tech/knowledge/guides/use-case-workflows/): Integrating business systems, automating processes, and building the software in between: when it's worth doing, what I deliver, and how I choose the right tool.
 
 ## Questions
 
@@ -98,13 +98,13 @@ neon1 is the independent engineering and technology consulting practice of neon1
 - [Business associate agreement request, filled in](https://neon1.tech/knowledge/examples/baa-request/): The BAA questionnaire completed for a fictional physical therapy practice, showing how the decision gets made. (fictional example)
 - [Intake, filled in](https://neon1.tech/knowledge/examples/intake/): The intake form completed for a fictional physical therapy practice after a first call. (fictional example)
 - [Proposal with options, filled in](https://neon1.tech/knowledge/examples/proposal-options/): A complete neon1 proposal with three options for a fictional retailer whose stock counts disagree: discovery, goals, what's in and out, the hours behind each price, when the client pays, what each side will do, and the agreement. (fictional example)
-- [Proposal, filled in](https://neon1.tech/knowledge/examples/proposal/): A complete neon1 proposal for a fictional physical therapy practice's intake project. (fictional example)
+- [Proposal, filled in](https://neon1.tech/knowledge/examples/proposal/): A complete neon1 proposal for a fictional analytics company's architecture review of its AWS account. (fictional example)
 - [Release and handover record, filled in](https://neon1.tech/knowledge/examples/release-and-handover/): The handover record that closed a fictional physical therapy practice's intake project. (fictional example)
 
 ## Policies
 
 - [Accessibility statement](https://neon1.tech/knowledge/policies/accessibility/): neon1.tech aims for WCAG 2.2 AA. What's in place, what isn't yet, and how to report a barrier.
-- [How I use AI](https://neon1.tech/knowledge/policies/ai-use/): Where neon1 uses AI tools in its own work, where a person stays responsible, and how your information is kept out of them.
+- [How I work with AI](https://neon1.tech/knowledge/policies/ai-use/): How AI is used in my work, what stays with me, how it's checked, and how your information is kept out of it.
 - [Cookie and browser storage notice](https://neon1.tech/knowledge/policies/cookies/): The only cookies and browser storage neon1.tech and 1NEON use, and why.
 - [Privacy and data policy](https://neon1.tech/knowledge/policies/privacy/): What neon1 collects on neon1.tech, in Neo, in the 1NEON portal, and in client work, where it goes, how long it's kept, and what you can do about it.
 - [Security disclosure](https://neon1.tech/knowledge/policies/security/): How to report a security problem in neon1.tech, the 1NEON portal, or a neon1 repository, and what happens after you do.
