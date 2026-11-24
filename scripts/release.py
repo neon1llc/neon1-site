@@ -2,6 +2,9 @@
 
 # scripts/release.py - Fails if the places that name the release disagree.
 # Usage: python3 scripts/release.py src/app/public CHANGELOG.md
+#        python3 scripts/release.py --bump X.Y.Z src/app/public CHANGELOG.md
+# --bump writes X.Y.Z into every place but the CHANGELOG (whose new top entry is the one thing written by hand),
+# then runs the check, so a release is one commit with no identifier left to fix on a second push (make bump VERSION=X.Y.Z).
 #
 # The release is named in several hand-edited places: the version meta on every page (make verify
 # and the white rabbit's media loader read it), the footer's link text, and the CHANGELOG's top entry.
@@ -21,9 +24,38 @@ LITERAL_V = re.compile(r"[?&]v=(\d+\.\d+\.\d+)")
 SOURCES = ("*.html", "css/*.css", "js/*.js", "shared/*.js", "shared/*.css")
 
 
+def bump(root, changelog, version):
+    if not re.fullmatch(r"\d+\.\d+\.\d+", version):
+        sys.exit(f"release: {version!r} isn't X.Y.Z")
+    top = TOP_ENTRY.search(changelog.read_text())
+    if not top or top.group(1).split()[0] != version:
+        sys.exit(f"release: write the '## v{version}' entry at the top of {changelog.name} first")
+
+    def swap(path, pattern, flags=0):
+        text = path.read_text()
+        # Replace the version inside each match only, so no other number on the page is touched
+        out = pattern.sub(lambda m: m.group(0).replace(m.group(1), version), text)
+        if out != text:
+            path.write_text(out)
+
+    for page in sorted(root.glob("*.html")):
+        swap(page, META)
+    swap(root / "index.html", SITE_ROW)
+    swap(root / "index.html", FOOTER)
+    meta = json.loads((root / "version.json").read_text())
+    meta["version"] = version
+    (root / "version.json").write_text(json.dumps(meta, indent=2) + "\n")
+    for pattern in SOURCES:
+        for f in sorted(root.glob(pattern)):
+            swap(f, LITERAL_V)
+
+
 def main():
+    if len(sys.argv) == 5 and sys.argv[1] == "--bump":
+        bump(pathlib.Path(sys.argv[3]), pathlib.Path(sys.argv[4]), sys.argv[2])
+        sys.argv = [sys.argv[0], sys.argv[3], sys.argv[4]]
     if len(sys.argv) != 3:
-        sys.exit("usage: release.py SITE_DIR CHANGELOG")
+        sys.exit("usage: release.py [--bump X.Y.Z] SITE_DIR CHANGELOG")
     root, changelog = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])
 
     # Every place that names a release, as (where, version)

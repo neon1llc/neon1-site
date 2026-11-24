@@ -194,6 +194,11 @@ jobs:
     needs: [plan, build, changes]
     if: needs.plan.outputs.go == 'true' && needs.changes.outputs.behavior == 'true'
     runs-on: ubuntu-latest
+    # Playwright's own image carries the browsers and their system libraries, so no step installs them from the
+    # Ubuntu mirror (it stalled one job for 30 minutes). Its tag is the version in knowledge/package-lock.json; change both together
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble
+      options: --init --ipc=host
     strategy:
       fail-fast: false
       matrix:
@@ -212,16 +217,14 @@ jobs:
           name: site
           path: ${{ runner.temp }}/site
       - run: tar xzf "$RUNNER_TEMP/site/site.tgz" -C src/app/public
-      - name: Install Playwright and Chromium
-        run: |
-          npm ci --prefix knowledge
-          npx --prefix knowledge playwright install --with-deps chromium
+      - name: Install the checks' packages
+        run: npm ci --prefix knowledge
       - name: make behavior (shard ${{ matrix.shard }} of ${{ strategy.job-total }})
         env:
           NODE_PATH: ${{ github.workspace }}/knowledge/node_modules
           SHARD: ${{ matrix.shard }}/${{ strategy.job-total }}
           ONLY: ${{ needs.changes.outputs.only }}
-        run: make behavior
+        run: node scripts/behavior.cjs src/app/public
 
   # Back, Forward, and reload at the exact spot, for every menu, button, footer, card, and cross-page link, on an iPhone profile in
   # WebKit and in Chromium, in both looks (scripts/history.cjs). One job for each engine and look, beside the behavior shards
@@ -229,6 +232,11 @@ jobs:
     needs: [plan, build, changes]
     if: needs.plan.outputs.go == 'true' && needs.changes.outputs.behavior == 'true'
     runs-on: ubuntu-latest
+    # Playwright's own image carries the browsers and their system libraries, so no step installs them from the
+    # Ubuntu mirror (it stalled one job for 30 minutes). Its tag is the version in knowledge/package-lock.json; change both together
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble
+      options: --init --ipc=host
     strategy:
       fail-fast: false
       matrix:
@@ -248,22 +256,25 @@ jobs:
           name: site
           path: ${{ runner.temp }}/site
       - run: tar xzf "$RUNNER_TEMP/site/site.tgz" -C src/app/public
-      - name: Install Playwright and its browser
-        run: |
-          npm ci --prefix knowledge
-          npx --prefix knowledge playwright install --with-deps ${{ matrix.engine }}
+      - name: Install the checks' packages
+        run: npm ci --prefix knowledge
       - name: make history (${{ matrix.engine }}, ${{ matrix.look }})
         env:
           NODE_PATH: ${{ github.workspace }}/knowledge/node_modules
           ENGINES: ${{ matrix.engine }}
           LOOKS: ${{ matrix.look }}
-        run: make history
+        run: node scripts/history.cjs src/app/public
 
   # The chat window's checks, beside the shards, when the chat or anything shared changed
   chat:
     needs: [plan, build, changes]
     if: needs.plan.outputs.go == 'true' && needs.changes.outputs.chat == 'true'
     runs-on: ubuntu-latest
+    # Playwright's own image carries the browsers and their system libraries, so no step installs them from the
+    # Ubuntu mirror (it stalled one job for 30 minutes). Its tag is the version in knowledge/package-lock.json; change both together
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble
+      options: --init --ipc=host
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -278,10 +289,8 @@ jobs:
           name: site
           path: ${{ runner.temp }}/site
       - run: tar xzf "$RUNNER_TEMP/site/site.tgz" -C src/app/public
-      - name: Install Playwright and Chromium
-        run: |
-          npm ci --prefix knowledge
-          npx --prefix knowledge playwright install --with-deps chromium
+      - name: Install the checks' packages
+        run: npm ci --prefix knowledge
       - name: Chat window checks
         env:
           NODE_PATH: ${{ github.workspace }}/knowledge/node_modules
