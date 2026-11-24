@@ -77,9 +77,9 @@ async function session(engine, look, start = "/") {
 // Where the page stands, once it has stopped moving
 // A page that is still navigating (WebKit under load can finish a Back or reload late) destroys the context under a
 // read; the read is made again once the page has loaded
-async function read(page, fn) {
+async function read(page, fn, arg) {
   for (let i = 0; ; i++) {
-    try { return await page.evaluate(fn); }
+    try { return await page.evaluate(fn, arg); }
     catch (e) {
       if (i >= 3 || !/context was destroyed|navigation/i.test(String(e.message))) throw e;
       await page.waitForLoadState("load").catch(() => {});
@@ -106,10 +106,10 @@ async function at(page) {
   };
 }
 // A wheel event first (mobile WebKit has no wheel to send), so the page knows a visitor has taken over, then the move itself
-const takeOver = (page) => page.evaluate(() => dispatchEvent(new WheelEvent("wheel", { deltaY: 1, bubbles: true, cancelable: true })));
+const takeOver = (page) => read(page,() => dispatchEvent(new WheelEvent("wheel", { deltaY: 1, bubbles: true, cancelable: true })));
 async function scrollTo(page, y) {
   await takeOver(page);
-  await page.evaluate((to) => scrollTo({ top: to, behavior: "instant" }), y);
+  await read(page, (to) => scrollTo({ top: to, behavior: "instant" }), y);
   await page.waitForTimeout(900);
 }
 const near = (a, b) => Math.abs(a - b) <= TOLERANCE;

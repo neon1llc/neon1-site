@@ -194,6 +194,11 @@ jobs:
     needs: [plan, build, changes]
     if: needs.plan.outputs.go == 'true' && needs.changes.outputs.behavior == 'true'
     runs-on: ubuntu-latest
+    # Playwright's own image carries the browsers and their system libraries, so no step installs them from the
+    # Ubuntu mirror (it stalled one job for 30 minutes). Its tag is the version in knowledge/package-lock.json; change both together
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble
+      options: --init --ipc=host
     strategy:
       fail-fast: false
       matrix:
@@ -212,15 +217,8 @@ jobs:
           name: site
           path: ${{ runner.temp }}/site
       - run: tar xzf "$RUNNER_TEMP/site/site.tgz" -C src/app/public
-      # The browser build Playwright downloads is kept between runs, so a run installs only the system libraries
-      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-chromium-${{ hashFiles('knowledge/package-lock.json') }}
-      - name: Install Playwright and Chromium
-        run: |
-          npm ci --prefix knowledge
-          npx --prefix knowledge playwright install --with-deps chromium
+      - name: Install the checks' packages
+        run: npm ci --prefix knowledge
       - name: make behavior (shard ${{ matrix.shard }} of ${{ strategy.job-total }})
         env:
           NODE_PATH: ${{ github.workspace }}/knowledge/node_modules
@@ -234,6 +232,11 @@ jobs:
     needs: [plan, build, changes]
     if: needs.plan.outputs.go == 'true' && needs.changes.outputs.behavior == 'true'
     runs-on: ubuntu-latest
+    # Playwright's own image carries the browsers and their system libraries, so no step installs them from the
+    # Ubuntu mirror (it stalled one job for 30 minutes). Its tag is the version in knowledge/package-lock.json; change both together
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble
+      options: --init --ipc=host
     strategy:
       fail-fast: false
       matrix:
@@ -253,15 +256,8 @@ jobs:
           name: site
           path: ${{ runner.temp }}/site
       - run: tar xzf "$RUNNER_TEMP/site/site.tgz" -C src/app/public
-      # The browser build Playwright downloads is kept between runs, so a run installs only the system libraries
-      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ matrix.engine }}-${{ hashFiles('knowledge/package-lock.json') }}
-      - name: Install Playwright and its browser
-        run: |
-          npm ci --prefix knowledge
-          npx --prefix knowledge playwright install --with-deps ${{ matrix.engine }}
+      - name: Install the checks' packages
+        run: npm ci --prefix knowledge
       - name: make history (${{ matrix.engine }}, ${{ matrix.look }})
         env:
           NODE_PATH: ${{ github.workspace }}/knowledge/node_modules
@@ -274,6 +270,11 @@ jobs:
     needs: [plan, build, changes]
     if: needs.plan.outputs.go == 'true' && needs.changes.outputs.chat == 'true'
     runs-on: ubuntu-latest
+    # Playwright's own image carries the browsers and their system libraries, so no step installs them from the
+    # Ubuntu mirror (it stalled one job for 30 minutes). Its tag is the version in knowledge/package-lock.json; change both together
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble
+      options: --init --ipc=host
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -288,15 +289,8 @@ jobs:
           name: site
           path: ${{ runner.temp }}/site
       - run: tar xzf "$RUNNER_TEMP/site/site.tgz" -C src/app/public
-      # The browser build Playwright downloads is kept between runs, so a run installs only the system libraries
-      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-chromium-${{ hashFiles('knowledge/package-lock.json') }}
-      - name: Install Playwright and Chromium
-        run: |
-          npm ci --prefix knowledge
-          npx --prefix knowledge playwright install --with-deps chromium
+      - name: Install the checks' packages
+        run: npm ci --prefix knowledge
       - name: Chat window checks
         env:
           NODE_PATH: ${{ github.workspace }}/knowledge/node_modules
