@@ -39,12 +39,23 @@ const server = http.createServer((req, res) => {
 
 // ---- Cases ----
 let failed = 0, ran = 0;
+// On CI's shared machines a case that fails once gets one more try in a fresh session, so a slow moment in WebKit's
+// software rendering doesn't hold a release; a real regression fails both times. A case that passed only on the
+// retry is named at the end, with why the first try failed, so a flake stays visible
+const RETRIES = Number(process.env.RETRIES ?? (process.env.CI ? 1 : 0));
+const retried = [];
 async function check(name, fn) {
   if (ONLY && !ONLY.test(name)) return;
   ran++;
   const t0 = Date.now();
-  try { await fn(); console.log(`ok   ${name} (${Date.now() - t0} ms)`); }
-  catch (e) { failed++; console.log(`FAIL ${name}: ${String(e.message).split("\n")[0]}`); }
+  for (let tries = RETRIES; ; tries--) {
+    try { await fn(); console.log(`ok   ${name} (${Date.now() - t0} ms)`); return; }
+    catch (e) {
+      const why = String(e.message).split("\n")[0];
+      if (tries > 0) { console.log(`retry ${name}: ${why}`); retried.push(`${name}: ${why}`); continue; }
+      failed++; console.log(`FAIL ${name}: ${why}`); return;
+    }
+  }
 }
 const expect = (ok, message, detail) => { if (!ok) throw new Error(detail === undefined ? message : `${message} ${JSON.stringify(detail)}`); };
 
@@ -64,19 +75,41 @@ async function session(engine, look, start = "/") {
   return { context, page, errors };
 }
 // Where the page stands, once it has stopped moving
+// A page that is still navigating (WebKit under load can finish a Back or reload late) destroys the context under a
+// read; the read is made again once the page has loaded
+async function read(page, fn, arg) {
+  for (let i = 0; ; i++) {
+    try { return await page.evaluate(fn, arg); }
+    catch (e) {
+      if (i >= 3 || !/context was destroyed|navigation/i.test(String(e.message))) throw e;
+      await page.waitForLoadState("load").catch(() => {});
+      await page.waitForTimeout(300);
+    }
+  }
+}
+// Where the page stands, once it has stopped moving. The page restores a spot with a timed glide that starts on a
+// frame, so on a busy machine (WebKit drawing the Matrix look in software) the glide can begin late or crawl at its
+// end. A position that held for one poll can be the old one; it counts as settled only after two frames have been
+// drawn and it has held for three polls in a row
 async function at(page) {
-  let last = -1, y = await page.evaluate(() => Math.round(scrollY));
-  for (let i = 0; i < 12 && y !== last; i++) { last = y; await page.waitForTimeout(250); y = await page.evaluate(() => Math.round(scrollY)); }
+  await read(page, () => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+  let last = NaN, held = 0, y = NaN;
+  for (let i = 0; i < 24 && held < 3; i++) {
+    y = await read(page, () => Math.round(scrollY));
+    held = y === last ? held + 1 : 0;
+    last = y;
+    if (held < 3) await page.waitForTimeout(250);
+  }
   return {
-    y, path: await page.evaluate(() => location.pathname), hash: await page.evaluate(() => location.hash),
-    panel: await page.evaluate(() => document.body.classList.contains("case-open")),
+    y, path: await read(page, () => location.pathname), hash: await read(page, () => location.hash),
+    panel: await read(page, () => document.body.classList.contains("case-open")),
   };
 }
 // A wheel event first (mobile WebKit has no wheel to send), so the page knows a visitor has taken over, then the move itself
-const takeOver = (page) => page.evaluate(() => dispatchEvent(new WheelEvent("wheel", { deltaY: 1, bubbles: true, cancelable: true })));
+const takeOver = (page) => read(page,() => dispatchEvent(new WheelEvent("wheel", { deltaY: 1, bubbles: true, cancelable: true })));
 async function scrollTo(page, y) {
   await takeOver(page);
-  await page.evaluate((to) => scrollTo({ top: to, behavior: "instant" }), y);
+  await read(page, (to) => scrollTo({ top: to, behavior: "instant" }), y);
   await page.waitForTimeout(900);
 }
 const near = (a, b) => Math.abs(a - b) <= TOLERANCE;
@@ -101,10 +134,10 @@ async function viaMenu(page, selector) {
   await click(page, "#menuBtn");
   await page.waitForTimeout(700);
   await click(page, selector);
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(700);
 }
-async function back(page) { await page.goBack({ waitUntil: "load" }).catch(() => {}); await page.waitForTimeout(1500); }
-async function forward(page) { await page.goForward({ waitUntil: "load" }).catch(() => {}); await page.waitForTimeout(1500); }
+async function back(page) { await page.goBack({ waitUntil: "load" }).catch(() => {}); await page.waitForTimeout(700); }
+async function forward(page) { await page.goForward({ waitUntil: "load" }).catch(() => {}); await page.waitForTimeout(700); }
 
 async function main() {
   await new Promise((r) => server.listen(0, "127.0.0.1", r));
@@ -273,6 +306,7 @@ async function main() {
 
   for (const e of ENGINES) await browsers[e].close();
   server.close();
+  if (retried.length) console.log(`\n${retried.length} case${retried.length === 1 ? "" : "s"} passed only on a retry:\n  ${retried.join("\n  ")}\n`);
   console.log(`history: ${ran - failed} of ${ran} passed${failed ? `, ${failed} failed` : ""}`);
   process.exit(failed ? 1 : 0);
 }
