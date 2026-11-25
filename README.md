@@ -86,10 +86,11 @@ dev.neon1.tech is a private copy of the site for looking at changes before they 
 make dev-push                 # build this branch and put it on dev (dev: the dev release; others: a preview)
 make dev-drop BRANCH=<name>   # forget a preview
 make dev-rollback             # previous dev release
-make dev-gate                 # new sign-in link (printed once; signed-in devices stay in)
 make dev-signout              # sign every device out
 make dev-allow EMAIL=<who>    # let a neon1 person sign in (dev-deny removes them)
 ```
+
+To sign in to dev, bookmark `https://dev.neon1.tech/__signin` (passkey or email code, for people `make dev-allow` added). Signed out, every dev address shows the not-found page.
 
 To release, merge the finished branches to main with the version set. The deploy below tags it.
 

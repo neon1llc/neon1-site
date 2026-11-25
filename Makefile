@@ -36,7 +36,7 @@ GITLEAKS_IMAGE := ghcr.io/gitleaks/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79
 
 # Plain make shows the help
 .DEFAULT_GOAL := help
-.PHONY: help content corpus-tag static corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf releases-export blog blog-check blog-export report-bug report-bug-check feedback feedback-check check html js links logic frame frame-check release bump rollback manifest rehash models budget secrets behavior history perf serve three icons deploy invalidate verify indexnow dev-build dev-check dev-push dev-drop dev-rollback dev-gate dev-signout dev-allow dev-deny
+.PHONY: help content corpus-tag static corpus corpus-check corpus-export knowledge knowledge-check knowledge-export knowledge-pdf releases-export blog blog-check blog-export report-bug report-bug-check feedback feedback-check check html js links logic frame frame-check release bump rollback manifest rehash models budget secrets behavior history perf serve three icons deploy invalidate verify indexnow dev-build dev-check dev-push dev-drop dev-rollback dev-signout dev-allow dev-deny
 
 
 ##@ Checks
@@ -308,11 +308,8 @@ dev-drop: ## Forget this branch's preview on dev.neon1.tech (BRANCH=<name> for a
 dev-rollback: ## Switch dev.neon1.tech back to its previous dev release
 	python3 scripts/deploy.py rollback $(DEV_BUCKET) $(DEV_STORE) $(RELEASE)
 
-# Sign-in is the secret link plus a dev-access account (passkey or email code). The link is printed
-# once, here, and kept nowhere else
-dev-gate: ## Make a new dev.neon1.tech sign-in link and print it (signed-in devices stay in)
-	@python3 scripts/dev_build.py gate
-
+# Sign in at the fixed address https://dev.neon1.tech/__signin with a dev-access account
+# (passkey or email code)
 dev-signout: ## Sign every device out of dev.neon1.tech (new cookie key)
 	@python3 scripts/dev_build.py signout $(DEV_STORE)
 
