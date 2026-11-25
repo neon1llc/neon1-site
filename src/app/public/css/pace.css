@@ -4,3 +4,23 @@
 :root[data-pace] .view + .view { border-top: 1px solid var(--line); }
 /* The last view keeps a full screen, so a link to contact can bring its heading to the top */
 :root[data-pace] .view.contact { min-height: calc(var(--vh, 100svh) - 64px); justify-content: flex-start; }
+
+/* ---- One object per section turns in depth as you pass it, tied to the scroll itself: service cards stand up, client cards swing
+   to face you, the portrait turns, and the process steps arrive along their line. Text is readable at every angle, nothing starts
+   hidden, and without support or with reduced motion everything stands flat. CSS only (animation-timeline), off the main thread ---- */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* Cards sit in sideways rows, which are scroll boxes of their own, so they read their section's timeline */
+    :root[data-pace]:not([data-motion="off"]) .view { view-timeline: --sec block; }
+    :root[data-pace]:not([data-motion="off"]) .svc { transform-origin: 50% 100%; animation: pace-stand linear backwards; animation-timeline: --sec; animation-range: entry 0px entry 420px; }
+    :root[data-pace]:not([data-motion="off"]) .svc:nth-child(n+3) { animation-range: entry 160px entry 580px; }
+    :root[data-pace]:not([data-motion="off"]) .case { animation: pace-swing linear backwards; animation-timeline: --sec; animation-range: entry 60px entry 480px; }
+    :root[data-pace]:not([data-motion="off"]) .portrait { animation: pace-turn linear both; animation-timeline: view(); animation-range: cover 0% cover 100%; }
+    :root[data-pace]:not([data-motion="off"]) .timeline > * { animation: pace-step linear both; animation-timeline: view(); animation-range: entry 0px entry 240px; }
+    @keyframes pace-stand { from { transform: perspective(1100px) rotateX(24deg) scale(.96); } to { transform: perspective(1100px) rotateX(0) scale(1); } }
+    @keyframes pace-swing { from { transform: perspective(1100px) rotateY(-22deg) translateX(24px); } to { transform: perspective(1100px) rotateY(0) translateX(0); } }
+    @keyframes pace-turn { from { transform: perspective(700px) rotateY(-28deg); } 50% { transform: perspective(700px) rotateY(0); } to { transform: perspective(700px) rotateY(18deg); } }
+    @keyframes pace-step { from { opacity: .35; translate: 28px 0; } to { opacity: 1; translate: 0 0; } }
+  }
+}
+@media print { :root[data-pace] :is(.svc, .case, .portrait, .timeline > *) { animation: none; } }
