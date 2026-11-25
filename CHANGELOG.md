@@ -2,7 +2,9 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
-## Unreleased
+## v0.88.0
+
+### Added
 - What's new reaches back to September 2025, with the 2025 versions of neon1.tech (v0.1.0 to v0.1.2) and the early work on neon1's other public repositories.
 
 ### Fixed
