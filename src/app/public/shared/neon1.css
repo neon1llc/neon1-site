@@ -214,3 +214,41 @@
   .n1-bar, .n1chat-launch { transition: opacity var(--t-base) var(--ease); }
   :root.n1-typing .n1-bar, :root.n1-typing .n1chat-launch { opacity: 0; pointer-events: none; }
 }
+
+/* ---- The section index (shared/page-index.js): the visual form of "On this page" on a long page. A rail at the right edge, one
+   stroke per section over 1NEON's rings; on a narrow or touch screen, one thin segmented line under the bar. It shows once a
+   section is being read, and hides under any window or menu ---- */
+.pi-rail, .pi-rings, .pi-line { --pi-on: var(--accent, var(--brand)); --pi-off: color-mix(in srgb, var(--muted) 45%, transparent); }
+.pi-rail { position: fixed; z-index: 5; right: var(--sp-4); top: 50%; translate: 0 -50%; display: flex; flex-direction: column; align-items: flex-end; gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-1); border-radius: 99px; background: var(--bg, var(--page)); border: 1px solid var(--line);
+  opacity: 0; visibility: hidden; transition: opacity var(--t-base) var(--ease), visibility 0s linear var(--t-base); }
+.pi-rail.on { opacity: 1; visibility: visible; transition: opacity var(--t-base) var(--ease); }
+body:is(.case-open, .n1chat-open, .white-rabbit-on) .pi-rail, body:has(.menu:not([hidden])) .pi-rail, html.n1-typing .pi-rail { opacity: 0; visibility: hidden; }
+.pi-rail ol { list-style: none; margin: 0; padding: 0; }
+.pi-rail li { margin: 0; }
+.pi-rail .pi-link { position: relative; display: flex; justify-content: flex-end; align-items: center; min-width: 24px; height: 24px; padding: 0; border: 0; background: none; cursor: pointer; text-decoration: none; color: var(--muted); }
+.pi-stroke { display: block; width: 10px; height: 2px; border-radius: 2px; background: var(--pi-off); overflow: hidden; transition: width var(--t-base) var(--ease); }
+.pi-stroke i, .pi-line i { display: block; height: 100%; background: var(--pi-on); transform: scaleX(var(--p, 0)); transform-origin: left; }
+.pi-link[aria-current] .pi-stroke { width: 20px; }
+.pi-name { position: absolute; right: var(--sp-6); white-space: nowrap; max-width: min(60vw, 320px); overflow: hidden; text-overflow: ellipsis; font: var(--fs-xs)/1 var(--mono); padding: var(--sp-1) var(--sp-2); border-radius: 6px;
+  background: var(--bg, var(--page)); border: 1px solid var(--line); color: var(--text); opacity: 0; translate: 4px 0; pointer-events: none; transition: opacity var(--t-fast) var(--ease), translate var(--t-fast) var(--ease); }
+.pi-rail:is(:hover, :focus-within) .pi-name { opacity: 1; translate: 0; pointer-events: auto; }
+.pi-link[aria-current] .pi-name { color: var(--pi-on); }
+/* Where the margin beside the content has room, the current name stays out */
+@media (min-width: 1560px) { .pi-rail .pi-link[aria-current] .pi-name { opacity: 1; translate: 0; } }
+.pi-rings { width: 20px; height: 20px; margin-right: 2px; flex: none; fill: none; stroke: var(--pi-off); stroke-width: 4; }
+.pi-rings circle { transition: stroke var(--t-slow) var(--ease); }
+.pi-rings circle.lit { stroke: var(--pi-on); }
+.pi-line { display: flex; gap: 2px; height: 3px; }
+.pi-line > div { flex: 1; background: var(--pi-off); overflow: hidden; }
+
+@media (max-width: 1199px), (pointer: coarse) {
+  .pi-rail { top: var(--pi-top, calc(env(safe-area-inset-top, 0px) + 63px)); left: 0; right: 0; translate: none; pointer-events: none; padding: 0; border: 0; border-radius: 0; background: none; }
+  .pi-rail ol { display: flex; gap: 2px; align-self: stretch; }
+  .pi-rail li { flex: 1; }
+  .pi-rail .pi-link { height: 3px; min-width: 0; }
+  .pi-rail .pi-stroke, .pi-rail .pi-link[aria-current] .pi-stroke { width: 100%; height: 3px; border-radius: 0; }
+  .pi-name, .pi-rail .pi-rings { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .pi-rail, .pi-rail.on, .pi-rail *, .pi-rings circle { transition: none; } }
+@media print { .pi-rail, .pi-rings, .pi-line { display: none; } }

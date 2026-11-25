@@ -2,6 +2,8 @@
 // read in both indexes, and on narrower screens docks the folded index under the top bar once the reader scrolls
 // past it, widening it into a bar of its own. Without JavaScript both indexes are plain lists of links.
 
+import { rings, segments, trackSections } from "/shared/page-index.js";
+
 const side = document.querySelector(".kc-toc-side");
 const fold = document.querySelector(".kc-toc-fold");
 const bar = document.querySelector(".n1-bar");
@@ -109,8 +111,23 @@ function place() {
   }
 }
 
+// ---- How far each section is read: the side list's line fills part by part over the rings, and the docked bar carries
+// the same parts as one thin line along its foot (shared/page-index.js) ----
+function showProgress() {
+  const mini = rings(), line = fold && segments(heads.length, "kc-toc-line");
+  side?.append(mini.el);
+  fold?.querySelector("summary").append(line.el);
+  const items = [...(side?.querySelectorAll("li") ?? [])];
+  trackSections(heads, ({ parts, current: at, done }) => {
+    items.forEach((li, i) => li.style.setProperty("--p", (parts[i] ?? 0).toFixed(3)));
+    mini.light(done, at >= 0);
+    line?.fill(parts);
+  }, { end: document.querySelector(".kc-text") ?? heads.at(-1), top: topEdge, line: (edge) => edge + Math.min(180, innerHeight * 0.3) });
+}
+
 // ---- Wiring ----
 if (heads.length) {
+  showProgress();
   let queued = false;
   const update = () => {
     if (queued) return;

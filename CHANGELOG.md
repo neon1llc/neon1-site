@@ -5,6 +5,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 ## Unreleased
 
 ### Changed
+- The landing scrolls like any page and rests where you leave it, with everything shown. A section index at the right edge (a thin line under the bar on phones) shows where you are.
 - The blog's topic label "What's and why's" reads "Notes".
 
 ## v0.87.2

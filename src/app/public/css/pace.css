@@ -5,38 +5,6 @@
 /* The last view keeps a full screen, so a link to contact can bring its heading to the top */
 :root[data-pace] .view.contact { min-height: calc(var(--vh, 100svh) - 64px); justify-content: flex-start; }
 
-/* ---- The section index (js/pace.js). Hidden on the first screen and under any window or menu ---- */
-/* It sits outside the page wrapper, so it takes the same text tokens; the looks' own colors come from frame.css and sentinel.css */
-.pace-rail { --text: var(--ink); --muted: var(--muted-ink); --line: rgb(var(--brand-rgb) / .16); }
-.pace-rail { position: fixed; z-index: 5; right: var(--sp-4); top: 50%; translate: 0 -50%; display: flex; flex-direction: column; align-items: flex-end; gap: var(--sp-2);
-  padding: var(--sp-2) var(--sp-1); border-radius: 99px; background: var(--page); border: 1px solid var(--line);
-  opacity: 0; visibility: hidden; transition: opacity var(--t-base) var(--ease), visibility 0s linear var(--t-base); }
-.pace-rail.on { opacity: 1; visibility: visible; transition: opacity var(--t-base) var(--ease); }
-body:is(.case-open, .n1chat-open, .white-rabbit-on) .pace-rail, body:has(.menu:not([hidden])) .pace-rail, html.n1-typing .pace-rail { opacity: 0; visibility: hidden; }
-.pace-rail ol { list-style: none; margin: 0; padding: 0; }
-.pace-rail a { position: relative; display: flex; justify-content: flex-end; align-items: center; min-width: 24px; height: 24px; text-decoration: none; color: var(--muted); }
-.pace-stroke { display: block; width: 10px; height: 2px; border-radius: 2px; background: color-mix(in srgb, var(--muted) 45%, transparent); overflow: hidden; transition: width var(--t-base) var(--ease); }
-.pace-stroke i { display: block; height: 100%; background: var(--brand); transform: scaleX(var(--p, 0)); transform-origin: left; }
-.pace-rail a[aria-current] .pace-stroke { width: 20px; }
-.pace-name { position: absolute; right: 32px; white-space: nowrap; font: var(--fs-xs)/1 var(--mono); padding: var(--sp-1) var(--sp-2); border-radius: 6px;
-  background: var(--page); border: 1px solid var(--line); color: var(--text); opacity: 0; translate: 4px 0; pointer-events: none; transition: opacity var(--t-fast) var(--ease), translate var(--t-fast) var(--ease); }
-.pace-rail:is(:hover, :focus-within) .pace-name { opacity: 1; translate: 0; pointer-events: auto; }
-.pace-rail a[aria-current] .pace-name { color: var(--brand); }
-/* Where the margin beside the content has room, the current name stays out */
-@media (min-width: 1560px) { .pace-rail a[aria-current] .pace-name { opacity: 1; translate: 0; } }
-.pace-rings { width: 20px; height: 20px; margin-right: 2px; fill: none; stroke: color-mix(in srgb, var(--muted) 45%, transparent); stroke-width: 4; }
-.pace-rings circle { transition: stroke var(--t-slow) var(--ease); }
-.pace-rings circle.lit { stroke: var(--brand); }
-
-/* No room for a rail on a narrow or touch screen: the strokes become one segmented line along the bar's foot */
-@media (max-width: 1199px), (pointer: coarse) {
-  .pace-rail { top: calc(env(safe-area-inset-top, 0px) + 63px); left: 0; right: 0; translate: none; pointer-events: none; padding: 0; border: 0; border-radius: 0; background: none; }
-  .pace-rail ol { display: flex; gap: 2px; align-self: stretch; }
-  .pace-rail li { flex: 1; }
-  .pace-rail a { height: 3px; min-width: 0; }
-  .pace-rail .pace-stroke { height: 3px; }
-  .pace-rail .pace-stroke, .pace-rail a[aria-current] .pace-stroke { width: 100%; border-radius: 0; }
-  .pace-name, .pace-rings { display: none; }
-}
-@media (prefers-reduced-motion: reduce) { .pace-rail, .pace-rail.on, .pace-rail * { transition: none; } }
-@media print { .pace-rail { display: none; } }
+/* The section index (shared/page-index.js) sits outside the page wrapper, so it takes the same text tokens; the looks' own
+   colors come from frame.css and sentinel.css */
+.pi-rail { --text: var(--ink); --muted: var(--muted-ink); --line: rgb(var(--brand-rgb) / .16); }

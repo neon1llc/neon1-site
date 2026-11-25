@@ -1,4 +1,5 @@
-// src/app/public/js/views.js - Moves the page one section ("view") at a time.
+// src/app/public/js/views.js - The landing's section links, folds, and remembered position; without html[data-pace] it also
+// moves the page one section ("view") at a time, as below.
 //
 // Wheel, trackpad, and finger scroll natively, with the platform's own momentum, so a soft flick moves a little and a strong
 // one can run through several views. Once the scroll has stopped, the page eases to the nearest view edge, like a wheel

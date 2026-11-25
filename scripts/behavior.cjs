@@ -367,7 +367,7 @@ for (const [label, init, urls] of [
   });
 }
 
-// ---- The first screen is the wordmark and tagline; the bar's contact link settles on contact, and the views still snap ----
+// ---- The first screen is the wordmark and tagline; the bar's contact link settles on contact, and the section links land ----
 check("browser", "home: the first screen has no offer block, and the bar's contact link settles on contact (motion, wide)", async () => {
   const { page, context, errors } = await open({ reducedMotion: "no-preference" });
   try {
@@ -418,17 +418,24 @@ check("browser", "home: Sentinel's first screen states the offer and the next st
   } finally { await matrix.context.close(); }
 });
 
-check("browser", "home: a wheel gesture settles on services the way it was going, and a tiny one falls back to the first screen (motion, wide)", async () => {
-  const { page, context } = await open({ reducedMotion: "no-preference" });
+check("browser", "home: the page rests wherever a scroll leaves it, nothing waits hidden, and the section index follows and links (motion, wide)", async () => {
+  const { page, context, errors } = await open({ reducedMotion: "no-preference" });
   try {
     await page.waitForLoadState("load");
+    expect(!(await page.locator(".pi-rail").isVisible()), "the section index shows on the first screen");
     await page.mouse.move(640, 450);
-    // A scroll settles the way it was going and turns back only when it stopped almost on the edge it left (12% of the gap)
-    await page.mouse.wheel(0, 6); await page.waitForTimeout(20);
-    await polled(page, () => scrollY === 0);
-    // A real push lands on services
-    for (let i = 0; i < 10; i++) { await page.mouse.wheel(0, 60); await page.waitForTimeout(20); }
-    await polled(page, () => Math.abs(document.getElementById("services").getBoundingClientRect().top - 64) < 3);
+    for (let i = 0; i < 18; i++) { await page.mouse.wheel(0, 60); await page.waitForTimeout(20); }
+    await polled(page, () => scrollY === 1080);
+    await page.waitForTimeout(700);
+    expect((await page.evaluate(() => scrollY)) === 1080, "the page moved on its own after a scroll");
+    const hidden = await page.evaluate(() => [...document.querySelectorAll(".view h2, .view .reveal-on")].filter((e) => getComputedStyle(e).opacity !== "1").length);
+    expect(!hidden, "something waits hidden for an entrance", hidden);
+    await page.locator('.pi-rail a[href="#process"]').click();
+    await polled(page, () => Math.abs(document.getElementById("process").getBoundingClientRect().top - 64) < 3);
+    await polled(page, () => document.querySelector('.pi-rail a[href="#process"]').getAttribute("aria-current") === "location");
+    await page.goBack();
+    await polled(page, () => Math.abs(scrollY - 1080) < 3);
+    expect(!errors.length, "page errors", errors);
   } finally { await context.close(); }
 });
 
