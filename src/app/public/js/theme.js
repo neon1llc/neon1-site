@@ -25,6 +25,32 @@
   const wantedLook = () => lookFor(style(), mode());
   write(KEY_MODE, mode());
 
+  // ---- One choice across neon1's hosts ----
+  // An explicit choice also travels in the n1_look cookie on neon1.tech, so the owner's portal on its own host follows it and a
+  // choice made there comes back. KEY_SYNC remembers the last value both sides held: a cookie that differs was changed elsewhere
+  // and wins; otherwise a local choice that differs (made here or in 1NEON) is the newer one
+  const KEY_SYNC = "neon1.theme.cookie";
+  const cookieLook = () => /(?:^|;\s*)n1_look=(sentinel|matrix)\.(light|dark)(?:;|$)/.exec(document.cookie || "");
+  function publish() {
+    if (read(KEY_SHARED) !== "1" || typeof location === "undefined") return;
+    const value = `${style()}.${mode()}`;
+    const host = location.hostname || "";
+    const parent = host === "neon1.tech" || host.endsWith(".neon1.tech") ? "; Domain=neon1.tech; Secure" : "";
+    document.cookie = `n1_look=${value}; Path=/; Max-Age=34560000; SameSite=Lax${parent}`;
+    write(KEY_SYNC, value);
+  }
+  function reconcile() {
+    const found = cookieLook();
+    const value = found ? `${found[1]}.${found[2]}` : "";
+    if (found && value !== read(KEY_SYNC)) {
+      write(KEY_STYLE, found[1]);
+      write(KEY_MODE, found[2]);
+      write(KEY_SHARED, "1");
+      write(KEY_SYNC, value);
+    } else if (value !== `${style()}.${mode()}`) publish();
+  }
+  reconcile();
+
   // ---- Applying it: the attributes the CSS keys on, the switch's state, the browser bar's color ----
   const BAR = { providence: "#F5F8F4", "desert-of-the-real": "#121A14" };
   // The tab icon follows the site's mode, not only the browser's: one drawing, colored here. favicon.svg covers the first paint
@@ -161,6 +187,7 @@
       b.addEventListener("click", () => {
         write(KEY_MODE, mode() === "dark" ? "light" : "dark");
         write(KEY_SHARED, "1");
+        publish();
         change();
       });
     });
@@ -172,6 +199,7 @@
         write(KEY_MODE, mode());
         write(KEY_STYLE, next);
         write(KEY_SHARED, "1");
+        publish();
         change();
       });
     });
@@ -195,6 +223,7 @@
         write(KEY_MODE, mode());
         write(KEY_STYLE, b.dataset.look);
         write(KEY_SHARED, "1");
+        publish();
         change();
         hold();
         if (can) requestAnimationFrame(() => requestAnimationFrame(hold));
@@ -211,11 +240,14 @@
   });
   addEventListener("pageshow", (e) => {
     if (!e.persisted) return;
+    reconcile();
     if (root.dataset.siteLook !== wantedLook()) change();
   });
   // A tab brought forward may have slept through a change made elsewhere
   document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible" && root.dataset.siteLook !== wantedLook()) change();
+    if (document.visibilityState !== "visible") return;
+    reconcile();
+    if (root.dataset.siteLook !== wantedLook()) change();
   });
 })();
 
