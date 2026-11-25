@@ -2,7 +2,7 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
-## Unreleased
+## v0.89.0
 
 ### Fixed
 - On the home page, a screen reader's landmark list now includes the introduction at the top.
@@ -11,6 +11,9 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - A table that scrolls sideways can be scrolled from the keyboard.
 
 ### Changed
+- A look you pick on neon1.tech carries to the other neon1 hosts.
+- The AWS CLIP card says what the name stands for.
+- Production can be promoted or rolled back from one guarded workflow.
 - Contact says the first call is free.
 - The tab icon uses the brand greens and follows the browser's light or dark. The home screen and search icons use the heavier mark on Neo's button.
 - What's new and the releases page link each thing they name to it: every version in a day's row, a document's changes from "updated", and in release notes the page, section, decision record, or release named. The build fails on a missing release tag, file, or section, and the links check now covers sections on other pages.

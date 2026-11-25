@@ -132,7 +132,8 @@ export function gather(dir) {
       all.push({ repo, name, ...e, date, tagged: tags.has(e.version) })
     }
     const top = entries.find((e) => !e.version.includes("-"))
-    if (top) current.push({ repo, name, version: top.version, date: all.find((x) => x.repo === repo && x.version === top.version).date })
+    // The same entry, so a version with no tag yet (this site's own, until it is live) links to its changelog heading
+    if (top) current.push(all.find((x) => x.repo === repo && x.version === top.version))
   }
   all.sort((a, b) => b.date.localeCompare(a.date) || compareVersions(a.version, b.version) || REPOS.indexOf(a.repo) - REPOS.indexOf(b.repo))
   return { all, current, tags: tagSets, changelogs }
@@ -156,7 +157,7 @@ export function releasesBody({ all, current }, links) {
 <table>
 <thead><tr><th>Product</th><th>Version</th></tr></thead>
 <tbody>
-${current.map((c) => `<tr><td><a href="${GH}${c.repo}/releases">${esc(c.name)}</a></td><td>${plainOut(`${GH}${c.repo}/releases/tag/${c.version}`, c.version)}</td></tr>`).join("\n")}
+${current.map((c) => `<tr><td><a href="${GH}${c.repo}/releases">${esc(c.name)}</a></td><td>${plainOut(releaseUrl(c), c.version)}</td></tr>`).join("\n")}
 </tbody>
 </table>`
   const recent = all.slice(0, RECENT).map((r) => `<section class="kc-rel" aria-labelledby="${r.repo}-${r.version}">
