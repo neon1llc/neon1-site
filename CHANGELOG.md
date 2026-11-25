@@ -5,6 +5,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 ## Unreleased
 
 ### Fixed
+- On the home page, a screen reader's landmark list now includes the introduction at the top.
 - Article counts in the Knowledge Center and the facts labels on its pages meet WCAG AA contrast in every look.
 - On touch screens the footer's legal links are at least 24px tall to tap.
 - A table that scrolls sideways can be scrolled from the keyboard.
