@@ -4,3 +4,18 @@
 :root[data-pace] .view + .view { border-top: 1px solid var(--line); }
 /* The last view keeps a full screen, so a link to contact can bring its heading to the top */
 :root[data-pace] .view.contact { min-height: calc(var(--vh, 100svh) - 64px); justify-content: flex-start; }
+
+/* ---- Each section's heading holds under the bar while its section is read ---- */
+:root[data-pace] .view.split { display: flex; }
+:root[data-pace] .view > h2 { position: sticky; top: calc(64px + env(safe-area-inset-top, 0px)); z-index: 3; align-self: stretch; margin-top: calc(-1 * var(--sp-3));
+  padding-block: var(--sp-3); background: var(--page); box-shadow: 0 0 0 100vmax var(--page); clip-path: inset(0 -100vmax); }
+
+/* ---- Pieces rise as they enter, tied to the scroll itself: scroll back and they settle back. CSS only (animation-timeline), so it runs
+   off the main thread. Nothing starts invisible; without support, or with reduced motion, everything simply stands in place ---- */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    :root[data-pace]:not([data-motion="off"]) .view :is(.reveal-on:not(.svc, .case), .rail-wrap) { animation: pace-rise linear both; animation-timeline: view(); animation-range: entry 0px entry 200px; }
+    @keyframes pace-rise { from { opacity: .3; translate: 0 32px; } to { opacity: 1; translate: 0 0; } }
+  }
+}
+@media print { :root[data-pace] .view :is(.reveal-on, .rail-wrap) { animation: none; } }
