@@ -177,7 +177,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - The free first call is 30 minutes, and the home page says it is about your needs, with options afterward in writing.
 - The About line and the structured data give my role at neon1 as Lead Engineer, and the About line no longer names a city.
 - The Sentinel landing no longer downloads the rain, the white rabbit's entry module, or the Matrix monospace font; they are preloaded only when the Matrix look is chosen. Sentinel's first load is about 58 KB smaller on the wire and its largest contentful paint is faster, and Matrix is unchanged.
-- The Sentinel landing says what neon1 is: independent engineering and technology consulting, who it serves, the four services, selected work, and the next step (Discuss a project, email, or a free 15-minute call, with no account needed). The slogan stays. Matrix, when chosen, keeps the wordmark and slogan on the rain and shows none of this; the rain, the white rabbit, the theme switches and their saved choices are unchanged.
+- The Sentinel landing says what neon1 is: independent engineering and technology consulting, who it serves, the four services, selected work, and the next step (Discuss a project, email, or a free 15-minute call (now 30 minutes), with no account needed). The slogan stays. Matrix, when chosen, keeps the wordmark and slogan on the rain and shows none of this; the rain, the white rabbit, the theme switches and their saved choices are unchanged.
 - Services are four equal blocks, each with its buying situations and a fold for deliverables, what else fits better, limits, related work, and a next step: workflow automation, cloud and AI engineering, networks and connected systems, and security readiness. No service is defined by a single small example, and SOC 2 appears as one context within security readiness.
 - Client work opens with how its figures are measured and a key to the six kinds of evidence: neon1 engagements, subcontracted engagements, previous employment, independent projects, reconstructed demonstrations, and fictional examples. About, process, and contact use the corpus wording, and the sections run services, client work, about, process.
 - Contact: no account is needed, topics follow the services, the form's placeholder and the line about the truth are gone, and "any need, any size" is replaced by what the first call covers.
@@ -222,7 +222,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - The home page's service-agreement link and the corpus's contact links use the Engagement addresses, so none goes through a redirect.
 
 - Knowledge Center: the Services shelf is now Engagement and holds Services, pricing, how a project runs, the capability statement, contact, publishing client work, and the service agreement (from the corpus branch refactor/engagement-shelf, shown on dev until it is released). Old addresses redirect.
-- Contact: the lead line reads "Tell me what's going on with an email, a call or text to (424) 32-neon1, or a free 15-minute call", with "How can I help?" above it and one gap between the lines. The facts table is now availability, where, size, and first call, each slash-separated, with weekday evenings as 6-9pm (Fri to 8pm); a few clients at a time. The home page's structured data lists opening hours.
+- Contact: the lead line reads "Tell me what's going on with an email, a call or text to (424) 32-neon1, or a free 15-minute call (now 30 minutes)", with "How can I help?" above it and one gap between the lines. The facts table is now availability, where, size, and first call, each slash-separated, with weekday evenings as 6-9pm (Fri to 8pm); a few clients at a time. The home page's structured data lists opening hours.
 - Knowledge Center: group headers are a band edge to edge with a line above and below, in type larger and heavier than the shelf titles. One gap (the one above the "On this page" bar) separates the bar, bands, shelf titles, and the cards. The bar is as thin as the document pages' bar, the group names in its menu are links, counts sit beside names (the current one in the current style), and the menu stays open when the theme changes.
 - Knowledge Center "On this page" bar: once it reaches the top it eases out to a square bar edge to edge, as on document pages, with its contents on the content column's edges (document pages had a small overhang at mid widths). The separate sticky group bar is gone; the bar says "2 of 11 · FOR YOU / Alternatives". Group headers are boxed with the brand line, and larger in the dropdown. Dropdowns carry a rule under the default choice (or under the collapsed bar) in the arrow's color.
 - Only one white rabbit shows in the rain at a time, and the next comes a random 7 to 10 seconds after the last one is gone, whether it faded or was caught.
@@ -308,7 +308,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## v0.77.0
 
-- The free 1NEON account is offered where it fits, with the 15-minute call kept to the contact view, the footer, and the menu. The services line points to a free account for starting before any call, and the line after the case studies offers it beside "tell me what's going on" instead of repeating the call. Both show only while sign-up is open.
+- The free 1NEON account is offered where it fits, with the 15-minute call (now 30 minutes) kept to the contact view, the footer, and the menu. The services line points to a free account for starting before any call, and the line after the case studies offers it beside "tell me what's going on" instead of repeating the call. Both show only while sign-up is open.
 
 ## v0.76.0
 
@@ -403,7 +403,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 - Links to the five companion guides use their new GitHub names (soc-2-readiness, incident-response-for-small-teams, compliance-basics, phishing-awareness-kit, household-tech-handbook); the old addresses still redirect.
 - The home page's title, description, link previews (Open Graph and Twitter), and structured data describe the small-business workflow work first, then cloud and AI, networks, and security training. The landing screen is unchanged.
-- One path from interest to a start: services, then client work, then a line to book a free 15-minute call or write in. Process, about, public code, and questions follow, and the bar and menu list them in that order.
+- One path from interest to a start: services, then client work, then a line to book a free 15-minute call (now 30 minutes) or write in. Process, about, public code, and questions follow, and the bar and menu list them in that order.
 - The home page has one way into 1NEON: "See how it works", the guided walkthrough at /1NEON/live, from the process section. The sample project and demo links, and the walkthrough links in the questions, are gone from the home page; 1NEON offers them itself.
 - DeployOps reads "a local preview you can run today" in place of "on one cloud or several". Public code lists refmark (v0.1.2, MIT), which flags the sources your documents cite when they change, so a person can review them.
 - Public code shows the retagged education releases: Ready, Secure, Go v0.1.2, SOC 2 readiness v0.1.3, Incident response for small teams v0.1.1, Compliance basics v0.1.2, Phishing awareness session kit v0.1.3, and Household tech handbook v0.1.3.
@@ -454,7 +454,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 ## v0.66.0
 
 ### Added
-- The first screen says what neon1 does in one plain line under the slogan, "Cloud, AI, and IT help for small businesses, offices, and homes," with a button to book the free 15-minute call.
+- The first screen says what neon1 does in one plain line under the slogan, "Cloud, AI, and IT help for small businesses, offices, and homes," with a button to book the free 15-minute call (now 30 minutes).
 - About shows Pradeep's photo beside the story, and closes with a client's words: Boris M. of Boris M Tax on the knowledge base project, linked to its case study.
 
 ### Changed
