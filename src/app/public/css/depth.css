@@ -1,0 +1,61 @@
+/* src/app/public/css/depth.css - Depth on the landing: sections that sit one over the next, and cards that stand off them.
+   All of it is paint behind the words: no motion, nothing to load, and print leaves it out. */
+
+/* The depth tokens. Light looks cast a soft green-black shade; dark looks, where a shadow can't be seen, lift the next
+   surface and light its edge; Matrix lights it in neon */
+:root, .awake {
+  --depth-edge: rgb(18 36 26 / .13);
+  --depth-shade: linear-gradient(to bottom, rgb(18 36 26 / .075), rgb(18 36 26 / .025) 40%, rgb(18 36 26 / 0));
+  --depth-tint: rgb(255 255 255 / .62);
+  --depth-card: 0 1px 2px rgb(18 36 26 / .06), 0 6px 14px -6px rgb(18 36 26 / .14), 0 18px 36px -20px rgb(18 36 26 / .24);
+  --depth-card-up: 0 1px 2px rgb(18 36 26 / .07), 0 10px 20px -8px rgb(18 36 26 / .18), 0 28px 48px -22px rgb(18 36 26 / .3);
+  --depth-glow: rgb(36 111 56 / .1);
+}
+:root[data-site-theme="matrix"] .awake {
+  --depth-edge: rgb(242 244 242 / .13);
+  --depth-shade: linear-gradient(to bottom, rgb(242 244 242 / .035), rgb(242 244 242 / 0));
+  --depth-tint: rgb(242 244 242 / .022);
+  --depth-card: inset 0 1px 0 rgb(242 244 242 / .06), 0 8px 18px -8px rgb(0 0 0 / .8), 0 22px 40px -20px rgb(0 0 0 / .9);
+  --depth-card-up: inset 0 1px 0 rgb(242 244 242 / .09), 0 12px 24px -8px rgb(0 0 0 / .85), 0 30px 52px -22px rgb(0 0 0 / .95);
+  --depth-glow: rgb(121 207 145 / .1);
+}
+:root[data-site-style="matrix"][data-site-theme="matrix"] .awake {
+  --depth-edge: rgb(108 255 168 / .28);
+  --depth-shade: linear-gradient(to bottom, rgb(108 255 168 / .075), rgb(108 255 168 / .02) 45%, rgb(108 255 168 / 0));
+  --depth-tint: rgb(108 255 168 / .02);
+  --depth-card: inset 0 1px 0 rgb(108 255 168 / .1), 0 0 0 1px rgb(108 255 168 / .05), 0 12px 28px -14px rgb(108 255 168 / .22);
+  --depth-card-up: inset 0 1px 0 rgb(108 255 168 / .16), 0 0 0 1px rgb(108 255 168 / .1), 0 16px 34px -14px rgb(108 255 168 / .32);
+  --depth-glow: rgb(108 255 168 / .12);
+}
+
+/* Each section spans the screen behind its own words */
+:root[data-depth] .view { position: relative; isolation: isolate; }
+:root[data-depth] .view + .view { border-top: 0; }
+:root[data-depth] .view::before, :root[data-depth] .view::after { content: ""; position: absolute; z-index: -1; pointer-events: none; left: calc(50% - 50vw + var(--sbw, 0px) / 2); right: calc(50% - 50vw + var(--sbw, 0px) / 2); }
+
+/* edge and layered: a line the width of the screen, with the shade falling below it */
+:root[data-depth]:is([data-depth="edge"], [data-depth="layered"]) .view::after { top: 0; height: 40px; border-top: 1px solid var(--depth-edge); background: var(--depth-shade); }
+/* layered: every other section sits on a lighter sheet */
+:root[data-depth="layered"] .view:nth-of-type(even)::before { top: 0; bottom: 0; background: var(--depth-tint); }
+/* glow: no lines or sheets; the divider fades out toward the sides */
+:root[data-depth="glow"] .view + .view::after { top: 0; height: 1px; background: linear-gradient(to right, transparent, var(--depth-edge) 30% 70%, transparent); }
+
+/* layered and glow: a faint pool of the brand's light behind each heading. The process heading is already sticky, which
+   holds the glow too, so it keeps its own position */
+:root:is([data-depth="layered"], [data-depth="glow"]) .view > h2 { isolation: isolate; width: fit-content; }
+:root:is([data-depth="layered"], [data-depth="glow"]) .view:not(.split) > h2 { position: relative; }
+:root:is([data-depth="layered"], [data-depth="glow"]) .view.contact > h2 { align-self: center; }
+:root:is([data-depth="layered"], [data-depth="glow"]) .view > h2::after { content: ""; position: absolute; z-index: -1; pointer-events: none; left: 50%; top: 50%; width: 460px; height: 220px; translate: -50% -50%;
+  background: radial-gradient(closest-side, var(--depth-glow), transparent); }
+:root[data-depth="glow"] .view > h2::after { width: 640px; height: 320px; }
+/* On a narrow screen the pool stays inside it */
+@media (max-width: 700px) { :root:is([data-depth="layered"], [data-depth="glow"]) .view > h2::after { left: -24px; translate: 0 -50%; width: min(320px, 100vw - 24px); height: 150px; } }
+
+/* Cards stand off their sheet */
+:root[data-depth] :is(.svc, .case) { box-shadow: var(--depth-card); }
+@media (hover: hover) { :root[data-depth] :is(.svc, .case) { transition: box-shadow var(--t-base) var(--ease); } :root[data-depth] :is(.svc, .case):hover { box-shadow: var(--depth-card-up); } }
+/* The sideways rows clip what falls outside them, so they keep room for the shadow */
+:root[data-depth] :is(.cases, .svc-grid) { padding-bottom: var(--sp-6); margin-bottom: calc(-1 * var(--sp-4)); }
+:root[data-depth] .portrait img { box-shadow: var(--depth-card); }
+@media (prefers-reduced-motion: reduce) { :root[data-depth] :is(.svc, .case) { transition: none; } }
+@media (forced-colors: active), print { :root[data-depth] .view::before, :root[data-depth] .view::after, :root[data-depth] .view > h2::after { display: none; } }
