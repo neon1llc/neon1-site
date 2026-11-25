@@ -1,0 +1,10 @@
+/* src/app/public/css/pace.css - Free pacing for the landing: sections take the height their content needs. */
+
+:root[data-pace] .view { min-height: 0; padding-block: clamp(56px, 10vh, 112px); }
+:root[data-pace] .view + .view { border-top: 1px solid var(--line); }
+/* The last view keeps a full screen, so a link to contact can bring its heading to the top */
+:root[data-pace] .view.contact { min-height: calc(var(--vh, 100svh) - 64px); justify-content: flex-start; }
+
+/* The section index (shared/page-index.js) sits outside the page wrapper, so it takes the same text tokens; the looks' own
+   colors come from frame.css and sentinel.css */
+.pi-rail { --text: var(--ink); --muted: var(--muted-ink); --line: rgb(var(--brand-rgb) / .16); }

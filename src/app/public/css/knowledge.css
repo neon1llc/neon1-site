@@ -182,7 +182,6 @@ body.kc { background: var(--page); }
 /* The section being read, marked as the reader scrolls (js/knowledge-toc.js) */
 .kc-toc a { position: relative; transition: color .2s; }
 .kc-toc a.is-current { color: var(--brand); font-weight: 600; }
-.kc-toc-side a.is-current::after { content: ""; position: absolute; left: -17.5px; top: 5px; bottom: 5px; width: 2px; border-radius: 2px; background: var(--brand); }
 .kc-toc-fold a.is-current::before { color: var(--brand); }
 
 /* Docked: once the folded index reaches the top bar it is held there, easing out from its own width to the screen's,
@@ -212,7 +211,7 @@ body.kc { background: var(--page); }
   .kc-doc-wrap.has-toc { display: grid; grid-template-columns: minmax(0, 760px) 240px; gap: var(--sp-6); justify-content: center; max-width: 1040px; margin: 0 auto; }
   .kc-doc-wrap.has-toc .kc-doc { margin: 0; width: 100%; }
   .kc-toc-side { display: block; position: sticky; top: calc(88px + env(safe-area-inset-top)); align-self: start; max-height: calc(100vh - 120px); overflow-y: auto;
-    margin-top: var(--sp-6); padding: var(--sp-1) 0 var(--sp-1) var(--sp-4); border-left: 1.5px solid var(--line); }
+    margin-top: var(--sp-6); padding: var(--sp-1) 0; }
   .kc-toc-fold { display: none; }
 }
 
@@ -384,8 +383,22 @@ body.kc { background: var(--page); }
 @media (min-width: 1540px) {
   .kc-shelves { display: none; }
   .kc-index-side { display: block; position: fixed; top: calc(88px + env(safe-area-inset-top)); right: var(--sp-5); width: 232px; max-height: calc(100vh - 120px); overflow-y: auto;
-    padding: var(--sp-1) 0 var(--sp-1) var(--sp-4); border-left: 1.5px solid var(--line); }
+    padding: var(--sp-1) 0; }
   .kc-index-side ul { list-style: none; margin: 0; padding: 0; }
   .kc-index-side a { display: flex; align-items: baseline; gap: .4em; padding: var(--sp-1) 0; color: var(--muted); text-decoration: none; font: var(--fs-ui)/1.4 var(--sans); }
   .kc-index-side a:hover, .kc-index-side a[aria-current] { color: var(--brand); }
 }
+
+/* ---- How far the reader is, in the section index's own marks (shared/page-index.js): the side list's line is one part per
+   section, each filling as it is read, with the rings under it; the stuck bar carries the same parts along its foot ---- */
+.kc-toc-side li { position: relative; padding-left: var(--sp-4); }
+.kc-toc-side li::before, .kc-toc-side li::after { content: ""; position: absolute; left: 0; top: 1px; bottom: 1px; width: 2px; border-radius: 2px; background: color-mix(in srgb, var(--muted) 35%, transparent); }
+.kc-index-side .kc-part { position: relative; padding-left: var(--sp-4); }
+.kc-index-side .kc-part::before, .kc-index-side .kc-part::after { content: ""; position: absolute; left: 0; top: 1px; bottom: 1px; width: 2px; border-radius: 2px; background: color-mix(in srgb, var(--muted) 35%, transparent); }
+.kc-index-side .kc-part::after { background: var(--accent, var(--brand)); transform: scaleY(var(--p, 0)); transform-origin: top; }
+.kc-toc-side li::after { background: var(--accent, var(--brand)); transform: scaleY(var(--p, 0)); transform-origin: top; }
+.kc-toc-side > .pi-rings, .kc-index-side > .pi-rings { display: block; margin: var(--sp-3) 0 0; }
+.kc-toc-line { display: none; position: absolute; left: 0; right: 0; top: calc(44px - 3px); pointer-events: none; }
+.kc-toc-fold.docked .kc-toc-line, .kc-shelves.is-stuck .kc-toc-line { display: flex; }
+@media print { .kc-toc-line { display: none; } }
+

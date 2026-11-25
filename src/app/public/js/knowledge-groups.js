@@ -3,6 +3,8 @@
 // edge, as the document pages' index does. The bar's link for the shelf in view takes aria-current, and the list scrolls to keep that link
 // in sight. Everything reads the page's own layout, so a search that hides groups or cards needs nothing here.
 
+import { rings, segments, trackSections } from "/shared/page-index.js";
+
 const bar = document.querySelector(".kc-shelves");
 
 if (bar) {
@@ -79,6 +81,18 @@ if (bar) {
     const el = document.getElementById(a.getAttribute("href").slice(1));
     if (el) a.addEventListener("click", go(el));
   }
+  // How far each shelf is read, drawn as on the document pages (shared/page-index.js): under the stuck bar, and beside the side list
+  const sideList = document.querySelector(".kc-index-side");
+  const line = fold && segments(shelves.length, "kc-toc-line"), mini = rings();
+  fold?.querySelector("summary").append(line.el);
+  sideList?.append(mini.el);
+  const sideItems = shelves.map((s) => sideList?.querySelector(`a[href="${s.a.getAttribute("href")}"]`));
+  sideItems.forEach((a) => a?.classList.add("kc-part"));
+  if (shelves.length > 2) trackSections(shelves.map((s) => s.el), ({ parts, current, done }) => {
+    line?.fill(parts);
+    sideItems.forEach((a, i) => a?.style.setProperty("--p", parts[i].toFixed(3)));
+    mini.light(done, current >= 0);
+  }, { end: document.querySelector(".kc-body") ?? shelves.at(-1).el, top: stickAt, line: (edge) => edge + 80 });
   const queue = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
 
   // Outside a tap, or Escape, shuts the list

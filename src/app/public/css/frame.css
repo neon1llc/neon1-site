@@ -24,7 +24,7 @@
 /* Matrix: 1NEON's dark palette (its ground and panels, the rain's pale green text, the logo's neon for the brand) */
 :root[data-site-theme="matrix"] { --page: #0F0A0D; --page-rgb: 15 10 13; color-scheme: dark; }
 /* The text tokens come from --m-* in shared/neon1.css: near-neutral off-whites with a faint green cast, so the brand green is left for headings, links, and buttons */
-:root[data-site-theme="matrix"] :is(.awake, .n1-bar, .menu, .case-layer) {
+:root[data-site-theme="matrix"] :is(.awake, .n1-bar, .menu, .case-layer, .pi-rail) {
   --paper: #0F0A0D; --ink: var(--m-ink); --brand: #6CFFA8; --mark: #00B84F; --deep: #E9FFEE;
   --page-rgb: 15 10 13; --ink-rgb: 237 241 237; /* = --m-ink as a triple */ --brand-rgb: 108 255 168;
   --ctl-line: rgb(var(--brand-rgb) / .3); --surface: #17110F; --surface-rgb: 23 17 15; --surface-2: #0A0608; --ink-soft: var(--m-ink-soft); --muted-ink: var(--m-muted); --err: #FF8A80; --warn: #FFB547;

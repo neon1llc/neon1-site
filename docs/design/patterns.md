@@ -46,3 +46,5 @@ Two independent choices: family (Sentinel default, Matrix optional) and mode (li
 ## Motion
 
 Use the shared lengths and curve. Something that appears eases in; a fold opens and its arrow turns together. Page changes cross-fade only through the browser's own transitions. Reduced motion and `data-motion="off"` change at once. No motion carries meaning that text does not.
+
+A long page scrolls freely: no section snapping, no key or wheel steering, and nothing hidden until an animation shows it. It says where you are with a section index (`js/pace.js`, `css/pace.css`), after the contents rails of long reading pages. Of Linear, Stripe, Vercel, Apple's MacBook Air page, rauno.me, emilkowal.ski, and Oxide, measured at 1440px on 2026-11-24, none snapped the document.
