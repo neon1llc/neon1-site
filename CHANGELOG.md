@@ -3,6 +3,7 @@
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
+- What's new reaches back to September 2025, with the first neon1.tech and the early work on neon1's other public repositories. v0.1.0 carries its own date.
 
 ### Fixed
 - The contact section's free-account line has its space before the 1NEON account link, and the links check now fails on a link written against the word before it.
@@ -1541,6 +1542,6 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - New single-page layout: services with rate tiers, how we work, open source, why neon1, contact.
 - Lighter Matrix rain with a pause control and reduced-motion support.
 
-## v0.1.0
+## v0.1.0 - 2025-09-07
 
 - The 2025 terminal-style landing page (restored to production on 2026-11-05).

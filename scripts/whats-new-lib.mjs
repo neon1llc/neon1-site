@@ -1,5 +1,5 @@
 // scripts/whats-new-lib.mjs - The "What's new" page (/knowledge/company/whats-new/): one feed of releases, updated
-// documents, and hand-listed outside updates since the relaunch, newest day first. scripts/knowledge.mjs calls
+// documents, and hand-listed updates, newest day first, back to the first commits. scripts/knowledge.mjs calls
 // feedBody() with the releases gathered by releases-lib.mjs, the corpus documents, and scripts/whats-new-external.json.
 // Releases and documents are never typed here, so the page can't drift from GitHub or the corpus.
 
@@ -7,7 +7,8 @@ import { esc, longDate, classifyLinks, bindExtArrows, BASE, SITE } from "./knowl
 
 const GH = "https://github.com/neon1llc/"
 
-// The day neon1.tech went back up (the 2025 landing page was restored on 2026-11-05); nothing earlier is listed
+// The day neon1.tech went back up (the 2025 landing page was restored on 2026-11-05). Releases and hand-listed
+// updates reach further back; documents count from here
 export const SINCE = "2026-11-05"
 
 // More documents than this on one day fold into a single line, so a corpus-wide edit doesn't bury the releases
@@ -26,18 +27,20 @@ const cmp = (a, b) => {
   return 0
 }
 
-// One item per product per day: the newest version that day, and how many shipped. Pre-releases and anything before SINCE drop out
-export function releaseItems(all) {
+// One item per product per day: the newest version that day, and how many shipped. Pre-releases drop out.
+// notes ({ "repo@version": text }) says what an early release changed, on its row
+export function releaseItems(all, notes = {}) {
   const byKey = new Map()
   for (const r of all) {
-    if (r.version.includes("-") || !r.date || r.date < SINCE) continue
+    if (r.version.includes("-") || !r.date) continue
     const key = `${r.date}|${r.repo}`
     if (!byKey.has(key)) byKey.set(key, { kind: "release", date: r.date, repo: r.repo, name: r.name, runs: [] })
     byKey.get(key).runs.push(r)
   }
   return [...byKey.values()].map(({ runs, ...it }) => {
     const top = runs.sort((a, b) => cmp(b.version, a.version))[0]
-    return { ...it, version: top.version, tagged: top.tagged, count: runs.length }
+    const note = notes[`${it.repo}@${top.version}`]
+    return { ...it, version: top.version, tagged: top.tagged, count: runs.length, ...(note ? { note } : {}) }
   })
 }
 
@@ -55,7 +58,7 @@ export function externalItems(list) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(e.date)) throw new Error(`whats-new-external.json item ${i} has a date that is not YYYY-MM-DD`)
     if (!/^https:\/\//.test(e.url)) throw new Error(`whats-new-external.json item ${i} needs an https url`)
     return { kind: "external", ...e }
-  }).filter((e) => e.date >= SINCE)
+  })
 }
 
 
@@ -77,7 +80,7 @@ const relUrl = (r) => (r.tagged ? `${GH}${r.repo}/releases/tag/${r.version}` : `
 // One row; a release or outside update links out, a document links to its own page
 function itemHtml(it) {
   if (it.kind === "release") {
-    return `<li><a href="${esc(relUrl(it))}">${esc(it.name)} ${esc(it.version)}</a>${it.count > 1 ? `<span class="kc-new-n"> · ${it.count} releases</span>` : ""}</li>`
+    return `<li><a href="${esc(relUrl(it))}">${esc(it.name)} ${esc(it.version)}</a>${it.count > 1 ? `<span class="kc-new-n"> · ${it.count} releases</span>` : ""}${it.note ? `<span class="kc-new-n"> · ${esc(it.note)}</span>` : ""}</li>`
   }
   if (it.kind === "external") return `<li><a href="${esc(it.url)}">${esc(it.source)}: ${esc(it.title)}</a></li>`
   return `<li><a href="${esc(it.url)}">${esc(it.title)}</a><span class="kc-new-n"> · ${it.fresh ? "new" : "updated"}</span></li>`
@@ -110,7 +113,7 @@ export function feedBody(items) {
     months.at(-1).days.push(d)
   }
   const html = months.map((m) => `<h2 id="m-${m.key}">${m.label}</h2>\n${m.days.map(dayHtml).join("\n")}`).join("\n\n")
-  return { html: bindExtArrows(classifyLinks(html)), sections: months.map((m) => ({ heading: m.label, key: `m-${m.key}` })), latest: days[0]?.date }
+  return { html: bindExtArrows(classifyLinks(html)), sections: months.map((m) => ({ heading: m.label, key: `m-${m.key}` })), latest: days[0]?.date, first: days.at(-1)?.date }
 }
 
 export const whatsNewLd = (updated) => ({ "@type": "CollectionPage", "@id": `${SITE}${WHATS_NEW_URL}#page`, url: `${SITE}${WHATS_NEW_URL}`, name: "What's new at neon1", inLanguage: "en-US", ...(updated ? { dateModified: updated } : {}) })

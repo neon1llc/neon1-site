@@ -6,10 +6,11 @@ import { releaseItems, docItems, externalItems, groupByDay, feedBody, SINCE } fr
 
 const rel = (repo, version, date, tagged = true) => ({ repo, name: repo, version, date, tagged })
 
-// Several versions of one product on one day show once, as the newest, with the count; pre-releases and older work drop out
+// Several versions of one product on one day show once, as the newest, with the count; pre-releases drop out
 test("releases collapse to one row per product per day", () => {
-  const items = releaseItems([rel("a", "v0.9.0", "2026-11-10"), rel("a", "v0.10.0", "2026-11-10"), rel("a", "v0.10.0-alpha.1", "2026-11-10"), rel("a", "v0.1.0", "2025-09-07"), rel("b", "v0.2.0", "2026-11-10")])
-  assert.equal(items.length, 2)
+  const items = releaseItems([rel("a", "v0.9.0", "2026-11-10"), rel("a", "v0.10.0", "2026-11-10"), rel("a", "v0.10.0-alpha.1", "2026-11-10"), rel("a", "v0.1.0", "2025-09-07"), rel("b", "v0.2.0", "2026-11-10")], { "a@v0.1.0": "first version" })
+  assert.equal(items.length, 3)
+  assert.equal(items.find((i) => i.date === "2025-09-07").note, "first version")
   const a = items.find((i) => i.repo === "a")
   assert.deepEqual([a.version, a.count], ["v0.10.0", 2])
 })

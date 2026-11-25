@@ -15,7 +15,7 @@ import { readFileSync, readdirSync, existsSync } from "node:fs"
 import { join } from "node:path"
 import { load, pageBody, relink, classifyLinks, bindExtArrows, fillNote, TASK_PATHS, searchIndex, esc, longDate, TYPE_LABELS, SITE, BASE, slugOf } from "./knowledge-lib.mjs"
 import { gather, releasesBody, releasesSections, releasesLd, pinOf, RELEASES_URL } from "./releases-lib.mjs"
-import { releaseItems, docItems, externalItems, feedBody, whatsNewLd, monthLabel, SINCE, WHATS_NEW_URL } from "./whats-new-lib.mjs"
+import { releaseItems, docItems, externalItems, feedBody, whatsNewLd, monthLabel, WHATS_NEW_URL } from "./whats-new-lib.mjs"
 import { homeFrame, page as page_, ORG, WEBSITE, AUTHOR, LICENSE, OG_IMAGE, crumbs, band, card as cardOf, CORPUS_LINK, rights, dateFacts, docMain, sitemapWith, syncFolder } from "./page-shell.mjs"
 
 
@@ -304,14 +304,14 @@ if (releases) {
   want.set("knowledge/releases.json", JSON.stringify({ pin: pinOf(releasesDir) }) + "\n")
   // What's new: the same releases, the corpus documents' update dates, and the hand-kept outside list, one feed by day
   const feed = feedBody([
-    ...releaseItems(releases.all),
+    ...releaseItems(releases.all, JSON.parse(readFileSync(new URL("./whats-new-notes.json", import.meta.url), "utf8"))),
     ...docItems(corpus.docs),
     ...externalItems(JSON.parse(readFileSync(new URL("./whats-new-external.json", import.meta.url), "utf8"))),
   ])
   const feedMain = docMain({
     crumbs: [["Knowledge center", BASE], ["What's new"]],
     title: "What's new",
-    summary: `Releases and updated documents across neon1, since ${monthLabel(SINCE)}.`,
+    summary: `Releases and updated documents across neon1, since ${monthLabel(feed.first)}.`,
     facts: [feed.latest ? ["Updated", longDate(feed.latest)] : null].filter(Boolean),
     sections: feed.sections,
     body: feed.html,
