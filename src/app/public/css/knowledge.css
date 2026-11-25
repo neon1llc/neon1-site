@@ -398,7 +398,11 @@ body.kc { background: var(--page); }
 .kc-index-side .kc-part::after { background: var(--accent, var(--brand)); transform: scaleY(var(--p, 0)); transform-origin: top; }
 .kc-toc-side li::after { background: var(--accent, var(--brand)); transform: scaleY(var(--p, 0)); transform-origin: top; }
 .kc-toc-side > .pi-rings, .kc-index-side > .pi-rings { display: block; margin: var(--sp-3) 0 0; }
-.kc-toc-line { display: none; position: absolute; left: 0; right: 0; top: calc(44px - 3px); pointer-events: none; }
+.kc-toc-line { display: none; position: absolute; left: -1px; right: -1px; top: calc(44px - 3px); pointer-events: none; }
 .kc-toc-fold.docked .kc-toc-line, .kc-shelves.is-stuck .kc-toc-line { display: flex; }
+/* Where the progress line shows, it is the bar's one divider: the open list's own rule and the closed bar's border give way to it */
+.kc-toc-fold.docked[open] ol::before, .kc-shelves.is-stuck ul::before { content: none; }
+.kc-toc-fold.docked[open] ol, .kc-shelves.is-stuck ul { padding-top: var(--sp-1); }
+.kc-toc-fold.docked.wide:not([open]), .kc-shelves.is-stuck .kc-shelves-fold:not([open]) { border-bottom-color: transparent; }
 @media print { .kc-toc-line { display: none; } }
 
