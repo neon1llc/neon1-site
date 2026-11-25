@@ -2,6 +2,16 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## Unreleased
+
+### Fixed
+- Article counts in the Knowledge Center and the facts labels on its pages meet WCAG AA contrast in every look.
+- On touch screens the footer's legal links are at least 24px tall to tap.
+- A table that scrolls sideways can be scrolled from the keyboard.
+
+### Changed
+- Contact says the first call is free.
+
 ## v0.88.0
 
 ### Added

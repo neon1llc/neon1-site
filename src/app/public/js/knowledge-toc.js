@@ -140,3 +140,13 @@ if (heads.length) {
   fold?.addEventListener("click", (e) => { if (e.target.closest("a") && fold.classList.contains("docked")) fold.open = false; });
   update();
 }
+
+// A table wide enough to scroll sideways takes keyboard focus, so arrow keys can scroll it
+(() => {
+  const set = () => document.querySelectorAll("article table, article pre").forEach((el) => {
+    if (el.scrollWidth > el.clientWidth + 1) el.tabIndex = 0;
+    else el.removeAttribute("tabindex");
+  });
+  set();
+  addEventListener("resize", set);
+})();

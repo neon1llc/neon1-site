@@ -394,6 +394,8 @@ footer .foot h2 { font: 600 var(--fs-sm) var(--mono); letter-spacing: .01em; col
 .legal a:not(.ext) { text-decoration-line: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
 /* The copyright line ends with the company's public state record: an internal link, so it carries no arrow */
 .legal .owner { display: inline-flex; gap: 8px; flex-wrap: wrap; align-items: baseline; }
+/* On touch, each legal link is at least 24px tall to tap (WCAG 2.5.8); the matching negative margin leaves the layout as it was */
+@media (pointer: coarse) { .legal, .legal :is(.owner, .policies) { row-gap: 12px; } .legal :is(.owner, .policies) a { padding-block: 5px; margin-block: -5px; } }
 /* On a phone these lines wrap, and a backslash left hanging at the end of a line points at nothing. The links are underlined already, so the
    backslashes go and a wider gap separates them (the report line, which never wraps, keeps its own) */
 @media (max-width: 599px) {
