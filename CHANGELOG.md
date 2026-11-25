@@ -389,7 +389,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## v0.71.0
 
-- Case study cards and Knowledge Center case pages lead with the kind of work, so one can't be mistaken for another: a neon1 engagement, a partner engagement, founder experience, or an independent demonstration, as in "Partner engagement: As neon1, subcontracted by Xenoss, 2026" or "neon1 engagement, 2025". A role or year the corpus hasn't confirmed reads "not yet confirmed" instead of disappearing. The Knowledge Center's case studies shelf lists neon1 engagements first, then partner work, founder experience, and the fictional bakery proposal as an independent demonstration, each card labeled.
+- Case study cards and Knowledge Center case pages lead with the kind of work, so one can't be mistaken for another: a neon1 engagement, a partner engagement, founder experience, or an independent demonstration, as in "Partner engagement: As neon1, subcontracted by the partner, 2026" or "neon1 engagement, 2025". A role or year the corpus hasn't confirmed reads "not yet confirmed" instead of disappearing. The Knowledge Center's case studies shelf lists neon1 engagements first, then partner work, founder experience, and the fictional bakery proposal as an independent demonstration, each card labeled.
 - Client work: the line above the cards says each one is labeled as a neon1 or a partner engagement, with who did what and what changed, in place of "what was measured before and after". The rail gains the dry cleaner, my first client, from the corpus.
 - Public code shows neon1-corpus v0.42.0, neon1-1NEON v0.11.0, and neon1-chat v0.2.1.
 - Services: each line names who it's for ("you run a small business", "you lead a technical team", "your office or home", "your team or group"), opens with the situation that fits, and links where to start: how a workflow project goes, how a cloud project goes, what a first project costs, and how a security session goes.
@@ -1387,7 +1387,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - The fourth stage is Normalize: handoff, training, retiring the old setup, and cleanup.
 - Proposals come with estimates rather than fixed prices, and a new question covers how data and accounts are treated.
 - About speaks to close to 15 years of interest in technology and automation, and to leaving people knowing their options.
-- Xenoss links to its site from the case studies.
+- The partner links to its site from the case studies.
 - The logo is a real link to neon1.tech, for bookmarking, and still springs back to the top.
 - The 1NEON button fades the page out and hands over to the portal, which fades itself in.
 - The hero pane has more room, and the rain is lighter so the content reads first.
