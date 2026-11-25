@@ -3,7 +3,7 @@
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
-- What's new reaches back to September 2025, with the first neon1.tech and the early work on neon1's other public repositories. v0.1.0 carries its own date.
+- What's new reaches back to September 2025, with the 2025 versions of neon1.tech (v0.1.0 to v0.1.2) and the early work on neon1's other public repositories.
 
 ### Fixed
 - The contact section's free-account line has its space before the 1NEON account link, and the links check now fails on a link written against the word before it.
@@ -1542,6 +1542,15 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - New single-page layout: services with rate tiers, how we work, open source, why neon1, contact.
 - Lighter Matrix rain with a pause control and reduced-motion support.
 
+## v0.1.2 - 2025-11-02
+
+- On phones, a tap beside the logo opens the keyboard for typing a word, and a tap outside a panel closes it.
+- The 2025 landing page came back to neon1.tech on 2026-11-05.
+
+## v0.1.1 - 2025-10-28
+
+- The landing page's panels fit the screen better, its story is shorter, and the Neo chat opens inside a panel.
+
 ## v0.1.0 - 2025-09-07
 
-- The 2025 terminal-style landing page (restored to production on 2026-11-05).
+- The first terminal-style landing page: green code rain, and a typed word such as about or contact opens that section.

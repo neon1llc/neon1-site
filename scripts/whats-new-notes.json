@@ -1,5 +1,7 @@
 {
   "neon1-site@v0.1.0": "first version: green code rain, and a typed word such as about or contact opens that section",
+  "neon1-site@v0.1.1": "panels fit the screen better, a shorter story, and Neo's chat inside a panel",
+  "neon1-site@v0.1.2": "typing and closing panels work by tap on phones",
   "aws-clip@v0.1.0": "first release: each command says which rule allowed or refused it",
   "deploy-ops@v0.13.0": "early releases of a local preview for delivering apps and infrastructure"
 }
