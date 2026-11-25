@@ -88,10 +88,10 @@
 /* ---- Neo: the same two palettes as the page ---- */
 /* The matrix dark look's tube glow on the launcher has high weight (css/frame.css, "Neon"); this one is a notch above it */
 :root[data-site-style="sentinel"][data-site-theme="matrix"]:has(.n1-bar.light) .n1chat-launch:not(.n1chat-light) { border-color: var(--accent); color: var(--accent);
-  background: rgb(var(--page-rgb) / .96); box-shadow: none; }
+  background: var(--neo-fill); box-shadow: none; }
 :root[data-site-style="sentinel"][data-site-theme="matrix"]:has(.n1-bar.light) .n1chat-launch:not(.n1chat-light) svg { filter: none; }
 :root[data-site-style="sentinel"][data-site-theme="matrix"] .n1-bar.light .n1-logo { color: var(--accent); }
-:root[data-site-style="sentinel"] .n1chat-launch:not(.n1chat-light) { color: var(--accent); border-color: var(--accent); background: rgb(var(--page-rgb) / .96); }
+:root[data-site-style="sentinel"] .n1chat-launch:not(.n1chat-light) { color: var(--accent); border-color: var(--accent); background: var(--neo-fill); }
 :root[data-site-style="sentinel"] .n1chat-launch:not(.n1chat-light):hover { background: var(--accent-wash); }
 :root[data-site-style="sentinel"] .n1chat-launch.n1chat-light { box-shadow: 0 2px 8px rgb(var(--ink-rgb) / .14); }
 :root[data-site-style="sentinel"] .n1chat { --bg: var(--surface); --fg: var(--ink); --line: rgb(var(--ink-rgb) / .6); --soft: rgb(var(--ink-rgb) / .12);

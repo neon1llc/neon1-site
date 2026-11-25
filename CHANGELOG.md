@@ -6,6 +6,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - What's new reaches back to September 2025, with the 2025 versions of neon1.tech (v0.1.0 to v0.1.2) and the early work on neon1's other public repositories.
 
 ### Fixed
+- Neo's dark launcher fill is one value, `--neo-fill`, that 1NEON uses too.
 - The contact section's free-account line has its space before the 1NEON account link, and the links check now fails on a link written against the word before it.
 
 ### Changed

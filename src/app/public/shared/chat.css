@@ -2,6 +2,8 @@
  * Dark over the rain, light ("awake") over the light pages, switched by .n1chat-light. */
 
 /* ---- The launcher: a round mark, styled like "book a call", that stretches to "ask Neo" ---- */
+/* The dark launcher's ground wherever page text can pass behind it, here and in 1NEON. Only the landing's rain leaves it clear */
+:root { --neo-fill: rgb(15 10 13 / .96); }
 /* --n1chat-bottom is the clearance above any fixed bottom bar; a host page with one (1NEON's phone tab
  * bar) raises it, and the launcher and the window both sit above it. Without one they keep 16px from the
  * edges and clear the home indicator and notch, on the same baseline as the rain controls */

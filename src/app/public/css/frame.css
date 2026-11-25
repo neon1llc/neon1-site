@@ -118,7 +118,7 @@
 :root[data-site-theme="matrix"] .n1-bar.light .n1-logo svg { filter: drop-shadow(0 0 2px #8CFFBE) drop-shadow(0 0 7px rgb(var(--neon-rgb) / .95)) drop-shadow(0 0 16px rgb(var(--neon-rgb) / .7)); }
 /* Below the rain, Neo's launcher glows in matrix as on 1NEON's public screens: the page's dark ground behind it so nothing shows
    through, and the same tube glow on its border and mark. Over the landing's rain it stays the plain outline */
-:root[data-site-theme="matrix"]:has(.n1-bar.light) .n1chat-launch:not(.n1chat-light) { border-color: #6CFFA8; color: #6CFFA8; background: rgb(15 10 13 / .94);
+:root[data-site-theme="matrix"]:has(.n1-bar.light) .n1chat-launch:not(.n1chat-light) { border-color: #6CFFA8; color: #6CFFA8; background: var(--neo-fill);
   box-shadow: 0 0 3px rgba(140, 255, 190, .9), 0 0 11px rgb(var(--neon-rgb) / .85), 0 0 26px rgb(var(--neon-rgb) / .55), inset 0 0 9px rgb(var(--neon-rgb) / .4); }
 :root[data-site-theme="matrix"]:has(.n1-bar.light) .n1chat-launch:not(.n1chat-light) svg { filter: drop-shadow(0 0 2px #8CFFBE) drop-shadow(0 0 7px rgb(var(--neon-rgb) / .95)) drop-shadow(0 0 14px rgb(var(--neon-rgb) / .6)); }
 
