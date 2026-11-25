@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## Unreleased
+
+### Changed
+- The blog's topic label "What's and why's" reads "Notes".
+
 ## v0.87.2
 
 ### Changed

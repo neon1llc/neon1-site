@@ -30,7 +30,7 @@ const frame = homeFrame(readFileSync(join(siteDir, "index.html"), "utf8"))
 // The three kinds of post (neon1-corpus schema, post.topic), as a reader would name them
 const TOPICS = {
   questions: "Local questions",
-  "whats-and-whys": "What's and why's",
+  "whats-and-whys": "Notes",
   lessons: "From the repos",
 }
 
