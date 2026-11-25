@@ -24,11 +24,12 @@ const VOID = "#0D0208", NEON = "#6CFFA8"; // shared/neon1.css --void and --neon
 
 // A square SVG: the dark brand ground edge to edge (touch icons and search results crop to their own shape),
 // the mark centered with room around it
-function svg(size, small) {
+// Icons wear the weight of Neo's launcher (3.4); the square logo keeps its own, since media never changes in place
+function svg(size, small, weight = 3.4) {
   const pad = small ? 5 : 12, box = 64 + 2 * pad;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="${-pad} ${-pad + 1} ${box} ${box}">` +
     `<rect x="${-pad}" y="${-pad + 1}" width="${box}" height="${box}" fill="${VOID}"/>` +
-    `<path d="${small ? SIMPLE : FULL}" fill="none" stroke="${NEON}" stroke-width="${small ? 5.5 : 2.6}" stroke-linecap="round"/></svg>`;
+    `<path d="${small ? SIMPLE : FULL}" fill="none" stroke="${NEON}" stroke-width="${small ? 5.5 : weight}" stroke-linecap="round"/></svg>`;
 }
 
 // An ICO whose entries are PNGs (supported by every current browser), largest last
@@ -49,9 +50,9 @@ function ico(pngs) {
 (async () => {
   const browser = await chromium.launch();
   const page = await browser.newPage({ deviceScaleFactor: 1 });
-  const draw = async (size, small) => {
+  const draw = async (size, small, weight) => {
     await page.setViewportSize({ width: size, height: size });
-    await page.setContent(`<!doctype html><style>html,body{margin:0}svg{display:block}</style>${svg(size, small)}`);
+    await page.setContent(`<!doctype html><style>html,body{margin:0}svg{display:block}</style>${svg(size, small, weight)}`);
     return page.screenshot({ type: "png", clip: { x: 0, y: 0, width: size, height: size } });
   };
   const small = {};
@@ -61,7 +62,7 @@ function ico(pngs) {
   fs.writeFileSync(path.join(SITE, "apple-touch-icon.png"), await draw(180, false));
   // Search results show one icon to everyone, at a multiple of 48 px: matrix green on the dark ground
   fs.writeFileSync(path.join(SITE, "favicon-192.png"), await draw(192, false));
-  fs.writeFileSync(path.join(SITE, "media/neon1-logo-512.png"), await draw(512, false));
+  fs.writeFileSync(path.join(SITE, "media/neon1-logo-512.png"), await draw(512, false, 2.6));
   await browser.close();
   console.log("icons: favicon.ico, favicon-48.png, favicon-192.png, apple-touch-icon.png, media/neon1-logo-512.png");
 })().catch((e) => { console.error(e); process.exit(1); });

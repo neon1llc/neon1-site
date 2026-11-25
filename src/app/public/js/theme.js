@@ -27,11 +27,20 @@
 
   // ---- Applying it: the attributes the CSS keys on, the switch's state, the browser bar's color ----
   const BAR = { providence: "#F5F8F4", "desert-of-the-real": "#121A14" };
+  // The tab icon follows the site's mode, not only the browser's: one drawing, colored here. favicon.svg covers the first paint
+  const TAB = "M6 6a24 24 0 0 1 24 24v30M6 18a12 12 0 0 1 12 12v30M34 6a24 24 0 0 1 24 24v30M34 18a12 12 0 0 1 12 12v30";
+  function tabIcon() {
+    const link = document.querySelector('link[rel="icon"][type="image/svg+xml"]');
+    if (!link) return;
+    const color = dark(root.dataset.siteLook) ? "#6CFFA8" : "#327641";
+    link.href = `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="1 2 62 62"><path d="${TAB}" fill="none" stroke="${color}" stroke-width="5.5" stroke-linecap="round"/></svg>`)}`;
+  }
   function apply(look) {
     const biz = look === "providence" || look === "desert-of-the-real";
     root.dataset.siteStyle = biz ? "sentinel" : "matrix";
     root.dataset.siteLook = look;
     root.dataset.siteTheme = dark(look) ? "matrix" : "awake";
+    tabIcon();
     document.querySelectorAll(".theme-sw:not(.style-sw)").forEach((b) => {
       b.setAttribute("aria-checked", String(dark(look)));
       b.title = "light or dark";
@@ -110,6 +119,8 @@
   }
 
   apply(wantedLook());
+  // The script runs in the head, where the icon link may not be parsed yet
+  addEventListener("DOMContentLoaded", tabIcon, { once: true });
 
   // Sentinel's bar is plain and light from the first paint. js/page.js sets the same classes, but as a module it runs after the
   // page has shown, so the landing's bar used to start as Matrix glass and fade to light on every visit. The observer catches the

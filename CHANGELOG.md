@@ -12,6 +12,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ### Changed
 - Contact says the first call is free.
+- The tab icon follows the light or dark mode you pick, in the brand greens. The home screen and search icons use the heavier mark on Neo's button.
 - dev.neon1.tech signs in at the fixed address `/__signin` with a passkey or email code. `make dev-gate` and the rotating link are gone.
 
 ## v0.88.0
