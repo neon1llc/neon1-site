@@ -25,7 +25,6 @@ endif
 CORPUS_DIR   ?= .corpus/$(CORPUS_TAG)
 # The tag travels to the generators, which record it in /knowledge/corpus.json
 export CORPUS_TAG
-export CORPUS_DIR
 
 # The AWS CLI reads the region from the environment
 export AWS_REGION
@@ -112,11 +111,11 @@ releases-export:
 
 # llms.txt, written whole by scripts/knowledge.mjs, lists the blog's posts too, so the knowledge targets read both bundles
 knowledge: knowledge-export blog-export releases-export ## Rewrite the knowledge center under /knowledge/ from CORPUS_TAG
-	@node scripts/knowledge.mjs sync $(SITE_DIR) .corpus/export/knowledge .corpus/export/blog .releases
+	@CORPUS_DIR="$(CORPUS_DIR)" node scripts/knowledge.mjs sync $(SITE_DIR) .corpus/export/knowledge .corpus/export/blog .releases
 	@node scripts/versions.mjs sync $(SITE_DIR) .releases
 
 knowledge-check: knowledge-export blog-export releases-export ## Fail if the knowledge center differs from CORPUS_TAG
-	@node scripts/knowledge.mjs check $(SITE_DIR) .corpus/export/knowledge .corpus/export/blog .releases
+	@CORPUS_DIR="$(CORPUS_DIR)" node scripts/knowledge.mjs check $(SITE_DIR) .corpus/export/knowledge .corpus/export/blog .releases
 	@node scripts/versions.mjs check $(SITE_DIR) .releases
 
 # The blog: every post the blog bundle holds, as a page under /blog/, with an RSS feed. Links to other corpus
