@@ -4,6 +4,9 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
 ## Unreleased
 
+### Fixed
+- The contact section's free-account line has its space before the 1NEON account link, and the links check now fails on a link written against the word before it.
+
 ### Changed
 - The blog's topic label "What's and why's" reads "Notes".
 

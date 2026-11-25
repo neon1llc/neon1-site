@@ -16,9 +16,10 @@ CHECK = os.path.join(os.path.dirname(os.path.abspath(__file__)), "check_page.py"
 
 # ---- The good site: a page, a stylesheet with an image and an import, a module with a static import
 # and one registered run-time path ----
+GOOD_PAGE = ('<!doctype html><html><head><link rel="stylesheet" href="/css/site.css"></head>'
+                  '<body><a href="#top" id="top">top</a><script type="module" src="/js/main.js"></script></body></html>')
 GOOD = {
-    "index.html": '<!doctype html><html><head><link rel="stylesheet" href="/css/site.css"></head>'
-                  '<body><a href="#top" id="top">top</a><script type="module" src="/js/main.js"></script></body></html>',
+    "index.html": GOOD_PAGE,
     "css/site.css": '@import "parts.css";\nbody { background: url("/media/bg.webp"); }\n',
     "css/parts.css": ".x { background: url(../media/tile.webp); }\n",
     "media/bg.webp": "",
@@ -32,6 +33,7 @@ REGISTRY = {"dynamic": [{"template": "/media/tex/${name}.webp", "from_calls": ["
 # ---- One break per case, and the text the check must print for it ----
 CASES = [
     ("good site passes", {}, None),
+    ("link glued to the word before it", {"index.html": GOOD_PAGE.replace('<body>', '<body><p>in a free<a href="#top">account</a></p>')}, "no space before a link"),
     ("missing image in a stylesheet", {"media/bg.webp": None}, "missing file /media/bg.webp"),
     ("missing image in an imported sheet", {"media/tile.webp": None}, "missing file /media/tile.webp"),
     ("missing static import", {"js/helper.js": None}, "missing file /js/helper.js"),

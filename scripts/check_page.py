@@ -7,6 +7,7 @@
 #   paths in its HTML, then, file by file, the url()s and @imports in its stylesheets and the site paths
 #   and imports in its first-party scripts. A path built at run time (a template literal) must be
 #   registered in scripts/assets.json, which says what it expands to, and each expansion must exist.
+# links also fails on a word or punctuation written straight against a link, which prints with no space.
 # scripts: inline scripts parse with node --check and JSON-LD parses as JSON.
 
 import json
@@ -52,6 +53,10 @@ def local_file(root, ref):
 JS_TYPES = {"", "text/javascript", "application/javascript", "module"}
 REF_ATTRS = {"href", "src", "poster", "data"}
 CSS_URL = re.compile(r"url\(\s*['\"]?(/[^'\")]+)")
+
+# A link written straight against the text before it shows as "free1NEON account"
+GLUED_LINK = re.compile(r"[A-Za-z0-9,.;:!?]<a[\s>]")
+
 
 # ---- The asset graph below the page ----
 # In stylesheets: any url() (root-relative or relative to the sheet) and @import
@@ -138,6 +143,10 @@ def check_links(path, page):
     for line, target in page.anchors:
         if target not in page.ids:
             problems.append(f"{path}:{line}: no element with id '{target}'")
+    with open(path, encoding="utf-8") as f:
+        text = f.read()
+    for m in GLUED_LINK.finditer(text):
+        problems.append(f"{path}:{text.count(chr(10), 0, m.start()) + 1}: no space before a link")
     for line, ref in page.refs:
         if ref.startswith(OTHER_APPS):
             continue
