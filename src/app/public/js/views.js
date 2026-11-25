@@ -132,7 +132,11 @@
   // The hero counts as seen, so it never plays an entrance
   // Input pauses while the menu, a case study, or the white rabbit is open
   const root = document.documentElement;
-  root.classList.add("motion-ready", "glide");
+  // Free pacing (html[data-pace], css/pace.css): the page scrolls like any page. No detent, no key steering, and nothing waits
+  // hidden for an entrance; section links, folds, and the remembered spot work as before
+  const free = root.dataset.pace !== undefined;
+  root.classList.add("glide");
+  if (!free) root.classList.add("motion-ready");
   try {
   const hero = document.querySelector(".hero");
   const views = [hero, ...document.querySelectorAll(".view")];
@@ -180,7 +184,7 @@
 
   // A first visit plays the entrance once; later visits only fade the view in
   function enter(v) {
-    if (v === hero) return;
+    if (free || v === hero) return;
     if (visited.has(v)) { animate(v, { opacity: 1 }, { duration: 0.5 }); return; }
     visited.add(v);
     v.style.opacity = "1";
@@ -193,7 +197,7 @@
   }
 
   // Only views already seen fade with a pull, so unseen ones keep their entrance
-  const setFade = (v, t) => { if (v && v !== hero && visited.has(v)) v.style.opacity = t.toFixed(3); };
+  const setFade = (v, t) => { if (!free && v && v !== hero && visited.has(v)) v.style.opacity = t.toFixed(3); };
 
   // ---- State ----
   let y = scrollY, target = scrollY; // rendered and wanted scroll positions
@@ -224,13 +228,14 @@
     const [top, bottom] = range(i);
     // Coming back up lands at the end of a tall view; End goes to the very bottom; Back to a remembered
     // spot (opts.y) lands there, kept inside the view
-    const dest = opts.y !== undefined ? Math.max(top, Math.min(bottom, opts.y)) : opts.end ? bottom : !opts.link && i < from ? bottom : top;
+    const dest = free ? Math.max(0, Math.min(maxY(), opts.y ?? (opts.end ? maxY() : top)))
+      : opts.y !== undefined ? Math.max(top, Math.min(bottom, opts.y)) : opts.end ? bottom : !opts.link && i < from ? bottom : top;
     if (settling) settling.stop();
     const fromView = views[from], toView = views[i];
     pull = 0; pullDir = 0;
     const distance = Math.abs(dest - y);
     const duration = opts.detent ? Math.min(0.5, 0.24 + distance / 2800) : Math.min(1.25, 0.7 + distance / 4000);
-    if (fromView !== toView && fromView !== hero && visited.has(fromView)) animate(fromView, { opacity: 0 }, { duration: duration * 0.6 });
+    if (!free && fromView !== toView && fromView !== hero && visited.has(fromView)) animate(fromView, { opacity: 0 }, { duration: duration * 0.6 });
     let entered = false;
     blockUntilIdle = true;
     detenting = !!opts.detent;
@@ -351,6 +356,9 @@
     toggleFold(d);
   });
 
+  // A wheel during a link's glide takes the page back at once (free pacing)
+  addEventListener("wheel", () => { if (free && settling) { settling.stop(); settling = null; blockUntilIdle = false; sync(); } }, { passive: true });
+
   // ---- Wheel and trackpad ----
   // Left to the browser, like a finger: a notch, a trackpad flick, and its momentum scroll natively, however far they carry. The
   // detent below (rest()) settles on the nearest view edge once the scroll has stopped, so a strong flick can run through several
@@ -366,7 +374,7 @@
   // Arrows and paging scroll inside a tall view, then move on at its edge
   // Form fields keep their keys, and Space still presses buttons and links
   addEventListener("keydown", (e) => {
-    if (e.altKey || e.ctrlKey || e.metaKey || paused() || settling || inChat(document.activeElement)) return;
+    if (free || e.altKey || e.ctrlKey || e.metaKey || paused() || settling || inChat(document.activeElement)) return;
     const tag = document.activeElement.tagName;
     if (/^(INPUT|TEXTAREA|SELECT)$/.test(tag)) return;
     if (e.key === " " && /^(BUTTON|A|SUMMARY)$/.test(tag)) return;
@@ -425,7 +433,7 @@
   addEventListener("keydown", (e) => { if (e.key === "Tab") tabAt = performance.now(); }, true);
   document.addEventListener("focusin", (e) => {
     const t = e.target;
-    if (off || performance.now() - tabAt > 600 || !(t instanceof Element) || t.closest("header, .menu, .n1chat, .case-panel, .skip")) return;
+    if (free || off || performance.now() - tabAt > 600 || !(t instanceof Element) || t.closest("header, .menu, .n1chat, .case-panel, .skip")) return;
     const v = t.closest(".view, .hero"), i = views.indexOf(v);
     if (i < 0) return;
     if (v !== hero) {
@@ -453,6 +461,7 @@
   // Views on screen during a native scroll show themselves as they arrive: a first visit plays its entrance, and one faded out by an
   // earlier settle comes back, so a flick across several views never passes a blank one
   function showVisible() {
+    if (free) return;
     for (const v of views) {
       if (v === hero) continue;
       const r = v.getBoundingClientRect();
@@ -482,6 +491,7 @@
   // A resize keeps the position inside the current view
   addEventListener("resize", () => {
     if (settling) return;
+    if (free) { target = y = scrollY; return; }
     const [top, bottom] = range(indexAt(target));
     target = y = Math.max(top, Math.min(bottom, target));
     rest();
@@ -496,12 +506,13 @@
   addEventListener("touchstart", (e) => {
     fingers = e.touches.length;
     // A finger down in the middle of a detent takes the page back, so a pull back or a new flick starts from where it is
-    if (settling && detenting) { settling.stop(); settling = null; detenting = false; blockUntilIdle = false; sync(); }
+    if (settling && (detenting || free)) { settling.stop(); settling = null; detenting = false; blockUntilIdle = false; sync(); }
   }, { passive: true, capture: true });
   addEventListener("touchend", (e) => { fingers = e.touches.length; rest(); }, { passive: true, capture: true });
   addEventListener("touchcancel", () => { fingers = 0; rest(); }, { passive: true, capture: true });
   const typing = () => { const a = document.activeElement; return !!a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && !/^(checkbox|radio|button|submit|reset|file|range|color|image)$/.test(a.type || ""); };
   function rest(wait = 160) {
+    if (free) return;
     clearTimeout(restTimer);
     restTimer = setTimeout(function check() {
       if (off || !menu.hidden || document.body.classList.contains("case-open") || document.body.classList.contains("n1chat-open") || document.body.classList.contains("white-rabbit-on")) return;
