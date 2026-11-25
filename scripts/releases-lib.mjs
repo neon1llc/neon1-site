@@ -6,6 +6,7 @@
 import { readFileSync, existsSync } from "node:fs"
 import { join } from "node:path"
 import { esc, longDate, classifyLinks, bindExtArrows, BASE, SITE } from "./knowledge-lib.mjs"
+import { linkEntry, changelogUrl } from "./release-links.mjs"
 
 
 // ---- Which repositories, under the names readers know them by ----
@@ -44,11 +45,11 @@ export function parseChangelog(text) {
   let cur = null
   for (const line of text.split("\n")) {
     const m = line.match(HEAD)
-    if (m) { cur = { version: m[2], date: m[3] || "", lines: [] }; out.push(cur); continue }
+    if (m) { cur = { version: m[2], date: m[3] || "", heading: line.replace(/^#+ /, "").trim(), lines: [] }; out.push(cur); continue }
     if (line.startsWith("## ")) { cur = null; continue }
     if (cur && !line.trim().startsWith("<!-- commit:")) cur.lines.push(line)
   }
-  return out.map((e) => ({ version: e.version, date: e.date, md: e.lines.join("\n").trim() }))
+  return out.map((e) => ({ version: e.version, date: e.date, heading: e.heading, md: e.lines.join("\n").trim() }))
 }
 
 // "v0.13.0 2026-11-15" per line, from git for-each-ref on the repository's tags
@@ -115,12 +116,15 @@ export function entryHtml(md, repo, tag) {
 // tagged, which some early site versions are) the date of the next newer entry. Only tagged versions link to
 // their GitHub release
 export function gather(dir) {
-  const all = [], current = []
+  const all = [], current = [], tagSets = new Map(), changelogs = new Map()
   for (const [repo, name] of PRODUCTS) {
     const file = join(dir, `${repo}.md`)
     if (!existsSync(file)) continue
     const tags = existsSync(join(dir, `${repo}.tags`)) ? parseTags(readFileSync(join(dir, `${repo}.tags`), "utf8")) : new Map()
-    const entries = parseChangelog(readFileSync(file, "utf8"))
+    const text = readFileSync(file, "utf8")
+    const entries = parseChangelog(text)
+    tagSets.set(repo, new Set(tags.keys()))
+    changelogs.set(repo, text)
     let carry = ""
     for (const e of entries) {
       const date = e.date || tags.get(e.version) || carry
@@ -131,7 +135,7 @@ export function gather(dir) {
     if (top) current.push({ repo, name, version: top.version, date: all.find((x) => x.repo === repo && x.version === top.version).date })
   }
   all.sort((a, b) => b.date.localeCompare(a.date) || compareVersions(a.version, b.version) || REPOS.indexOf(a.repo) - REPOS.indexOf(b.repo))
-  return { all, current }
+  return { all, current, tags: tagSets, changelogs }
 }
 
 
@@ -145,8 +149,8 @@ export const RELEASES_URL = `${BASE}company/releases/`
 // A version opens its release on GitHub, so it is an outbound link like the others: a new tab, with the arrow after its last
 // word. It keeps the mono face the version numbers had (css/knowledge.css a.kc-ver)
 const plainOut = (href, text) => `<a class="ext kc-ver" href="${href}" target="_blank" rel="noopener"><span class="ext-end">${text}</span></a>`
-export function releasesBody({ all, current }) {
-  const relUrl = (r) => (r.tagged ? `${GH}${r.repo}/releases/tag/${r.version}` : `${GH}${r.repo}/blob/main/CHANGELOG.md`)
+export const releaseUrl = (r) => (r.tagged ? `${GH}${r.repo}/releases/tag/${r.version}` : changelogUrl(r))
+export function releasesBody({ all, current }, links) {
   // Each product links to its whole history on GitHub; the version opens that release's notes
   const table = `<h2 id="current">Current versions</h2>
 <table>
@@ -156,9 +160,9 @@ ${current.map((c) => `<tr><td><a href="${GH}${c.repo}/releases">${esc(c.name)}</
 </tbody>
 </table>`
   const recent = all.slice(0, RECENT).map((r) => `<section class="kc-rel" aria-labelledby="${r.repo}-${r.version}">
-<h3 id="${r.repo}-${r.version}">${esc(r.name)} ${plainOut(relUrl(r), r.version)}</h3>
+<h3 id="${r.repo}-${r.version}">${esc(r.name)} ${plainOut(releaseUrl(r), r.version)}</h3>
 <p class="kc-rel-date">${r.date ? longDate(r.date) : ""}</p>
-${entryHtml(r.md, r.repo, r.version)}
+${linkEntry(entryHtml(r.md, r.repo, r.tagged === false ? "main" : r.version), links)}
 </section>`).join("\n")
   const html = `${table}
 

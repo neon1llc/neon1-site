@@ -12,7 +12,7 @@ test("releases collapse to one row per product per day", () => {
   assert.equal(items.length, 3)
   assert.equal(items.find((i) => i.date === "2025-09-07").note, "first version")
   const a = items.find((i) => i.repo === "a")
-  assert.deepEqual([a.version, a.count], ["v0.10.0", 2])
+  assert.deepEqual([a.version, a.earlier.map((r) => r.version)], ["v0.10.0", ["v0.9.0"]])
 })
 
 // A document written inside the window is new; one first written earlier and edited since is updated
@@ -46,11 +46,14 @@ test("days sort newest first with releases leading", () => {
 // Releases and outside rows open in a new tab with the arrow; documents stay in the tab; a long run of documents folds
 test("rows link the right way and a long document day folds", () => {
   const docs = Array.from({ length: 7 }, (_, i) => ({ kind: "doc", date: "2026-11-10", title: `D${i}`, url: `/knowledge/d${i}/`, fresh: false }))
-  const { html, sections } = feedBody([...docs, { kind: "release", date: "2026-11-10", repo: "neon1-chat", name: "Neo", version: "v0.4.0", tagged: true, count: 1 }, { kind: "external", date: "2026-11-09", source: "Upwork", title: "Profile", url: "https://www.upwork.com/x" }])
+  const { html, sections } = feedBody([...docs, { kind: "release", date: "2026-11-10", repo: "neon1-chat", name: "Neo", version: "v0.4.0", tagged: true, earlier: [{ version: "v0.3.1", tagged: true }, { version: "v0.1.0", tagged: false, heading: "v0.1.0 - 2026-11-10" }] }, { kind: "external", date: "2026-11-09", source: "Upwork", title: "Profile", url: "https://www.upwork.com/x" }])
   assert.match(html, /<a class="ext" href="https:\/\/github.com\/neon1llc\/neon1-chat\/releases\/tag\/v0.4.0" target="_blank" rel="noopener">Neo <span class="ext-end">v0.4.0<\/span>/)
   assert.match(html, /<a class="ext" href="https:\/\/www.upwork.com\/x"/)
   assert.match(html, /<a href="\/knowledge\/d0\/">D0<\/a>/)
   assert.match(html, /<summary>7 documents updated<\/summary>/)
+  // Every older version of the day has its own link; one without a tag opens its changelog entry
+  assert.match(html, /releases\/tag\/v0\.3\.1"/)
+  assert.match(html, /neon1-chat\/blob\/main\/CHANGELOG\.md#v010---2026-11-10"/)
   assert.deepEqual(sections, [{ heading: "November 2026", key: "m-2026-11" }])
   assert.ok(SINCE === "2026-11-05")
 })

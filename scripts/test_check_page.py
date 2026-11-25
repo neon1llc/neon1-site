@@ -33,6 +33,8 @@ REGISTRY = {"dynamic": [{"template": "/media/tex/${name}.webp", "from_calls": ["
 # ---- One break per case, and the text the check must print for it ----
 CASES = [
     ("good site passes", {}, None),
+    ("section missing on another page", {"index.html": GOOD_PAGE.replace('<body>', '<body><a href="/other/#gone">x</a>'), "other/index.html": '<h2 id="here">Here</h2>'}, "no element with id 'gone' in /other/"),
+    ("section present on another page", {"index.html": GOOD_PAGE.replace('<body>', '<body><a href="/other/#here">x</a>'), "other/index.html": '<h2 id="here">Here</h2>'}, None),
     ("link glued to the word before it", {"index.html": GOOD_PAGE.replace('<body>', '<body><p>in a free<a href="#top">account</a></p>')}, "no space before a link"),
     ("missing image in a stylesheet", {"media/bg.webp": None}, "missing file /media/bg.webp"),
     ("missing image in an imported sheet", {"media/tile.webp": None}, "missing file /media/tile.webp"),

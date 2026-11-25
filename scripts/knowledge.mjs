@@ -15,6 +15,7 @@ import { readFileSync, readdirSync, existsSync } from "node:fs"
 import { join } from "node:path"
 import { load, pageBody, relink, classifyLinks, bindExtArrows, fillNote, TASK_PATHS, searchIndex, esc, longDate, TYPE_LABELS, SITE, BASE, slugOf } from "./knowledge-lib.mjs"
 import { gather, releasesBody, releasesSections, releasesLd, pinOf, RELEASES_URL } from "./releases-lib.mjs"
+import { linkIndex, checkGithubLinks } from "./release-links.mjs"
 import { releaseItems, docItems, externalItems, feedBody, whatsNewLd, monthLabel, WHATS_NEW_URL } from "./whats-new-lib.mjs"
 import { homeFrame, page as page_, ORG, WEBSITE, AUTHOR, LICENSE, OG_IMAGE, crumbs, band, card as cardOf, CORPUS_LINK, rights, dateFacts, docMain, sitemapWith, syncFolder } from "./page-shell.mjs"
 
@@ -284,6 +285,8 @@ want.set("knowledge/search-index.json", JSON.stringify(searchIndex(corpus)) + "\
 // The releases page: current versions, then the newest releases across every product, from each repository's
 // changelog. releases.json names the tags it read, so the deploy watch republishes when any product releases
 const releases = releasesDir ? gather(releasesDir) : null
+// The corpus checkout being built, for the links into its files
+const corpusDir = process.env.CORPUS_DIR ?? ""
 if (releases) {
   const updated = releases.all[0]?.date
   const main = docMain({
@@ -292,7 +295,7 @@ if (releases) {
     summary: "What changed in each neon1 product.",
     facts: [updated ? ["Updated", longDate(updated)] : null].filter(Boolean),
     sections: releasesSections,
-    body: releasesBody(releases),
+    body: releasesBody(releases, linkIndex({ docs: corpus.docs, corpusDir, siteDir, tags: releases.tags })),
     colophon: "Every release is also on its repository's GitHub Releases page.",
   })
   want.set(`${RELEASES_URL.slice(1)}index.html`, page({
@@ -323,6 +326,12 @@ if (releases) {
     path: WHATS_NEW_URL, main: feedMain, kind: "doc",
     ld: [whatsNewLd(feed.latest), crumbs([["Knowledge center", `${SITE}${BASE}`], ["What's new"]])],
   }))
+}
+// A release tag, corpus file, or heading these two pages name must exist, or the build stops
+if (releases) {
+  const written = [RELEASES_URL, WHATS_NEW_URL].map((u) => want.get(`${u.slice(1)}index.html`)).join("\n")
+  const broken = checkGithubLinks(written, { tags: releases.tags, changelogs: releases.changelogs, corpusDir })
+  if (broken.length) { console.error(`knowledge: broken release links\n  ${broken.join("\n  ")}`); process.exit(1) }
 }
 // Which corpus release these pages came from. The deploy workflow's watch reads it from the live site and
 // publishes when a newer release exists, so it must name the tag and the bundle's digest exactly

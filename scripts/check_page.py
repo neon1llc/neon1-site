@@ -3,13 +3,14 @@
 # scripts/check_page.py - Static checks for a page that html-validate can't do.
 # Usage: python3 scripts/check_page.py links src/app/public/index.html
 #
-# links: every in-page anchor has a target, and every asset the page reaches exists: the root-relative
+# links: every anchor, in the page or on another page of the site, has a target, and every asset the page reaches exists: the root-relative
 #   paths in its HTML, then, file by file, the url()s and @imports in its stylesheets and the site paths
 #   and imports in its first-party scripts. A path built at run time (a template literal) must be
 #   registered in scripts/assets.json, which says what it expands to, and each expansion must exist.
 # links also fails on a word or punctuation written straight against a link, which prints with no space.
 # scripts: inline scripts parse with node --check and JSON-LD parses as JSON.
 
+import functools
 import json
 import os
 import re
@@ -154,7 +155,18 @@ def check_links(path, page):
             continue
         if not os.path.isfile(local_file(root, ref)):
             problems.append(f"{path}:{line}: missing file {ref}")
+            continue
+        # A link into another page's section needs that id there too
+        fragment, target = unquote(urlsplit(ref).fragment), local_file(root, ref)
+        if fragment and target.endswith(".html") and fragment not in page_ids(target):
+            problems.append(f"{path}:{line}: no element with id '{fragment}' in {urlsplit(ref).path}")
     return problems
+
+
+@functools.lru_cache(maxsize=None)
+def page_ids(path):
+    """The ids a page offers, read once however many pages link to it."""
+    return parse(path).ids
 
 
 def strip_comments(text, kind):

@@ -13,6 +13,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 ### Changed
 - Contact says the first call is free.
 - The tab icon follows the light or dark mode you pick, in the brand greens. The home screen and search icons use the heavier mark on Neo's button.
+- What's new and the releases page link each thing they name to it: every version in a day's row, a document's changes from "updated", and in release notes the page, section, decision record, or release named. The build fails on a missing release tag, file, or section, and the links check now covers sections on other pages.
 - dev.neon1.tech signs in at the fixed address `/__signin` with a passkey or email code. `make dev-gate` and the rotating link are gone.
 
 ## v0.88.0

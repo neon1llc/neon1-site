@@ -4,8 +4,8 @@
 // Releases and documents are never typed here, so the page can't drift from GitHub or the corpus.
 
 import { esc, longDate, classifyLinks, bindExtArrows, BASE, SITE } from "./knowledge-lib.mjs"
-
-const GH = "https://github.com/neon1llc/"
+import { releaseUrl } from "./releases-lib.mjs"
+import { historyUrl } from "./release-links.mjs"
 
 // The day neon1.tech went back up (the 2025 landing page was restored on 2026-11-05). Releases and hand-listed
 // updates reach further back; documents count from here
@@ -40,7 +40,9 @@ export function releaseItems(all, notes = {}) {
   return [...byKey.values()].map(({ runs, ...it }) => {
     const top = runs.sort((a, b) => cmp(b.version, a.version))[0]
     const note = notes[`${it.repo}@${top.version}`]
-    return { ...it, version: top.version, tagged: top.tagged, count: runs.length, ...(note ? { note } : {}) }
+    // The day's older versions, each with its own address
+    const earlier = runs.slice(1).map((r) => ({ version: r.version, tagged: r.tagged, heading: r.heading }))
+    return { ...it, version: top.version, tagged: top.tagged, heading: top.heading, earlier, ...(note ? { note } : {}) }
   })
 }
 
@@ -48,7 +50,7 @@ export function releaseItems(all, notes = {}) {
 export function docItems(docs) {
   return docs
     .filter((d) => d.data.updated && d.data.updated >= SINCE)
-    .map((d) => ({ kind: "doc", date: d.data.updated, title: d.title, url: d.url, fresh: (d.data.created || "") >= SINCE }))
+    .map((d) => ({ kind: "doc", date: d.data.updated, title: d.title, url: d.url, source: d.source, fresh: (d.data.created || "") >= SINCE }))
 }
 
 // Entries of the hand-kept file: { date, source, title, url }. Anything malformed fails the build rather than showing half a row
@@ -75,15 +77,16 @@ export function groupByDay(items) {
     .map(([date, list]) => ({ date, list: list.sort((a, b) => ORDER[a.kind] - ORDER[b.kind] || label(a).localeCompare(label(b))) }))
 }
 
-const relUrl = (r) => (r.tagged ? `${GH}${r.repo}/releases/tag/${r.version}` : `${GH}${r.repo}/blob/main/CHANGELOG.md`)
-
-// One row; a release or outside update links out, a document links to its own page
+// One row. Each version links to its own release; a document links to its page, and "updated" to its changes
+const versionLink = (it, r, text) => `<a href="${esc(releaseUrl({ ...r, repo: it.repo }))}">${esc(text)}</a>`
 function itemHtml(it) {
   if (it.kind === "release") {
-    return `<li><a href="${esc(relUrl(it))}">${esc(it.name)} ${esc(it.version)}</a>${it.count > 1 ? `<span class="kc-new-n"> · ${it.count} releases</span>` : ""}${it.note ? `<span class="kc-new-n"> · ${esc(it.note)}</span>` : ""}</li>`
+    const also = it.earlier?.length ? `<span class="kc-new-n"> · also ${it.earlier.map((r) => versionLink(it, r, r.version)).join(", ")}</span>` : ""
+    return `<li>${versionLink(it, it, `${it.name} ${it.version}`)}${also}${it.note ? `<span class="kc-new-n"> · ${esc(it.note)}</span>` : ""}</li>`
   }
   if (it.kind === "external") return `<li><a href="${esc(it.url)}">${esc(it.source)}: ${esc(it.title)}</a></li>`
-  return `<li><a href="${esc(it.url)}">${esc(it.title)}</a><span class="kc-new-n"> · ${it.fresh ? "new" : "updated"}</span></li>`
+  const state = it.fresh ? "new" : it.source ? `<a href="${esc(historyUrl(it.source))}">updated</a>` : "updated"
+  return `<li><a href="${esc(it.url)}">${esc(it.title)}</a><span class="kc-new-n"> · ${state}</span></li>`
 }
 
 // One day: its date as a heading, then its items; a long run of documents folds
