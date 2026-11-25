@@ -85,6 +85,10 @@ A link that stays in the product is underlined thinly at 55% of its color and ta
 2. If the scale really lacks a step, add it here, in `shared/neon1.css`, and say why in the commit.
 3. A one-off size gets a comment on that line naming the reason. A reviewer should be able to find every exception by searching for the comment.
 
+## Depth
+
+The landing layers by paint alone (`css/depth.css`): no motion, and nothing in print or forced colors. Its tokens are set per look: `--depth-edge` and `--depth-shade` under each section edge, `--depth-tint` for every other section, `--depth-card` and `--depth-card-up` for cards at rest and under a pointer, and `--depth-glow` behind headings. Light looks cast shadows. A shadow can't be seen on a near-black ground, so dark looks lift the surface and light its edge, in neon for Matrix. `data-depth` on `<html>` picks `layered` (in use), `edge` (shade and cards only), or `glow` (light without sheets). After the layered shadows measured on stripe.com and oxide.computer, and the faint radial light on linear.app, on 2026-11-24.
+
 ## What this was built from
 
 Said plainly, so it can be corrected:

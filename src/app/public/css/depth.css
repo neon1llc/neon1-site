@@ -48,8 +48,10 @@
 :root:is([data-depth="layered"], [data-depth="glow"]) .view > h2::after { content: ""; position: absolute; z-index: -1; pointer-events: none; left: 50%; top: 50%; width: 460px; height: 220px; translate: -50% -50%;
   background: radial-gradient(closest-side, var(--depth-glow), transparent); }
 :root[data-depth="glow"] .view > h2::after { width: 640px; height: 320px; }
+/* Where the process heading stops being sticky (css/site.css), it still has to hold its pool */
+@media (max-width: 760px) { :root:is([data-depth="layered"], [data-depth="glow"]) .view.split > h2 { position: relative; top: auto; } }
 /* On a narrow screen the pool stays inside it */
-@media (max-width: 700px) { :root:is([data-depth="layered"], [data-depth="glow"]) .view > h2::after { left: -24px; translate: 0 -50%; width: min(320px, 100vw - 24px); height: 150px; } }
+@media (max-width: 700px) { :root:is([data-depth="layered"], [data-depth="glow"]) .view > h2::after { left: -20px; right: -20px; width: auto; translate: 0 -50%; height: 150px; } }
 
 /* Cards stand off their sheet */
 :root[data-depth] :is(.svc, .case) { box-shadow: var(--depth-card); }
