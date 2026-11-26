@@ -144,7 +144,7 @@
 /* "reach by" in the report line's dull gray, then the ways in as outbound links */
 :root[data-site-style="sentinel"] .pitch-reach .reach-lead { margin-right: .7em; }
 :root[data-site-style="sentinel"] .pitch-reach .sep { margin: 0 .5em; }
-:root[data-site-style="sentinel"] .pitch-services { list-style: none; margin: 0 0 20px; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 28px; width: 100%; }
+:root[data-site-style="sentinel"] .pitch-services { list-style: none; margin: 0 0 20px; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 28px; width: 100%; }
 :root[data-site-style="sentinel"] .pitch-services a { display: block; height: 100%; padding: 12px 0 10px; border-top: 1px solid rgb(var(--ink-rgb) / .3); color: var(--ink); text-decoration: none; }
 :root[data-site-style="sentinel"] .pitch-services a:is(:hover, :focus-visible) { border-top-color: var(--accent); }
 :root[data-site-style="sentinel"] .pitch-services a:is(:hover, :focus-visible) b { color: var(--accent); }
