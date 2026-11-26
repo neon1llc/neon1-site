@@ -364,46 +364,10 @@ footer .foot h2 { font: 600 var(--fs-sm) var(--mono); letter-spacing: .01em; col
 .foot ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
 .foot a { color: var(--muted); text-decoration: none; } .foot a:hover { color: var(--glow); }
 .foot .slogan { margin: 0; }
-/* The look picker: two plain text buttons for the same choice as the bar's style switch, which only the landing's first screen shows */
-/* The theme choice: the legal strip's first line, ending where the report line ends */
-/* 32px under it, the room between the copyright lines and the report line (the strip's bottom padding less half the launcher row), the strip's 8px gap included */
-/* What's new sits at the left of that line, the theme choice at the right */
-.legal .foot-meta { flex: 0 0 100%; display: flex; justify-content: space-between; align-items: baseline; gap: var(--sp-3); margin: 0 0 24px; font: var(--fs-xs) var(--mono); }
-.legal .look-pick { display: flex; align-items: baseline; gap: 6px; margin: 0 0 0 auto; }
-@media (min-width: 1320px) { .legal .look-pick { margin-right: calc(-1 * ((100vw - var(--sbw, 0px) - 1200px) / 4 + 38px)); } }
-.legal .look-lead { margin-right: .4em; }
-.legal .look-opt { padding: 0; border: 0; background: none; color: var(--muted); font: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; cursor: pointer; }
-.legal .look-opt:hover { color: var(--glow); }
-.legal .look-opt[aria-pressed="true"] { color: var(--text); text-decoration: none; font-weight: 600; cursor: default; }
+/* The footer's theme choice shows only once js/theme.js has set the family */
 :root:not([data-site-style]) .look-pick { display: none; }
 .mark-light { font: 700 var(--fs-lg) var(--mono); letter-spacing: .06em; color: var(--brand); margin: 0 0 10px; }
 @media (max-width: 700px) { .foot { grid-template-columns: 1fr 1fr; } .foot > div:first-child { grid-column: 1 / -1; } }
-/* Legal line. Its bottom padding is a resting place for Neo's launcher (fixed, bottom left, 48px tall, 16px from the bottom edge): the
-   launcher's own distance from the edge is also its distance above the line's last row, so at the end of any page it never covers text.
-   "report bug \\ feedback" sits in the same strip at the right, centered on the launcher (see its rule below) */
-:root { --foot-gap: max(16px, env(safe-area-inset-bottom)); --foot-neo: 48px; }
-.legal { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; gap: 8px 12px; flex-wrap: wrap; /* 8px between wrapped lines, whether the line wrapped inside a group or between groups */
-  font: var(--fs-xs) var(--mono); color: var(--muted); border-top: 1px solid var(--line);
-  padding: 16px max(24px, env(safe-area-inset-right)) calc(var(--foot-gap) * 2 + var(--foot-neo)) max(24px, env(safe-area-inset-left)); }
-.legal a { color: inherit; text-decoration: none; } .legal a:hover { color: var(--glow); }
-.legal .policies { display: flex; gap: 8px; flex-wrap: wrap; align-items: baseline; }
-.legal .sep { opacity: .6; }
-/* A separator inside running text (the contact table): the footer's backslash, with room on both sides */
-.sep { font-family: var(--mono); opacity: .6; margin: 0 .2em; }
-/* The legal line sits among plain text, so its internal links are underlined, thinly and in the line's own gray, to tell them apart; internal links never carry an arrow */
-.legal a:not(.ext) { text-decoration-line: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
-/* The copyright line ends with the company's public state record: an internal link, so it carries no arrow */
-.legal .owner { display: inline-flex; gap: 8px; flex-wrap: wrap; align-items: baseline; }
-/* On touch, each legal link is at least 24px tall to tap (WCAG 2.5.8); the matching negative margin leaves the layout as it was */
-@media (pointer: coarse) { .legal, .legal :is(.owner, .policies) { row-gap: 12px; } .legal :is(.owner, .policies) a { padding-block: 5px; margin-block: -5px; } }
-/* On a phone these lines wrap, and a backslash left hanging at the end of a line points at nothing. The links are underlined already, so the
-   backslashes go and a wider gap separates them (the report line, which never wraps, keeps its own) */
-@media (max-width: 599px) {
-  .legal .policies { column-gap: var(--sp-4); }
-  .legal .owner a { margin-inline-start: var(--sp-2); }
-  .legal :is(.owner, .policies) .sep { display: none; }
-}
-
 /* Running-text links (about, contact, case studies, the legal line), after the footer's plain links so they win: brand green, bold, and a small
    arrow instead of an underline; the arrow nudges out on hover and focus */
 a.ext { color: var(--brand); font-weight: 600; text-decoration: none; }
@@ -425,21 +389,6 @@ a.ext:hover { color: var(--brand); }
 .menu a.ext { color: var(--neon); font-weight: 500; } .menu a.ext:hover, .menu a.ext:focus-visible { color: #e9ffee; }
 .chip.arrow .arr { top: 0; --arr-t: .12em; }
 
-/* ---- "report bug \ feedback": two footer links at the legal line's bottom right, each opening its form in a new tab ----
-   The footer's own mono face at its size, semibold, each with a small line drawing (a bug before "bug", a speech bubble before "feedback", under a plain "report"), so they read as items of the legal line and still stand out by weight and mark. The pair is placed against the footer (the nearest
-   positioned box) so its right edge lines up with the bar's rightmost control at every width: the theme
-   switch's right edge on a wide desktop (see the switch's own rule, which sits in the page margin), the menu button's or the switch's
-   24px in from the edge everywhere narrower. Vertically it is centered on Neo's launcher (the bottom offset is the launcher's middle). A drawing's gap
-   to the text is the outbound arrow's gap to the text, .18em */
-.legal .report-links { position: absolute; right: max(24px, env(safe-area-inset-right)); bottom: calc(var(--foot-gap) + var(--foot-neo) / 2); translate: 0 50%; display: inline-flex; align-items: center; white-space: nowrap; }
-.legal .report-links .sep { margin: 0 .5em; }
-/* "report" leads both links, as a plain muted word, so the pair reads "report bug" or "report feedback", the drawings sitting alike before each name */
-.legal .report-links .report-lead { color: var(--muted); margin-right: .7em; }
-.legal a.report-bug, .legal a.report-bug.ext, .legal a.report-feedback, .legal a.report-feedback.ext { display: inline-flex; align-items: center; gap: .18em;
-  font: 600 var(--fs-xs) var(--mono); color: var(--glow); text-decoration: none; }
-.legal :is(a.report-bug, a.report-feedback) svg { width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-@media (min-width: 1200px) and (max-width: 1319px) { .legal .report-links { right: calc((100% - 1200px) / 2 + 24px); } }
-@media (min-width: 1320px) { .legal .report-links { right: calc((100% - 1200px) / 4 - 14px); } }
 /* ---- Links, one rule for the whole site ----
    Links that leave the page (another site, mailto:, tel:) end in the northeast arrow and carry no underline in either look or mode, since the
    arrow marks them. Links that stay on the site are underlined, thinly, so they never rely on color alone; the underline is dimmed
@@ -470,10 +419,6 @@ a:not(.ext):is(:hover, :focus-visible) { text-decoration-color: currentColor; }
   .foot li a { position: relative; }
   .foot li a::after { content: ""; position: absolute; inset: -11px -4px; }
   .kc-crumbs a { display: inline-flex; align-items: center; min-height: 44px; margin-block: -14px; }
-  .legal :is(a.report-bug, a.report-feedback) { position: relative; }
-  .legal :is(a.report-bug, a.report-feedback)::after { content: ""; position: absolute; inset: -15px -4px; }
-  .legal .look-opt { position: relative; }
-  .legal .look-opt::after { content: ""; position: absolute; inset: -14px -6px; }
   /* Not a flex box: flex would make the text and the arrow's word separate items and drop the space between them. The padding
      brings one line to the 44px target; a wrapped title is taller than that already */
   .repo h3 > a { display: inline-block; padding-block: max(0px, calc((44px - 1lh) / 2)); }
@@ -482,7 +427,5 @@ a:not(.ext):is(:hover, :focus-visible) { text-decoration-color: currentColor; }
   .kc-path li > a::after { content: ""; position: absolute; inset: -6px -4px; }
   .kc-path li + li { margin-top: var(--sp-2); }
   .kc-shelf-desc a { display: inline-block; padding-block: 12px; margin-block: -12px; }
-  .legal :is(.policies, .owner) a { position: relative; }
-  .legal :is(.policies, .owner) a::after { content: ""; position: absolute; inset: -13px -4px; }
 }
 
