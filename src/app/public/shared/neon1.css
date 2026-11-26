@@ -52,6 +52,8 @@
    card title, and a problem is the same line in red, not different text in the same place */
 .helper { margin: 0; font-size: var(--fs-sm); color: var(--muted, inherit); }
 .helper.warn { color: var(--red, #B3261E); }
+/* Headings set tight: body leading above a title reads as extra top padding in a card. Zero specificity, so any surface's own heading rule wins */
+:where(h1, h2, h3, h4) { line-height: 1.25; }
 
 /* Motion: one curve, three lengths, and a longer open/close for folds (--t-open with --ease-open) for every state change on neon1.tech and 1NEON (shared/motion.js holds the same
    numbers). Reduced motion, or html[data-motion="off"] (1NEON's own switch), sets the lengths to nothing, so every

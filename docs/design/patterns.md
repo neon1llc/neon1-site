@@ -24,6 +24,17 @@ The menu is full. A new entry needs a reason a panel cannot meet. Reuse before b
 
 One question per field, a visible label, the right phone keyboard, `.req` for required. A wrong field loses nothing. The error says what went wrong and how to fix it, in `.helper.warn` under the field, not in a toast. After submit, say it was received and what happens next, once. Reference: GOV.UK Design System.
 
+## Cards
+
+One rule for every boxed card on the site, 1NEON, and the admin, so spacing comes from the convention, not from per-card fixes.
+
+- Padding is one step on all four sides. The content sits on it: the last child adds no margin, so the bottom inset matches the top.
+- Headings use line-height 1.25 (`shared/neon1.css`). Body leading above a title reads as extra top padding.
+- A note under a card's buttons is its own line, `--sp-3` below them.
+- Cards in a grid row stretch to the tallest. A card that ends in a link row pins it to the bottom, so the links line up across the row.
+
+References: Surge AI's site (one line height and generous, even insets), Linear and Vercel (a short gap ladder of 4, 8, and 12), and Radix Themes' Card (padding on a single step).
+
 ## States
 
 Every control and surface defines default, hover, focus-visible, active, disabled, loading, empty, error, and success. Focus is never removed. Loading keeps the layout's size so nothing jumps. Empty says what belongs here and offers the one action. Error is local to what failed.
