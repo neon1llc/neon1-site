@@ -406,3 +406,23 @@ body.kc { background: var(--page); }
 .kc-toc-fold.docked.wide:not([open]), .kc-shelves.is-stuck .kc-shelves-fold:not([open]) { border-bottom-color: transparent; }
 @media print { .kc-toc-line { display: none; } }
 
+
+/* Fill-in fields (scripts/forms-lib.mjs): each label above its own line, fields in a row sharing the width,
+   a date short, a signature tall, a longer answer as several lines, and each party's signature block side by side */
+.kc-text .fields { display: flex; flex-wrap: wrap; gap: var(--sp-4) var(--sp-5); margin: var(--sp-3) 0 var(--sp-5); }
+.kc-text .f { flex: 2 1 14em; min-width: 0; display: flex; flex-direction: column; }
+.kc-text .f-short { flex: 1 1 8em; }
+.kc-text .f-wide { flex-basis: 100%; }
+.kc-text .f-label { font: 600 var(--fs-xs) var(--mono); letter-spacing: .04em; text-transform: uppercase; color: rgb(var(--ink-rgb) / .72); margin-bottom: var(--sp-1); }
+.kc-text .f-line { display: block; min-height: 2.2em; border-bottom: 1px solid rgb(var(--ink-rgb) / .5); }
+.kc-text .f-line + .f-line { margin-top: var(--sp-1); }
+.kc-text .f-sig .f-line { min-height: 3em; }
+.kc-text .f-filled { display: flex; align-items: flex-end; padding-bottom: 2px; }
+.kc-text .f-area { margin-top: calc(-1 * var(--sp-3)); }
+.kc-text .sign-blocks { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16em), 1fr)); gap: var(--sp-6); margin: var(--sp-4) 0 var(--sp-5); }
+.kc-text .sign { display: flex; flex-direction: column; gap: var(--sp-4); }
+.kc-text .sign-party { margin: 0; font-weight: 600; padding-bottom: var(--sp-1); border-bottom: 1.5px solid var(--brand); color: var(--brand); }
+.kc-text td .blank { display: block; min-width: 5em; min-height: 1.8em; }
+.kc-text .sign .f { flex: none; }
+.kc-text .fields > .f-short:only-child { flex: 0 1 14em; }
+.kc-text li > .blank:only-child { display: block; width: 100%; min-height: 1.8em; }

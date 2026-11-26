@@ -6,6 +6,7 @@
 
 import { readFileSync } from "node:fs"
 import { join, posix } from "node:path"
+import { formFields } from "./forms-lib.mjs"
 
 
 export const SITE = "https://neon1.tech"
@@ -129,7 +130,7 @@ export function staticChecks(html) {
 }
 
 export function pageBody(doc, corpus) {
-  return bindExtArrows(staticChecks(classifyLinks(relink(singleH1(doc.html, doc.title), doc, corpus))))
+  return bindExtArrows(staticChecks(classifyLinks(relink(formFields(singleH1(doc.html, doc.title)), doc, corpus))))
 }
 
 // Counts and the PDF claim, read from the documents so no sentence can say more than the manifest does

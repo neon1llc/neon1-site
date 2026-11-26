@@ -282,3 +282,37 @@ test("classifyLinks marks mailto and tel links as outbound without opening a tab
   assert.equal(classifyLinks('<a href="tel:+14243263661">call</a>'), '<a class="ext" href="tel:+14243263661">call</a>')
   assert.equal(classifyLinks('<a href="https://example.com/">x</a>'), '<a class="ext" href="https://example.com/" target="_blank" rel="noopener">x</a>')
 })
+
+test("form fields: a row of labels with lines, a longer answer, prose with lines, and signature blocks", async () => {
+  const { formFields } = await import("./forms-lib.mjs")
+  const b = '<span class="blank" role="img" aria-label="blank to fill in"></span>'
+  const row = formFields(`<p><strong>Project:</strong> ${b} <strong>Date:</strong> ${b}</p>`)
+  assert.match(row, /^<div class="fields"><div class="f"><span class="f-label">Project<\/span><span class="f-line" role="img"/)
+  assert.match(row, /<div class="f f-short"><span class="f-label">Date<\/span>/)
+  const long = formFields(`<p><strong>Why:</strong> ${b}\n${b}\n${b}</p>`)
+  assert.equal((long.match(/class="f-line/g) ?? []).length, 3)
+  assert.match(long, /f-wide/)
+  const prose = formFields(`<p>In your words:\n${b}\n${b}</p>`)
+  assert.match(prose, /^<p>In your words:<\/p><div class="fields"><div class="f f-wide f-area"/)
+  // A blank inside a sentence stays inline
+  const inline = `<p>Approved with changes: ${b} and noted</p>`
+  assert.equal(formFields(inline), inline)
+  const table = `<table><thead><tr><th></th><th>Client</th><th>neon1 LLC</th></tr></thead><tbody><tr><td>Name</td><td>${b}</td><td>Pradeep Tathineni</td></tr><tr><td>Signature</td><td>${b}</td><td>${b}</td></tr></tbody></table>`
+  const sign = formFields(table)
+  assert.match(sign, /^<div class="sign-blocks"><div class="sign"><p class="sign-party">Client<\/p>/)
+  assert.match(sign, /<span class="f-line f-filled">Pradeep Tathineni<\/span>/)
+  assert.match(sign, /<div class="f f-sig"><span class="f-label">Signature<\/span>/)
+  // An ordinary table is left alone
+  const other = `<table><thead><tr><th></th><th>Before</th></tr></thead><tbody><tr><td>Scope</td><td>${b}</td></tr></tbody></table>`
+  assert.equal(formFields(other), other)
+})
+
+test("form fields: a short printed value sits on its line beside blank ones", async () => {
+  const { formFields } = await import("./forms-lib.mjs")
+  const b = '<span class="blank" role="img" aria-label="blank to fill in"></span>'
+  const out = formFields(`<p><strong>Prepared by:</strong> Pradeep Tathineni, neon1 <strong>Prepared for:</strong> ${b}</p>`)
+  assert.match(out, /<span class="f-label">Prepared by<\/span><span class="f-line f-filled">Pradeep Tathineni, neon1<\/span>/)
+  // A long sentence after a label is prose, not a field
+  const prose = `<p><strong>Note:</strong> ${"word ".repeat(20)}and then ${b}</p>`
+  assert.equal(formFields(prose), prose)
+})

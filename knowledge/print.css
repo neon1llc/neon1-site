@@ -547,3 +547,22 @@ p > .blank:only-child {
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
+
+/* ---- Fill-in fields (scripts/forms-lib.mjs): label above a generous line, rows share the width ---- */
+.fields { display: flex; flex-wrap: wrap; gap: 10pt 18pt; margin: 6pt 0 12pt; break-inside: avoid; }
+.f { flex: 2 1 2.2in; min-width: 0; display: flex; flex-direction: column; }
+.f-short { flex: 1 1 1.2in; }
+.f-wide { flex-basis: 100%; }
+.f-label { font-size: 7.5pt; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #59625c; margin-bottom: 2pt; }
+.f-line { display: block; min-height: 22pt; border-bottom: 0.75pt solid #4f5a53; }
+.f-line + .f-line { margin-top: 4pt; }
+.f-sig .f-line { min-height: 34pt; }
+.f-filled { display: flex; align-items: flex-end; padding-bottom: 2pt; }
+.f-area { margin-top: -6pt; }
+.sign-blocks { display: grid; grid-template-columns: 1fr 1fr; gap: 28pt; margin: 10pt 0 14pt; break-inside: avoid; }
+.sign { display: flex; flex-direction: column; gap: 12pt; }
+.sign-party { margin: 0; font-weight: 700; padding-bottom: 3pt; border-bottom: 1.25pt solid #035704; color: #035704; }
+td .blank { display: block; min-width: 0.9in; min-height: 18pt; }
+.sign .f { flex: none; }
+.fields > .f-short:only-child { flex: 0 1 2.4in; }
+li > .blank:only-child { display: block; width: 100%; min-height: 20pt; }

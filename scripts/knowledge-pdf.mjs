@@ -16,6 +16,7 @@ import { createRequire } from "node:module"
 import { fileURLToPath, pathToFileURL } from "node:url"
 import { tmpdir } from "node:os"
 import { load, relink, singleH1, keepFields, fillNote, esc, longDate, TYPE_LABELS, SITE } from "./knowledge-lib.mjs"
+import { formFields } from "./forms-lib.mjs"
 
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..")
@@ -88,7 +89,7 @@ function pageHtml(d) {
   <p class="summary">${esc(d.summary)}</p>
   ${facts(d)}
   ${shortOf(d)}
-  <main>${keepFields(relink(singleH1(d.html, d.title), d, corpus, { absolute: true }))}</main>
+  <main>${keepFields(relink(formFields(singleH1(d.html, d.title)), d, corpus, { absolute: true }))}</main>
   <p class="colophon">© neon1 LLC (neon1.tech). Shared under CC BY-ND 4.0: copy and share it word for word with credit.${fillNote(d) ? ` ${esc(fillNote(d))}` : ""} The latest version is at <a href="${SITE}${d.url}">${esc(`neon1.tech${d.url}`)}</a>.</p>
 </body>
 </html>`
@@ -97,10 +98,14 @@ function pageHtml(d) {
 // Running footer on every page, as on neon1's letters: the document centered in italics, the slogan in
 // green under it, and the page number at the right. Chromium draws it in its own frame, so styles are inline and
 // Figtree comes from the copy make knowledge-pdf installs (knowledge/fonts)
+// Agreements that two parties sign on paper carry both parties' initials on every page, so no page can be swapped
+// after signing. Signed electronically in 1NEON, the signature's fingerprint of the exact text does that instead
+const INITIALED = new Map([["templates-services-agreement", "Client"], ["templates-business-associate-agreement", "Covered entity"], ["templates-care-plan", "Client"]])
+
 function footerHtml(d) {
   const edition = d.data.edition ? ` · edition ${esc(d.data.edition)}` : ""
   return `<div style="width:100%;margin:0 0.75in;display:grid;grid-template-columns:1fr auto 1fr;align-items:end;font-family:Figtree,Helvetica,sans-serif;font-size:7.5pt;color:#59625c;">
-    <span></span>
+    <span>${INITIALED.has(d.id) ? `<span style="display:inline-grid;grid-template-columns:auto auto 0.5in auto 0.5in;gap:4pt;align-items:end;font-size:7pt;"><b>Initials</b> ${esc(INITIALED.get(d.id))} <span style="border-bottom:0.6pt solid #59625c;height:12pt;"></span> neon1 <span style="border-bottom:0.6pt solid #59625c;height:12pt;"></span></span>` : ""}</span>
     <span style="text-align:center;line-height:1.45;"><i>neon1 · ${esc(d.title)}${edition} · neon1.tech/knowledge</i><br><b style="color:#035704;font-style:italic;">1 is glad to be of service.</b></span>
     <span style="text-align:right;font-weight:700;color:#035704;font-size:9pt;"><span class="pageNumber"></span></span>
   </div>`
