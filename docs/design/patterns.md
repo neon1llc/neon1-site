@@ -28,7 +28,7 @@ One question per field, a visible label, the right phone keyboard, `.req` for re
 
 One rule for every boxed card on the site, 1NEON, and the admin, so spacing comes from the convention, not from per-card fixes.
 
-- Padding is one step on all four sides. The content sits on it: the last child adds no margin, so the bottom inset matches the top.
+- Padding is `--pad-card` on all four sides: `--sp-4` on phones, `--sp-5` from 720px. The content sits on it: the last child adds no margin, so the bottom inset matches the top.
 - Headings use line-height 1.25 (`shared/neon1.css`). Body leading above a title reads as extra top padding.
 - A note under a card's buttons is its own line, `--sp-3` below them.
 - Cards in a grid row stretch to the tallest. A card that ends in a link row pins it to the bottom, so the links line up across the row.

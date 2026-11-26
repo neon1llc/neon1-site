@@ -47,7 +47,9 @@
   --fs-2xl: 1.5rem;     /* 24  headings */
   --fs-3xl: 2rem;       /* 32  display */
   --sp-0: .125rem; --sp-1: .25rem; --sp-2: .5rem; --sp-3: .75rem; --sp-4: 1rem; --sp-5: 1.5rem; --sp-6: 2rem; --sp-7: 3rem;
+  --pad-card: var(--sp-4); /* a card's inner padding, every side: one step on phones, a step more from 720px */
 }
+@media (min-width: 720px) { :root { --pad-card: var(--sp-5); } }
 /* Helper text: one style for every hint, caption, and status line under a control or inside a card. It is never larger than a
    card title, and a problem is the same line in red, not different text in the same place */
 .helper { margin: 0; font-size: var(--fs-sm); color: var(--muted, inherit); }
