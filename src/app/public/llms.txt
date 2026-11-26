@@ -27,7 +27,7 @@ neon1 is the independent engineering and technology consulting practice of neon1
 - [How I price my work](https://neon1.tech/knowledge/engagement/pricing/): How a neon1 project is priced: a first call, a written estimate for each piece of work, changes agreed before they are added, approval before work starts, and how paying works.
 - [How a project runs](https://neon1.tech/knowledge/engagement/process/): Listen, propose, decide, build, and hand over.
 - [Publishing client work](https://neon1.tech/knowledge/engagement/publishing-client-work/): When and how a client's work appears as a case study: permission, anonymity, quotes, and figures.
-- [Service agreement](https://neon1.tech/knowledge/engagement/service-agreement/): neon1's service agreement, as a client organization signs it once in 1NEON: how work is agreed, purchases, paying, ownership, confidentiality, case studies, records, quality, limits, and ending.
+- [Service agreement](https://neon1.tech/knowledge/engagement/service-agreement/): neon1's service agreement, as a client organization signs it once in 1NEON: how work is agreed, purchases, paying and disputes, review and acceptance, delays, defects, ownership, confidentiality, case studies, records, limits, ending, and law.
 
 ## How I work
 
@@ -84,7 +84,7 @@ neon1 is the independent engineering and technology consulting practice of neon1
 - [Decision review](https://neon1.tech/knowledge/templates/decision-review/): A two-page written review of one technology decision: the situation, the options with their costs, a recommendation, and the next step.
 - [Partner responsibilities](https://neon1.tech/knowledge/templates/partner-responsibilities/): Who does what when neon1 works alongside another firm: selling, building, support, billing, data, insurance, and exit.
 - [Proposal](https://neon1.tech/knowledge/templates/proposal/): The proposal neon1 sends after discovery: your problem, the result, the options with what's in and out and honest hours, what each of us will do, price, and acceptance.
-- [Services agreement](https://neon1.tech/knowledge/templates/services-agreement/): The short agreement a client and neon1 sign once, before any paid work: how proposals become agreed work, payment, changes, ownership, confidentiality, limits, and ending.
+- [Services agreement](https://neon1.tech/knowledge/templates/services-agreement/): The short agreement a client and neon1 sign once, before any paid work: how proposals become agreed work, payment and disputes, review and acceptance, delays, changes, ownership, confidentiality, limits, and ending.
 
 ## Forms
 
