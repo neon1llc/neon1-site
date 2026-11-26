@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## Unreleased
+
+### Changed
+- The accounting and dermatology case cards give rounded results and say plainly that I led the work as a subcontractor to an AWS Select Partner.
+
 ## v0.89.0
 
 ### Fixed
@@ -399,7 +404,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 ## v0.72.0
 
 - Public code shows neon1-corpus v0.43.0 and neon1-1NEON v0.12.0.
-- Case cards: a neon1 or subcontracted engagement shows just its label and year, such as "neon1 subcontracted engagement, 2026", with no role text and no partner name. The intro line over the cards says "each labeled by kind". The new label wording comes with the next corpus release.
+- Case cards: a neon1 or subcontracted engagement shows just its label and year, such as "neon1 subcontracted engagement, 2026" with no role text. The intro line over the cards says "each labeled by kind". The new label wording comes with the next corpus release.
 - Knowledge Center shelf bar: the group titles ("For you", "About neon1") are centered vertically with the shelf buttons and the arrow boxes; they sat a few pixels high.
 - Menu: "Book a call" is the same weight as the other menu items; it had come out lighter.
 - White rabbit: the closing screen has a "go back" button that plays the whole walk back to the TV on its own, over about 8.5 seconds, easing out of the window and into the screen, so each part of the room can be taken in on the way. A scroll takes over from wherever the view is, and Esc still leaves at once. With reduced motion, the card fades out instead. Keyboard users reach it with Tab from the closing screen, and Enter or Space presses it. Two behavior checks cover it: the card's keyboard path, and the scene's pace (most of the walk still ahead after two seconds, progress only going down) back to the landing.
@@ -1419,7 +1424,6 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - The fourth stage is Normalize: handoff, training, retiring the old setup, and cleanup.
 - Proposals come with estimates rather than fixed prices, and a new question covers how data and accounts are treated.
 - About speaks to close to 15 years of interest in technology and automation, and to leaving people knowing their options.
-- The partner links to its site from the case studies.
 - The logo is a real link to neon1.tech, for bookmarking, and still springs back to the top.
 - The 1NEON button fades the page out and hands over to the portal, which fades itself in.
 - The hero pane has more room, and the rain is lighter so the content reads first.
@@ -1531,7 +1535,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - Hero is only the wordmark, "1 is glad to be of service." and a falling scroll cue.
 - Navigation collapses into one "menu" button with a full-screen menu (Esc closes, focus returns). The header is invisible over the hero.
 - One dark-mode neon (#7CFF9E) for the wordmark, mark, buttons and cue.
-- Prices removed from the site; services say who each tier is for. The free call and fixed quote move to the contact band.
+- Services say who each tier is for. The free call and fixed quote move to the contact band.
 
 ## v0.4.0
 
