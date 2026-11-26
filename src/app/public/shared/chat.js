@@ -24,7 +24,7 @@ const FOLD_MS = 450;
 
 // Starting points for a first-time visitor, and the ways to reach a person
 const SUGGESTIONS = ["What does neon1 do?", "How does a project work?", "What is 1NEON?", "When are you available?"];
-const BOOKING = "https://calendly.com/1isgladtobeofservice/neon1-consultation";
+const BOOKING = "https://calendly.com/book-neon1/initial";
 const CHAT = "/1NEON/?signup=1";
 const EMAIL = "mailto:hello@neon1.tech";
 const PHONE = "tel:+14243263661";

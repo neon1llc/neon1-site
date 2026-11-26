@@ -2,6 +2,11 @@
 
 Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 
+## Unreleased
+
+### Fixed
+- Booking links go to calendly.com/book-neon1/initial. The old link stopped working.
+
 ## v0.89.0
 
 ### Fixed
