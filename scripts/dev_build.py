@@ -21,7 +21,7 @@ import sys
 DEV_ROOT = ".dev-build"
 CORPUS_REPO = "https://github.com/neon1llc/neon1-corpus"
 # The two sign-in keys (neon1-aws-infrastructure site-dev/sign-in.tf reads them at the edge)
-LINK_PARAM = "/neon1-site/dev/link_key"
+LINK_PARAM = "/neon1-site/dev/signin_key"
 # Each private host's link key and sign-in address; admin-dev's key is checked by neon1-admin's gate
 LINKS = {
     "site": (LINK_PARAM, "https://dev.neon1.tech/__signin?k="),
