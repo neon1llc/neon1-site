@@ -58,6 +58,6 @@
 @media (hover: hover) { :root[data-depth] :is(.svc, .case) { transition: box-shadow var(--t-base) var(--ease); } :root[data-depth] :is(.svc, .case):hover { box-shadow: var(--depth-card-up); } }
 /* The sideways rows clip what falls outside them, so they keep room for the shadow */
 :root[data-depth] :is(.cases, .svc-grid) { padding-bottom: var(--sp-6); margin-bottom: calc(-1 * var(--sp-4)); }
-:root[data-depth] .portrait img { box-shadow: var(--depth-card); }
+:root[data-depth] :is(.portrait, .portal-shot) img { box-shadow: var(--depth-card); }
 @media (prefers-reduced-motion: reduce) { :root[data-depth] :is(.svc, .case) { transition: none; } }
 @media (forced-colors: active), print { :root[data-depth] .view::before, :root[data-depth] .view::after, :root[data-depth] .view > h2::after { display: none; } }

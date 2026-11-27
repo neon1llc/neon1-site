@@ -5,6 +5,7 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 ## Unreleased
 
 ### Added
+- The process section shows a real 1NEON project, from a made-up client, in the visitor's light or dark mode.
 - Two services on the landing page and in the services section: custom software, and modernization (greenfield, migrate, retrofit, upgrade, and repair). Security covers readiness and awareness, and the contact topics match.
 
 ### Changed

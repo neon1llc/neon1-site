@@ -476,6 +476,14 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 /* It sits under the steps across both columns, so it reads on one line, with a gap about the size of the one under the case cards */
 .tour-link { margin: 22px 0 0; color: var(--muted); max-width: none; }
 .split > .tour-link { grid-column: 1 / -1; margin: -20px 0 0; }
+/* A real 1NEON project under the steps: framed like the portrait, one picture per mode */
+.portal-shot { grid-column: 2; margin: 0; }
+.portal-shot img { display: block; width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); }
+.portal-shot .ps-dark, :root[data-site-theme="matrix"] .portal-shot .ps-light { display: none; }
+:root[data-site-theme="matrix"] .portal-shot .ps-dark { display: block; }
+.portal-shot figcaption { margin-top: var(--sp-2); font-size: var(--fs-xs); color: var(--muted); }
+.split > .portal-shot + .tour-link { margin-top: 0; }
+@media (max-width: 760px) { .portal-shot { grid-column: 1; margin-top: var(--sp-4); } }
 @media (max-width: 760px) { .split > .tour-link { margin: 16px 0 0; } }
 /* Under the case studies: the next step after the proof */
 .start-line { margin: clamp(0px, 1vh, 8px) 0 0; max-width: none; }
