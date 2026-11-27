@@ -9,6 +9,7 @@
 # no page script may name a place corpus content lives, and every built Knowledge Center and blog page must
 # carry its own heading and text in the HTML.
 
+import json
 import pathlib
 import re
 import sys
@@ -27,6 +28,35 @@ MIN_TEXT = 200
 # reader's own app in place, so they are left out
 EXT_LINK = re.compile(r'<a\b[^>]*\bclass="[^"]*\bext\b[^"]*"[^>]*>')
 LEAVES = re.compile(r'href="(?:https?:|/1NEON)')
+JSON_LD = re.compile(r'<script\s+type=["\']application/ld\+json["\'][^>]*>(.*?)</script\s*>', re.I | re.S)
+MOVED = '<title>Moved · neon1</title>'
+
+
+def check_json_ld(page, html, problems):
+    """Check built structured data before a deploy can publish it."""
+    scripts = JSON_LD.findall(html)
+    moved = 'http-equiv="refresh"' in html and MOVED in html
+    generated = page.parts[0] in ("knowledge", "blog") and not moved
+    if generated and not scripts:
+        problems.append(f"{page}: generated content page has no JSON-LD")
+        return 0
+
+    for n, script in enumerate(scripts, 1):
+        try:
+            data = json.loads(script)
+        except json.JSONDecodeError as error:
+            problems.append(f"{page}: JSON-LD block {n} is invalid JSON ({error.msg})")
+            continue
+        if not isinstance(data, dict) or data.get("@context") != "https://schema.org":
+            problems.append(f"{page}: JSON-LD block {n} must use the schema.org context")
+            continue
+        graph = data.get("@graph")
+        if not isinstance(graph, list) or not graph:
+            problems.append(f"{page}: JSON-LD block {n} must contain a non-empty @graph")
+            continue
+        if any(not isinstance(item, dict) or not item.get("@type") for item in graph):
+            problems.append(f"{page}: JSON-LD block {n} has a graph item without @type")
+    return len(scripts)
 
 
 def main():
@@ -58,15 +88,19 @@ def main():
         if len(text) < MIN_TEXT:
             problems.append(f"{page.relative_to(root)} has {len(text)} characters of text in <main>, under {MIN_TEXT}")
 
-    # Outbound links on every page: a link that leaves the site opens in a new tab
-    for page in sorted(root.rglob("*.html")):
-        for m in EXT_LINK.finditer(page.read_text()):
+    # Metadata and outbound links on every page, including generated corpus output
+    metadata_pages = sorted(root.rglob("*.html"))
+    json_ld_pages = 0
+    for page in metadata_pages:
+        html = page.read_text()
+        json_ld_pages += check_json_ld(page.relative_to(root), html, problems)
+        for m in EXT_LINK.finditer(html):
             if LEAVES.search(m.group(0)) and 'target="_blank"' not in m.group(0):
                 problems.append(f"{page.relative_to(root)}: an outbound link lacks target=\"_blank\": {m.group(0)[:100]}")
 
     if problems:
         sys.exit("static: " + "\nstatic: ".join(problems))
-    print(f"static: {len(pages)} built pages carry their own text, and no page script reads corpus sources")
+    print(f"static: {len(pages)} built pages carry their own text; {json_ld_pages} JSON-LD blocks are valid; no page script reads corpus sources")
 
 
 if __name__ == "__main__":

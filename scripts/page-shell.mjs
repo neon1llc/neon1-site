@@ -70,7 +70,9 @@ export function page(frame, { title, description, path, main, kind, ld, current,
   <meta property="og:description" content="${esc(description)}" />
   <meta property="og:url" content="${url}" />
   <meta property="og:image" content="${OG_IMAGE}" />
-  <meta name="twitter:card" content="summary_large_image" />${ld ? `
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="${esc(title)}" />
+  <meta name="twitter:description" content="${esc(description)}" />${ld ? `
   <!-- What this page is, for search engines and AI answers: built from the same corpus fields the page shows -->
   <script type="application/ld+json">${jsonLd(ld)}</script>` : ""}${head}
   ${frame.block("icons")}
