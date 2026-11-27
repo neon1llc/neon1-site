@@ -5,6 +5,17 @@
   const yr = document.getElementById("yr");
   if (yr) yr.textContent = new Date().getFullYear();
 
+  // ---- Focus rings for the keyboard only ----
+  // Tab, arrows, or F6 (outside a text field's own caret) mark html[data-keys]; a pointer or touch clears it. shared/neon1.css
+  // hides :focus-visible rings without it, the same rule 1NEON's lib/keys.ts sets
+  {
+    const root = document.documentElement;
+    const moves = new Set(["Tab", "F6", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Home", "End", "PageUp", "PageDown"]);
+    const field = (t) => t instanceof Element && t.matches("input:not([type=checkbox]):not([type=radio]), textarea, select, [contenteditable='true']");
+    addEventListener("keydown", (e) => { if (moves.has(e.key) && !(e.key.startsWith("Arrow") && field(e.target))) root.dataset.keys = ""; }, true);
+    addEventListener("pointerdown", () => { delete root.dataset.keys; }, true);
+  }
+
   const header = document.querySelector(".n1-bar");
   const reduce = matchMedia("(prefers-reduced-motion: reduce)");
 

@@ -80,7 +80,10 @@
 .n1chat-typing span:nth-child(3) { animation-delay: .3s; }
 
 /* ---- The question box, send, and the route to a person ---- */
-.n1chat-form { display: flex; gap: var(--sp-2); padding: var(--sp-2) var(--sp-3) var(--sp-1); border-top: 1px solid var(--soft); }
+/* The box to write in sits evenly in its band: the same inset on every side. A note under it (Neo's) takes the
+   band's bottom inset instead, so the pair is still centered */
+.n1chat-form { display: flex; gap: var(--sp-2); padding: var(--sp-3); border-top: 1px solid var(--soft); }
+.n1chat-form:has(+ .n1chat-note:not([hidden])) { padding-bottom: var(--sp-2); }
 .n1chat-input { flex: 1 1 auto; min-width: 0; width: 100%; min-height: 40px; max-height: 160px; height: auto; field-sizing: content; overflow-y: hidden;
   resize: none; font: var(--fs-ui)/1.4 var(--sans); color: var(--fg); background: var(--field);
   border: 1px solid var(--soft); border-radius: var(--glass-r); padding: var(--sp-2) var(--sp-2); }
@@ -157,9 +160,17 @@ body.case-open .n1chat, body.case-open .n1chat-launch, body.white-rabbit-on .n1c
 
 /* ---- Tabs: Neo beside another conversation (1NEON adds neon1). A hidden part stays hidden whatever display it has ---- */
 .n1chat [hidden] { display: none !important; }
-.n1chat-tabs { display: inline-flex; align-items: center; gap: var(--sp-3); }
-.n1chat-tab { background: none; border: 0; padding: 0 0 2px; cursor: pointer; opacity: .6; border-bottom: 2px solid transparent; }
-.n1chat-tab[aria-selected="true"] { opacity: 1; border-bottom-color: var(--accent); }
+/* The head with more than one conversation: the neon1 mark, then each name as a tab. Only the selected name is underlined;
+   the mark and the gaps never are */
+.n1chat-tabs { display: inline-flex; align-items: center; gap: var(--sp-2); }
+.n1chat-tabs > .n1chat-mark { width: 18px; height: 18px; flex: none; color: var(--accent); }
+.n1chat-tablist { display: inline-flex; align-items: center; gap: var(--sp-3); }
+.n1chat-tab { background: none; border: 0; padding: 0; cursor: pointer; opacity: .6; }
+.n1chat-tab-name { padding-bottom: 2px; border-bottom: 2px solid transparent; transition: border-color var(--t-hover, .2s) ease; }
+.n1chat-tab:hover .n1chat-tab-name { border-bottom-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+.n1chat-tab[aria-selected="true"] { opacity: 1; }
+.n1chat-tab[aria-selected="true"] .n1chat-tab-name { border-bottom-color: var(--accent); }
+.n1chat-launch.n1chat-only-mark .n1chat-label { display: none; }
 .n1chat-badge { min-width: 18px; height: 18px; padding: 0 5px; margin-left: var(--sp-1); border-radius: 9px; background: var(--accent); color: var(--accent-ink); font: 700 var(--fs-xs) var(--mono); display: inline-grid; place-items: center; }
 .n1chat-launch .n1chat-badge-launch { position: absolute; top: -6px; right: -6px; margin: 0; }
 .n1chat-extra { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }

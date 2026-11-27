@@ -63,15 +63,6 @@ function feedbackMark() {
 }
 
 // The neon1 mark (the site logo's eight arcs), drawn in the current text color
-function person() {
-  const svg = document.createElementNS(SVG, "svg");
-  for (const [k, v] of Object.entries({ viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "2", "stroke-linecap": "round", "aria-hidden": "true", class: "n1chat-mark" })) svg.setAttribute(k, v);
-  const c = document.createElementNS(SVG, "circle"); c.setAttribute("cx", "12"); c.setAttribute("cy", "8"); c.setAttribute("r", "4");
-  const b = document.createElementNS(SVG, "path"); b.setAttribute("d", "M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7");
-  svg.append(c, b);
-  return svg;
-}
-
 function mark() {
   const svg = document.createElementNS(SVG, "svg");
   for (const [k, v] of Object.entries({ viewBox: "3 4 58 58", fill: "none", stroke: "currentColor", "stroke-width": "3.4", "stroke-linecap": "round", "aria-hidden": "true", class: "n1chat-mark" })) svg.setAttribute(k, v);
@@ -286,23 +277,29 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
     const n = total();
     launcher.querySelector(".n1chat-badge")?.remove();
     if (n > 0) launcher.append(Object.assign(badge(n), { className: "n1chat-badge n1chat-badge-launch" }));
+    // With tabs the launcher is the neon1 mark alone, standing for everything to talk to here; Neo alone keeps "ask Neo"
     const named = tabs[0];
-    launchLabel.textContent = named ? named.launcher?.label ?? launchText : launchText;
+    launchLabel.textContent = named ? "" : launchText;
+    launcher.classList.toggle("n1chat-only-mark", Boolean(named));
     launcher.setAttribute("aria-label", `${named ? named.launcher?.aria ?? launchAria : launchAria}${n > 0 ? `, ${n} new` : ""}`);
-    launcher.classList.toggle("n1chat-wide", Boolean(named?.launcher?.label));
   }
   function addTab({ id, label, hint, launcher: spec, onselect }) {
+    // With more than one conversation the head is one neon1 mark, then the names as tabs; the selected
+    // name is underlined, the mark never is (it stands for the whole window: everything to talk to here)
     if (!neoTab) {
       neoTab = el("button", "n1chat-title n1chat-tab", null, { type: "button", role: "tab", "aria-selected": "true" });
-      neoTab.append(mark(), "Neo");
+      neoTab.append(el("span", "n1chat-tab-name", "Neo"));
       neoTab.addEventListener("click", () => select("neo"));
-      const bar = el("span", "n1chat-tabs", null, { role: "tablist" });
-      bar.append(neoTab);
+      const bar = el("span", "n1chat-tabs");
+      const list = el("span", "n1chat-tablist", null, { role: "tablist" });
+      list.append(neoTab);
+      bar.append(mark(), list);
       title.replaceWith(bar);
-      neoTab.bar = bar;
+      neoTab.bar = list;
+      neoTab.head = bar;
     }
-    const button = el("button", "n1chat-title n1chat-tab n1chat-tab-person", null, { type: "button", role: "tab", "aria-selected": "false" });
-    button.append(person(), label);
+    const button = el("button", "n1chat-title n1chat-tab", null, { type: "button", role: "tab", "aria-selected": "false" });
+    button.append(el("span", "n1chat-tab-name", label));
     const count = badge(0);
     button.append(count);
     button.addEventListener("click", () => select(id));
@@ -322,7 +319,7 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
         tabs.splice(tabs.indexOf(t), 1);
         box.remove();
         button.remove();
-        if (!tabs.length && neoTab) { neoTab.bar.replaceWith(title); neoTab = null; }
+        if (!tabs.length && neoTab) { neoTab.head.replaceWith(title); neoTab = null; }
         select("neo");
         paintLauncher();
       },
@@ -346,7 +343,7 @@ export function chat({ root = document.body, endpoint = ENDPOINT, className = ""
 
   // ---- The launcher peeks open once, so the round mark reads as "ask Neo" ----
   if (!reduce()) {
-    setTimeout(() => launcher.classList.add("n1chat-peek"), 1500);
+    setTimeout(() => { if (!tabs.length) launcher.classList.add("n1chat-peek"); }, 1500);
     setTimeout(() => launcher.classList.remove("n1chat-peek"), 5000);
   }
 

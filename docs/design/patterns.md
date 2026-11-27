@@ -12,6 +12,7 @@ Use these words in reviews, issues, and docs so a note points at one thing:
 - **Card**: a bordered box of content in a section.
 - **Card head**: a card's title, and its one line of description when it has one, over the card's rule.
 - **Card group**: a labeled group inside one card, such as Overdue in Coming up, or Passkey in Two-step verification.
+- **Chat window**: Neo's window on every surface. With more than one conversation its head is one neon1 mark, then the names as tabs (Neo, Trin, Chat); only the selected name is underlined, and the launcher is the mark alone.
 
 ## Placement first
 
@@ -60,6 +61,22 @@ Text inside a sentence that does something ("To use admin actions, confirm it's 
 ## Control padding
 
 One rule for padding inside controls, in tokens: `--ctl-px` inside a full-size control (a button), `--ctl-px-sm` inside a small one (a small button, a chip, a segment), and `--ctl-inset` between a group's edge and what it holds (a segmented switch), equal on every side so the pressed segment sits evenly in its track. On touch a group and its control together make the 44px target.
+
+## Structure and spacing
+
+Every box belongs to one family, and the family sets its inset; a new box joins a family before it gets a number of its own.
+
+- **Surface** (card, dialog, sheet): `--pad-card` on every side, its head over an edge-to-edge rule.
+- **Band** (a strip inside a surface: a panel's head, the box to write in, a toolbar): one inset, `--sp-3`, on every side, so what's in it sits centered in its band. A note under a band takes the band's bottom inset.
+- **Row** (an item in a list or table): `--sp-2` above and below, no side inset of its own (it lines up with its surface's content); rows split by inset rules.
+- **Control** (button, chip, segment, select): `--ctl-px`, `--ctl-px-sm`, `--ctl-inset`, and `--sel-in` for a select, whose arrow sits as far from its right edge as its text from its left.
+- **Group of actions**: in a card or row they start where the content starts; at the end of a page on a phone they center.
+
+Where a title goes: one card's title sits inside it, as its head; a heading above cards introduces several of them (Board stages over its stage cards). A row keeps its content on one line when it holds pills or action buttons; a table of such rows is as wide as its widest row and scrolls sideways in its box.
+
+## Keyboard and focus
+
+Focus rings show only while someone moves by keyboard (Tab, arrows, F6); a tap, a click, or a dialog focusing its safe button shows none, and a text field marks typing with its border in the accent. Tab stays inside what's open: a dialog (native `showModal`), the open menu (the page behind is inert). F6 steps between the page's regions (menu, top bar, the section, Neo); in 1NEON `[` opens and closes the menu. Cards are not tab stops; their links and controls are. References: Primer and Radix (`:focus-visible` with input modality), Slack and browsers (F6 between regions), Linear (`[` for the sidebar).
 
 ## States
 

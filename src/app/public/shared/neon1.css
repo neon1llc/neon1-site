@@ -335,3 +335,10 @@ body:is(.case-open, .n1chat-open, .white-rabbit-on) .pi-rail, body:has(.menu:not
   .legal :is(.policies, .owner) a { position: relative; }
   .legal :is(.policies, .owner) a::after { content: ""; position: absolute; inset: -13px -4px; }
 }
+
+/* Focus rings are for the keyboard. While someone moves by Tab, arrows, or F6, html carries data-keys (1NEON's
+   lib/keys.ts, neon1.tech's js/frame.js) and every :focus-visible ring shows as each place draws it. A tap, a click, or
+   a dialog that focuses its safe button on opening shows none; a text field still marks where typing goes, with its
+   border in the accent instead of the ring. Primer, Radix, and Linear do the same with :focus-visible plus input modality */
+:root:not([data-keys]) :focus-visible:not(input:not([type="checkbox"], [type="radio"]), textarea, select) { outline: none !important; }
+:root:not([data-keys]) :is(input:not([type="checkbox"], [type="radio"]), textarea, select):focus { outline: none !important; border-color: var(--accent, var(--brand)) !important; }
