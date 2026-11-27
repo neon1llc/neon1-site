@@ -173,8 +173,8 @@ h2 .pr { display: inline-block; width: .7ex; height: 1ex; margin-right: .3em; ve
 .faq details { border-bottom: 1px solid rgb(var(--ink-rgb) / .12); }
 .faq summary { cursor: pointer; list-style: none; padding: 20px 32px 20px 0; position: relative; font: 500 var(--fs-xl)/1.35 var(--sans); letter-spacing: -.01em; color: var(--ink); }
 .faq summary::-webkit-details-marker { display: none; }
-.faq details { --fold-arrow: var(--brand); --arr-t: .109em; }
-.faq summary::after { position: absolute; right: 4px; top: 25px; font-size: var(--fs-xl); }
+.faq details { --fold-arrow: var(--brand); }
+.faq summary::after { position: absolute; right: var(--sp-1); top: calc(20px + .675 * var(--fs-xl) - .4em); }
 .faq details p { margin: -4px 0 22px; max-width: 720px; color: var(--muted); }
 
 .glance { display: grid; grid-template-columns: max-content 1fr; gap: 6px 10px; margin: 0 0 14px; font-size: var(--fs-ui); line-height: 1.4; }
@@ -420,16 +420,13 @@ body.white-rabbit-on .white-rabbit-how { visibility: visible; }
 .cform textarea, .cform input, .cform select, .ctopic .pick { transition: border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease), background-color var(--t-fast) var(--ease), opacity var(--t-fast) var(--ease); }
 .cstatus:not(:empty) { animation: n1-appear var(--t-base) var(--ease) both; }
 /* The "How did you find neon1?" dropdown stays a native select (keyboard and screen readers unchanged), as in 1NEON.
-   Safari and Firefox: a plain chevron in the brand green with room for it, and the browser's own list. Chrome and
-   Edge (base-select): a left arrow that turns down as the list unrolls, both over --t-base so they finish together */
-.cform select { appearance: none; padding-right: 44px;
-  background-image: linear-gradient(45deg, transparent 50%, var(--brand) 50%), linear-gradient(135deg, var(--brand) 50%, transparent 50%);
-  background-position: calc(100% - 23px) 50%, calc(100% - 18px) 50%; background-size: 5px 5px, 5px 5px; background-repeat: no-repeat; }
+   Safari and Firefox: the closed box shows the shared arrow (shared/neon1.css) and the browser's own list. Chrome and
+   Edge (base-select): the arrow turns down as the list unrolls, both over --t-base so they finish together */
+.cform select { --arr-color: var(--brand); }
 @supports (appearance: base-select) {
   .cform select, .cform select::picker(select) { appearance: base-select; }
   .cform select { background-image: none; padding-right: 10px; display: inline-flex; align-items: center; gap: 12px; }
-  .cform select { --arr-t: .105em; } /* the stroke 1NEON's dropdown arrows draw (about 1.6px at 15px), so every dropdown arrow matches */
-  .cform select::picker-icon { content: ""; width: .95em; height: .75em; font: var(--fs-md) var(--sans); background: var(--brand); clip-path: var(--arr-shape); align-self: center; margin-left: auto; margin-right: 2px; transition: rotate var(--t-base) var(--ease); }
+  .cform select::picker-icon { content: ""; width: .95em; height: .8em; font: var(--arr-fs-sm) var(--sans); background: var(--brand); clip-path: var(--arr-shape); align-self: center; margin-left: auto; margin-right: 2px; transition: rotate var(--t-base) var(--ease); }
   .cform select:open::picker-icon { rotate: -90deg; }
   /* The list opens above when there isn't room below (js/motion.js sets data-dir), and the arrow turns clockwise to point up */
   .cform select[data-dir="up"]::picker(select) { position-area: block-start span-inline-end; margin: 0 0 4px; }

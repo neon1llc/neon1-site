@@ -159,10 +159,11 @@
    the text's baseline and is moved down so its center lands on that line, where the middle of the lowercase letters is.
    Where the arrow turns, it turns on that center line, in place. */
 .arr { --arr-xc: .2575em; width: .95em; height: .8em; background: currentColor; flex: none; clip-path: var(--arr-shape); }
-/* The arrow's stroke is the stem width of the text beside it, so it never looks thinner than its label: --arr-t, in em, is
-   that stem (Figtree: .156em at weight 700, about .109em at 500, .086em at 400; set it where the text weight differs). The
-   head's arms are 45 degrees, and each is the same thickness as the shaft. */
-:root { --arr-t: .156em; --arr-shape: polygon(0 50%, .37em calc(50% - .37em), calc(.37em + .7071 * var(--arr-t)) calc(50% - .37em + .7071 * var(--arr-t)),
+/* The arrow's stroke, --arr-t, in em, is
+   the bold stem (.156em) everywhere, whatever the weight of the text beside it, so every arrow on every surface matches. The
+   head's arms are 45 degrees, and each is the same thickness as the shaft. A disclosure arrow (anything that opens or
+   closes) also has one of two sizes: --arr-fs on rows of reading text and larger, --arr-fs-sm in controls and small text. */
+:root { --arr-fs: var(--fs-lg); --arr-fs-sm: var(--fs-md); --arr-t: .156em; --arr-shape: polygon(0 50%, .37em calc(50% - .37em), calc(.37em + .7071 * var(--arr-t)) calc(50% - .37em + .7071 * var(--arr-t)),
   calc(1.914 * var(--arr-t)) calc(50% - .5 * var(--arr-t)), 100% calc(50% - .5 * var(--arr-t)), 100% calc(50% + .5 * var(--arr-t)),
   calc(1.914 * var(--arr-t)) calc(50% + .5 * var(--arr-t)), calc(.37em + .7071 * var(--arr-t)) calc(50% + .37em - .7071 * var(--arr-t)), .37em calc(50% + .37em)); } /* kept for places that read it unchanged (1NEON); the rule below is the one that follows a place's own --arr-t */
 /* The shape is declared on each element that draws it, not once on :root: a var() inside a custom property is filled in where
@@ -187,13 +188,28 @@
    back as it closes, on the panel's own length and curve (--t-open, --ease-open), so the turn and the panel finish together.
    .closing is set by whatever eases the panel (js/views.js on the home page, js/fold.js elsewhere) as a close begins, so
    the arrow turns back at once. The defaults suit both themes (the arrow takes --fold-arrow, which is the summary's own text
-   color unless a place sets it, and its stroke is --arr-t); a place restyles it by setting those, or the summary around it. */
-.n1-fold > summary::after { content: ""; display: block; flex: none; width: .95em; height: .8em; background: var(--fold-arrow, currentColor);
+   color unless a place sets it); a place restyles it by setting that, or the summary around it. Add .n1-more where the
+   summary is a small label ("History", "More about it"): the small size, right after the words. */
+.n1-fold > summary::after { content: ""; display: block; flex: none; font-size: var(--arr-fs); width: .95em; height: .8em; background: var(--fold-arrow, currentColor);
   clip-path: var(--arr-shape); transition: transform var(--t-open) var(--ease-open); }
 .n1-fold[open]:not(.closing) > summary::after { transform: rotate(-90deg); }
 .n1-fold.closing > summary::after { transition-duration: calc(var(--t-open) * .85); }
 /* In a baseline-aligned summary (the home page's lowercase labels) the arrow sits on the middle of the lowercase letters like .arr */
-.n1-fold.fold > summary::after { position: relative; top: calc(.375em - var(--arr-xc)); --arr-xc: .2575em; --arr-t: .156em; }
+.n1-fold.fold > summary::after { position: relative; top: calc(.375em - var(--arr-xc)); --arr-xc: .2575em; }
+.n1-fold.n1-more > summary { display: flex; align-items: center; justify-content: flex-start; gap: var(--sp-2); width: fit-content; list-style: none; cursor: pointer; }
+.n1-fold.n1-more > summary::-webkit-details-marker { display: none; }
+.n1-fold.n1-more > summary::after { font-size: var(--arr-fs-sm); }
+/* Where the browser can't draw into its select (Safari, Firefox, every iPhone browser), the closed box shows the same
+   arrow, painted as three strokes so it takes the theme's color. The browser's own list opens, so it doesn't turn */
+@supports not (appearance: base-select) {
+  select:not([multiple]) { --a: var(--arr-fs-sm); --c: var(--arr-color, var(--accent, var(--brand))); --s: calc(var(--a) * .156); --h: calc(var(--a) * .43); --in: var(--sp-3);
+    appearance: none; -webkit-appearance: none; padding-right: var(--sp-7); background-repeat: no-repeat;
+    background-image: linear-gradient(var(--c), var(--c)),
+      linear-gradient(to bottom right, transparent calc(50% - var(--s) / 2), var(--c) calc(50% - var(--s) / 2) calc(50% + var(--s) / 2), transparent calc(50% + var(--s) / 2)),
+      linear-gradient(to top right, transparent calc(50% - var(--s) / 2), var(--c) calc(50% - var(--s) / 2) calc(50% + var(--s) / 2), transparent calc(50% + var(--s) / 2));
+    background-size: calc(var(--a) * .95 - var(--s)) var(--s), var(--h) var(--h), var(--h) var(--h);
+    background-position: right var(--in) top 50%, right calc(var(--in) + var(--a) * .95 - var(--h)) top calc(50% - var(--h) / 2 + var(--s) / 4), right calc(var(--in) + var(--a) * .95 - var(--h)) top calc(50% + var(--h) / 2 - var(--s) / 4); }
+}
 @media (prefers-reduced-motion: reduce) { .n1-fold > summary::after { transition: none; } }
 :root[data-motion="off"] .n1-fold > summary::after { transition: none; }
 
@@ -290,13 +306,8 @@ body:is(.case-open, .n1chat-open, .white-rabbit-on) .pi-rail, body:has(.menu:not
 .legal .owner { display: inline-flex; gap: 8px; flex-wrap: wrap; align-items: baseline; }
 /* On touch, each legal link is at least 24px tall to tap (WCAG 2.5.8); the matching negative margin leaves the layout as it was */
 @media (pointer: coarse) { .legal, .legal :is(.owner, .policies) { row-gap: 12px; } .legal :is(.owner, .policies) a { padding-block: 5px; margin-block: -5px; } }
-/* On a phone these lines wrap, and a backslash left hanging at the end of a line points at nothing. The links are underlined already, so the
-   backslashes go and a wider gap separates them (the report line, which never wraps, keeps its own) */
-@media (max-width: 599px) {
-  .legal .policies { column-gap: var(--sp-4); }
-  .legal .owner a { margin-inline-start: var(--sp-2); }
-  .legal :is(.owner, .policies) .sep { display: none; }
-}
+/* The backslashes stay at every width. A narrower line wraps between items, closing up the gap so each group holds one line */
+@media (max-width: 599px) { .legal .policies, .legal .owner { column-gap: var(--sp-1); } }
 
 /* ---- "report bug \ feedback": two footer links at the legal line's bottom right, each opening its form in a new tab ----
    The footer's own mono face at its size, semibold, each with a small line drawing (a bug before "bug", a speech bubble before "feedback", under a plain "report"), so they read as items of the legal line and still stand out by weight and mark. The pair is placed against the footer (the nearest

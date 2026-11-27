@@ -311,10 +311,10 @@ a:is(:hover, :focus-visible) { text-decoration-color: currentColor; }
 .menu a { display: inline-flex; align-items: baseline; justify-content: center; }
 .menu .pr { display: inline-block; width: .7ex; height: 1ex; margin-right: .3em; overflow: visible; fill: none; stroke: currentColor; stroke-width: 2.4;
   stroke-linecap: round; stroke-linejoin: round; color: var(--mark); opacity: .9; }
-.menu .arr { margin-left: .4em; font-size: .74em; --arr-t: .135em; --arr-xc: .3692em; }
+.menu .arr { margin-left: .4em; font-size: .74em; --arr-xc: .3692em; }
 /* The arrow is drawn at .74 of the label's size, and --arr-xc is in the arrow's own em, so the centre lands where it should in the label's:
  * half the x-height (.2917em of the label) when the label is all lowercase, half the cap height (.375em) when it has a capital */
-.menu .arr.arr-mixed { --arr-xc: .4818em; } /* the arrow is as big as the one after book a call (.7em wide), its stroke the same weight as before */
+.menu .arr.arr-mixed { --arr-xc: .4818em; } /* the arrow is as big as the one after book a call (.7em wide), the same bold stroke */
 .menu .mp { width: .9em; height: .9em; margin-right: .4em; align-self: center; flex: none; }
 .menu .m-first, .menu .m-split { position: relative; margin-top: 20px; }
 .menu .m-first::before, .menu .m-split::before { content: ""; position: absolute; top: -19px; left: 50%; width: 56px; margin-left: -28px; border-top: 1.5px solid rgb(var(--neon-rgb) / .4); }
@@ -387,7 +387,7 @@ a.ext:hover { color: var(--brand); }
 /* Outbound links in the footer and phone menu keep those places' own colours and weight; only the arrow is added */
 .foot a.ext { color: var(--muted); font-weight: inherit; } .foot a.ext:hover { color: var(--glow); }
 .menu a.ext { color: var(--neon); font-weight: 500; } .menu a.ext:hover, .menu a.ext:focus-visible { color: #e9ffee; }
-.chip.arrow .arr { top: 0; --arr-t: .12em; }
+.chip.arrow .arr { top: 0; }
 
 /* ---- Links, one rule for the whole site ----
    Links that leave the page (another site, mailto:, tel:) end in the northeast arrow and carry no underline in either look or mode, since the

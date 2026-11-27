@@ -11,8 +11,9 @@ What already exists. Extend one of these before building another. Class names ar
 | Wordmark | `.wm` with `.ne` and `.one` | Branding only: the bar's logo, the landing hero, the footer mark. The 1 keeps the surrounding size and weight and "neon" is scaled up and lightened to meet it (DESIGN.md, Wordmark). Everywhere else `neon1` is plain text at the text's size, lowercase. Never redrawn, stretched, or recolored. |
 | Helper text | `.helper`, `.helper.warn` | One style for every hint, caption, and status line. A problem is the same line in red. |
 | Required mark | `.req` | After the label, sans face at the label's size. |
-| Arrow | `.arr`, `.arr-next`, `.arr-mixed` | Drawn, not typed. Set `--arr-t` where the text weight differs. |
-| Expandable | `.n1-fold` on a `<details>` | Arrow and panel move, reverse, and settle together on `--t-open`. Eased by `js/fold.js` or `js/views.js`. |
+| Arrow | `.arr`, `.arr-next`, `.arr-mixed` | Drawn, not typed. One shape and one bold stroke everywhere; never override `--arr-t`, never use a chevron glyph, icon, +/− or the browser's triangle. The northeast outbound arrow is a separate mark. |
+| Disclosure size | `--arr-fs`, `--arr-fs-sm` | Anything that opens or closes uses `--arr-fs` on rows of reading text and larger, `--arr-fs-sm` in controls and small labels. A fixed icon size apart from the title's size, as in Radix and GitHub Primer. |
+| Expandable | `.n1-fold` on a `<details>`, plus `.n1-more` for a small label | Arrow and panel move, reverse, and settle together on `--t-open`. Eased by `js/fold.js` or `js/views.js`. |
 | Motion | `--t-fast`, `--t-base`, `--t-slow`, `--t-open`, `--ease` | Zero under reduced motion and `data-motion="off"`. |
 | Appear | `.n1-appear` | Errors, results, and panels ease in from just above. |
 | Input caret | `shared/caret.js`, `--n1-caret` | Matrix only. Sentinel keeps the browser caret. |

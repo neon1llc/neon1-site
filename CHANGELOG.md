@@ -8,9 +8,11 @@ Site releases use `v0.MINOR.PATCH` until the first complete release, v1.0.0.
 - Two services on the landing page and in the services section: custom software, and modernization (greenfield, migrate, retrofit, upgrade, and repair). Security covers readiness and awareness, and the contact topics match.
 
 ### Changed
+- Every arrow that opens or closes something is now one short, bold arrow in two sizes, including questions, dropdowns, and Safari and iPhone dropdowns.
 - The accounting and dermatology case cards give rounded results and say plainly that I led the work as a subcontractor to an AWS Select Partner.
 
 ### Fixed
+- On phones the footer keeps the backslashes between its links.
 - Booking links go to calendly.com/book-neon1/initial. The old link stopped working.
 
 ## v0.89.0
