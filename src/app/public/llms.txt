@@ -23,11 +23,11 @@ neon1 is the independent engineering and technology consulting practice of neon1
 
 - [Capability statement](https://neon1.tech/knowledge/engagement/capabilities/): neon1 on one page for a buyer, partner, or procurement office: what it does, how it differs, work it has delivered, and the company's details.
 - [Contact](https://neon1.tech/knowledge/engagement/contact/): How to reach neon1, when, and what the first call covers.
-- [Services](https://neon1.tech/knowledge/engagement/services/): Custom software, workflow automation, cloud and AI engineering, modernization, networks and connected devices, and security, from a focused assessment to a complete implementation.
+- [Services](https://neon1.tech/knowledge/engagement/services/): Workflow automation, cloud and AI engineering, networks, devices, and connected systems, and security readiness, from a focused assessment to a complete implementation.
 - [How I price my work](https://neon1.tech/knowledge/engagement/pricing/): How a neon1 project is priced: a first call, a written estimate for each piece of work, changes agreed before they are added, approval before work starts, and how paying works.
 - [How a project runs](https://neon1.tech/knowledge/engagement/process/): Listen, propose, decide, build, and hand over.
 - [Publishing client work](https://neon1.tech/knowledge/engagement/publishing-client-work/): When and how a client's work appears as a case study: permission, anonymity, quotes, and figures.
-- [Service agreement](https://neon1.tech/knowledge/engagement/service-agreement/): neon1's service agreement, as a client organization signs it once in 1NEON: how work is agreed, purchases, paying and disputes, review and acceptance, delays, defects, ownership, confidentiality, case studies, records, limits, ending, and law.
+- [Service agreement](https://neon1.tech/knowledge/engagement/service-agreement/): neon1's service agreement, as a client organization signs it once in 1NEON: how work is agreed, purchases, paying, ownership, confidentiality, case studies, records, quality, limits, and ending.
 
 ## How I work
 
@@ -42,8 +42,6 @@ neon1 is the independent engineering and technology consulting practice of neon1
 - [How 1NEON accounts work](https://neon1.tech/knowledge/guides/free-accounts/): Start before we talk: make a 1NEON account, outline up to three projects, then ask for an assessment. The 30-minute call is the other way in.
 - [A password manager for your family](https://neon1.tech/knowledge/guides/password-manager-for-family/): How to move a household onto a password manager, step by step, without locking anyone out.
 - [Cloud and AI engineering](https://neon1.tech/knowledge/guides/use-case-cloud/): Cloud architecture, infrastructure as code, delivery, migrations, and AI applications: when an independent engineer is worth bringing in, what I deliver, and how ownership stays with your team.
-- [Custom software](https://neon1.tech/knowledge/guides/use-case-custom-software/): Web applications, portals, internal tools, APIs, and services built for a need off-the-shelf software doesn't meet: when it's worth building, what I deliver, and what you keep.
-- [Modernization](https://neon1.tech/knowledge/guides/use-case-modernization/): Greenfield, migrate, retrofit, upgrade, or repair: from a full redesign to a targeted fix, one approach or several.
 - [Networks, devices, and connected systems](https://neon1.tech/knowledge/guides/use-case-networks/): Designing and integrating networks, devices, and connected environments: when it's worth doing, what I deliver, and how I work with installers and licensed trades.
 - [Security awareness sessions](https://neon1.tech/knowledge/guides/use-case-security-awareness/): How an informational security awareness session for a team or group runs, and what people leave able to do.
 - [Security readiness](https://neon1.tech/knowledge/guides/use-case-security-readiness/): Assessing technical risk, strengthening controls, and preparing systems for a security review or audit: what I deliver, and how I work with auditors and specialists.
@@ -84,7 +82,7 @@ neon1 is the independent engineering and technology consulting practice of neon1
 - [Decision review](https://neon1.tech/knowledge/templates/decision-review/): A two-page written review of one technology decision: the situation, the options with their costs, a recommendation, and the next step.
 - [Partner responsibilities](https://neon1.tech/knowledge/templates/partner-responsibilities/): Who does what when neon1 works alongside another firm: selling, building, support, billing, data, insurance, and exit.
 - [Proposal](https://neon1.tech/knowledge/templates/proposal/): The proposal neon1 sends after discovery: your problem, the result, the options with what's in and out and honest hours, what each of us will do, price, and acceptance.
-- [Services agreement](https://neon1.tech/knowledge/templates/services-agreement/): The short agreement a client and neon1 sign once, before any paid work: how proposals become agreed work, payment and disputes, review and acceptance, delays, changes, ownership, confidentiality, limits, and ending.
+- [Services agreement](https://neon1.tech/knowledge/templates/services-agreement/): The short agreement a client and neon1 sign once, before any paid work: how proposals become agreed work, payment, changes, ownership, confidentiality, limits, and ending.
 
 ## Forms
 

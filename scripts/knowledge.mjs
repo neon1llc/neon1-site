@@ -111,6 +111,11 @@ const countMark = (g) => `<span class="kc-n"> ${groupCount(g)}</span>`
 const shelfCount = (s) => new Set(Object.values(shelfDocs(s)).flat().map((d) => d.id)).size
 const shelfMark = (s) => `<span class="kc-n"> ${shelfCount(s)}</span>`
 
+// On a phone a long shelf shows its first three cards and this button for the rest (js/knowledge-groups.js
+// reveals it and opens the shelf); without scripts every card shows and the button stays hidden
+const more = (s, n) => (n > 4 ? `
+        <button type="button" class="kc-all" aria-expanded="false" hidden>All ${n} ${esc(s.label.toLowerCase())}</button>` : "")
+
 function shelfSection(s) {
   const { lead, rest, dev } = shelfDocs(s)
   const fold = dev.length
@@ -125,7 +130,7 @@ function shelfSection(s) {
           <h3 id="${s.key}-h">${esc(s.label)}${shelfMark(s)}</h3>
           <div class="kc-shelf-desc"><p>${esc(s.description)}</p></div>
         </div>
-        ${cardList([...lead, ...rest])}${fold}
+        ${cardList([...lead, ...rest])}${more(s, lead.length + rest.length)}${fold}
       </section>`
 }
 

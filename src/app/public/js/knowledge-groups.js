@@ -107,3 +107,21 @@ if (bar) {
   const hash = location.hash.slice(1), arrived = hash && shelves.find((s) => s.el.id === hash);
   if (arrived) requestAnimationFrame(() => land(arrived.el, false));
 }
+
+
+// A long shelf on a phone opens to all its cards from its "All" button (scripts/knowledge.mjs, css/knowledge.css)
+const alls = [...document.querySelectorAll(".kc-all")];
+if (alls.length) {
+  document.documentElement.classList.add("kc-js");
+  for (const b of alls) {
+    b.hidden = false;
+    b.addEventListener("click", () => {
+      const shelf = b.closest(".kc-shelf");
+      const open = !shelf.classList.contains("open");
+      shelf.classList.toggle("open", open);
+      b.setAttribute("aria-expanded", String(open));
+      b.textContent = open ? "Fewer" : b.dataset.label || b.textContent;
+    });
+    b.dataset.label = b.textContent;
+  }
+}
