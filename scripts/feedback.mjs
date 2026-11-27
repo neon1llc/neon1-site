@@ -63,7 +63,7 @@ ${WHERE.map(([v, t]) => `            <option value="${v}">${t}</option>`).join("
           <label><span>What's on your mind?<span class="req" aria-hidden="true">*</span></span><textarea name="what" rows="6" maxlength="3000" required placeholder="What did you notice? What would you change, or what worries you?"></textarea></label>
           <label><span>Email <span class="opt">optional</span></span><input name="email" type="email" autocomplete="email" maxlength="200" /><span class="rb-help">Only if you want a reply.</span></label>
           <!-- Hidden from people and screen readers; a bot that fills every field fills this one -->
-          <div class="rb-hp" aria-hidden="true"><label>Leave this empty<input name="website" tabindex="-1" autocomplete="off" /></label></div>
+          <div class="rb-hp" aria-hidden="true"><label>Leave this empty<input name="website" tabindex="-1" autocomplete="off" data-1p-ignore data-lpignore="true" data-bwignore /></label></div>
           <p class="rb-help" id="rb-sent">Sent with it: the page you came from, your theme, browser, and window size.</p>
           <div class="rb-actions"><button class="btn btn-primary" type="submit">Send feedback</button><p class="rb-status" id="rb-status" role="status"></p></div>
         </form>
