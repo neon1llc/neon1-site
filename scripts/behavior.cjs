@@ -394,7 +394,7 @@ check("browser", "home: Sentinel's first screen states the offer and the next st
     expect((await p.evaluate(() => document.documentElement.dataset.siteStyle)) === "sentinel", "a fresh visitor does not get Sentinel");
     const text = await p.locator(".pitch").innerText();
     expect(/independent engineering and technology consulting/i.test(text), "the first screen doesn't say what neon1 is", text);
-    expect((await p.locator(".pitch-services a").count()) === 4, "the first screen doesn't name the four services");
+    expect((await p.locator(".pitch-services a").count()) === 6, "the first screen doesn't name the six services");
     expect((await p.locator('.pitch a[href^="mailto:hello@"]').count()) === 1, "the first screen has no email link");
     expect(/book a call/i.test(text) && !/no account/i.test(text), "the first screen offers a call, or still says no account is needed", text);
     expect(/1 is glad to be of service/.test(await p.locator(".hero").innerText()), "the slogan is gone");
