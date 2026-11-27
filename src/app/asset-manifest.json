@@ -119,6 +119,14 @@
     }
   },
   "assets": {
+    "portal-screens": {
+      "title": "A 1NEON project page, light and dark",
+      "origin": "first-party",
+      "made": "Screenshots of the made-up MATRIS client's project in 1NEON on dev, so all its data is fictional, saved as WebP.",
+      "consumers": [
+        "index.html"
+      ]
+    },
     "font-inter": {
       "title": "Inter, Latin subset, variable weight",
       "origin": "third-party",
@@ -371,6 +379,14 @@
     "js/vendor/three-LICENSE.md": {
       "asset": "three-bundle",
       "sha256": "8b378ebe60e2fe500158cb0ac71cb5e8b7d92953c2abcc63a0eb90499653b5bc"
+    },
+    "media/1neon-project-dark.webp": {
+      "asset": "portal-screens",
+      "sha256": "58f2d47892cf2213d256760483810d0ff29353aa60fd6d38292ce26e8b12800d"
+    },
+    "media/1neon-project-light.webp": {
+      "asset": "portal-screens",
+      "sha256": "09e62f20629342de6b94cb787fcfc623fec68a84f8b3ac8b5c3757fd642994d3"
     },
     "media/neon1-logo-512.png": {
       "sha256": "ba9cd3a993ba720b5f66ce0356269ff8da026762b05d20299c02fbde80aac3db",

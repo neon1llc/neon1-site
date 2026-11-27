@@ -12,7 +12,7 @@ DISTRIBUTION ?= EKL1R4AOR1VRG
 VERIFY_URLS  ?= https://neon1.tech/ https://www.neon1.tech/
 AWS_REGION   ?= us-east-1
 PORT         ?= 8000
-BUDGET_KB    ?= 8192
+BUDGET_KB    ?= 8256
 # The key value store whose "release" key names the live release folder (neon1-aws-infrastructure site/)
 RELEASE_STORE ?= neon1-site-release
 # neon1-corpus holds the words: case studies, questions, the Knowledge Center, and the blog. Every build takes
