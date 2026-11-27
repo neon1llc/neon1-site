@@ -115,6 +115,11 @@ async function measure(browser, origin, profile) {
   });
   const page = await context.newPage();
   const errors = [];
+  // The rabbit exists only in Matrix; make its opt-in look explicit instead of relying on a prior browser preference.
+  await context.addInitScript(() => {
+    localStorage.setItem("neon1.style", "matrix");
+    localStorage.setItem("neon1.mode", "dark");
+  });
   page.on("pageerror", (e) => errors.push(String(e)));
   let bytes = 0, counting = false;
   page.on("response", async (r) => { if (counting) { const n = +(r.headers()["content-length"] || 0); bytes += n; } });
