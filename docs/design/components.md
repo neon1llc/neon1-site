@@ -31,7 +31,9 @@ What already exists. Extend one of these before building another. Class names ar
 | Part | Where | Notes |
 |---|---|---|
 | Shell | `Shell.tsx`, `.shell`, `.side`, `.shell.mini` | Persistent side rail, 53px mini rail on a phone, sticky context bar, phone bottom tab bar. Rows shorten with window height so the open menu fits. |
-| Dialog, ask, toast | `Dialog`, `useAsk`, `useToast` in `ui.tsx` | Confirm with `useAsk`. Do not build a one-off modal. |
+| Dialog, ask, toast | `Dialog`, `useAsk`, `useToast` in `ui.tsx` | Confirm with `useAsk`; an action with choices gets its own dialog on `Dialog` (`MemberActs.tsx`). |
+| Action button | `Act` in `Act.tsx`, `.act` | A record's actions: icon, then its name on the first press, then it acts. See patterns. |
+| Arrow | `Arr` in `ui.tsx`, `.arr` | The one drawn arrow; `dir` turns it. Never a font glyph or icon arrow. |
 | Empty state | `Empty` in `ui.tsx` | One line and, where it helps, one action. |
 | Badges and progress | `LayerBadge`, `Rings`, `OnionProgress`, `Health`, `Trend` | Layer greens `--l1` to `--l4` hold 4.5:1 against the badge text. |
 | Palette, row menu, bell | `Palette.tsx`, `RowMenu.tsx`, `Bell.tsx` | The in-context controls the menu does not need to carry. |
