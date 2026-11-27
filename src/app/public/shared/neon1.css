@@ -202,7 +202,7 @@
 /* Where the browser can't draw into its select (Safari, Firefox, every iPhone browser), the closed box shows the same
    arrow, painted as three strokes so it takes the theme's color. The browser's own list opens, so it doesn't turn */
 @supports not (appearance: base-select) {
-  select:not([multiple]) { --a: var(--arr-fs-sm); --c: var(--arr-color, var(--accent, var(--brand))); --s: calc(var(--a) * .156); --h: calc(var(--a) * .43); --in: var(--sp-3);
+  select:not([multiple]):not([size]) { --a: var(--arr-fs-sm); --c: var(--arr-color, var(--accent, var(--brand))); --s: calc(var(--a) * .156); --h: calc(var(--a) * .43); --in: var(--sp-3);
     appearance: none; -webkit-appearance: none; padding-right: var(--sp-7); background-repeat: no-repeat;
     background-image: linear-gradient(var(--c), var(--c)),
       linear-gradient(to bottom right, transparent calc(50% - var(--s) / 2), var(--c) calc(50% - var(--s) / 2) calc(50% + var(--s) / 2), transparent calc(50% + var(--s) / 2)),
