@@ -174,7 +174,7 @@ h2 .pr { display: inline-block; width: .7ex; height: 1ex; margin-right: .3em; ve
 .faq summary { cursor: pointer; list-style: none; padding: 20px 32px 20px 0; position: relative; font: 500 var(--fs-xl)/1.35 var(--sans); letter-spacing: -.01em; color: var(--ink); }
 .faq summary::-webkit-details-marker { display: none; }
 .faq details { --fold-arrow: var(--brand); }
-.faq summary::after { position: absolute; right: var(--sp-1); top: calc(20px + .675 * var(--fs-xl) - .4em); }
+.faq summary::after { position: absolute; right: 0; top: calc(20px + .675 * var(--fs-xl) - .4em); }
 .faq details p { margin: -4px 0 22px; max-width: 720px; color: var(--muted); }
 
 .glance { display: grid; grid-template-columns: max-content 1fr; gap: 6px 10px; margin: 0 0 14px; font-size: var(--fs-ui); line-height: 1.4; }
