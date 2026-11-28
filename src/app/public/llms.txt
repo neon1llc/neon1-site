@@ -58,11 +58,11 @@ neon1 is the independent engineering and technology consulting practice of neon1
 
 - [Permission-aware document assistant](https://neon1.tech/knowledge/case-studies/answers-in-seconds/): Staff spent minutes searching Microsoft 365, or asked a senior colleague.
 - [Patient intake portal](https://neon1.tech/knowledge/case-studies/intake-out-of-the-inbox/): Patient intake ran through a shared inbox and a slow EHR, with staff chasing documents by email.
-- [Operations integration and monitoring](https://neon1.tech/knowledge/case-studies/one-view-of-the-shop/): A small business's point-of-sale, order tracking, and cameras each had their own screen, and none showed the business as a whole.
+- [Operations integration and monitoring](https://neon1.tech/knowledge/case-studies/one-view-of-the-shop/): A small business's systems each had their own screen, and none showed the business as a whole.
 - [Two-site server migration](https://neon1.tech/knowledge/case-studies/two-offices-off-local-servers/): The app, database, and files lived on two local servers both offices used.
 - [Security awareness sessions](https://neon1.tech/knowledge/case-studies/security-for-non-security-people/): People knew they were exposed online, but not where to start.
-- [Home cameras and family accounts](https://neon1.tech/knowledge/case-studies/cameras-to-grandmas-email/): A house with no cameras, and passwords reused everywhere.
-- [Where neon1 started](https://neon1.tech/knowledge/case-studies/where-neon1-started/): A grade school wanted real STEM tools on a small budget.
+- [Home technology and account security](https://neon1.tech/knowledge/case-studies/cameras-to-grandmas-email/): A personal project: home technology and account security for my family.
+- [Where neon1 started](https://neon1.tech/knowledge/case-studies/where-neon1-started/): My work with a school community in Queens before I formed neon1.
 
 ## Products
 
@@ -93,7 +93,7 @@ neon1 is the independent engineering and technology consulting practice of neon1
 - [Incident and restore record](https://neon1.tech/knowledge/forms/incident-and-restore/): A timestamped record of an interruption or restore test, what was affected, what was done, and what changes next.
 - [Intake](https://neon1.tech/knowledge/forms/intake/): The first record of a possible project: the problem, who's involved, and whether it's a fit.
 - [Metric record](https://neon1.tech/knowledge/forms/metric-record/): The exact definition of one measure: what counts, the formula, the source, the baseline, and the target.
-- [Publication permission record](https://neon1.tech/knowledge/forms/publication-permission/): Your specific permission before anything about your project is published.
+- [Publication permission](https://neon1.tech/knowledge/forms/publication-permission/): Your permission for exactly what neon1 may publish about your work.
 - [Release and handover record](https://neon1.tech/knowledge/forms/release-and-handover/): The checklist that closes a project: acceptance, ownership, recovery, training, access removal, and follow-up.
 - [Service and recovery profile](https://neon1.tech/knowledge/forms/service-and-recovery-profile/): What a running service must do, how it's measured, who supports it, and how it comes back after a failure.
 - [Tool and architecture decision](https://neon1.tech/knowledge/forms/tool-decision/): A short record of a technology choice: the problem, the options, the evidence, the cost, and the way out.

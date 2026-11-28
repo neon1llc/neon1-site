@@ -216,7 +216,7 @@ test("the listed queries return documents from the built corpus", { skip: !exist
   const prepared = prepare(JSON.parse(readFileSync(join(site, "knowledge", "search-index.json"), "utf8")))
   const expect = {
     passkey: "faq-1neon-help", authenticator: "faq-1neon-help", mfa: "company-glossary", wifi: "guides-password-manager-for-family",
-    "wi-fi": "guides-password-manager-for-family", "two factor": "case-security-for-non-security-people", "two-factor": "case-security-for-non-security-people",
+    "wi-fi": "guides-password-manager-for-family", "two factor": "guides-use-case-security-awareness", "two-factor": "guides-use-case-security-awareness",
     phishing: "guides-use-case-security-awareness", ransomware: "guides-backups-you-can-trust",
   }
   for (const [q, id] of Object.entries(expect)) {
