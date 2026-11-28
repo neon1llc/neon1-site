@@ -64,7 +64,7 @@ const withoutQuotes = (html) => html.replace(/(<p>[^<]*client's words:<\/p>)?<bl
 const confirmed = (v) => typeof v === "string" && v.trim() !== "" && v.trim() !== "TBD"
 const roleLine = (d) => {
   // Client work assumes neon1, so a neon1 or subcontracted engagement's label already says the role (Pradeep, 2026-11-15)
-  const role = d.kind === "neon1" || d.kind === "partner" ? null : d.role
+  const role = d.kind === "neon1" || d.kind === "partner" || d.kind === "community" ? null : d.role
   const facts = [role, d.when].filter(confirmed).join(", ")
   if (!d.kind_label) return facts
   return confirmed(role) ? `${d.kind_label}: ${facts}` : [d.kind_label, facts].filter(Boolean).join(", ")
